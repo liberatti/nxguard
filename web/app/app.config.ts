@@ -13,8 +13,9 @@ import { provideHighlightOptions } from 'ngx-highlightjs';
 export const REST_API_URL = new InjectionToken<string>('REST_API_URL');
 export const API_DATA_FORMAT = new InjectionToken<string>('API_DATA_FORMAT');
 
-export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
-  return new TranslateHttpLoader(); 
+
+  export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
+  return new TranslateHttpLoader(http, './assets/i18n/', '.json'); 
 }
 
 export const appConfig: ApplicationConfig = {
@@ -29,6 +30,7 @@ export const appConfig: ApplicationConfig = {
     provideMomentDateAdapter(undefined, {useUtc: true}),
     { provide: REST_API_URL, useValue: environment.apiUrl },
     { provide: API_DATA_FORMAT, useValue: environment.apiDateFormat},
+
     provideRouter(routes),
     provideAnimationsAsync(),
     provideHttpClient(

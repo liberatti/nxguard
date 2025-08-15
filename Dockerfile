@@ -64,10 +64,10 @@ COPY --from=frontend /app/web/dist/index.html /opt/nxguard/admin/templates/
 WORKDIR /opt/nxguard/admin
 
 COPY requirements.txt /opt/nxguard/admin/
-COPY *.py /opt/nxguard/admin/
 RUN pip3.12 install -r /opt/nxguard/admin/requirements.txt
 
-COPY api /opt/nxguard/admin
+COPY *.py /opt/nxguard/admin/
+COPY api /opt/nxguard/admin/api
 COPY config /opt/nxguard/admin/config
 COPY web/assets/swagger-ui /opt/nxguard/admin/static/swagger-ui
 COPY openapi.yml /opt/nxguard/admin/static/swagger-ui/

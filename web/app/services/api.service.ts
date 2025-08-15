@@ -4,9 +4,7 @@ import {  Observable } from 'rxjs';
 import { APIOperations, Page, PageMeta } from '../models/shared';
 import { REST_API_URL } from '../app.config';
 
-@Injectable({
-    providedIn: 'root'
-})
+
 export abstract class APIService<T, ID> implements APIOperations<T, ID> {
     protected readonly END_POINT: string;
     protected httpClient: HttpClient;

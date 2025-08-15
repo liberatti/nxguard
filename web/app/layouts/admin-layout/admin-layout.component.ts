@@ -185,7 +185,12 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
         moment.locale(this.config.locale);
 
         this.changeDetectorRef.detectChanges();
-        this.socket = io(this.injector.get(REST_API_URL), {
+        const apiUrl = this.injector.get(REST_API_URL);
+        if (!apiUrl) {
+            console.error('REST_API_URL not found in injector');
+            return;
+        }
+        this.socket = io(apiUrl, {
             reconnection: true,
             reconnectionAttempts: 5,
             reconnectionDelay: 10000,

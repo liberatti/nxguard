@@ -15,11 +15,15 @@ export class FormaterService {
     private config;
     protected DEFAULT_API_DATA_FORMAT: string;
 
-    constructor(private injector: Injector,
-                private localstorage: LocalStorageService
+    constructor(private injector: Injector
     ) {
         this.config = this.localstorage.get("ui_config");
         this.DEFAULT_API_DATA_FORMAT = injector.get(API_DATA_FORMAT)
+    }
+
+    // Lazy injection method for LocalStorageService
+    private get localstorage(): LocalStorageService {
+        return this.injector.get(LocalStorageService);
     }
 
 

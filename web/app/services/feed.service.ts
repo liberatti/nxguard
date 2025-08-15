@@ -9,9 +9,13 @@ import {LocalStorageService} from "./localstorage.service";
 export class FeedService extends APIService<Feed, string> {
 
     constructor(
-        protected override injector: Injector,
-        private localStorage: LocalStorageService
+        protected override injector: Injector
     ) {
         super(injector, 'feed')
+    }
+
+    // Lazy injection method for LocalStorageService
+    private get localStorage(): LocalStorageService {
+        return this.injector.get(LocalStorageService);
     }
 }

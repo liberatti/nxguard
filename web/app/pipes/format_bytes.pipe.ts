@@ -2,7 +2,8 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { FormaterService } from '../services/formater.service';
 
 @Pipe({
-  name: 'byteFormat',standalone: true
+  name: 'byteFormat',
+  standalone: true
 })
 export class ByteFormatPipe implements PipeTransform {
   constructor(private formater: FormaterService) { }

@@ -2,7 +2,8 @@ import { Pipe, PipeTransform } from '@angular/core';
 import { FormaterService } from '../services/formater.service';
 
 @Pipe({
-    name: 'dateFormat',standalone: true,
+    name: 'dateFormat',
+    standalone: true
 })
 export class DateFormatPipe implements PipeTransform {
     constructor(private formater: FormaterService) { }

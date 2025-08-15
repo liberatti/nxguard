@@ -15,12 +15,16 @@ export class TransactionService extends APIService<TransactionLog, number> {
     private config;
     protected _API_DATA_FORMAT :string;
     constructor(
-        protected override injector: Injector,
-        private localStorage: LocalStorageService,
+        protected override injector: Injector
     ) {
         super(injector, 'trn')
         this._API_DATA_FORMAT = injector.get(API_DATA_FORMAT)
         this.config = this.localStorage.get("ui_config");
+    }
+
+    // Lazy injection method for LocalStorageService
+    private get localStorage(): LocalStorageService {
+        return this.injector.get(LocalStorageService);
     }
 
     getTpm(filter: TransactionFilter): Observable<any> {
