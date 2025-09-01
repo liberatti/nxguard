@@ -1,9 +1,8 @@
 import ipaddress
 import socket
-from typing import Dict, List, Optional, Tuple, Union
+from typing import List, Optional
 
-from api.common_utils import logger
-
+from api.core.middleware.logging import logger
 
 class NetworkTool:
     """Network utility class for handling IP addresses and network operations.

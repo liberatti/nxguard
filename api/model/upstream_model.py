@@ -1,12 +1,13 @@
 from enum import Enum
-from typing import Dict, Any, List, Optional, Union
+from typing import Dict, Any, List
 from bson import ObjectId
 from marshmallow import EXCLUDE, Schema, fields
 from datetime import datetime
-from api.common_utils import logger
-from api.model.mongo_base_model import MongoDAO
-from config import DATETIME_FMT
 
+from api.core.middleware.logging import logger
+from api.core.repository.mongo import MongoDAO
+
+from config import DATETIME_FMT
 
 class Protocol(Enum):
     """

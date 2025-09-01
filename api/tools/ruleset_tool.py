@@ -1,9 +1,9 @@
 import json
 import re
-
 from marshmallow import ValidationError
 
-from api.common_utils import logger
+from api.core.middleware.logging import logger
+
 from api.model.seclang_model import (
     SecAction,
     SecBaseSchema,
@@ -12,7 +12,6 @@ from api.model.seclang_model import (
     SecRule,
     DataObjectSchema,
 )
-
 
 # noinspection PyMethodMayBeStatic,PyListCreation
 class RuleSetParser:

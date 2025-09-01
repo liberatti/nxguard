@@ -1,15 +1,21 @@
 import json
-import pickle
-from typing import Any, Dict, List, Optional, Union
-from datetime import datetime
+from typing import Any, Dict, Optional, Union
 
 from bson import ObjectId
-from marshmallow import Schema, fields
+from marshmallow import EXCLUDE, Schema, fields
+import pymongo
 from pymongo.errors import PyMongoError
 
-from api.common_utils import logger, config_db
-from config import MONGO_DB
+from api.core.middleware.logging import logger
+import config 
 
+class PageMetaSchema(Schema):
+    class Meta:
+        unknown = EXCLUDE
+    
+    total_elements = fields.Integer()
+    page = fields.Integer()
+    per_page = fields.Integer()
 
 class MongoDAO:
     """
@@ -34,22 +40,57 @@ class MongoDAO:
             collection_name (str): MongoDB collection name
             schema (Optional[Schema]): Marshmallow schema for validation
         """
-        self.__DB_NAME__ = MONGO_DB
-        self.database = getattr(config_db, self.__DB_NAME__)
+        self.__DB_NAME__ = config.MONGO_DB
         self.collection_name = collection_name
-        self.collection = self.database[collection_name]
+        self.client = None
         if schema:
             page_class = type(
                 "pagination",
                 (Schema,),
                 {
-                    "metadata": fields.Nested("PageMetaSchema", many=False),
+                    "metadata": fields.Nested(PageMetaSchema, many=False),
                     "data": fields.Nested(schema, many=True),
                 },
             )
             self.pageSchema = page_class()
             self.schema = schema()
+        self.connect()
 
+    def connect(self) -> None:
+        """Establish connection to MongoDB."""
+        if not self.client:
+            self.client = pymongo.MongoClient(
+                config.MONGO_URI,
+                maxPoolSize=10,
+                minPoolSize=1,
+                maxIdleTimeMS=10000
+            )
+            self.collection = self.client[self.__DB_NAME__][self.collection_name]
+
+    def is_connected(self) -> bool:
+        """Check if the connection to MongoDB is established and credentials are valid."""
+        if self.client is None:
+            return False
+        try:
+            self.client.admin.command('ping')
+            return True
+        except Exception:
+            return False
+
+    def close(self) -> None:
+        """Close the connection to MongoDB."""
+        if self.client:
+            self.client.close()
+            self.client = None
+
+    def __enter__(self):
+        """Context manager entry."""
+        self.connect()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """Context manager exit."""
+        self.close()
 
     def json_load(self, json_data):
         if self.schema:
@@ -207,19 +248,3 @@ class MongoDAO:
     def delete_all(self):
         dr = self.collection.delete_many({})
         return dr.deleted_count > 0
-
-    def data_export(self, folder):
-        dset = list(self.collection.find())
-        logger.info(f"Export {len(dset)} to {folder}/{self.collection_name}.data")
-        with open(f"{folder}/{self.collection_name}.data", "wb") as f:
-            pickle.dump(dset, f)
-
-    def data_import(self, folder):
-        with open(f"{folder}/{self.collection_name}.data", "rb") as f:
-            dset = pickle.load(f)
-            self.collection.delete_many({})
-            if len(dset) > 0:
-                logger.info(
-                    f"Import {len(dset)} to {folder}/{self.collection_name}.data"
-                )
-                self.collection.insert_many(dset)

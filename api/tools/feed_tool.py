@@ -7,13 +7,14 @@ import tarfile
 import traceback
 from datetime import datetime, timedelta
 from zipfile import ZipFile
-
 import geoip2.database
 import requests
 from bson import ObjectId
 from marshmallow import ValidationError
 
-from api.common_utils import logger, replace_tz
+from api.core.middleware.logging import logger
+
+from api.common_utils import replace_tz
 from api.model.config_model import ConfigDao
 from api.model.feed_model import FeedDao
 from api.model.geoip_model import GeoIpDao

@@ -1,17 +1,24 @@
 import traceback
 import bcrypt
-from typing import Dict, List, Optional, Union
-
+from typing import Dict
 from flask import Blueprint, request, Response
 from marshmallow import ValidationError
 
-from api.common_utils import (
-    ResponseBuilder,
+from api.core.controllers.base_controller import (
+    response_data,
+    response_error_parse,
+    response_error_500,
+    response_error_401,
+    has_any_authority
+)
+
+from api.core.middleware.jwt import (
     jwt_decode,
     jwt_create_access_token,
     jwt_create_refresh_token,
     jwt_get_refresh
 )
+
 from api.model.oauth_model import OIDCToken, UserDao
 from config import JWT_EXPIRE
 
@@ -26,7 +33,7 @@ def forbidden() -> Response:
     Returns:
         Response: 401 Unauthorized error response
     """
-    return ResponseBuilder.error_401()
+    return response_error_401()
 
 
 @routes.route("/token", methods=["GET"])
@@ -43,7 +50,7 @@ def refresh_token() -> Response:
         user_dao = UserDao()
         user = user_dao.get_by_id(payload['sub'])
         if not user:
-            return ResponseBuilder.error_500(msg=f"Authorization failed for {payload['sub']}")
+            return response_error_500(msg=f"Authorization failed for {payload['sub']}")
             
         return {
             "access_token": jwt_create_access_token(user["_id"], authorities=[user["role"]], profile=user),
@@ -51,7 +58,7 @@ def refresh_token() -> Response:
             "token_type": 'bearer'
         }
     except Exception as e:
-        return ResponseBuilder.error_500(msg=f"Authorization failed for {r_token}",details=traceback.format_exc())
+        return response_error_500(msg=f"Authorization failed for {r_token}",details=traceback.format_exc())
 
 
 def _create_oidc_token(user: Dict) -> Dict:
@@ -91,8 +98,8 @@ def login() -> Response:
             user_dict["password"].encode("utf8"),
             user["password"].encode("utf8")
         ):
-            return ResponseBuilder.data(_create_oidc_token(user), schema=OIDCToken())
+            return response_data(_create_oidc_token(user), schema=OIDCToken())
             
-        return ResponseBuilder.error_401("Sign in failed")
+        return response_error_401("Sign in failed")
     except ValidationError as err:
-        return ResponseBuilder.error_parse(err)
+        return response_error_parse(err)

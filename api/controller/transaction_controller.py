@@ -1,8 +1,14 @@
 from datetime import datetime
-
 from flask import Blueprint, request
 
-from api.common_utils import ResponseBuilder, has_any_authority, get_pagination, replace_tz
+from api.core.controllers.base_controller import (
+    response_data,
+    response_error_404,
+    get_pagination,
+    has_any_authority   
+)
+
+from api.common_utils import  replace_tz
 from api.model.transaction_model import TransactionDao
 from config import DATETIME_FMT
 
@@ -35,9 +41,9 @@ def st_tpm():
                 dtj["year"], dtj["month"], dtj["day"], dtj["hour"], dtj["minute"]
             ))
             s.update({"logtime": dt.strftime(DATETIME_FMT)})
-        return ResponseBuilder.data(tpm)
+        return response_data(tpm)
     else:
-        return ResponseBuilder.error_404()
+        return response_error_404()
 
 
 @routes.route("/<trn_id>", methods=["GET"])
@@ -47,9 +53,9 @@ def get(trn_id):
     trn = dao.get_by_id(trn_id)
 
     if trn:
-        return ResponseBuilder.data(trn, dao.schema)
+        return response_data(trn, dao.schema)
     else:
-        return ResponseBuilder.error_404()
+        return response_error_404()
 
 
 @routes.route("", methods=["POST"])
@@ -76,6 +82,6 @@ def search():
             filters=None,
         )
     if result["metadata"]["total_elements"] > 0:
-        return ResponseBuilder.data(result, dao.pageSchema)
+        return response_data(result, dao.pageSchema)
     else:
-        return ResponseBuilder.error_404()
+        return response_error_404()

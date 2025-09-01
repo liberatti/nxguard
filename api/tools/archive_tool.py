@@ -1,9 +1,10 @@
 import json
 from datetime import datetime, timedelta
-
 from elasticsearch import Elasticsearch
 
-from api.common_utils import logger, deep_date_str
+from api.core.middleware.logging import logger
+
+from api.common_utils import  deep_date_str
 from api.model.transaction_model import TransactionDao
 from api.tools.cluster_tool import ClusterTool
 from config import TZ

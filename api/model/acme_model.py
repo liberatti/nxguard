@@ -1,8 +1,8 @@
 from datetime import datetime
 from typing import Optional, Dict, Any
-from api.common_utils import logger
-from api.model.mongo_base_model import MongoDAO
 
+from api.core.middleware.logging import logger
+from api.core.repository.mongo import MongoDAO
 
 class ChallengeDao(MongoDAO):
     """

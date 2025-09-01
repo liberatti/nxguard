@@ -1,11 +1,17 @@
 import json
-
 from flask import Blueprint, request
 from marshmallow import ValidationError
 
+from api.core.controllers.base_controller import (
+    response_data,
+    response_error_404,
+    response_error_parse,
+    get_pagination,
+    has_any_authority
+)
+
 from api.model.service_model import ServiceDao
-from api.common_utils import ResponseBuilder, has_any_authority, get_pagination
-from api.common_utils import socketio
+from api.core.middleware.socket_manager import emit_event
 from api.model.config_model import ChangeDao
 from api.model.upstream_model import UpstreamDao
 
@@ -17,7 +23,7 @@ def after(response):
         dao = ChangeDao()
         if not dao.get_by_name("upstream"):
             dao.persist({"name": "upstream"})
-        socketio.emit('tracking_evt')
+        emit_event('tracking_evt')
     return response
 
 
@@ -30,9 +36,9 @@ def search():
         for e in result['data']:
             if 'content' in e:
                 e.pop('content')
-        return ResponseBuilder.data(result, dao.pageSchema)
+        return response_data(result, dao.pageSchema)
     else:
-        return ResponseBuilder.error_404()
+        return response_error_404()
 
 @routes.route("/<upstream_id>", methods=["GET"])
 @has_any_authority(authorities=["viewer", "superuser"])
@@ -42,9 +48,9 @@ def get(upstream_id):
     if upstream:
         if 'content' in upstream:
             upstream.pop('content')
-        return ResponseBuilder.data(upstream, dao.schema)
+        return response_data(upstream, dao.schema)
     else:
-        return ResponseBuilder.error_404()
+        return response_error_404()
 
 @routes.route("", methods=["POST"])
 @has_any_authority(authorities=["superuser"])
@@ -64,9 +70,9 @@ def save():
         dao.persist(upstream)
         if 'content' in upstream:
             upstream.pop("content")
-        return ResponseBuilder.data(upstream, dao.schema)
+        return response_data(upstream, dao.schema)
     except ValidationError as err:
-        return ResponseBuilder.error_parse(err)
+        return response_error_parse(err)
 
 @routes.route("/<upstream_id>", methods=["PUT"])
 @has_any_authority(authorities=["superuser"])
@@ -86,9 +92,9 @@ def update(upstream_id):
         dao.update_by_id(upstream_id, upstream)
         if 'content' in upstream:
             upstream.pop("content")
-        return ResponseBuilder.data(upstream, dao.schema)
+        return response_data(upstream, dao.schema)
     except ValidationError as err:
-        return ResponseBuilder.error_parse(err)
+        return response_error_parse(err)
 
 @routes.route("/<upstream_id>", methods=["DELETE"])
 @has_any_authority(authorities=["superuser"])
@@ -101,9 +107,9 @@ def delete(upstream_id):
             if "routes" in service:
                 for route in service["routes"]:
                     if upstream_id in route["upstream"]["_id"]:
-                        return ResponseBuilder.error_500("Upstream in use")
+                        return response_error_500("Upstream in use")
     r = dao.delete_by_id(upstream_id)
     if r:
-        return ResponseBuilder.data_removed(upstream_id)
+        return response_data_removed(upstream_id)
     else:
-        return ResponseBuilder.error_404()
+        return response_error_404()

@@ -1,10 +1,12 @@
-from typing import Dict, Any, List, Optional, Union
+from typing import Dict, Any, List, Optional
 from datetime import datetime, timedelta
 from bson import ObjectId
 from marshmallow import EXCLUDE, Schema, fields
 
-from api.common_utils import logger, replace_tz
-from api.model.mongo_base_model import MongoDAO
+from api.core.middleware.logging import logger
+from api.core.repository.mongo import MongoDAO
+
+from api.common_utils import replace_tz
 from api.model.sensor_model import SensorSchema, SensorDao
 from api.model.service_model import ServiceSchema, ServiceDao
 from api.model.upstream_model import UpstreamSchema, UpstreamDao

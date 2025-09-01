@@ -1,13 +1,13 @@
-from typing import Dict, Any, List, Optional, Union
+from typing import Dict, Any, List, Optional
 from bson import ObjectId
 from marshmallow import EXCLUDE, Schema, fields
 
-from api.common_utils import logger
+from api.core.middleware.logging import logger
+from api.core.repository.mongo import MongoDAO
+
 from api.model.certificate_model import CertificateDao, CertificateSchema
-from api.model.mongo_base_model import MongoDAO
 from api.model.sensor_model import SensorSchema, SensorDao
 from api.model.upstream_model import UpstreamDao, UpstreamSchema
-
 
 class HeaderSchema(Schema):
     """

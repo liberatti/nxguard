@@ -1,13 +1,13 @@
 from datetime import datetime
-from typing import Dict, Any, List, Optional, Union
+from typing import Dict, Any
 from bson import ObjectId
 from marshmallow import EXCLUDE, Schema, fields
 
-from api.common_utils import logger
-from api.model.feed_model import FeedSchema
-from api.model.mongo_base_model import MongoDAO
-from api.tools.network_tool import NetworkTool
+from api.core.middleware.logging import logger
+from api.core.repository.mongo import MongoDAO
 
+from api.model.feed_model import FeedSchema
+from api.tools.network_tool import NetworkTool
 
 class RBLSchema(Schema):
     """

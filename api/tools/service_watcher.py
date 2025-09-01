@@ -1,9 +1,10 @@
 import threading
 
-from api.common_utils import LogCache, logger
+from api.core.middleware.logging import logger
+
+from api.common_utils import LogCache
 from api.tools.log_tool import LogParserTool
 from config import APP_BASE
-
 
 class ServiceWatcher:
     def __init__(self, service):

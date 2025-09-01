@@ -1,8 +1,6 @@
 import unittest
-from ipaddress import IPv4Address, IPv6Address
 
 from api.tools.network_tool import NetworkTool
-
 
 class TestNetworkTool(unittest.TestCase):
     def setUp(self):

@@ -1,12 +1,12 @@
 from datetime import datetime, timedelta
 from typing import Dict, Any, List
-
 from marshmallow import EXCLUDE, Schema, fields
 
-from api.common_utils import replace_tz, logger
-from api.model.mongo_base_model import MongoDAO
-from config import DATETIME_FMT
+from api.core.middleware.logging import logger
+from api.core.repository.mongo import MongoDAO
 
+from api.common_utils import replace_tz
+from config import DATETIME_FMT
 
 class CertificateSchema(Schema):
     """

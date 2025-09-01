@@ -4,12 +4,15 @@ from typing import Dict, List, Optional, Union
 from flask import Blueprint, request, Response
 from marshmallow import ValidationError
 
-from api.common_utils import (
-    ResponseBuilder,
-    has_any_authority,
+from api.core.controllers.base_controller import (
+    response_data,
+    response_error_404,
+    response_error_parse,
     get_pagination,
-    socketio,
+    has_any_authority
 )
+
+from api.core.middleware.socket_manager import emit_event
 from api.model.config_model import ChangeDao
 from api.model.feed_model import FeedDao
 from api.model.rbl_model import RBLDao
@@ -33,7 +36,7 @@ def after(response: Response) -> Response:
         dao = ChangeDao()
         if not dao.get_by_name("feed"):
             dao.persist({"name": "feed"})
-        socketio.emit("tracking_evt")
+        emit_event("tracking_evt")
     return response
 
 
@@ -51,7 +54,7 @@ def get(feed_id: str) -> Response:
     """
     dao = FeedDao()
     feed = dao.get_by_id(feed_id)
-    return ResponseBuilder.data(feed, dao.schema) if feed else ResponseBuilder.error_404()
+    return response_data(feed, dao.schema) if feed else response_error_404()
 
 
 @routes.route("", methods=["POST"])
@@ -73,9 +76,9 @@ def save() -> Response:
         if "network_static" in feed_dict["type"]:
             __rebuild_feed(feed_dict)
             
-        return ResponseBuilder.data(feed, dao.schema)
+        return response_data(feed, dao.schema)
     except ValidationError as err:
-        return ResponseBuilder.error_parse(err)
+        return response_error_parse(err)
 
 
 @routes.route("", methods=["GET"])
@@ -89,7 +92,7 @@ def search() -> Response:
     """
     dao = FeedDao()
     result = dao.get_all(pagination=get_pagination())
-    return ResponseBuilder.data(result, dao.pageSchema) if result["metadata"]["total_elements"] > 0 else ResponseBuilder.error_404()
+    return response_data(result, dao.pageSchema) if result["metadata"]["total_elements"] > 0 else response_error_404()
 
 
 @routes.route("/<feed_id>", methods=["PUT"])
@@ -111,9 +114,9 @@ def update(feed_id: str) -> Response:
         if "network_static" in feed_dict["type"]:
             __rebuild_feed(feed_dict)
         dao.update_by_id(feed_id, feed_dict)
-        return ResponseBuilder.data(feed_dict, dao.schema)
+        return response_data(feed_dict, dao.schema)
     except ValidationError as err:
-        return ResponseBuilder.error_parse(err)
+        return response_error_parse(err)
 
 
 @routes.route("/<feed_id>", methods=["DELETE"])
@@ -130,7 +133,7 @@ def delete(feed_id: str) -> Response:
     """
     dao = FeedDao()
     result = dao.delete_by_id(feed_id)
-    return ResponseBuilder.data_removed(feed_id) if result else ResponseBuilder.error_404()
+    return response_data_removed(feed_id) if result else response_error_404()
 
 
 def __rebuild_feed(feed_dict: Dict) -> None:

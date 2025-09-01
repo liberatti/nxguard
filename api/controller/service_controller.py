@@ -1,13 +1,20 @@
 from flask import Blueprint, request, Response
 from marshmallow import ValidationError
 
-from api.common_utils import (
-    ResponseBuilder,
-    has_any_authority,
+from api.core.controllers.base_controller import (
+    response_data,
+    response_error_404,
+    response_error_parse,
+    response_ok,
+    response_error,
     get_pagination,
-    deep_merge,
-    socketio,
+    has_any_authority
 )
+
+from api.common_utils import (
+    deep_merge,
+)
+from api.core.middleware.socket_manager import emit_event
 from api.model.config_model import ChangeDao
 from api.model.service_model import ServiceDao
 
@@ -29,7 +36,7 @@ def after(response: Response) -> Response:
         dao = ChangeDao()
         if not dao.get_by_name("service"):
             dao.persist({"name": "service"})
-        socketio.emit('tracking_evt')
+        emit_event('tracking_evt')
     return response
 
 
@@ -47,7 +54,7 @@ def get(service_id: str) -> Response:
     """
     dao = ServiceDao()
     service = dao.get_by_id(service_id)
-    return ResponseBuilder.data(service, dao.schema) if service else ResponseBuilder.error_404()
+    return response_data(service, dao.schema) if service else response_error_404()
 
 
 @routes.route("", methods=["POST"])
@@ -65,13 +72,13 @@ def save() -> Response:
         service_dict = dao.json_load(request.json)
         sv_check = dao.get_by_sans(service_dict['sans'])
         if sv_check:
-            return ResponseBuilder.error('Domains in use', code=406)
+            return response_error('Domains in use', code=406)
 
         pk = dao.persist(service_dict)
         service = dao.get_by_id(pk)
-        return ResponseBuilder.data(service, dao.schema)
+        return response_data(service, dao.schema)
     except ValidationError as err:
-        return ResponseBuilder.error_parse(err)
+        return response_error_parse(err)
 
 
 @routes.route("", methods=["GET"])
@@ -85,7 +92,7 @@ def search() -> Response:
     """
     dao = ServiceDao()
     result = dao.get_all(pagination=get_pagination())
-    return ResponseBuilder.data(result, dao.pageSchema) if result["metadata"]["total_elements"] > 0 else ResponseBuilder.error_404()
+    return response_data(result, dao.pageSchema) if result["metadata"]["total_elements"] > 0 else response_error_404()
 
 
 @routes.route("/<service_id>", methods=["PATCH"])
@@ -105,9 +112,9 @@ def partial_update(service_id: str) -> Response:
         service_new = dao.json_load(request.json)
         service_old = dao.get_by_id(service_id)
         dao.update_by_id(service_id, deep_merge(service_old, service_new))
-        return ResponseBuilder.ok("Partially updated")
+        return response_ok("Partially updated")
     except ValidationError as err:
-        return ResponseBuilder.error_parse(err)
+        return response_error_parse(err)
 
 
 @routes.route("/<service_id>", methods=["PUT"])
@@ -128,12 +135,12 @@ def update(service_id: str) -> Response:
         service_dict = dao.json_load(request.json)
         sv_check = dao.get_by_sans(service_dict['sans'])
         if sv_check and service_id not in sv_check['_id']:
-            return ResponseBuilder.error('Domains in use', code=406)
+            return response_error('Domains in use', code=406)
             
         dao.update_by_id(service_id, service_dict)
-        return ResponseBuilder.data(dao.get_by_id(service_id), dao.schema)
+        return response_data(dao.get_by_id(service_id), dao.schema)
     except ValidationError as err:
-        return ResponseBuilder.error_parse(err)
+        return response_error_parse(err)
 
 
 @routes.route("/<service_id>", methods=["DELETE"])
@@ -150,4 +157,4 @@ def delete(service_id: str) -> Response:
     """
     dao = ServiceDao()
     result = dao.delete_by_id(service_id)
-    return ResponseBuilder.data_removed(service_id) if result else ResponseBuilder.error_404()
+    return response_data_removed(service_id) if result else response_error_404()

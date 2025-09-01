@@ -1,14 +1,16 @@
-from typing import Dict, List, Optional, Union
-
 from flask import Blueprint, request, Response
 from marshmallow import ValidationError
 
-from api.common_utils import (
-    ResponseBuilder,
-    has_any_authority,
+from api.core.controllers.base_controller import (
+    response_data,
+    response_error_404,
+    response_error_parse,
     get_pagination,
-    socketio,
+    has_any_authority
 )
+
+
+from api.core.middleware.socket_manager import emit_event
 from api.model.config_model import ChangeDao
 from api.model.sensor_model import SensorDao
 from api.tools.cluster_tool import ClusterTool
@@ -32,7 +34,7 @@ def after(response: Response) -> Response:
         dao = ChangeDao()
         if not dao.get_by_name("sensor"):
             dao.persist({"name": "sensor"})
-        socketio.emit("tracking_evt")
+        emit_event("tracking_evt")
     return response
 
 
@@ -50,7 +52,7 @@ def get(sensor_id: str) -> Response:
     """
     dao = SensorDao()
     sensor = dao.get_by_id(sensor_id)
-    return ResponseBuilder.data(sensor, schema=dao.schema) if sensor else ResponseBuilder.error_404()
+    return response_data(sensor, schema=dao.schema) if sensor else response_error_404()
 
 
 @routes.route("", methods=["POST"])
@@ -67,9 +69,9 @@ def save() -> Response:
         sensor_dict = dao.json_load(request.json)
         pk = dao.persist(sensor_dict)
         sensor = dao.get_by_id(pk)
-        return ResponseBuilder.data(sensor, dao.schema)
+        return response_data(sensor, dao.schema)
     except ValidationError as err:
-        return ResponseBuilder.error_parse(err)
+        return response_error_parse(err)
 
 
 @routes.route("", methods=["GET"])
@@ -83,7 +85,7 @@ def search() -> Response:
     """
     dao = SensorDao()
     result = dao.get_all(pagination=get_pagination())
-    return ResponseBuilder.data(result, dao.pageSchema) if result["metadata"]["total_elements"] > 0 else ResponseBuilder.error_404()
+    return response_data(result, dao.pageSchema) if result["metadata"]["total_elements"] > 0 else response_error_404()
 
 
 @routes.route("/<sensor_id>", methods=["PUT"])
@@ -102,9 +104,9 @@ def update(sensor_id: str) -> Response:
     try:
         sensor_dict = dao.json_load(request.json)
         result = dao.update_by_id(sensor_id, sensor_dict)
-        return ResponseBuilder.data(result, schema=dao.schema)
+        return response_data(result, schema=dao.schema)
     except ValidationError as err:
-        return ResponseBuilder.error_parse(err)
+        return response_error_parse(err)
 
 
 @routes.route("/<sensor_id>", methods=["DELETE"])
@@ -121,7 +123,7 @@ def delete(sensor_id: str) -> Response:
     """
     dao = SensorDao()
     result = dao.delete_by_id(sensor_id)
-    return ResponseBuilder.data_removed(sensor_id) if result else ResponseBuilder.error_404()
+    return response_data_removed(sensor_id) if result else response_error_404()
 
 
 @routes.route("/<sensor_id>/check/<ipaddr>", methods=["GET"])
@@ -137,8 +139,8 @@ def geoip_info(ipaddr: str) -> Response:
         Response: JSON response containing GeoIP information or error response
     """
     if not ClusterTool.CONFIG:
-        return ResponseBuilder.error_500("System not ready")
+        return response_error_500("System not ready")
     
     geo = SecurityFeedTool.geo_info(ipaddr)
     ip_info = {"country": geo["country"]}
-    return ResponseBuilder.data(ip_info)
+    return response_data(ip_info)

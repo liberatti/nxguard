@@ -1,12 +1,15 @@
 import os
 import pytz
-from distutils.util import strtobool
 
-APP_VERSION = "v1.0.4"
+APP_CONTEXT = os.getenv('APP_CONTEXT',"/")
+APP_VERSION = os.getenv('APP_VERSION',"v1.0.4")
+APP_PUBLIC_URL = os.getenv('APP_PUBLIC_URL',f"http://localhost:4200{APP_CONTEXT}")
+API_HEADERS = {"User-Agent": f"NXGuard/{APP_VERSION}"}
+
 APP_BASE = "/opt/nxguard"
-
 ENGINE_BASE = f"{APP_BASE}/nginx"
 ENGINE_VERSION = "1.27.1"
+
 DATETIME_FMT = "%Y-%m-%dT%H:%M:%S.%fZ"
 TZ = pytz.timezone("UTC")
 
@@ -32,3 +35,27 @@ JWT_AUD = "nxguard"
 CLUSTER_ENDPOINT = os.environ.get("CLUSTER_ENDPOINT")
 NODE_ROLE = os.environ.get("NODE_ROLE", "main")
 NODE_KEY = os.environ.get("NODE_KEY", "DEV")
+
+CORS = {
+    r"/*": {
+        "origins": "*",
+        "methods": ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+        "allow_headers": [
+            "Content-Type", 
+            "Authorization", 
+            "X-Requested-With",
+            "Account-ID",
+            "Refresh-Token",
+            "pragma"
+        ],
+        "expose_headers": [
+            "Content-Type", 
+            "Authorization",
+            "X-Total-Count",
+            "X-Page",
+            "X-Size"
+        ],
+        "supports_credentials": True,
+        "max_age": 3600
+    }
+}

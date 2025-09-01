@@ -1,12 +1,14 @@
-from typing import Dict, List, Optional, Union
-
 from flask import Blueprint, Response
 
-from api.common_utils import ResponseBuilder, has_any_authority
+from api.core.controllers.base_controller import (
+    response_data,
+    response_error_404,
+    has_any_authority
+)
+
 from api.model.seclang_model import RuleDao
 
 routes = Blueprint("rulesec", __name__)
-
 
 @routes.route("/by_code/<rule_code>", methods=["GET"])
 @has_any_authority(authorities=["viewer", "superuser"])
@@ -22,4 +24,4 @@ def get(rule_code: str) -> Response:
     """
     dao = RuleDao()
     vo = dao.get_by_code(rule_code)
-    return ResponseBuilder.data(vo) if vo else ResponseBuilder.error_404()
+    return response_data(vo) if vo else response_error_404()

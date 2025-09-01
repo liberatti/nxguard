@@ -1,16 +1,21 @@
 from datetime import datetime
-from typing import Dict, List, Optional, Union
-
 from flask import Blueprint, request, Response
 from marshmallow import ValidationError
 
-from api.common_utils import (
-    ResponseBuilder,
-    deep_merge,
-    has_any_authority,
+from api.core.controllers.base_controller import (
+    response_data,
+    response_error_404,
+    response_error_parse,
+    response_ok,
+    response_error,
     get_pagination,
-    replace_tz,
-    socketio
+    has_any_authority
+)
+from api.core.middleware.socket_manager import emit_event
+
+from api.common_utils import (
+    deep_merge,
+    replace_tz
 )
 from api.model.certificate_model import CertificateDao
 from api.model.config_model import ChangeDao
@@ -35,7 +40,7 @@ def after(response: Response) -> Response:
         dao = ChangeDao()
         if not dao.get_by_name("certificate"):
             dao.persist({"name": "certificate"})
-        socketio.emit('tracking_evt')
+        emit_event('tracking_evt')
     return response
 
 @routes.route("/<certificate_id>", methods=["GET"])
@@ -52,7 +57,7 @@ def get(certificate_id: str) -> Response:
     """
     dao = CertificateDao()
     certificate = dao.get_by_id(certificate_id)
-    return ResponseBuilder.data(certificate, schema=dao.schema) if certificate else ResponseBuilder.error_404()
+    return response_data(certificate, schema=dao.schema) if certificate else response_error_404()
 
 @routes.route("", methods=["GET"])
 @has_any_authority(authorities=["viewer", "superuser"])
@@ -70,8 +75,8 @@ def search() -> Response:
         renew_date = replace_tz(datetime.now())
         for cert in result["data"]:
             cert["status"] = "EXPIRED" if cert["force_renew"] or replace_tz(cert["not_after"]) < renew_date else "VALID"
-        return ResponseBuilder.data(result, schema=dao.pageSchema)
-    return ResponseBuilder.error_404()
+        return response_data(result, schema=dao.pageSchema)
+    return response_error_404()
 
 @routes.route("", methods=["POST"])
 @has_any_authority(authorities=["superuser"])
@@ -119,9 +124,9 @@ def save() -> Response:
             pk = dao.persist(crt)
 
         certificate = dao.get_by_id(pk)
-        return ResponseBuilder.data(certificate, schema=dao.schema)
+        return response_data(certificate, schema=dao.schema)
     except ValidationError as err:
-        return ResponseBuilder.error_parse(err)
+        return response_error_parse(err)
 
 @routes.route("/<certificate_id>", methods=["PUT"])
 @has_any_authority(authorities=["superuser"])
@@ -166,9 +171,9 @@ def update(certificate_id: str) -> Response:
             }
             dao.update_by_id(certificate_id, crt)
         
-        return ResponseBuilder.data(dto, schema=dao.schema)
+        return response_data(dto, schema=dao.schema)
     except ValidationError as err:
-        return ResponseBuilder.error_parse(err)
+        return response_error_parse(err)
 
 @routes.route("/<certificate_id>", methods=["PATCH"])
 @has_any_authority(authorities=["superuser"])
@@ -187,11 +192,11 @@ def partial_update(certificate_id: str) -> Response:
         c_new = dao.json_load(request.json)
         c_old = dao.get_by_id(certificate_id)
         dao.update_by_id(certificate_id, deep_merge(c_old, c_new))
-        return ResponseBuilder.ok("Certificate partially updated")
+        return response_ok("Certificate partially updated")
     except ValidationError as err:
-        return ResponseBuilder.error_parse(err)
+        return response_error_parse(err)
     except Exception as err:
-        return ResponseBuilder.error(msg=str(err))
+        return response_error(msg=str(err))
 
 @routes.route("/<certificate_id>", methods=["DELETE"])
 @has_any_authority(authorities=["superuser"])
@@ -213,6 +218,6 @@ def delete(certificate_id: str) -> Response:
     if "data" in service_list:
         for service in service_list["data"]:
                 if certificate_id in service["certificate"]["_id"]:
-                    return ResponseBuilder.error_500("Certificate in use")
+                    return response_error_500("Certificate in use")
     result = dao.delete_by_id(certificate_id)
-    return ResponseBuilder.data_removed(certificate_id) if result else ResponseBuilder.error_404()
+    return response_data_removed(certificate_id) if result else response_error_404()

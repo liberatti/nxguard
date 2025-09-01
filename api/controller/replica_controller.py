@@ -1,11 +1,10 @@
-from typing import Dict, List, Optional, Union
-
 from flask import Blueprint, Response
 
-from api.common_utils import (
-    ResponseBuilder,
+from api.core.controllers.base_controller import (
+    response_data,
     has_any_authority
 )
+
 from api.tools.cluster_tool import ClusterTool
 
 routes = Blueprint("replica", __name__)
@@ -21,8 +20,8 @@ def scn() -> Response:
         Response: JSON response containing the SCN or error response
     """
     if not ClusterTool.CONFIG:
-        return ResponseBuilder.error_500("System not ready")
-    return ResponseBuilder.data({'scn': ClusterTool.CONFIG['scn']})
+        return response_error_500("System not ready")
+    return response_data({'scn': ClusterTool.CONFIG['scn']})
 
 
 @routes.route("/config", methods=["GET"])
@@ -34,4 +33,4 @@ def config() -> Response:
     Returns:
         Response: JSON response containing the cluster configuration
     """
-    return ResponseBuilder.data(ClusterTool.CONFIG)
+    return response_data(ClusterTool.CONFIG)

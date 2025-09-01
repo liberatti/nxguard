@@ -1,8 +1,11 @@
-from typing import Dict, List, Optional, Union
-
 from flask import Blueprint, request, Response
 
-from api.common_utils import ResponseBuilder, has_any_authority
+from api.core.controllers.base_controller import (
+    response_error_404,
+    has_any_authority
+)
+
+
 from api.model.seclang_model import RuleCategoryDao
 from api.tools.ruleset_tool import RuleSetParser
 
@@ -24,7 +27,7 @@ def get(cat_id: str) -> Response:
     dao = RuleCategoryDao()
     cat = dao.get_by_id(cat_id)
     if not cat:
-        return ResponseBuilder.error_404()
+        return response_error_404()
     return Response(
         RuleSetParser.dumps(cat),
         status=201,
@@ -47,7 +50,7 @@ def get_by_name(cat_name: str) -> Response:
     dao = RuleCategoryDao()
     cat = dao.get_by_name(cat_name)
     if not cat:
-        return ResponseBuilder.error_404()
+        return response_error_404()
     return Response(
         RuleSetParser.dumps(cat),
         status=201,
@@ -73,4 +76,4 @@ def search() -> Response:
         result = dao.get_by_name_and_phases(name, phases)
     else:
         result = dao.get_by_phases(phases)
-    return ResponseBuilder.data_list(result, dao.schema)
+    return response_data_list(result, dao.schema)

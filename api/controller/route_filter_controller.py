@@ -1,14 +1,15 @@
-from typing import Dict, List, Optional, Union
-
 from flask import Blueprint, request, Response
 from marshmallow import ValidationError
 
-from api.common_utils import (
-    ResponseBuilder,
-    has_any_authority,
+from api.core.controllers.base_controller import (
+    response_data,
+    response_error_404,
+    response_error_parse,
     get_pagination,
-    socketio,
+    has_any_authority
 )
+
+from api.core.middleware.socket_manager import emit_event
 from api.model.config_model import ChangeDao
 from api.model.service_model import RouteFilterDao
 
@@ -30,7 +31,7 @@ def after(response: Response) -> Response:
         dao = ChangeDao()
         if not dao.get_by_name("route_filter"):
             dao.persist({"name": "route_filter"})
-        socketio.emit('tracking_evt')
+        emit_event('tracking_evt')
     return response
 
 
@@ -45,7 +46,7 @@ def search() -> Response:
     """
     dao = RouteFilterDao()
     result = dao.get_all(pagination=get_pagination())
-    return ResponseBuilder.data(result, dao.pageSchema) if result["metadata"]["total_elements"] > 0 else ResponseBuilder.error_404()
+    return response_data(result, dao.pageSchema) if result["metadata"]["total_elements"] > 0 else response_error_404()
 
 
 @routes.route("/<route_filter_id>", methods=["GET"])
@@ -62,7 +63,7 @@ def get(route_filter_id: str) -> Response:
     """
     dao = RouteFilterDao()
     route_filter = dao.get_by_id(route_filter_id)
-    return ResponseBuilder.data(route_filter, dao.schema) if route_filter else ResponseBuilder.error_404()
+    return response_data(route_filter, dao.schema) if route_filter else response_error_404()
 
 
 @routes.route("", methods=["POST"])
@@ -78,9 +79,9 @@ def save() -> Response:
     try:
         route_filter = dao.json_load(request.json)
         dao.persist(route_filter)
-        return ResponseBuilder.data(route_filter, dao.schema)
+        return response_data(route_filter, dao.schema)
     except ValidationError as err:
-        return ResponseBuilder.error_parse(err)
+        return response_error_parse(err)
 
 
 @routes.route("/<route_filter_id>", methods=["PUT"])
@@ -99,9 +100,9 @@ def update(route_filter_id: str) -> Response:
     try:
         route_filter = dao.json_load(request.json)
         dao.update_by_id(route_filter_id, route_filter)
-        return ResponseBuilder.data(route_filter, dao.schema)
+        return response_data(route_filter, dao.schema)
     except ValidationError as err:
-        return ResponseBuilder.error_parse(err)
+        return response_error_parse(err)
 
 
 @routes.route("/<route_filter_id>", methods=["DELETE"])
@@ -118,4 +119,4 @@ def delete(route_filter_id: str) -> Response:
     """
     dao = RouteFilterDao()
     result = dao.delete_by_id(route_filter_id)
-    return ResponseBuilder.data_removed(route_filter_id) if result else ResponseBuilder.error_404()
+    return response_data_removed(route_filter_id) if result else response_error_404()

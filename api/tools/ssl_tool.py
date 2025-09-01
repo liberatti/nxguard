@@ -3,7 +3,6 @@ import time
 from collections import OrderedDict
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Union
-
 import josepy as jose
 from acme import challenges, client, crypto_util, messages
 from cryptography import x509
@@ -13,11 +12,12 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives.hashes import SHA256
 from cryptography.x509.oid import NameOID
 
-from api.common_utils import logger, replace_tz
+from api.core.middleware.logging import logger
+
+from api.common_utils import  replace_tz
 from api.model.acme_model import ChallengeDao
 from api.model.config_model import ConfigDao
 from config import APP_BASE, KEY_SIZE, TZ
-
 
 class SSLTool:
     """SSL/TLS certificate management utility class.

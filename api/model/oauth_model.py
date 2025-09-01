@@ -1,10 +1,8 @@
 from typing import Dict, Any, Optional
-
 from marshmallow import EXCLUDE, Schema, fields
 
-from api.common_utils import logger
-from api.model.mongo_base_model import MongoDAO
-
+from api.core.middleware.logging import logger
+from api.core.repository.mongo import MongoDAO
 
 class OIDCToken(Schema):
     """

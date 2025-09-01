@@ -2,11 +2,20 @@ import bcrypt
 from flask import Blueprint, request
 from marshmallow import ValidationError
 
-from api.common_utils import ResponseBuilder, has_any_authority, jwt_decode, jwt_get, get_pagination
+from api.core.controllers.base_controller import (
+    response_data,
+    response_error_404,
+    response_error_parse,
+    get_pagination,
+    has_any_authority
+)
+from api.core.middleware.jwt import (
+    jwt_decode,
+    jwt_get
+)
 from api.model.oauth_model import UserDao
 
 routes = Blueprint("user", __name__)
-
 
 @routes.route("/<user_id>", methods=["GET"])
 @has_any_authority(authorities=["viewer", "superuser"])
@@ -16,9 +25,9 @@ def get(user_id):
     if user:
         if "password" in user:
             user.pop("password")
-        return ResponseBuilder.data(user, dao.schema)
+        return response_data(user, dao.schema)
     else:
-        return ResponseBuilder.error_404()
+        return response_error_404()
 
 
 @routes.route("", methods=["POST"])
@@ -32,9 +41,9 @@ def save():
             vo.update({"password":hashed.decode("utf-8")})
         dao.persist(vo)
         vo.pop("password")
-        return ResponseBuilder.data(vo, dao.schema)
+        return response_data(vo, dao.schema)
     except ValidationError as err:
-        return ResponseBuilder.error_parse(err)
+        return response_error_parse(err)
 
 
 @routes.route("", methods=["GET"])
@@ -46,9 +55,9 @@ def search():
         for user in result['data']:
             if "password" in user:
                 user.pop("password")
-        return ResponseBuilder.data(result, dao.pageSchema)
+        return response_data(result, dao.pageSchema)
     else:
-        return ResponseBuilder.error_404()
+        return response_error_404()
 
 
 @routes.route("/<user_id>/account", methods=["PUT"])
@@ -64,11 +73,11 @@ def account_update(user_id):
                 hashed = bcrypt.hashpw(vo["password"].encode("utf8"), bcrypt.gensalt())
                 vo.update({"password": hashed.decode("utf-8")})
             result = dao.update_by_id(user_id, vo)
-            return ResponseBuilder.data(result, dao.schema)
+            return response_data(result, dao.schema)
         else:
-            return ResponseBuilder.error_403("Account update failed")
+            return response_error_403("Account update failed")
     except ValidationError as err:
-        return ResponseBuilder.error_parse(err)
+        return response_error_parse(err)
 
 
 @routes.route("/<user_id>", methods=["PUT"])
@@ -81,9 +90,9 @@ def update(user_id):
             hashed = bcrypt.hashpw(vo["password"].encode("utf8"), bcrypt.gensalt())
             vo.update({"password": hashed.decode("utf-8")})
         result = dao.update_by_id(user_id, vo)
-        return ResponseBuilder.data(result, dao.schema)
+        return response_data(result, dao.schema)
     except ValidationError as err:
-        return ResponseBuilder.error_parse(err)
+        return response_error_parse(err)
 
 
 @routes.route("/<user_id>", methods=["DELETE"])
@@ -92,6 +101,6 @@ def delete(user_id):
     dao = UserDao()
     r = dao.delete_by_id(user_id)
     if r:
-        return ResponseBuilder.data_removed(user_id)
+        return response_data_removed(user_id)
     else:
-        return ResponseBuilder.error_404()
+        return response_error_404()

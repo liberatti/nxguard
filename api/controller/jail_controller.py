@@ -1,14 +1,16 @@
-from typing import Dict, List, Optional, Union
-
 from flask import Blueprint, request, Response
 from marshmallow import ValidationError
 
-from api.common_utils import (
-    ResponseBuilder,
-    has_any_authority,
+from api.core.controllers.base_controller import (
+    response_data,
+    response_error_404,
+    response_error_parse,
+    response_ok,
     get_pagination,
-    socketio,
+    has_any_authority
 )
+
+from api.core.middleware.socket_manager import emit_event
 from api.model.config_model import ChangeDao
 from api.model.jail_model import JailDao
 
@@ -30,7 +32,7 @@ def after(response: Response) -> Response:
         dao = ChangeDao()
         if not dao.get_by_name("jail"):
             dao.persist({"name": "jail"})
-        socketio.emit("tracking_evt")
+        emit_event("tracking_evt")
     return response
 
 
@@ -48,7 +50,7 @@ def get(jail_id: str) -> Response:
     """
     dao = JailDao()
     jail = dao.get_by_id(jail_id)
-    return ResponseBuilder.data(jail, schema=dao.schema) if jail else ResponseBuilder.error_404()
+    return response_data(jail, schema=dao.schema) if jail else response_error_404()
 
 
 @routes.route("", methods=["POST"])
@@ -65,9 +67,9 @@ def save() -> Response:
         jail_dict = dao.json_load(request.json)
         pk = dao.persist(jail_dict)
         jail = dao.get_by_id(pk)
-        return ResponseBuilder.data(jail, schema=dao.schema)
+        return response_data(jail, schema=dao.schema)
     except ValidationError as err:
-        return ResponseBuilder.error_parse(err)
+        return response_error_parse(err)
 
 
 @routes.route("", methods=["GET"])
@@ -81,7 +83,7 @@ def search() -> Response:
     """
     dao = JailDao()
     result = dao.get_all(pagination=get_pagination())
-    return ResponseBuilder.data(result, schema=dao.pageSchema) if result["metadata"]["total_elements"] > 0 else ResponseBuilder.error_404()
+    return response_data(result, schema=dao.pageSchema) if result["metadata"]["total_elements"] > 0 else response_error_404()
 
 
 @routes.route("/<jail_id>", methods=["PUT"])
@@ -100,9 +102,9 @@ def update(jail_id: str) -> Response:
     try:
         jail_dict = dao.json_load(request.json)
         result = dao.update_by_id(jail_id, jail_dict)
-        return ResponseBuilder.data(result, dao.schema)
+        return response_data(result, dao.schema)
     except ValidationError as err:
-        return ResponseBuilder.error_parse(err)
+        return response_error_parse(err)
 
 
 @routes.route("/<jail_id>", methods=["DELETE"])
@@ -119,7 +121,7 @@ def delete(jail_id: str) -> Response:
     """
     dao = JailDao()
     result = dao.delete_by_id(jail_id)
-    return ResponseBuilder.data_removed(jail_id) if result else ResponseBuilder.error_404()
+    return response_data_removed(jail_id) if result else response_error_404()
 
 
 @routes.route("/<jail_id>/add/<addr>", methods=["PUT"])
@@ -140,9 +142,9 @@ def add_to_jail(jail_id: str, addr: str) -> Response:
         result = dao.get_by_id(jail_id)
         result["content"].append({"ipaddr": addr})
         dao.update_by_id(jail_id, result)
-        return ResponseBuilder.ok("ok")
+        return response_ok("ok")
     except ValidationError as err:
-        return ResponseBuilder.error_parse(err)
+        return response_error_parse(err)
 
 
 @routes.route("/<jail_id>/del/<addr>", methods=["PUT"])
@@ -163,6 +165,6 @@ def del_to_jail(jail_id: str, addr: str) -> Response:
         result = dao.get_by_id(jail_id)
         result["content"] = [content for content in result["content"] if addr not in content["ipaddr"]]
         dao.update_by_id(jail_id, result)
-        return ResponseBuilder.ok("ok")
+        return response_ok("ok")
     except ValidationError as err:
-        return ResponseBuilder.error_parse(err)
+        return response_error_parse(err)

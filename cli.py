@@ -2,19 +2,19 @@ import json
 import os
 import sys
 import traceback
-
 import bcrypt
 
-from config import MONGO_DB
-from api.common_utils import logger, gen_random_string,config_db
+from api.core.middleware.logging import logger
+
+from api.common_utils import gen_random_string,config_db
 from api.model.config_model import ConfigDao
 from api.model.feed_model import FeedDao
 from api.model.oauth_model import UserDao
 from api.tools.feed_tool import RuleSetTool, SecurityFeedTool
 from api.tools.ssl_tool import SSLTool
-from config import APP_BASE
+import config
 
-APP_CONFIG_DIR = os.path.join(APP_BASE, "admin/config")
+APP_CONFIG_DIR = os.path.join(config.APP_BASE, "admin/config")
 
 def update_schema():
     with open("config/mongo-schema.json", "r") as file:
@@ -28,7 +28,7 @@ def update_schema():
 
 def initialize_db():
     logger.info("Initialize DB")
-    config_db.drop_database(MONGO_DB)
+    config_db.drop_database(config.MONGO_DB)
     update_schema()
 
     config_dao = ConfigDao()

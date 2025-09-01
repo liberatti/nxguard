@@ -2,12 +2,15 @@ import os
 from flask import Blueprint, request, send_file, Response
 from marshmallow import ValidationError
 
-from api.common_utils import (
-    ResponseBuilder,
-    has_any_authority,
-    print_request,
-    socketio,
+from api.core.controllers.base_controller import (
+    response_data,
+    response_error_404,
+    response_error_parse,
+    response_ok,
+    has_any_authority
 )
+
+from api.core.middleware.socket_manager import emit_event
 from api.model.config_model import ChangeDao, ConfigDao
 from api.model.rbl_model import RBLDao
 from api.model.transaction_model import TransactionDao
@@ -34,7 +37,7 @@ def after(response: Response) -> Response:
         dao = ChangeDao()
         if not dao.get_by_name("config"):
             dao.persist({"name": "config"})
-        socketio.emit("tracking_evt")
+        emit_event("tracking_evt")
     return response
 
 
@@ -49,7 +52,7 @@ def restore() -> Response:
     """
     if "zipfile" not in request.files:
         print_request(request)
-        return ResponseBuilder.error_500("No file uploaded")
+        return response_error_500("No file uploaded")
 
     file = request.files["zipfile"]
     if file and file.filename.endswith(".zip"):
@@ -60,10 +63,10 @@ def restore() -> Response:
             dao = ChangeDao()
             if not dao.get_by_name("backup"):
                 dao.persist({"name": "backup"})
-            return ResponseBuilder.ok("ok")
+            return response_ok("ok")
         except Exception as e:
-            return ResponseBuilder.error_500("Failed processing restore", str(e))
-    return ResponseBuilder.error_500("Invalid file format")
+            return response_error_500("Failed processing restore", str(e))
+    return response_error_500("Invalid file format")
 
 
 @routes.route("/backup", methods=["GET"])
@@ -109,8 +112,8 @@ def get_node_status() -> Response:
                 "net_recv": telemetry[0]["net_recv"] if telemetry else 0,
                 "net_send": telemetry[0]["net_send"] if telemetry else 0
             })
-        return ResponseBuilder.data(result, dao.pageSchema)
-    return ResponseBuilder.error_404()
+        return response_data(result, dao.pageSchema)
+    return response_error_404()
 
 
 @routes.route("/config", methods=["GET"])
@@ -124,7 +127,7 @@ def get_config() -> Response:
     """
     dao = ConfigDao()
     conf = dao.get_active()
-    return ResponseBuilder.data(conf, dao.schema) if conf else ResponseBuilder.error_404()
+    return response_data(conf, dao.schema) if conf else response_error_404()
 
 
 @routes.route("/config", methods=["PUT"])
@@ -140,9 +143,9 @@ def save() -> Response:
     try:
         vo = dao.json_load(request.json)
         dao.update_by_id(vo["_id"], vo)
-        return ResponseBuilder.data(vo, dao.schema)
+        return response_data(vo, dao.schema)
     except ValidationError as err:
-        return ResponseBuilder.error_parse(err)
+        return response_error_parse(err)
 
 
 @routes.route("/health", methods=["GET"])
@@ -161,8 +164,8 @@ def health_check() -> Response:
         if result["metadata"]["total_elements"] > 0:
             st["apply_pendding"] = [x["name"] for x in result["data"]]
 
-        return ResponseBuilder.data(st, NodeStatusSchema())
-    return ResponseBuilder.data({}, NodeStatusSchema())
+        return response_data(st, NodeStatusSchema())
+    return response_data({}, NodeStatusSchema())
 
 @routes.route("/apply", methods=["GET"])
 @has_any_authority(authorities=["superuser"])
@@ -185,10 +188,10 @@ def apply() -> Response:
         if action_result["succeed"]:
             for change in changes["data"]:
                 dao.delete_by_id(change["_id"])
-            socketio.emit("tracking_aply")
-            return ResponseBuilder.data(action_result)
+            emit_event("tracking_aply")
+            return response_data(action_result)
     
-    return ResponseBuilder.error_500(action_result["message"])
+    return response_error_500(action_result["message"])
 
 
 @routes.route("/geoip_info/<ipaddr>", methods=["GET"])
@@ -204,10 +207,10 @@ def geoip_info(ipaddr: str) -> Response:
         Response: JSON response containing GeoIP information or error response
     """
     if not ClusterTool.CONFIG:
-        return ResponseBuilder.error_500("System not ready")
+        return response_error_500("System not ready")
     
     info = SecurityFeedTool.geo_info(ipaddr)
-    return ResponseBuilder.data(info)
+    return response_data(info)
 
 
 @routes.route("/rbl/blocked/<sensor_id>/<ipaddr>", methods=["GET"])
@@ -224,12 +227,12 @@ def rbl_status(ipaddr: str, sensor_id: str) -> Response:
         Response: JSON response containing RBL check results or error response
     """
     if not ClusterTool.CONFIG:
-        return ResponseBuilder.error_500("System not ready")
+        return response_error_500("System not ready")
     
     for sensor in ClusterTool.CONFIG["sensors"]:
         if sensor["_id"] == sensor_id:
             model = RBLDao()
             rbl_result = model.check_by_ip(ipaddr, sensor)
-            return ResponseBuilder.data(rbl_result)
+            return response_data(rbl_result)
     
-    return ResponseBuilder.error_500("Failed checking RBL")
+    return response_error_500("Failed checking RBL")

@@ -1,11 +1,10 @@
 from datetime import datetime
-from typing import Dict, Any, List, Optional, Union
+from typing import Dict, Any, List, Optional
 from bson import ObjectId
 from marshmallow import EXCLUDE, Schema, fields
 
-from api.common_utils import logger
-from api.model.mongo_base_model import MongoDAO
-
+from api.core.middleware.logging import logger
+from api.core.repository.mongo import MongoDAO
 
 class DataObjectSchema(Schema):
     """

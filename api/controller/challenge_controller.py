@@ -1,6 +1,9 @@
 from flask import Blueprint, make_response, Response
 
-from api.common_utils import ResponseBuilder
+from api.core.controllers.base_controller import (
+    response_error_404
+)
+
 from api.model.acme_model import ChallengeDao
 
 routes = Blueprint("acme", __name__)
@@ -23,4 +26,4 @@ def get_config(key: str) -> Response:
         response = make_response(result["content"], 200)
         response.mimetype = "text/plain"
         return response
-    return ResponseBuilder.error_404()
+    return response_error_404()

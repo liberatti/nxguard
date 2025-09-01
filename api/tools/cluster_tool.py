@@ -3,13 +3,13 @@ import pickle
 import socket
 import subprocess
 import traceback
-import time
 from datetime import datetime, timedelta
-
 import psutil
 import requests
 
-from api.common_utils import logger, get_server_id
+from api.core.middleware.logging import logger
+
+from api.common_utils import get_server_id
 from api.model.upstream_model import UpstreamDao, NodeStatusDao
 from api.tools.engine_tool import EngineManager
 from api.tools.network_tool import NetworkTool

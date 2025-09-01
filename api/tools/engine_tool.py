@@ -5,14 +5,13 @@ import pickle
 import time
 import traceback
 from collections import OrderedDict
-
 import requests
 from marshmallow import ValidationError
 
+from api.core.middleware.logging import logger
+
 from api.common_utils import (
-    gen_random_string,
     hash_dict,
-    logger,
     get_server_id,
     unpack_zip,
     clear_directory,

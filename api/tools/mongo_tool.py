@@ -1,17 +1,12 @@
 import os
 import shutil
 import zipfile
+import pickle
 
-from api.model.certificate_model import CertificateDao
-from api.model.feed_model import FeedDao
-from api.model.geoip_model import GeoIpDao
-from api.model.oauth_model import UserDao
-from api.model.seclang_model import RuleCategoryDao, RuleDao
-from api.model.sensor_model import SensorDao
-from api.model.service_model import ServiceDao
-from api.model.upstream_model import UpstreamDao
+from api.core.middleware.logging import logger
+from api.core.repository.mongo import MongoDAO
+
 from config import APP_BASE
-
 
 class MongoTool:
 
@@ -19,15 +14,9 @@ class MongoTool:
     def backup(cls):
         if not os.path.exists(f"{APP_BASE}/backup"):
             os.makedirs(f"{APP_BASE}/backup")
-        UserDao().data_export(f"{APP_BASE}/backup")
-        CertificateDao().data_export(f"{APP_BASE}/backup")
-        GeoIpDao().data_export(f"{APP_BASE}/backup")
-        RuleCategoryDao().data_export(f"{APP_BASE}/backup")
-        RuleDao().data_export(f"{APP_BASE}/backup")
-        SensorDao().data_export(f"{APP_BASE}/backup")
-        UpstreamDao().data_export(f"{APP_BASE}/backup")
-        ServiceDao().data_export(f"{APP_BASE}/backup")
-        FeedDao().data_export(f"{APP_BASE}/backup")
+        for collection_name in ["users", "certificates","geoip","rule_cat",
+                                "rules","sensors","upstreams","service","feeds"]:
+            cls.data_export(collection_name)
 
         with zipfile.ZipFile(
             f"{APP_BASE}/backup.zip", "w", zipfile.ZIP_DEFLATED
@@ -44,16 +33,27 @@ class MongoTool:
     @classmethod
     def restore(cls, zip_path):
         with zipfile.ZipFile(zip_path, "r") as zip_ref:
-            zip_ref.extractall(f"{APP_BASE}/backup")
-
-        UserDao().data_import(f"{APP_BASE}/backup")
-        CertificateDao().data_import(f"{APP_BASE}/backup")
-        GeoIpDao().data_import(f"{APP_BASE}/backup")
-        RuleCategoryDao().data_import(f"{APP_BASE}/backup")
-        RuleDao().data_import(f"{APP_BASE}/backup")
-        SensorDao().data_import(f"{APP_BASE}/backup")
-        UpstreamDao().data_import(f"{APP_BASE}/backup")
-        ServiceDao().data_import(f"{APP_BASE}/backup")
-        FeedDao().data_import(f"{APP_BASE}/backup")
+            zip_ref.extractall()
+        for collection_name in ["users", "certificates","geoip","rule_cat",
+                                "rules","sensors","upstreams","service","feeds"]:
+            cls.data_import(collection_name)
         os.remove(zip_path)
         shutil.rmtree(f"{APP_BASE}/backup")
+
+    def data_export(cls,collection_name, folder=f"{APP_BASE}/backup"):
+        if not os.path.exists(folder):
+            os.makedirs(folder)
+        dao = MongoDAO(collection_name)
+        dset = list(dao.collection.find())
+        logger.info(f"Export {len(dset)} to {folder}/{collection_name}.data")
+        with open(f"{folder}/{collection_name}.data", "wb") as f:
+            pickle.dump(dset, f)
+
+    def data_import(cls,collection_name, folder=f"{APP_BASE}/backup"):
+        with open(f"{folder}/{collection_name}.data", "rb") as f:
+            dset = pickle.load(f)
+            dao = MongoDAO(collection_name)
+            dao.collection.delete_many({})
+            if len(dset) > 0:
+                logger.info(f"Import {len(dset)} to {folder}/{collection_name}.data")
+                dao.collection.insert_many(dset)
