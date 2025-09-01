@@ -1,7 +1,6 @@
 from functools import wraps
 import jwt
-from flask import jsonify, request
-from flask import Response, jsonify
+from flask import jsonify, request, Response
 import config   
 from api.core.middleware.jwt import jwt_get,jwt_decode
 import traceback
@@ -21,7 +20,10 @@ def has_any_authority(authorities=None,_internal=False):
         def decorator(*args, **kwargs):
             if not config.SECURITY_ENABLED:
                 return fn(*args, **kwargs)
-     
+
+            if _internal and hasattr(config, 'NXGUARD_API_KEY') and config.NXGUARD_API_KEY:
+                if config.NXGUARD_API_KEY == request.headers.get("x-cluster-key"):
+                    return fn(*args, **kwargs)
             try:
                 token = jwt_get()
                 if token:

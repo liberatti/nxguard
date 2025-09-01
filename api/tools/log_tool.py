@@ -11,10 +11,10 @@ from api.core.middleware.logging import logger
 from config import APP_VERSION, DATETIME_FMT
 from api.model.config_model import ConfigDao
 from config import TELEMETRY_INTERVAL
-from api.common_utils import API_HEADERS, deep_merge, get_server_id
+from api.common_utils import deep_merge, get_server_id
 from api.model.transaction_model import TransactionDao
 from api.tools.feed_tool import SecurityFeedTool
-from config import TZ
+from config import TZ,API_HEADERS
 
 
 class LogParserTool:

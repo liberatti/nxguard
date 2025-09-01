@@ -15,7 +15,6 @@ from api.model.service_model import RouteFilterDao
 
 routes = Blueprint("route_filter", __name__)
 
-
 @routes.after_request
 def after(response: Response) -> Response:
     """

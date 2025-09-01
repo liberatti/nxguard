@@ -72,7 +72,7 @@ with app.app_context():
         config = dao.get_active()
         if not config:
             install()
-        if "main" in env_config.NODE_ROLE:
+        if "main" in env_config.NXGUARD_ROLE:
             config = dao.get_active()
                 
             if "cluster_id" not in config:

@@ -17,7 +17,7 @@ services:
       context: .
       dockerfile: Dockerfile
     environment:
-      NODE_ROLE: "main"
+      NXGUARD_ROLE: "main"
       SERVERID: "dev-node"
       PYTHONUNBUFFERED: 1
     network_mode: "host"

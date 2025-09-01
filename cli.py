@@ -6,7 +6,7 @@ import bcrypt
 
 from api.core.middleware.logging import logger
 
-from api.common_utils import gen_random_string,config_db
+from api.common_utils import gen_random_string
 from api.model.config_model import ConfigDao
 from api.model.feed_model import FeedDao
 from api.model.oauth_model import UserDao
@@ -16,20 +16,20 @@ import config
 
 APP_CONFIG_DIR = os.path.join(config.APP_BASE, "admin/config")
 
-def update_schema():
-    with open("config/mongo-schema.json", "r") as file:
-        schema = json.load(file)
-        database = getattr(config_db,schema['database'])
-        for collection in schema['collections']:
-            db_collection = database[collection['name']]
-            if 'indexes' in collection:
-                for index in collection['indexes']:
-                    db_collection.create_index(index['name'])
+#def update_schema():
+#    with open("config/mongo-schema.json", "r") as file:
+#        schema = json.load(file)
+#        database = getattr(config_db,schema['database'])
+#        for collection in schema['collections']:
+#            db_collection = database[collection['name']]
+#            if 'indexes' in collection:
+#                for index in collection['indexes']:
+#                    db_collection.create_index(index['name'])
 
 def initialize_db():
     logger.info("Initialize DB")
-    config_db.drop_database(config.MONGO_DB)
-    update_schema()
+    #config_db.drop_database(config.MONGO_DB)
+    #update_schema()
 
     config_dao = ConfigDao()
     ca = SSLTool.gen_ca("Internal-CA", crt_org="nxguard")
@@ -68,7 +68,7 @@ def install():
     update()
 
 def update():
-    update_schema()
+#    update_schema()
     feed_dao = FeedDao()
     for arq_name in os.listdir(APP_CONFIG_DIR):
         feed = None

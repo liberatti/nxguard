@@ -17,12 +17,13 @@ from api.tools.service_watcher import ServiceWatcher
 from config import (
     APP_BASE,
     ENGINE_VERSION,
-    NODE_ROLE
+    NXGUARD_ROLE
 )
-from api.tools.feed_tool import JailTool, SecurityFeedTool, RuleSetTool
+from api.tools.feed_tool import SecurityFeedTool, RuleSetTool
 from api.tools.acme_tool import AcmeTool
 from api.model.transaction_model import TransactionDao
 from config import TZ
+
 class ClusterTool:
     CONFIG = None
     APPLY_ACTIVE = False
@@ -73,7 +74,7 @@ class ClusterTool:
             logger.info(f"Apply active, skip auto apply config")
             return
         if not cls.CONFIG:
-            logger.info(f"No config, skip auto apply config")
+            logger.debug(f"No config, skip auto apply config")
             return
         try:
             manager = EngineManager()
@@ -154,7 +155,7 @@ class ClusterTool:
             node_st.update(
                 {
                     "version": ENGINE_VERSION,
-                    "role": NODE_ROLE,
+                    "role": NXGUARD_ROLE,
                     "last_check": datetime.now(),
                     "apply_active": cls.APPLY_ACTIVE
                 }

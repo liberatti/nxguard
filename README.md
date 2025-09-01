@@ -32,8 +32,8 @@ docker run -it \
  -e MONGO_DB="nxguard"\
  -e MONGO_USER="nxguard_usr"\
  -e MONGO_PASS="xxxxxxxxxxxxxxxxxxx"\
- -e NODE_KEY="xxxxxxxxxxxxxxxxxxx"\
- -e NODE_ROLE="main"\
+ -e NXGUARD_API_KEY="xxxxxxxxxxxxxxxxxxx"\
+ -e NXGUARD_ROLE="main"\
  -e SERVERID="nxguard-node01"\
  -p 5000:5000 \
  -p 80:80 
@@ -60,8 +60,8 @@ services:
       MONGO_USER: nxguard_usr
       MONGO_PASS: xxxxxxxxxxxxxxxxxxxxxxxxxxxxx
       SERVERID: "srv-001"
-      NODE_ROLE: main
-      NODE_KEY: xxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      NXGUARD_ROLE: main
+      NXGUARD_API_KEY: xxxxxxxxxxxxxxxxxxxxxxxxxxxxx
     ports:
       - "80:80"
       - "443:443"

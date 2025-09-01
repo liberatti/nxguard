@@ -37,14 +37,14 @@ if not addr_action then
     if res and (res.status == 200 or res.status == 201) then
         local data, decode_err = cjson.decode(res.body)
         if not data then
-            msg(500, "RBL blocked" .. "Error decoding RBL data: " .. decode_err)
+            msg(500, "RBL blocked" .. "Error decoding RBL data: " .. res.status)
         end
 
         ngx.shared["si_" .. ngx.var.sensor_id .. "_cache"]:set(client_ip, data.blocked, 60)
         addr_action = data.blocked
-        --ngx.log(ngx.ERR, "RBL Search: " .. client_ip .. ":" .. cjson.encode(data))
+        ngx.log(ngx.ERR, "RBL Search: " .. client_ip .. ":" .. cjson.encode(data))
     else
-        msg(500, "RBL blocked" .. "Error fetching RBL data: " .. err)
+        msg(500, "RBL blocked" .. "Error fetching RBL data: " .. res.status)
     end
 end
 

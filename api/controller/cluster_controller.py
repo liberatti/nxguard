@@ -7,7 +7,8 @@ from api.core.controllers.base_controller import (
     response_error_404,
     response_error_parse,
     response_ok,
-    has_any_authority
+    has_any_authority,
+    response_error_500
 )
 
 from api.core.middleware.socket_manager import emit_event
@@ -19,8 +20,8 @@ from api.tools.acme_tool import AcmeTool
 from api.tools.cluster_tool import ClusterTool
 from api.tools.feed_tool import SecurityFeedTool
 from api.tools.mongo_tool import MongoTool
-routes = Blueprint("cluster", __name__)
 
+routes = Blueprint("cluster", __name__)
 
 @routes.after_request
 def after(response: Response) -> Response:
@@ -51,7 +52,6 @@ def restore() -> Response:
         Response: Success message or error response
     """
     if "zipfile" not in request.files:
-        print_request(request)
         return response_error_500("No file uploaded")
 
     file = request.files["zipfile"]

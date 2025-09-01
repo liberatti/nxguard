@@ -33,8 +33,8 @@ JWT_AUD = "nxguard"
 
 # Cluster config
 CLUSTER_ENDPOINT = os.environ.get("CLUSTER_ENDPOINT")
-NODE_ROLE = os.environ.get("NODE_ROLE", "main")
-NODE_KEY = os.environ.get("NODE_KEY", "DEV")
+NXGUARD_ROLE = os.environ.get("NXGUARD_ROLE", "main")
+NXGUARD_API_KEY = os.environ.get("NXGUARD_API_KEY", "DEV")
 
 CORS = {
     r"/*": {

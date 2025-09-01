@@ -15,7 +15,6 @@ from api.common_utils import (
     get_server_id,
     unpack_zip,
     clear_directory,
-    API_HEADERS,
 )
 from api.model.certificate_model import CertificateDao
 from api.model.config_model import ConfigDao
@@ -26,7 +25,7 @@ from api.model.sensor_model import SensorDao
 from api.model.service_model import ServiceDao
 from api.model.upstream_model import UpstreamDao
 from api.tools.ruleset_tool import RuleSetParser
-from config import APP_BASE, CLUSTER_ENDPOINT, ENGINE_BASE, NODE_ROLE, NODE_KEY
+from config import APP_BASE, CLUSTER_ENDPOINT, ENGINE_BASE, NXGUARD_ROLE, NXGUARD_API_KEY,API_HEADERS
 from api.tools.network_tool import NetworkTool
 
 
@@ -40,7 +39,7 @@ class EngineManager:
 
     def __init__(self, startup=False):
         self._init_dir()
-        if "main" in NODE_ROLE:
+        if "main" in NXGUARD_ROLE:
             if startup:  # READ START_CONFIG
                 with open(f"{APP_BASE}/run/activated.config", "rb") as f:
                     self.CONFIG = pickle.load(f)
@@ -75,7 +74,7 @@ class EngineManager:
                         check = response.json()
                         if self.CONFIG and check["scn"] in self.CONFIG["scn"]:
                             logger.info(
-                                f"Keep {self.CONFIG['scn']} for {NODE_ROLE} {CLUSTER_ENDPOINT}"
+                                f"Keep {self.CONFIG['scn']} for {NXGUARD_ROLE} {CLUSTER_ENDPOINT}"
                             )
                         else:
                             response = requests.get(
@@ -518,7 +517,7 @@ class EngineManager:
                     sb.append(f"   set $route_name '{route['name']}';")
 
                     sb.append(f"   set $api_url 'http://127.0.0.1:5000/api';")
-                    sb.append(f"   set $api_key {NODE_KEY};")
+                    sb.append(f"   set $api_key {NXGUARD_API_KEY};")
                     if "geo_block_list" in sensor:
                         sb.append(
                             f"   set $geo_block_list '{'|'.join(sensor['geo_block_list'])}';"
