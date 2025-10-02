@@ -53,7 +53,7 @@ def jwt_decode(token):
     return jwt.decode(token, config.JWT_SECRET_KEY, algorithms=["HS256"], audience=config.JWT_AUD)
 
 
-def jwt_create_access_token(sub, profile=None, authorities=None):
+def jwt_create_access_token(sub, profile=None, authorities=None,extra_clains=None):
     now = datetime.now(config.TZ)
     if profile:
         profile.pop("created_at", None)
@@ -67,6 +67,8 @@ def jwt_create_access_token(sub, profile=None, authorities=None):
         "authorities": authorities,
         "aud": config.JWT_AUD,
     }
+    if extra_clains:
+        payload.update(extra_clains)
     return jwt.encode(payload, config.JWT_SECRET_KEY, algorithm="HS256")
 
 

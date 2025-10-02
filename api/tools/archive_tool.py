@@ -5,12 +5,34 @@ from elasticsearch import Elasticsearch
 from api.core.middleware.logging import logger
 
 from api.common_utils import  deep_date_str
+from api.model.upstream_model import NodeStatusDao
 from api.model.transaction_model import TransactionDao
 from api.tools.cluster_tool import ClusterTool
 from config import TZ
 
 
 class LogArchiverTool:
+
+    @classmethod
+    def clean(cls):
+        now = datetime.now(TZ)
+        with NodeStatusDao() as node_dao, TransactionDao() as trn_dao:
+            node_dao.purge_before_date(now - timedelta(hours=1))
+            if ClusterTool.CONFIG:
+                if (
+                    "purge" in ClusterTool.CONFIG["config"]
+                    and ClusterTool.CONFIG["config"]["purge"]["enabled"]
+                ):
+                    purge_config = ClusterTool.CONFIG["config"]["purge"]
+                    try:
+                        t_purged = trn_dao.purge_before_date(
+                                now - timedelta(days=purge_config["purge_after"])
+                        )
+                        if t_purged > 0:
+                            logger.info(f"Purged {t_purged} transactions")
+                    except Exception as e:
+                        logger.error(e)
+
     @classmethod
     def auto_archive(cls):
         if ClusterTool.CONFIG:

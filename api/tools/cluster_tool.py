@@ -38,27 +38,6 @@ class ClusterTool:
         cls.APPLY_ACTIVE=False
 
     @classmethod
-    def clean(cls):
-        now = datetime.now(TZ)
-        dao = NodeStatusDao()
-        dao.purge_before_date(now - timedelta(hours=1))
-        if ClusterTool.CONFIG:
-            if (
-                    "purge" in ClusterTool.CONFIG["config"]
-                    and ClusterTool.CONFIG["config"]["purge"]["enabled"]
-                ):
-                trn_dao = TransactionDao()
-                purge_config = ClusterTool.CONFIG["config"]["purge"]
-                try:
-                    t_purged = trn_dao.purge_before_date(
-                            now - timedelta(days=purge_config["purge_after"])
-                    )
-                    if t_purged > 0:
-                        logger.info(f"Purged {t_purged} transactions")
-                except Exception as e:
-                    logger.error(e)
-
-    @classmethod
     def check_tcp_port(cls, host, port):
         try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

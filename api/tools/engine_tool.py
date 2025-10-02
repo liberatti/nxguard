@@ -346,8 +346,8 @@ class EngineManager:
             sb.append(f"  ssl_session_timeout 10m;")
             sb.append(f"  ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!3DES:!MD5:!PSK;")
             sb.append(f"  ssl_ecdh_curve secp384r1;")
-            sb.append(f"  ssl_stapling on;")
-            sb.append(f"  ssl_stapling_verify on;")
+            sb.append(f"  ssl_stapling off;")
+            sb.append(f"  ssl_stapling_verify off;")
 
             if cert:
                 sb.append(f"  ssl_certificate {APP_BASE}/keystore/{cert['_id']}.crt;")

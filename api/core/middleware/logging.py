@@ -1,7 +1,7 @@
 import os
 import logging
 import inspect
-
+from config import LOG_LEVEL
 
 class CustomLogger(logging.Logger):
     def info(self, msg, *args, **kwargs):
@@ -27,9 +27,10 @@ class CustomLogger(logging.Logger):
 
 
 logger = CustomLogger(__name__)
-logger.setLevel(logging.INFO)
+level = getattr(logging, LOG_LEVEL, logging.INFO)
+logger.setLevel(level)
 console_handler = logging.StreamHandler()
-console_handler.setLevel(logging.DEBUG)
+console_handler.setLevel(level)
 formatter = logging.Formatter("%(asctime)s - :name - %(levelname)s - %(message)s")
 console_handler.setFormatter(formatter)
 logger.addHandler(console_handler)

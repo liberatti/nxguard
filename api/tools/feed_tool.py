@@ -175,76 +175,73 @@ class SecurityFeedTool:
 
     @classmethod
     def update(cls):
-        dao = ConfigDao()
-        conf = dao.get_active()
-
-        cls.download_ip2asn()
-        if "maxmind_key" in conf and len(conf["maxmind_key"]) > 0:
-            try:
-                cls.download_mmdb(conf["maxmind_key"], "GeoLite2-ASN")
-                cls.download_mmdb(conf["maxmind_key"], "GeoLite2-City")
-            except Exception as e:
-                logger.error(f"Failed to download GeoLite2: %s", e)
-                
-        feed_dao = FeedDao()
-        for feed in feed_dao.get_by_type("network"):
-            if "source" in feed and len(feed["source"]) > 1:
+        with ConfigDao() as dao, FeedDao() as feed_dao, RBLDao() as rbl_dao:
+            conf = dao.get_active()
+            cls.download_ip2asn()
+            if "maxmind_key" in conf and len(conf["maxmind_key"]) > 0:
                 try:
-                    source_url = feed["source"]
-                    rbl_dao = RBLDao()
-                    if feed["restricted"]:
-                        if "iblocklist" in feed["provider"]:
-                            if (
-                                "iblocklist_username" in conf
-                                and len(conf["iblocklist_username"]) > 0
-                            ):
-                                source_url = f"{source_url}&username={conf['iblocklist_username']}&pin={conf['iblocklist_pin']}"
-                            else:
-                                logger.info(
-                                    f"Feed {feed['name']} skipped, no credentials"
-                                )
-                                continue
-
-                    resp = requests.get(source_url)
-                    if resp and resp.status_code == 200:
-                        lines = []
-                        if "cdir_text" in feed["format"]:
-                            lines = resp.text.splitlines()
-                        if "cdir_gz" in feed["format"]:
-                            with gzip.GzipFile(fileobj=io.BytesIO(resp.content)) as gz:
-                                for l in gz:
-                                    lines.append(l.decode("utf-8").strip())
-                        rbl_dao.delete_by_provider("feed", feed["_id"])
-                        fc = 0
-                        for line in lines:
-                            if line.strip() and "#" not in line:
-                                if NetworkTool.is_network(line):
-                                    rbl = dict(NetworkTool.range_from_network(line))
-                                    ip_v = (
-                                        4
-                                        if NetworkTool.is_ipv4(line.split("/")[0])
-                                        else 6
-                                    )
-                                    rbl.update(
-                                        {
-                                            "version": ip_v,
-                                            "provider_type": "feed",
-                                            "provider_id": ObjectId(feed["_id"]),
-                                            "action": feed["action"],
-                                        }
-                                    )
-                                    rbl_dao.persist(rbl)
-                                    fc += 1
-
-                        feed_dao.update_by_id(
-                            feed["_id"], {"updated_on": datetime.now(TZ)}
-                        )
-                        logger.info(
-                            f"Update Security IP feeds {feed['name']} with {fc} records"
-                        )
+                    cls.download_mmdb(conf["maxmind_key"], "GeoLite2-ASN")
+                    cls.download_mmdb(conf["maxmind_key"], "GeoLite2-City")
                 except Exception as e:
-                    logger.error(f"Failed to load {feed['slug']}: %s", e)
-                    logger.error(traceback.format_exc())
+                    logger.error(f"Failed to download GeoLite2: %s", e)
+                    
+            for feed in feed_dao.get_by_type("network"):
+                if "source" in feed and len(feed["source"]) > 1:
+                    try:
+                        source_url = feed["source"]
+                        if feed["restricted"]:
+                            if "iblocklist" in feed["provider"]:
+                                if (
+                                    "iblocklist_username" in conf
+                                    and len(conf["iblocklist_username"]) > 0
+                                ):
+                                    source_url = f"{source_url}&username={conf['iblocklist_username']}&pin={conf['iblocklist_pin']}"
+                                else:
+                                    logger.info(
+                                        f"Feed {feed['name']} skipped, no credentials"
+                                    )
+                                    continue
+
+                        resp = requests.get(source_url)
+                        if resp and resp.status_code == 200:
+                            lines = []
+                            if "cdir_text" in feed["format"]:
+                                lines = resp.text.splitlines()
+                            if "cdir_gz" in feed["format"]:
+                                with gzip.GzipFile(fileobj=io.BytesIO(resp.content)) as gz:
+                                    for l in gz:
+                                        lines.append(l.decode("utf-8").strip())
+                            rbl_dao.delete_by_provider("feed", feed["_id"])
+                            fc = 0
+                            for line in lines:
+                                if line.strip() and "#" not in line:
+                                    if NetworkTool.is_network(line):
+                                        rbl = dict(NetworkTool.range_from_network(line))
+                                        ip_v = (
+                                            4
+                                            if NetworkTool.is_ipv4(line.split("/")[0])
+                                            else 6
+                                        )
+                                        rbl.update(
+                                            {
+                                                "version": ip_v,
+                                                "provider_type": "feed",
+                                                "provider_id": ObjectId(feed["_id"]),
+                                                "action": feed["action"],
+                                            }
+                                        )
+                                        rbl_dao.persist(rbl)
+                                        fc += 1
+
+                            feed_dao.update_by_id(
+                                feed["_id"], {"updated_on": datetime.now(TZ)}
+                            )
+                            logger.info(
+                                f"Update Security IP feeds {feed['name']} with {fc} records"
+                            )
+                    except Exception as e:
+                        logger.error(f"Failed to load {feed['slug']}: %s", e)
+                        logger.error(traceback.format_exc())
 
     @classmethod
     def download_ip2asn(cls, feed="ip2asn-combined"):
