@@ -13,11 +13,6 @@ export interface ConfigPurge {
     purge_after: number;
 }
 
-export interface ConfigTelemetry {
-    enabled: boolean;
-    url: string;
-}
-
 export interface Config {
     _id: string;
     maxmind_key: string;
@@ -26,5 +21,4 @@ export interface Config {
     acme_directory_url: string;
     archive: ConfigArchive;
     purge: ConfigPurge;
-    telemetry: ConfigTelemetry;
 }

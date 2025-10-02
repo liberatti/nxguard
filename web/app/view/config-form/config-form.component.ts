@@ -85,11 +85,7 @@ export class ConfigFormComponent implements OnInit {
                 ca_private: data.ca_private,
                 acme_directory_url: data.acme_directory_url,
                 archive: data.archive || {},
-                purge: data.purge || {},
-                telemetry: data.telemetry || {
-                    enabled: true,
-                    url: 'https://nproxy.app.br'
-                }
+                purge: data.purge || {}
             });
         });
     }

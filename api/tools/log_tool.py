@@ -8,14 +8,11 @@ from ua_parser import user_agent_parser
 
 from api.core.middleware.logging import logger
 
-from config import APP_VERSION, DATETIME_FMT
 from api.model.config_model import ConfigDao
-from config import TELEMETRY_INTERVAL
 from api.common_utils import deep_merge, get_server_id
 from api.model.transaction_model import TransactionDao
 from api.tools.feed_tool import SecurityFeedTool
-from config import TZ,API_HEADERS
-
+import config as env_config
 
 class LogParserTool:
 
@@ -46,19 +43,18 @@ class LogParserTool:
     @classmethod
     def send_telemetry(cls,t):
         conf = ConfigDao().get_active()
-        if conf["telemetry"]["enabled"]:
-            TELEMETRY_URL = conf["telemetry"]["url"]
-            t.update({"version": APP_VERSION})
-            t.update({"interval": TELEMETRY_INTERVAL})
+        if env_config.TELEMETRY_ENABLE:
+            t.update({"version": env_config.APP_VERSION})
+            t.update({"interval": env_config.TELEMETRY_INTERVAL})
             t.update({"cluster_id": conf["cluster_id"]})
             t.update({"server_id": get_server_id()})
-            t.update({"logtime": datetime.now(TZ).strftime(DATETIME_FMT)})
+            t.update({"logtime": datetime.now(env_config.TZ).strftime(env_config.DATETIME_FMT)})
             try:
-                API_HEADERS.update({"Content-Type": "application/json"})
+                env_config.API_HEADERS.update({"Content-Type": "application/json"})
                 response = requests.post(
-                    f"{TELEMETRY_URL}/api/usage",
+                    f"{env_config.TELEMETRY_URL}/api/usage",
                     json=t,
-                    headers=API_HEADERS,
+                    headers=env_config.API_HEADERS,
                     timeout=10,
                 )
                 if response.status_code not in [200, 201]:
@@ -101,7 +97,7 @@ class LogParserTool:
                 cls.telemetry["req_total"] += (len(cache.access_log) - len(t_arr)) / 1000.0 # K requests
                 cache.access_log = t_arr
                 cls.telemetry["c_interval"] += 1
-                if cls.telemetry["c_interval"] >= TELEMETRY_INTERVAL:
+                if cls.telemetry["c_interval"] >= env_config.TELEMETRY_INTERVAL:
                     cls.send_telemetry(cls.telemetry.copy())
                     cls.telemetry = {
                         "net_recv": 0.0,
@@ -260,7 +256,7 @@ class LogParserTool:
         try:
             dto = json.loads(line)
             record = {
-                "logtime": datetime.strptime(dto["time"], st_format).astimezone(TZ),
+                "logtime": datetime.strptime(dto["time"], st_format).astimezone(env_config.TZ),
                 "unique_id": dto["uniqueid"],
                 "server_id": server_id,
                 "service": {"_id": dto["service_id"]},

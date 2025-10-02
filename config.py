@@ -13,8 +13,13 @@ ENGINE_VERSION = "1.27.1"
 DATETIME_FMT = "%Y-%m-%dT%H:%M:%S.%fZ"
 TZ = pytz.timezone("UTC")
 
+TELEMETRY_ENABLE = bool(os.environ.get('TELEMETRY_ENABLE','true'))
 TELEMETRY_INTERVAL = int(os.environ.get("TELEMETRY_INTERVAL", "60")) # in transaction merge (10 minutes)
+TELEMETRY_URL = os.environ.get("TELEMETRY_URL", "https://nxguard.app.br")
+
 MAINTENANCE_WINDOW = "01:00"
+
+LOG_LEVEL = os.environ.get('LOG_LEVEL', 'INFO').upper()
 
 # Config database (MongoDB)
 MONGO_HOST = os.environ.get("MONGO_HOST",'127.0.0.1')

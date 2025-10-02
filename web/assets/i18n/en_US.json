@@ -19,7 +19,7 @@
     "routes": "Routes"
   },
   "content": {
-    "copy": "&copy; 2024 nxguard. All rights reserved. This solution is built on top of OpenResty.",
+    "copy": "&copy; 2025 nxguard. All rights reserved. This solution is built on top of OpenResty.",
     "about": "This is a proxy server built on OpenResty with ModSecurity for advanced protection.",
     "restore_notice": "Configuration Restore Notice: All existing data will be overwritten by the restored configuration."
   },

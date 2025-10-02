@@ -10,8 +10,7 @@ from api.common_utils import replace_tz
 from api.model.sensor_model import SensorSchema, SensorDao
 from api.model.service_model import ServiceSchema, ServiceDao
 from api.model.upstream_model import UpstreamSchema, UpstreamDao
-from config import DATETIME_FMT, TZ, TELEMETRY_INTERVAL
-
+import config as env_config
 
 class TransactionHeaderSchema(Schema):
     """
@@ -181,7 +180,7 @@ class TransactionSchema(Schema):
         unknown = EXCLUDE
 
     _id = fields.String(required=False)
-    logtime = fields.DateTime(format=DATETIME_FMT)
+    logtime = fields.DateTime(format=env_config.DATETIME_FMT)
     unique_id = fields.String(required=False)
     server_id = fields.String(required=False)
     action = fields.String(required=False)
@@ -227,7 +226,7 @@ class DashboardRequests(Schema):
     class Meta:
         unknown = EXCLUDE
 
-    logtime = fields.DateTime(format=DATETIME_FMT)
+    logtime = fields.DateTime(format=env_config.DATETIME_FMT)
     actions = fields.List(fields.Integer())
 
 
@@ -385,7 +384,7 @@ class TransactionDao(MongoDAO):
             query = [
                 {
                     "$match": {
-                        "logtime": {"$gte": (datetime.now(TZ) - timedelta(minutes=1))},
+                        "logtime": {"$gte": (datetime.now(env_config.TZ) - timedelta(minutes=1))},
                         "server_id": server_id,
                     },
                 },
@@ -429,7 +428,7 @@ class TransactionDao(MongoDAO):
             query = [
                 {
                     "$match": {
-                        "logtime": {"$gt": dt_start - timedelta(minutes=TELEMETRY_INTERVAL)}
+                        "logtime": {"$gt": dt_start - timedelta(minutes=env_config.TELEMETRY_INTERVAL)}
                     }
                 },
                 {

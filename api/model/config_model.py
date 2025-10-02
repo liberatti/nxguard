@@ -30,15 +30,6 @@ class ConfigPurgeSchema(Schema):
     enabled = fields.Boolean()
     purge_after = fields.Integer()  # days
 
-class ConfigTelemetrySchema(Schema):
-    """
-    Schema for purge configuration validation and serialization.
-    
-    This schema defines the structure and validation rules for purge configuration.
-    """
-    enabled = fields.Boolean()
-    url = fields.String()
-
 
 class ConfigSchema(Schema):
     """
@@ -57,7 +48,6 @@ class ConfigSchema(Schema):
     acme_directory_url = fields.String()
     archive = fields.Nested(ConfigArchiveSchema)
     purge = fields.Nested(ConfigPurgeSchema)
-    telemetry = fields.Nested(ConfigTelemetrySchema)
 
 
 class ConfigDao(MongoDAO):

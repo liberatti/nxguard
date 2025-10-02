@@ -19,33 +19,6 @@
                             <mat-label>acme_directory_url</mat-label>
                             <input matInput formControlName="acme_directory_url" id="acme-directory-url-input">
                         </mat-form-field>
-                        <mat-card appearance="outlined" formGroupName="telemetry">
-                            <mat-card-header>
-                                <span>Telemetry </span>
-                                <mat-slide-toggle labelPosition="before" style="float: right;"
-                                                  formControlName="enabled">
-                                    Enable Telemetry
-                                </mat-slide-toggle>
-                            </mat-card-header>
-                            <mat-card-content>
-                                <p>
-                                    The telemetry process involves the collection of usage data from the system to help us improve the product.
-                                </p>
-                                <div class="mat-row">
-                                    <div class="mat-col-6">
-                                        <small>
-                                            The Telemetry URL field defines the URL to send the telemetry data.
-                                        </small>
-                                    </div>
-                                    <div class="mat-col-6">
-                                        <mat-form-field>
-                                            <mat-label>Telemetry URL</mat-label>
-                                            <input id="telemetry-url-input" matInput formControlName="url">
-                                        </mat-form-field>
-                                    </div>
-                                </div>
-                            </mat-card-content>
-                        </mat-card>
                     </mat-expansion-panel>
                     <mat-expansion-panel id="ca-config-panel">
                         <mat-expansion-panel-header>
