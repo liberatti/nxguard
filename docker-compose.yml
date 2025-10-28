@@ -1,0 +1,45 @@
+# /etc/sysctl.conf
+# vm.max_map_count=262144
+
+services:
+
+  web:
+    image: node:lts
+    command: [ "npm", "run", "container" ]
+    working_dir: /app
+    volumes:
+      - ./web:/app
+    network_mode: "host"
+
+  api:
+    image: liberatti/nxguard:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      NXGUARD_ROLE: "main"
+      SERVERID: "dev-node"
+      PYTHONUNBUFFERED: 1
+    network_mode: "host"
+    init: true
+    volumes:
+      - ./api:/opt/nxguard/admin/api
+      - ./config:/opt/nxguard/admin/config
+      - ./lualib:/opt/nxguard/lualib/share/lua/5.4/nxguard
+      - ./engine:/opt/nxguard/admin/engine
+    deploy:
+      resources:
+        limits:
+          memory: 1512M
+
+  export:
+    image: liberatti/nxguard:export
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: engine
+    entrypoint: [ '/bin/bash','-c' ]
+    command: [ 'cp /root/rpmbuild/RPMS/*/*.rpm /target' ]
+    volumes:
+      - ./target:/target
+
