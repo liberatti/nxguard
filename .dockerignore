@@ -1,0 +1,48 @@
+# Git
+.git
+.gitignore
+
+# Docker
+.dockerignore
+Dockerfile*
+
+# IDE
+.idea/
+.vscode/
+
+# Python cache
+**/__pycache__
+*.pyc
+*.pyo
+*.pyd
+
+# Ambientes virtuais
+.venv
+venv
+env
+
+# Arquivos de dependência e build
+*.egg-info
+dist
+build
+wheels
+pip-wheel-metadata
+parts
+eggs
+.eggs
+
+# Testes
+.pytest_cache
+.tox
+.coverage
+.coverage.*
+htmlcov
+nosetests.xml
+coverage.xml
+
+# Arquivos de configuração local
+.env
+
+# Arquivos de sistema
+.DS_Store
+Thumbs.db

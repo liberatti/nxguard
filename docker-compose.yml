@@ -26,6 +26,7 @@ services:
       - .:/opt/nxguard/admin
       - ./lualib:/opt/nxguard/lualib/share/lua/5.4/nxguard
       - ./data:/data
+      - /home/liberatti/workspace/.venv/lib/python3.12/site-packages:/opt/nxguard/site-packages
     deploy:
       resources:
         limits:
