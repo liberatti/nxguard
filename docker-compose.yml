@@ -5,7 +5,7 @@ services:
 
   web:
     image: node:lts
-    command: [ "npm", "run", "container" ]
+    command: [ "npm", "run", "start" ]
     working_dir: /app
     volumes:
       - ./web:/app
@@ -23,10 +23,9 @@ services:
     network_mode: "host"
     init: true
     volumes:
-      - ./api:/opt/nxguard/admin/api
-      - ./config:/opt/nxguard/admin/config
+      - .:/opt/nxguard/admin
       - ./lualib:/opt/nxguard/lualib/share/lua/5.4/nxguard
-      - ./engine:/opt/nxguard/admin/engine
+      - ./data:/data
     deploy:
       resources:
         limits:

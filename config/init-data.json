@@ -1,0 +1,259 @@
+{
+  "user": {
+    "name": "Default admin user",
+    "password": "admin",
+    "email": "admin@nxguard.local",
+    "role": "superuser"
+  },
+  "certificates": [
+    {
+      "certificate": "-----BEGIN CERTIFICATE-----\nMIIFGzCCBAOgAwIBAgISBQqkrUkJaFJbLVBsdml3GxDxMA0GCSqGSIb3DQEBCwUA\nMDMxCzAJBgNVBAYTAlVTMRYwFAYDVQQKEw1MZXQncyBFbmNyeXB0MQwwCgYDVQQD\nEwNSMTMwHhcNMjUxMDEwMTQwMzI2WhcNMjYwMTA4MTQwMzI1WjAfMR0wGwYDVQQD\nExRhZG1pbi5ueGd1YXJkLmNvbS5icjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCC\nAQoCggEBAKGn7EThuHxn/zneappMO2yWSZe2qquKR64sB/3UPzthkbd6HVqlT6R2\n6Bt1lB7pjTam8YLgyHXz1Jn+MFeuxm7+i8P7B/cx/lrWcXkK0ET2/McQssqDQFSc\nTu5+UXbIn+lYUQQeFsMQuYvYPko1twB9wAz1yfjflO4Rl61pli+SYMeS+dC7cP+k\nCg30+59gzwvFzVcfrdqqmVKZEeqeTcsdOd6rj3jhIQ/7zuxzbFEPKSVTygM5qPmN\nYKpK3JeZcyUP0YkJfNDX2aNb+1CH5yfsyMBwz9S6EdcbHTlpkEvXDhGP63JYF7d5\nGcedk4wgsuhK+lLO4fxtgARgUtragVECAwEAAaOCAjswggI3MA4GA1UdDwEB/wQE\nAwIFoDAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwDAYDVR0TAQH/BAIw\nADAdBgNVHQ4EFgQUDZPtRUCXN680hPoki6sge35Jt9cwHwYDVR0jBBgwFoAU56uf\nDywzoFPTXk94yLKEDjvWkjMwMwYIKwYBBQUHAQEEJzAlMCMGCCsGAQUFBzAChhdo\ndHRwOi8vcjEzLmkubGVuY3Iub3JnLzA1BgNVHREELjAsghRhZG1pbi5ueGd1YXJk\nLmNvbS5icoIUcHJveHkubnhndWFyZC5jb20uYnIwEwYDVR0gBAwwCjAIBgZngQwB\nAgEwLwYDVR0fBCgwJjAkoCKgIIYeaHR0cDovL3IxMy5jLmxlbmNyLm9yZy8xMTQu\nY3JsMIIBBAYKKwYBBAHWeQIEAgSB9QSB8gDwAHYAZBHEbKQS7KeJHKICLgC8q08o\nB9QeNSer6v7VA8l9zfAAAAGZzqST2wAABAMARzBFAiAOGWLMWatdSzZRNdbTfjuU\nXgEvYNjEqaX+V6I+wI3bpQIhAIRpJ4YbyTr6ZkKKH0osalBdakYWatPBHhFb8AOn\nWdntAHYAlpdkv1VYl633Q4doNwhCd+nwOtX2pPM2bkakPw/KqcYAAAGZzqSUIwAA\nBAMARzBFAiEAzHLglHa1c+2A8hJFlUSEAcNDUik8qmMHeqImavT0oM8CIFvapjTX\nKi+Z2i749iCdPNE/9UHLjQYyPjPWjf5zRkWnMA0GCSqGSIb3DQEBCwUAA4IBAQBN\ncP9N8zfx5jkX00nisq0+g0sDBnKfu3lTj5YGx4GFxWRTYFTCkwFD/Uw43Lb2WrZe\nFOJFPd4IGQmflGMhVQhq6F0mx0JVYRoLXGkWHZzKKGpwFrSZZsHsY5HbG7qYwYgY\nmMPUHM6KG1qTEGtGhr7QCYlrzFCoUQxHKaM9EUr9pO2blxNuDEcPt48fkOQ2jJaD\nc1v52vNAbIoDCsaITWHnmLg7LqbQSwTUHZ63T0v/YLc8bG99XgdCEsGDsjt0STyg\nvaq20debdtnX1d+vOEc5S7xDQQtjRzAvfB1aYC5ZalOn2NQmPtRZE//Gtgzd+UCQ\n4KySxCelCg539oWPB33n\n-----END CERTIFICATE-----\n",
+      "chain": "-----BEGIN CERTIFICATE-----\nMIIFBTCCAu2gAwIBAgIQWgDyEtjUtIDzkkFX6imDBTANBgkqhkiG9w0BAQsFADBP\nMQswCQYDVQQGEwJVUzEpMCcGA1UEChMgSW50ZXJuZXQgU2VjdXJpdHkgUmVzZWFy\nY2ggR3JvdXAxFTATBgNVBAMTDElTUkcgUm9vdCBYMTAeFw0yNDAzMTMwMDAwMDBa\nFw0yNzAzMTIyMzU5NTlaMDMxCzAJBgNVBAYTAlVTMRYwFAYDVQQKEw1MZXQncyBF\nbmNyeXB0MQwwCgYDVQQDEwNSMTMwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEK\nAoIBAQClZ3CN0FaBZBUXYc25BtStGZCMJlA3mBZjklTb2cyEBZPs0+wIG6BgUUNI\nfSvHSJaetC3ancgnO1ehn6vw1g7UDjDKb5ux0daknTI+WE41b0VYaHEX/D7YXYKg\nL7JRbLAaXbhZzjVlyIuhrxA3/+OcXcJJFzT/jCuLjfC8cSyTDB0FxLrHzarJXnzR\nyQH3nAP2/Apd9Np75tt2QnDr9E0i2gB3b9bJXxf92nUupVcM9upctuBzpWjPoXTi\ndYJ+EJ/B9aLrAek4sQpEzNPCifVJNYIKNLMc6YjCR06CDgo28EdPivEpBHXazeGa\nXP9enZiVuppD0EqiFwUBBDDTMrOPAgMBAAGjgfgwgfUwDgYDVR0PAQH/BAQDAgGG\nMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDATASBgNVHRMBAf8ECDAGAQH/\nAgEAMB0GA1UdDgQWBBTnq58PLDOgU9NeT3jIsoQOO9aSMzAfBgNVHSMEGDAWgBR5\ntFnme7bl5AFzgAiIyBpY9umbbjAyBggrBgEFBQcBAQQmMCQwIgYIKwYBBQUHMAKG\nFmh0dHA6Ly94MS5pLmxlbmNyLm9yZy8wEwYDVR0gBAwwCjAIBgZngQwBAgEwJwYD\nVR0fBCAwHjAcoBqgGIYWaHR0cDovL3gxLmMubGVuY3Iub3JnLzANBgkqhkiG9w0B\nAQsFAAOCAgEAUTdYUqEimzW7TbrOypLqCfL7VOwYf/Q79OH5cHLCZeggfQhDconl\nk7Kgh8b0vi+/XuWu7CN8n/UPeg1vo3G+taXirrytthQinAHGwc/UdbOygJa9zuBc\nVyqoH3CXTXDInT+8a+c3aEVMJ2St+pSn4ed+WkDp8ijsijvEyFwE47hulW0Ltzjg\n9fOV5Pmrg/zxWbRuL+k0DBDHEJennCsAen7c35Pmx7jpmJ/HtgRhcnz0yjSBvyIw\n6L1QIupkCv2SBODT/xDD3gfQQyKv6roV4G2EhfEyAsWpmojxjCUCGiyg97FvDtm/\nNK2LSc9lybKxB73I2+P2G3CaWpvvpAiHCVu30jW8GCxKdfhsXtnIy2imskQqVZ2m\n0Pmxobb28Tucr7xBK7CtwvPrb79os7u2XP3O5f9b/H66GNyRrglRXlrYjI1oGYL/\nf4I1n/Sgusda6WvA6C190kxjU15Y12mHU4+BxyR9cx2hhGS9fAjMZKJss28qxvz6\nAxu4CaDmRNZpK/pQrXF17yXCXkmEWgvSOEZy6Z9pcbLIVEGckV/iVeq0AOo2pkg9\np4QRIy0tK2diRENLSF2KysFwbY6B26BFeFs3v1sYVRhFW9nLkOrQVporCS0KyZmf\nwVD89qSTlnctLcZnIavjKsKUu1nA1iU0yYMdYepKR7lWbnwhdx3ewok=\n-----END CERTIFICATE-----\n",
+      "force_renew": false,
+      "name": "nxguard-lets",
+      "not_after": "2026-01-08T14:03:25.000000Z",
+      "not_before": "2025-10-10T14:03:26.000000Z",
+      "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQChp+xE4bh8Z/85\n3mqaTDtslkmXtqqrikeuLAf91D87YZG3eh1apU+kdugbdZQe6Y02pvGC4Mh189SZ\n/jBXrsZu/ovD+wf3Mf5a1nF5CtBE9vzHELLKg0BUnE7uflF2yJ/pWFEEHhbDELmL\n2D5KNbcAfcAM9cn435TuEZetaZYvkmDHkvnQu3D/pAoN9PufYM8Lxc1XH63aqplS\nmRHqnk3LHTneq4944SEP+87sc2xRDyklU8oDOaj5jWCqStyXmXMlD9GJCXzQ19mj\nW/tQh+cn7MjAcM/UuhHXGx05aZBL1w4Rj+tyWBe3eRnHnZOMILLoSvpSzuH8bYAE\nYFLa2oFRAgMBAAECggEARSsOH6z7HJP88zxVHZ83n+8wHu+kWBCrOf2SD8wkoBpP\n2JMyAyqPiL3t823cSlvBNdy5orfeXgXN9nP6KFJainx0vg7nqh/khuaRl+qGEbQi\nlWRyM890E5/r8ATxg2M1dQj6ZUogkCdUVN9aS7NvEZE8vu7eFBRKa5Dwdt0iS0jm\nfIN+mMZ+ZB4ZZcq/sXieb1teRcsjXutSytoFphbVh2C6YhxcVjEnhgiLDS4NLuj1\nOzqFLt6nCygM//TrxEi21sGyUflFjXLzqWQFzw7+QWwK2YhrQyM3No3F5O298ndj\niJYT2bgD0wPglgsiBdcRWY5DiGG7fvN3wtFdctUmtwKBgQDa7et4jJ0kZocxAmr1\nIOgZK2x5iVRRmCMr7P0y8m5bVOChrGVw2Z/uFB5YmfRkboII1cHr5K6hOnixf3CR\nnDFx3gpKXLvN4GAuIcK30HiIhFk/7MelJCB5+3T+ZUK2ULkTKLxgC/rZaAQSaL5u\nLXynrSwmyUW6b2eEMRnUd6V+VwKBgQC9B1VEV/ggwzsdsIE3OETK9x+zrbgkQ776\nM5PJdbO1qJr8G/R9f4VvMKZ2OERHv+B2RCtmoZGU0tl4UqlvbdQvtsl71mLzK346\ndZCGbAljGXOR+m9nHvNug22Dtw4r5qoS/iycXlq/AsKEgJ7rqdjse3QoRjo1sxx7\nIZJm0FVklwKBgEJyYbyF2Q/6OmAKntHleexhvJuqrbfSGCK13CeBYzM/MKqBO4yj\n0KGe45L6ry1oSPlLf38MOmBe8dDVoCHhqTQpMzBcsveKeUanIoVNtbehi8EWKYYa\nz+yWAG1R6IyTNYj2HS59lFY19r5rohion6P4sGTZQ9uRAnchu/g7lDQjAoGAcyuW\nng9jFMMer5YtBHH6KBetbxI3EZFdOKBYOPTHy7SwyU5XBme96uMfaQQbRgP4RNaA\nAwYJ5z0YVyE2LrgiAfhChns2yqYDQKcEqYIFriWBrr2BRrkq5HibLxdHQSRHF09Z\n6uPqMlsCHS0oprlTe7I0MZ2oNbOtdLAdvRrODH0CgYEAjg7UbHGKR+upk+q5Gcds\nMifJSgxTusMkeAXwrr29AtE3FoJtBzTZufE2hgXfoyk7s3My1gYEndaQxMA4x1VV\nu008Vh5g3t9OtmNKT+EcrNSk/0EEmH46RpZ3Fzlp5YsjCXRRFmDTdxOLRYEPudcl\n3Njp4SUeregup5j1BO+G6Fg=\n-----END PRIVATE KEY-----\n",
+      "provider": "MANAGED",
+      "status": "VALID",
+      "subjects": [
+        "admin.nxguard.com.br",
+        "proxy.nxguard.com.br"
+      ]
+    }
+  ],
+  "upstreams": [
+    {
+      "name": "NXGuard_Frontend",
+      "description": "NXGuard Frontend",
+      "retry": 3,
+      "retry_timeout": 10,
+      "conn_timeout": 10,
+      "protocol": "HTTP",
+      "type": "backend",
+      "targets": [
+        {
+          "host": "nxguard.local",
+          "port": 4200,
+          "weight": 1
+        }
+      ],
+      "persist": {
+        "type": "COOKIE",
+        "enabled": true,
+        "cookie_name": "LB-X-NxGuard",
+        "cookie_path": "/",
+        "cookie_domain": "nxguard.local",
+        "cookie_secure": true,
+        "cookie_http_only": true
+      }
+    },
+    {
+      "name": "NXGuard_API",
+      "description": "NXGuard API",
+      "retry": 3,
+      "retry_timeout": 10,
+      "conn_timeout": 10,
+      "protocol": "HTTP",
+      "type": "backend",
+      "targets": [
+        {
+          "host": "nxguard.local",
+          "port": 5000,
+          "weight": 1
+        }
+      ],
+      "persist": {
+        "type": "COOKIE",
+        "enabled": true,
+        "cookie_name": "LB-X-NxGuard",
+        "cookie_path": "/",
+        "cookie_domain": "nxguard.local",
+        "cookie_secure": true,
+        "cookie_http_only": true
+      }
+    }
+  ],
+  "services": [
+    {
+      "name": "portainer",
+      "rate_limit": true,
+      "rate_limit_per_sec": 256,
+      "active": true,
+      "body_limit": 10,
+      "buffer": 256,
+      "bindings": [
+        {
+          "port": 80,
+          "protocol": "HTTP",
+          "ssl_upgrade": false
+        },
+        {
+          "port": 443,
+          "protocol": "HTTPS",
+          "ssl_upgrade": true
+        }
+      ],
+      "certificate": {
+        "name": "nxguard-lets"
+      },
+      "compression": true,
+      "compression_types": [
+        "text/plain",
+        "text/css",
+        "application/json",
+        "application/javascript",
+        "application/x-javascript",
+        "text/xml",
+        "application/xml",
+        "application/xml+rss",
+        "text/javascript"
+      ],
+      "headers": [
+        {
+          "content": "NXGuard",
+          "name": "X-Powered-By"
+        },
+        {
+          "content": "1; mode=block",
+          "name": "X-XSS-Protection"
+        },
+        {
+          "content": "SAMEORIGIN",
+          "name": "X-Frame-Options"
+        }
+      ],
+      "routes": [
+        {
+          "cache_methods": [],
+          "filters": [],
+          "methods": [
+            "GET",
+            "POST",
+            "PUT",
+            "PATCH",
+            "DELETE"
+          ],
+          "monitor_only": false,
+          "name": "all-req",
+          "paths": [
+            "^/(.*)"
+          ],
+          "redirect": {
+            "code": 500,
+            "url": ""
+          },
+          "sensor": {
+            "name": "Default"
+          },
+          "type": "upstream",
+          "upstream": {
+            "name": "portainer"
+          }
+        }
+      ],
+      "sans": [
+        "admin.nxguard.com.br"
+      ],
+      "ssl_client_auth": false,
+      "ssl_client_ca": "",
+      "ssl_protocols": [
+        "TLSv1",
+        "TLSv1.1",
+        "TLSv1.2",
+        "TLSv1.3"
+      ],
+      "timeout": 120
+    },
+    {
+      "active": true,
+      "body_limit": 10,
+      "buffer": 256,
+      "name": "proxy",
+      "rate_limit": true,
+      "rate_limit_per_sec": 256,
+      "bindings": [
+        {
+          "port": 80,
+          "protocol": "HTTP",
+          "ssl_upgrade": false
+        },
+        {
+          "port": 443,
+          "protocol": "HTTPS",
+          "ssl_upgrade": true
+        }
+      ],
+      "certificate": {
+        "name": "nxguard-lets"
+      },
+      "compression": true,
+      "compression_types": [
+        "text/plain",
+        "text/css",
+        "application/json",
+        "application/javascript",
+        "application/x-javascript",
+        "text/xml",
+        "application/xml",
+        "application/xml+rss",
+        "text/javascript"
+      ],
+      "headers": [
+        {
+          "content": "NXGuard",
+          "name": "X-Powered-By"
+        },
+        {
+          "content": "1; mode=block",
+          "name": "X-XSS-Protection"
+        },
+        {
+          "content": "SAMEORIGIN",
+          "name": "X-Frame-Options"
+        }
+      ],
+      "routes": [
+        {
+          "cache_methods": [],
+          "filters": [],
+          "methods": [
+            "GET",
+            "POST",
+            "PUT",
+            "PATCH",
+            "DELETE"
+          ],
+          "monitor_only": false,
+          "name": "all-req",
+          "paths": [
+            "^/(.*)"
+          ],
+          "redirect": {
+            "code": 500,
+            "url": ""
+          },
+          "sensor": {
+            "name": "Default"
+          },
+          "type": "upstream",
+          "upstream": {
+            "name": "proxy"
+          }
+        }
+      ],
+      "sans": [
+        "proxy.nxguard.com.br"
+      ],
+      "ssl_client_auth": false,
+      "ssl_client_ca": "",
+      "ssl_protocols": [
+        "TLSv1",
+        "TLSv1.1",
+        "TLSv1.2",
+        "TLSv1.3"
+      ],
+      "timeout": 120
+    }
+  ]
+}

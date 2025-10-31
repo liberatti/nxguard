@@ -4,7 +4,7 @@ from marshmallow import EXCLUDE, Schema, fields
 
 import config as config
 from basic4web.middleware.logging import logger
-from basic4web.repository.mongo import MongoDAO
+from basic4web.repository.sqlite3_base_dao import SQLite3DAO
 
 
 class ConfigArchiveSchema(Schema):
@@ -52,7 +52,7 @@ class ConfigSchema(Schema):
     purge = fields.Nested(ConfigPurgeSchema)
 
 
-class ConfigDao(MongoDAO):
+class ConfigDao(SQLite3DAO):
     """
     DAO for managing system configuration.
     
@@ -64,7 +64,7 @@ class ConfigDao(MongoDAO):
         """
         Initializes the DAO with the 'config' collection and schema.
         """
-        super().__init__(url=config.MONGO_URI, collection_name="config", database="nxguard", schema=ConfigSchema)
+        super().__init__(db_path=config.DB_PATH, table_name="config", schema=ConfigSchema)
 
     def get_active(self) -> Optional[Dict[str, Any]]:
         """
@@ -85,7 +85,7 @@ class ConfigDao(MongoDAO):
             raise
 
 
-class ChangeDao(MongoDAO):
+class ChangeDao(SQLite3DAO):
     """
     DAO for managing configuration changes.
     
@@ -97,4 +97,4 @@ class ChangeDao(MongoDAO):
         """
         Initializes the DAO with the 'changes' collection.
         """
-        super().__init__(url=config.MONGO_URI, collection_name="changes", database="nxguard")
+        super().__init__(db_path=config.DB_PATH, table_name="changes", schema=ConfigSchema)

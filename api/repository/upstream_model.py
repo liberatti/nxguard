@@ -1,52 +1,24 @@
-from datetime import datetime
-from enum import Enum
+import json
 from typing import Dict, Any, List
 
-from bson import ObjectId
 from marshmallow import EXCLUDE, Schema, fields
 
 import config as config
 from basic4web.middleware.logging import logger
-from basic4web.repository.mongo import MongoDAO
-
-
-class Protocol(Enum):
-    """
-    Enumeration for supported upstream protocols.
-    
-    This enum defines the available protocols for upstream connections.
-    """
-    AJP = ("AJP",)
-    HTTP = ("HTTP",)
-    HTTPS = "HTTPS"
-
-    def __str__(self):
-        """Returns the string representation of the protocol."""
-        return str(self.name)
+from basic4web.repository.sqlite3_base_dao import SQLite3DAO
 
 
 class UpstreamTargetSchema(Schema):
-    """
-    Schema for upstream target validation and serialization.
-    
-    This schema defines the structure and validation rules for upstream targets.
-    """
-
     class Meta:
         unknown = EXCLUDE
 
     host = fields.String()
     port = fields.Integer()
     weight = fields.Integer()
+    state = fields.String()
 
 
 class UpstreamPersistSchema(Schema):
-    """
-    Schema for upstream persistence validation and serialization.
-    
-    This schema defines the structure and validation rules for upstream persistence settings.
-    """
-
     class Meta:
         unknown = EXCLUDE
 
@@ -58,222 +30,73 @@ class UpstreamPersistSchema(Schema):
 
 
 class UpstreamSchema(Schema):
-    """
-    Schema for upstream validation and serialization.
-    
-    This schema defines the structure and validation rules for upstream configurations.
-    """
-
     class Meta:
         unknown = EXCLUDE
 
-    _id = fields.String()
+    id = fields.String()
     name = fields.String()
     description = fields.String()
     retry = fields.Integer()
     retry_timeout = fields.Integer()
     conn_timeout = fields.Integer()
-    protocol = fields.String()
+    protocol = fields.String()  # AJP, HTTP, HTTPS
     script_path = fields.String()  # fastcgi
     type = fields.String()  # backend, static
     targets = fields.List(fields.Nested(UpstreamTargetSchema))
     persist = fields.Nested(UpstreamPersistSchema)
-    index = fields.String()
-    content = fields.Raw()
-    healthy = fields.Boolean()  # Virtual
+    target_index = fields.String()
+    target_content = fields.Raw()
 
 
-class UpstreamTargetStatusSchema(Schema):
-    """
-    Schema for upstream target status validation and serialization.
-    
-    This schema defines the structure and validation rules for upstream target status information.
-    """
-
-    class Meta:
-        unknown = EXCLUDE
-
-    endpoint = fields.String()
-    healthy = fields.Boolean()
-
-
-class UpstreamStatusSchema(Schema):
-    """
-    Schema for upstream status validation and serialization.
-    
-    This schema defines the structure and validation rules for upstream status information.
-    """
-
-    class Meta:
-        unknown = EXCLUDE
-
-    _id = fields.String()
-    name = fields.String()
-    healthy = fields.Boolean()
-    targets = fields.List(fields.Nested(UpstreamTargetStatusSchema))
-
-
-class NodeStatusSchema(Schema):
-    """
-    Schema for node status validation and serialization.
-    
-    This schema defines the structure and validation rules for node status information.
-    """
-
-    class Meta:
-        unknown = EXCLUDE
-
-    _id = fields.String()
-    name = fields.String()
-    scn = fields.String()
-    version = fields.String()
-    upstreams = fields.List(fields.Nested(UpstreamStatusSchema))
-    healthy = fields.Boolean()  # Virtual
-    role = fields.String()
-    last_check = fields.DateTime(format=config.DATETIME_FMT, allow_none=True, required=False)
-    net_recv = fields.Integer(required=False)  # Virtual
-    net_send = fields.Integer(required=False)  # Virtual
-    apply_active = fields.Boolean(required=False, dump_default=False)
-    apply_pendding = fields.List(fields.String(), required=False)
-
-
-class NodeStatusDao(MongoDAO):
-    """
-    DAO for managing node status information.
-    
-    This class extends MongoDAO to provide specific operations
-    related to node status management and monitoring.
-    """
+class UpstreamDao(SQLite3DAO):
 
     def __init__(self):
-        """
-        Initializes the DAO with the 'nodes' collection and schema.
-        """
         super().__init__(
-            url=config.MONGO_URI,
-            collection_name="nodes",
-            database="nxguard",
-            schema=NodeStatusSchema
-        )
-
-    def purge_before_date(self, last_check: datetime) -> int:
-        """
-        Purges transactions older than the specified date.
-        
-        Args:
-            purge_date (datetime): Cutoff date for purging
-            
-        Returns:
-            int: Number of documents deleted
-            
-        Raises:
-            PyMongoError: If an error occurs during the purge operation
-        """
-        try:
-            query = {"logtime": {"$lte": last_check}}
-            rs = self.collection.delete_many(query)
-            logger.debug(query)
-            return rs.deleted_count
-        except Exception as e:
-            logger.error(f"Error purging transactions: {str(e)}")
-            raise
-
-    def get_upstream_healthy(self, upstream_id: str) -> bool:
-        """
-        Checks if an upstream is healthy across all nodes.
-        
-        Args:
-            upstream_id (str): Upstream ID to check
-            
-        Returns:
-            bool: True if the upstream is healthy on all nodes, False otherwise
-            
-        Raises:
-            PyMongoError: If an error occurs during the search operation
-        """
-        try:
-            query = {"upstreams._id": ObjectId(upstream_id)}
-            rows = list(self.collection.find(query))
-            for r in rows:
-                if not r['healthy']:
-                    return False
-            return True
-        except Exception as e:
-            logger.error(f"Error checking upstream health: {str(e)}")
-            raise
-
-    def _from_dict(self, vo: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Unloads a node status document, converting nested objects to IDs.
-        
-        Args:
-            vo (Dict[str, Any]): Node status document to unload
-            
-        Returns:
-            Dict[str, Any]: Unloaded node status document
-        """
-        super()._from_dict(vo)
-        if "upstreams" in vo:
-            ups = vo.pop('upstreams')
-            for u in ups:
-                u.update({"_id": ObjectId(u['_id'])})
-            vo.update({"upstreams": ups})
-        return vo
-
-
-class UpstreamDao(MongoDAO):
-    """
-    DAO for managing upstream configurations.
-    
-    This class extends MongoDAO to provide specific operations
-    related to upstream management and configuration.
-    """
-
-    def __init__(self):
-        """
-        Initializes the DAO with the 'upstream' collection and schema.
-        """
-        super().__init__(
-            url=config.MONGO_URI,
-            collection_name="upstream",
-            database="nxguard",
+            db_path=config.DB_PATH,
+            table_name="upstream",
             schema=UpstreamSchema
         )
 
+    def create_schema(self):
+        self.ddl(f"""
+            CREATE TABLE IF NOT EXISTS {self.table_name} (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                description TEXT,
+                retry INTEGER,
+                retry_timeout INTEGER,
+                conn_timeout INTEGER,
+                protocol TEXT,
+                script_path TEXT,
+                type TEXT,
+                targets_json TEXT,
+                persist_json TEXT,
+                target_index TEXT,
+                target_content TEXT
+            );
+        """)
+
     def get_all_by_type(self, t: str) -> List[Dict[str, Any]]:
-        """
-        Retrieves all upstreams of a specific type.
-        
-        Args:
-            t (str): Upstream type to filter by
-            
-        Returns:
-            List[Dict[str, Any]]: List of upstream documents
-            
-        Raises:
-            PyMongoError: If an error occurs during the search operation
-        """
         try:
-            query = {"type": {"$eq": t}}
-            rows = list(self.collection.find(query))
+            query = f"SELECT * from {self.table_name} WHERE type = ?"
+            rows = list(self._query(query, (t,), many=True, fetch=True))
             for r in rows:
-                self._to_dict(r)
+                r.update(self.to_dict(r))
             return rows
         except Exception as e:
             logger.error(f"Error retrieving upstreams by type: {str(e)}")
             raise
 
-    def _from_dict(self, vo: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Unloads an upstream document, converting nested objects to IDs.
-        
-        Args:
-            vo (Dict[str, Any]): Upstream document to unload
-            
-        Returns:
-            Dict[str, Any]: Unloaded upstream document
-        """
-        super()._from_dict(vo)
+    def from_dict(self, vo: Dict[str, Any]) -> Dict[str, Any]:
+        if 'targets' in vo:
+            vo.update({
+                "targets_json": json.dumps(vo.pop('targets'))
+            })
+        if 'persist' in vo:
+            vo.update({
+                "persist_json": json.dumps(vo.pop('persist'))
+            })
+
         if "type" not in vo:
             vo.update({"type": "backend"})
-        return vo
+        return super().from_dict(vo)

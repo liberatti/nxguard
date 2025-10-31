@@ -1,3 +1,4 @@
+import json
 from datetime import datetime, timedelta
 from typing import Dict, Any
 
@@ -6,20 +7,14 @@ from marshmallow import EXCLUDE, Schema, fields
 import config as config
 from basic4web.common_utils import replace_tz
 from basic4web.middleware.logging import logger
-from basic4web.repository.mongo import MongoDAO
+from basic4web.repository.sqlite3_base_dao import SQLite3DAO
 
 
 class CertificateSchema(Schema):
-    """
-    Schema for certificate validation and serialization.
-    
-    This schema defines the structure and validation rules for certificate documents.
-    """
-
     class Meta:
         unknown = EXCLUDE
 
-    _id = fields.String()
+    id = fields.String()
     name = fields.String()
     subjects = fields.List(fields.String())
     chain = fields.String()
@@ -33,56 +28,35 @@ class CertificateSchema(Schema):
     force_renew = fields.Boolean(required=False, load_default=False, dump_default=False)
 
 
-class CertificateDao(MongoDAO):
-    """
-    DAO for managing SSL/TLS certificates.
-    
-    This class extends MongoDAO to provide specific operations
-    related to certificate management, including status tracking
-    and certificate persistence.
-    """
+class CertificateDao(SQLite3DAO):
 
     def __init__(self):
-        """
-        Initializes the DAO with the 'certificate' collection and schema.
-        """
-        super().__init__(url=config.MONGO_URI, collection_name="certificate", database="nxguard",
-                         schema=CertificateSchema)
+        super().__init__(db_path=config.DB_PATH, table_name="certificate", schema=CertificateSchema)
 
-    def count_by_status(self) -> Dict[str, int]:
-        """
-        Counts certificates by their status.
-        
-        Returns:
-            Dict[str, int]: Dictionary with status as key and count as value
-            
-        Raises:
-            PyMongoError: If an error occurs during the aggregation
-        """
-        try:
-            query = [
-                {"$facet": {"data": [{"$group": {"_id": "$status", "count": {"$sum": 1}}}]}}
-            ]
-            rs = list(self.collection.aggregate(query))[0]
-            rows = rs.get("data", [])
-            return {rows[0]["_id"]: rows[0]["count"], rows[1]["_id"]: rows[1]["count"]}
-        except Exception as e:
-            logger.error(f"Error counting certificates by status: {str(e)}")
-            raise
+    def create_schema(self):
+        self.ddl(f"""
+            CREATE TABLE IF NOT EXISTS {self.table_name} (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                subjects TEXT NOT NULL,
+                chain TEXT,
+                certificate TEXT NOT NULL,
+                private_key TEXT NOT NULL,
+                ssl_client_ca TEXT,
+                not_before TEXT,
+                not_after TEXT,
+                status TEXT,
+                provider TEXT,
+                force_renew BOOLEAN DEFAULT 0
+            );
+        """)
+
+    def from_dict(self, vo):
+        if "subjects" in vo:
+            vo.update({"subjects": json.dumps(vo.pop("subjects"))})
+        return super().from_dict(vo)
 
     def persist(self, o: Dict[str, Any]) -> str:
-        """
-        Persists a new certificate with default dates if not provided.
-        
-        Args:
-            o (Dict[str, Any]): Certificate data dictionary
-            
-        Returns:
-            str: ID of the inserted certificate
-            
-        Raises:
-            PyMongoError: If an error occurs during the insert operation
-        """
         try:
             default_date = (
                 replace_tz((datetime.now() - timedelta(days=1)))

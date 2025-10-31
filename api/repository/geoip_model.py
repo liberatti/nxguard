@@ -1,13 +1,12 @@
 from typing import Dict, Any, Optional
 
-from api.tools.network_tool import NetworkTool
-
 import config as config
+from api.tools.network_tool import NetworkTool
 from basic4web.middleware.logging import logger
-from basic4web.repository.mongo import MongoDAO
+from basic4web.repository.sqlite3_base_dao import SQLite3DAO
 
 
-class GeoIpDao(MongoDAO):
+class GeoIpDao(SQLite3DAO):
     """
     DAO for managing GeoIP data.
     
@@ -19,7 +18,7 @@ class GeoIpDao(MongoDAO):
         """
         Initializes the DAO with the 'geoip' collection.
         """
-        super().__init__(url=config.MONGO_URI, collection_name="geoip", database="nxguard")
+        super().__init__(db_path=config.DB_PATH, table_name="geoip")
 
     def find_by_ip(self, ip: str) -> Optional[Dict[str, Any]]:
         """

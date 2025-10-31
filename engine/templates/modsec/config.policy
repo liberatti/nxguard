@@ -1,0 +1,38 @@
+SecPcreMatchLimit 10000
+SecPcreMatchLimit 10000
+SecPcreMatchLimitRecursion 10000
+SecDataDir /tmp/modsec
+SecRequestBodyLimitAction Reject
+SecRequestBodyAccess On
+SecResponseBodyAccess On
+SecResponseBodyLimitAction ProcessPartial
+SecResponseBodyMimeType text/plain text/html text/xml application/json
+SecArgumentSeparator &
+SecCookieFormat 0
+SecCollectionTimeout 600
+SecDefaultAction "phase:1,log,auditlog,pass"
+SecDefaultAction "phase:2,log,auditlog,pass"
+SecRule TX:/^MSC_/ "!@streq 0" "id:50,phase:1,deny,nolog,t:none,msg:'ModSecurity internal error flagged: %{MATCHED_VAR_NAME}'"
+SecRule MULTIPART_UNMATCHED_BOUNDARY "!@eq 0" "id:51,phase:1,deny,log,t:none,msg:'Multipart parser detected a possible unmatched boundary.'"
+SecRule REQUEST_HEADERS:Content-Type "(?:application(?:/soap\+|/)|text/)xml" "id:52,phase:1,pass,nolog,t:none,t:lowercase,ctl:requestBodyProcessor=XML"
+SecRule REQUEST_HEADERS:Content-Type "(?:application(?:/json\+|/))json" "id:53,phase:1,pass,nolog,t:none,t:lowercase,ctl:requestBodyProcessor=JSON"
+SecRule REQBODY_ERROR "!@eq 0" "id:55,severity:2,phase:2,deny,nolog,t:none,ctl:requestBodyProcessor=JSON,msg:'Failed to parse request body.',logdata:'%{reqbody_error_msg}'"
+SecAction "id:900990,phase:1,pass,nolog,noauditlog,t:none,setvar:tx.crs_setup_version=336"
+# service #######################################
+
+SecAuditEngine On
+SecRequestBodyLimit 10485760
+SecAuditLogParts ABHF
+SecAuditLogFormat JSON
+SecAuditLogType Serial
+SecDebugLogLevel 0
+SecAuditLog /opt/nxguard/logs/audit_log-68e91e5c192fdb2f1b0779d0.log
+
+
+# CRS ##############################################
+SecAction "id:900200,phase:1,pass,log,noauditlog,t:none,setvar:tx.allowed_methods=GET HEAD POST PUT DELETE OPTIONS PATCH"
+SecAction "id:900000,phase:1,pass,nolog,noauditlog,t:none,setvar:tx.paranoia_level=%{TX.SENSOR_LEVEL}"
+SecAction "id:900100,phase:1,pass,nolog,noauditlog,t:none,setvar:tx.critical_anomaly_score=15,setvar:tx.error_anomaly_score=4,setvar:tx.warning_anomaly_score=3,setvar:tx.notice_anomaly_score=2"
+SecAction "id:900110,phase:1,pass,nolog,noauditlog,t:none,setvar:tx.inbound_anomaly_score_threshold=%{TX.SENSOR_ISCORE},setvar:tx.outbound_anomaly_score_threshold=%{TX.SENSOR_OSCORE}"
+SecAction "id:900220,phase:1,pass,nolog,noauditlog,t:none,setvar:'tx.allowed_request_content_type=|application/x-www-form-urlencoded| |multipart/form-data| |multipart/related| |text/xml| |application/xml| |application/soap+xml| |application/json| |application/cloudevents+json| |application/cloudevents-batch+json|'"
+

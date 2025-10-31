@@ -3,10 +3,10 @@ from typing import Optional, Dict, Any
 
 import config as config
 from basic4web.middleware.logging import logger
-from basic4web.repository.mongo import MongoDAO
+from basic4web.repository.sqlite3_base_dao import SQLite3DAO
 
 
-class ChallengeDao(MongoDAO):
+class ChallengeDao(SQLite3DAO):
     """
     DAO for managing ACME challenges.
     
@@ -18,8 +18,9 @@ class ChallengeDao(MongoDAO):
     def __init__(self):
         """
         Initializes the DAO with the 'challenge' collection.
+        self, db_path, table_name, schema=None, conn=None
         """
-        super().__init__(url=config.MONGO_URI, collection_name="challenge", database="nxguard")
+        super().__init__(db_path=config.DB_PATH, table_name="challenge")
 
     def delete_issued_before(self, dt: datetime) -> int:
         """

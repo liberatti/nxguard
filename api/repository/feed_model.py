@@ -4,7 +4,7 @@ from marshmallow import EXCLUDE, Schema, fields
 
 import config as config
 from basic4web.middleware.logging import logger
-from basic4web.repository.mongo import MongoDAO
+from basic4web.repository.sqlite3_base_dao import SQLite3DAO
 
 
 class FeedSchema(Schema):
@@ -32,7 +32,7 @@ class FeedSchema(Schema):
     updated_on = fields.DateTime(format=config.DATETIME_FMT, allow_none=True, required=False)
 
 
-class FeedDao(MongoDAO):
+class FeedDao(SQLite3DAO):
     """
     DAO for managing feed data.
     
@@ -44,7 +44,7 @@ class FeedDao(MongoDAO):
         """
         Initializes the DAO with the 'feeds' collection and schema.
         """
-        super().__init__(url=config.MONGO_URI, collection_name="feeds", database="nxguard", schema=FeedSchema)
+        super().__init__(db_path=config.DB_PATH, table_name="feeds", schema=FeedSchema)
 
     def get_by_slug(self, slug: str) -> Optional[Dict[str, Any]]:
         """

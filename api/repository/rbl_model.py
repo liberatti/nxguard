@@ -8,7 +8,7 @@ import config as config
 from api.repository.feed_model import FeedSchema
 from api.tools.network_tool import NetworkTool
 from basic4web.middleware.logging import logger
-from basic4web.repository.mongo import MongoDAO
+from basic4web.repository.sqlite3_base_dao import SQLite3DAO
 
 
 class RBLSchema(Schema):
@@ -30,7 +30,7 @@ class RBLSchema(Schema):
     src_type_id = fields.String()  # _id from source
 
 
-class RBLDao(MongoDAO):
+class RBLDao(SQLite3DAO):
     """
     DAO for managing RBL (Real-time Blackhole List) data.
     
@@ -42,7 +42,7 @@ class RBLDao(MongoDAO):
         """
         Initializes the DAO with the 'rbl' collection and schema.
         """
-        super().__init__(url=config.MONGO_URI, collection_name="rbl", database="nxguard", schema=FeedSchema)
+        super().__init__(db_path=config.DB_PATH, table_name="rbl", schema=FeedSchema)
 
     def check_by_ip(self, ip: str, sensor: Dict[str, Any]) -> Dict[str, bool]:
         """

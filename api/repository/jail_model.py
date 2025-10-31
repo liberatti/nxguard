@@ -6,7 +6,7 @@ from marshmallow import EXCLUDE, Schema, fields
 import config as config
 from basic4web.common_utils import replace_tz
 from basic4web.middleware.logging import logger
-from basic4web.repository.mongo import MongoDAO
+from basic4web.repository.sqlite3_base_dao import SQLite3DAO
 
 
 class JailEntrySchema(Schema):
@@ -56,7 +56,7 @@ class JailSchema(Schema):
     rules = fields.Nested(JailRulesSchema, many=True)
 
 
-class JailDao(MongoDAO):
+class JailDao(SQLite3DAO):
     """
     DAO for managing jail data.
     
@@ -69,7 +69,7 @@ class JailDao(MongoDAO):
         """
         Initializes the DAO with the 'jail' collection and schema.
         """
-        super().__init__(url=config.MONGO_URI, collection_name="jail", database="nxguard", schema=JailSchema)
+        super().__init__(db_path=config.DB_PATH, table_name="jail", schema=JailSchema)
 
     def get_by_type(self, t: str) -> List[Dict[str, Any]]:
         """

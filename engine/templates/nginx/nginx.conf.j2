@@ -1,0 +1,51 @@
+server {
+    listen {{ port }};
+    server_name {{ server_name }};
+
+    location / {
+        proxy_pass http://{{ backend_host }}:{{ backend_port }};
+    }
+}
+
+
+
+
+load_module modules/ngx_http_modsecurity_module.so;
+load_module modules/ngx_http_sticky_module.so;
+user nxguard nxguard;
+pid /opt/nxguard/run/nginx.pid;
+events {worker_connections 1024;}
+http {
+ lua_shared_dict geoip_cache 10m;
+ lua_shared_dict si_68e91d2946043e189ab49b96_cache 10m;
+ client_body_temp_path /opt/nxguard/temp/client_body;
+ fastcgi_temp_path /opt/nxguard/temp/fastcgi;
+ proxy_temp_path /opt/nxguard/temp/proxy;
+ scgi_temp_path /opt/nxguard/temp/scgi;
+ uwsgi_temp_path /opt/nxguard/temp/uwsgi;
+ access_log off;error_log /dev/null crit;
+ proxy_intercept_errors on;
+ include mime.types;
+ default_type  application/octet-stream;
+ sendfile on;
+ keepalive_timeout 65;
+ log_format logger-json escape=json '{"time":"$time_local","service_id":"$service_id","route_name":"$route_name","upstream_id":"$upstream_id","target_addr":"$upstream_addr","sensor_id":"$sensor_id","uniqueid":"$request_id","host":"$http_host","remote_addr":"$remote_addr","remote_port":$remote_port,"server_port":$server_port,"request_line":"$request","method":"$real_method","status":$status,"bytes_in":$request_length,"bytes_out":$body_bytes_sent,"duration":$request_time,"uht":"$upstream_header_time","urt":"$upstream_response_time","referer":"$http_referer","user_agent":"$http_user_agent","limit_req_status":"$limit_req_status","geoip_status":"$geoip_status","rbl_status":"$rbl_status"}';
+ large_client_header_buffers 4 32k;
+ map $host $missing_domain_match {
+  admin.nxguard.com.br 0;
+  proxy.nxguard.com.br 0;
+  default 1;
+ }
+ map $http_upgrade $connection_upgrade {default upgrade;'' close;}
+ map '$scheme:$request_uri' $ssl_upgrade{
+  ~^http:/\.well-known/acme-challenge/ 0;
+  ~^http: 1;
+  default 0;
+ }
+ proxy_next_upstream error timeout invalid_header http_500 http_502 http_503 http_504;
+ include upstreams.conf;
+ include monitor.conf;
+ {%- for u in upstreams %}
+ include {{ u.name }}.conf;
+ {%- endfor %}
+}
