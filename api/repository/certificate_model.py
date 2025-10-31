@@ -14,7 +14,7 @@ class CertificateSchema(Schema):
     class Meta:
         unknown = EXCLUDE
 
-    id = fields.String()
+    _id = fields.String()
     name = fields.String()
     subjects = fields.List(fields.String())
     chain = fields.String()
@@ -36,7 +36,7 @@ class CertificateDao(SQLite3DAO):
     def create_schema(self):
         self.ddl(f"""
             CREATE TABLE IF NOT EXISTS {self.table_name} (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                _id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
                 subjects TEXT NOT NULL,
                 chain TEXT,

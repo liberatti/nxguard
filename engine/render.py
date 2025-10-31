@@ -3,18 +3,10 @@ import os
 
 from jinja2 import Environment, FileSystemLoader
 
-import engine.admin as admin
 from basic4web.middleware.logging import logger
 from config import APP_BASE
 
 env = Environment(loader=FileSystemLoader('engine/templates'))
-
-
-def validate(output_dir):
-    if admin.test_config():
-        admin.restart()
-
-    # /opt/nxguard/nginx/sbin/nginx -c /opt/nxguard/nginx/conf/nginx.conf  -t
 
 
 def generate(data, output_dir=f"{APP_BASE}"):

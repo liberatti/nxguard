@@ -33,7 +33,7 @@ class UpstreamSchema(Schema):
     class Meta:
         unknown = EXCLUDE
 
-    id = fields.String()
+    _id = fields.String()
     name = fields.String()
     description = fields.String()
     retry = fields.Integer()
@@ -60,7 +60,7 @@ class UpstreamDao(SQLite3DAO):
     def create_schema(self):
         self.ddl(f"""
             CREATE TABLE IF NOT EXISTS {self.table_name} (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                _id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
                 description TEXT,
                 retry INTEGER,

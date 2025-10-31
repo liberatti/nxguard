@@ -67,8 +67,6 @@ COPY engine engine
 RUN mkdir -p /opt/nxguard/lualib/share/lua/5.4/nxguard/
 COPY lualib /opt/nxguard/lualib/share/lua/5.4/nxguard/
 
-RUN pip3.12 install 'basic4web[web,sqlite] @ git+https://github.com/liberatti/basic4web.git@develop#egg=basic4web'
-
 COPY --from=frontend /app/web/dist /opt/nxguard/admin/static
 COPY --from=frontend /app/web/dist/index.html /opt/nxguard/admin/templates/
 

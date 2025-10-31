@@ -25,5 +25,4 @@ setuptools_rust
 setuptools~=75.8.2
 josepy~=1.15.0
 Jinja2~=3.1.4
-#
 basic4web[web,sqlite] @ git+https://github.com/liberatti/basic4web.git@develop#egg=basic4web

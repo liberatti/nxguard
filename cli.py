@@ -31,6 +31,8 @@ def test_config(config_file=os.path.join(APP_CONFIG_DIR, "init-data.json")):
 def install():
     logger.info(f"Installing NXGuard")
     os.makedirs(APP_CONFIG_DIR, exist_ok=True)
+
+    os.remove(f"/data/app.sqlite")
     c_builder.init_from_json(os.path.join(APP_CONFIG_DIR, "init-data.json"))
 
 
