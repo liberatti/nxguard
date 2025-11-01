@@ -1,0 +1,53 @@
+import {Injectable, Injector} from "@angular/core";
+import {APIService} from "./api.service";
+import {Config} from "../models/config";
+import {LocalStorageService} from "./localstorage.service";
+import {Observable} from "rxjs";
+import {Page} from "../models/shared";
+
+@Injectable({
+    providedIn: 'root'
+})
+export class ConfigService extends APIService<Config, string> {
+
+    constructor(
+        protected override injector: Injector,
+        private localStorage: LocalStorageService
+    ) {
+        super(injector, 'cluster')
+    }
+
+    getActive(): Observable<Config> {
+        return this.httpClient.get<Config>(this.END_POINT + "/config");
+    }
+
+    override update(id: string, data: Config): Observable<Config> {
+        return this.httpClient.put<Config>(this.END_POINT + "/config", data);
+    }
+    healthCheck(): Observable<any> {
+        return this.httpClient.get<any>(this.END_POINT + "/health");
+    }
+
+    getPending(): Observable<any> {
+        return this.httpClient.get<any>(this.END_POINT + "/changes");
+    }
+
+    applyConfig(): Observable<any> {
+        return this.httpClient.get<any>(this.END_POINT + "/apply");
+    }
+
+    downloadConfig(): Observable<Blob> {
+        const httpOptions = {
+            responseType: 'blob' as 'json'
+        };
+        return this.httpClient.get<Blob>(this.END_POINT + "/backup", httpOptions);
+    }
+
+    uploadConfig(data: FormData): Observable<any> {
+        return this.httpClient.post<any>(this.END_POINT + "/backup", data);
+    }
+
+    getNodes(): Observable<Page> {
+        return this.httpClient.get<Page>(this.END_POINT + "/nodes");
+    }
+}
