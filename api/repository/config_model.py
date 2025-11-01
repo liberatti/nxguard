@@ -65,9 +65,9 @@ class ConfigDao(SQLite3DAO):
     def to_dict(self, row):
         if row:
             if "archive_json" in row:
-                row.update({"archive": json.load(row.pop('archive_json'))})
+                row.update({"archive": json.loads(row.pop('archive_json'))})
             if "purge_json" in row:
-                row.update({"purge": json.load(row.pop('purge_json'))})
+                row.update({"purge": json.loads(row.pop('purge_json'))})
         return super().to_dict(row)
 
     def get_active(self) -> Optional[Dict[str, Any]]:
