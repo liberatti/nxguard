@@ -18,12 +18,15 @@ def init_from_json(json_file):
         data = json.load(f)
         with UserDao() as dao:
             dao.create_schema()
-            dao.persist({
+            encrypted_pass = bcrypt.hashpw(data['user']['password'].encode("utf8"), bcrypt.gensalt())
+            user = {
                 "name": data['user']['name'],
-                "password": bcrypt.hashpw(data['user']['password'].encode("utf8"), bcrypt.gensalt()),
+                "password": encrypted_pass.decode("utf8"),
                 "email": data['user']['email'],
                 "role": data['user']['role']
-            })
+            }
+            # logger.info(user)
+            dao.persist(user)
         with UpstreamDao() as dao:
             dao.create_schema()
             dao.persist_many(data['upstreams'])
@@ -31,7 +34,7 @@ def init_from_json(json_file):
         with CertificateDao() as dao:
             dao.create_schema()
             dao.persist_many(data['certificates'])
-            
+
         return data
 
 

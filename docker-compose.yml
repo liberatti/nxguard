@@ -2,7 +2,20 @@
 # vm.max_map_count=262144
 
 services:
-
+  redis:
+    image: redis:7.2
+    container_name: redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    environment:
+      - REDIS_PASSWORD=supersecreto
+    command: [
+      "redis-server",
+      "--requirepass", "supersecreto",
+      "--save", "",
+      "--appendonly", "no"
+    ]
   web:
     image: node:lts
     command: [ "npm", "run", "start" ]

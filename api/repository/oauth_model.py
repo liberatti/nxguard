@@ -19,7 +19,7 @@ class UserSchema(Schema):
     class Meta:
         unknown = EXCLUDE
 
-    id = fields.String()
+    _id = fields.String()
     name = fields.String()
     email = fields.String()
     password = fields.String()
@@ -33,7 +33,7 @@ class UserDao(SQLite3DAO):
         self.ddl(
             f"""
                     CREATE TABLE IF NOT EXISTS {self.table_name} (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        _id INTEGER PRIMARY KEY AUTOINCREMENT,
                         name TEXT NOT NULL,
                         email TEXT NOT NULL UNIQUE,
                         password TEXT NOT NULL,
