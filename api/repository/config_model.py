@@ -1,3 +1,4 @@
+import json
 from typing import Dict, Any, Optional
 
 from marshmallow import EXCLUDE, Schema, fields
@@ -8,11 +9,6 @@ from basic4web.repository.sqlite3_base_dao import SQLite3DAO
 
 
 class ConfigArchiveSchema(Schema):
-    """
-    Schema for archive configuration validation and serialization.
-    
-    This schema defines the structure and validation rules for archive configuration.
-    """
     enabled = fields.Boolean()
     archive_after = fields.Integer()  # minutes
     purge_after = fields.Integer()  # days
@@ -23,22 +19,11 @@ class ConfigArchiveSchema(Schema):
 
 
 class ConfigPurgeSchema(Schema):
-    """
-    Schema for purge configuration validation and serialization.
-    
-    This schema defines the structure and validation rules for purge configuration.
-    """
     enabled = fields.Boolean()
     purge_after = fields.Integer()  # days
 
 
 class ConfigSchema(Schema):
-    """
-    Schema for main configuration validation and serialization.
-    
-    This schema defines the structure and validation rules for the main configuration.
-    """
-
     class Meta:
         unknown = EXCLUDE
 
@@ -53,48 +38,55 @@ class ConfigSchema(Schema):
 
 
 class ConfigDao(SQLite3DAO):
-    """
-    DAO for managing system configuration.
-    
-    This class extends MongoDAO to provide specific operations
-    related to system configuration management.
-    """
-
     def __init__(self):
-        """
-        Initializes the DAO with the 'config' collection and schema.
-        """
         super().__init__(db_path=config.DB_PATH, table_name="config", schema=ConfigSchema)
 
+    def create_schema(self):
+        self.ddl(f"""
+            CREATE TABLE IF NOT EXISTS {self.table_name} (
+                _id INTEGER PRIMARY KEY AUTOINCREMENT,
+                cluster_id TEXT,
+                maxmind_key TEXT,
+                ca_certificate TEXT,
+                ca_private TEXT,
+                acme_directory_url TEXT,
+                archive_json TEXT,
+                purge_json TEXT
+            );
+        """)
+
+    def from_dict(self, vo):
+        if "archive" in vo:
+            vo.update({"archive_json": json.dumps(vo.pop('archive'))})
+        if "purge" in vo:
+            vo.update({"purge_json": json.dumps(vo.pop('purge'))})
+        return super().from_dict(vo)
+
+    def to_dict(self, row):
+        if "archive_json" in row:
+            row.update({"archive": json.load(row.pop('archive_json'))})
+        if "purge_json" in row:
+            row.update({"purge": json.load(row.pop('purge_json'))})
+        return super().to_dict(row)
+
     def get_active(self) -> Optional[Dict[str, Any]]:
-        """
-        Retrieves the active configuration.
-        
-        Returns:
-            Optional[Dict[str, Any]]: Active configuration document or None if not found
-            
-        Raises:
-            PyMongoError: If an error occurs during the search operation
-        """
         try:
-            rs = self.collection.find_one({})
-            self._to_dict(rs)
-            return rs
+            query = f"select * from {self.table_name}"
+            rs = self._query(query, many=False)
+            return self.to_dict(rs)
         except Exception as e:
             logger.error(f"Error retrieving active configuration: {str(e)}")
             raise
 
 
 class ChangeDao(SQLite3DAO):
-    """
-    DAO for managing configuration changes.
-    
-    This class extends MongoDAO to provide specific operations
-    related to configuration change tracking.
-    """
-
     def __init__(self):
-        """
-        Initializes the DAO with the 'changes' collection.
-        """
         super().__init__(db_path=config.DB_PATH, table_name="changes", schema=ConfigSchema)
+
+    def create_schema(self):
+        self.ddl(f"""
+            CREATE TABLE IF NOT EXISTS {self.table_name} (
+                _id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT
+            );
+        """)

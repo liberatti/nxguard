@@ -14,7 +14,7 @@ export class ConfigService extends APIService<Config, string> {
         protected override injector: Injector,
         private localStorage: LocalStorageService
     ) {
-        super(injector, 'cluster')
+        super(injector, 'config')
     }
 
     getActive(): Observable<Config> {

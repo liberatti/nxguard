@@ -1,4 +1,12 @@
 {
+  "config": {
+    "archive": {
+      "enabled": false
+    },
+    "purge": {
+      "enabled": false
+    }
+  },
   "user": {
     "name": "Default admin user",
     "password": "admin",

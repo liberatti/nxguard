@@ -6,8 +6,7 @@ services:
     image: redis:7.2
     container_name: redis
     restart: unless-stopped
-    ports:
-      - "6379:6379"
+    network_mode: "host"
     environment:
       - REDIS_PASSWORD=supersecreto
     command: [
@@ -33,6 +32,7 @@ services:
       NXGUARD_ROLE: "main"
       SERVERID: "dev-node"
       PYTHONUNBUFFERED: 1
+      REDIS_CACHE_PASS: "admin"
     network_mode: "host"
     init: true
     volumes:
