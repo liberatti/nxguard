@@ -16,11 +16,10 @@ def create():
         c.update({"config": dao.get_active()})
 
     with UpstreamDao() as dao:
-        c.update({"upstreams": dao.get_all(['data'])})
+        c.update({"upstreams": dao.get_all()['data']})
 
     with CertificateDao() as dao:
-        c.update({"certificates": dao.get_all(['data'])})
-        
+        c.update({"certificates": dao.get_all()['data']})
     return c
 
 
