@@ -7,11 +7,11 @@ services:
     container_name: redis
     restart: unless-stopped
     network_mode: "host"
-    environment:
-      - REDIS_PASSWORD=supersecreto
+    #environment:
+    #  - REDIS_PASSWORD=supersecreto
     command: [
       "redis-server",
-      "--requirepass", "supersecreto",
+      #  "--requirepass", "supersecreto",
       "--save", "",
       "--appendonly", "no"
     ]

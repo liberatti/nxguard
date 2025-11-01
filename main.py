@@ -1,3 +1,4 @@
+import json
 import os
 import threading
 import time
@@ -75,7 +76,12 @@ with app.app_context():
 
     if config.NXGUARD_ROLE == "main":
         with RedisCache() as cache:
-            cache.set(f"node_{get_server_id()}", config.NXGUARD_ROLE)
+            node = {
+                "_id": get_server_id(),
+                "status": "ACTIVE",
+                "role": config.NXGUARD_ROLE
+            }
+            cache.persist(f"node_{get_server_id()}", json.dumps(node))
 
     if not os.path.exists(f"{env_config.APP_BASE}/logs"):
         os.makedirs(f"{env_config.APP_BASE}/logs")
