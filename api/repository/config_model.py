@@ -69,12 +69,12 @@ class ConfigDao(SQLite3DAO):
             if "purge_json" in row:
                 row.update({"purge": json.load(row.pop('purge_json'))})
         return super().to_dict(row)
-        
+
     def get_active(self) -> Optional[Dict[str, Any]]:
         try:
             query = f"select * from {self.table_name}"
-            rs = self._query(query, many=False)
-            return self.to_dict(rs)
+            rs = self._query(query, fetch=True)
+            return self.to_dict(rs[0]) if rs else None
         except Exception as e:
             logger.error(f"Error retrieving active configuration: {str(e)}")
             raise

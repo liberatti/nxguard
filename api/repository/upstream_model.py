@@ -79,7 +79,7 @@ class UpstreamDao(SQLite3DAO):
     def get_all_by_type(self, t: str) -> List[Dict[str, Any]]:
         try:
             query = f"SELECT * from {self.table_name} WHERE type = ?"
-            rows = list(self._query(query, (t,), many=True, fetch=True))
+            rows = list(self._query(query, (t,), fetch=True))
             for r in rows:
                 r.update(self.to_dict(r))
             return rows

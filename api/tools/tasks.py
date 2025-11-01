@@ -13,7 +13,7 @@ def update_node_status() -> None:
                 "_id": get_server_id(),
                 "status": "ACTIVE",
                 "role": config.NXGUARD_ROLE,
-                "last_contact": datetime.datetime.now(config.TZ),
+                "last_contact": datetime.datetime.now(config.TZ).isoformat(),
                 "scn": None
             }
             cache.persist(f"node_{get_server_id()}", json.dumps(node), expire=120)
