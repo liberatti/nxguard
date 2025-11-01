@@ -8,6 +8,7 @@ from api.repository.oauth_model import UserDao
 from api.repository.upstream_model import UpstreamDao
 from api.tools.network_tool import NetworkTool
 from basic4web.common_utils import gen_random_string
+from basic4web.middleware.logging import logger
 
 
 def create():
@@ -20,6 +21,7 @@ def create():
 
     with CertificateDao() as dao:
         c.update({"certificates": dao.get_all()['data']})
+        logger.info(c)
     return c
 
 

@@ -100,3 +100,10 @@ class UpstreamDao(SQLite3DAO):
         if "type" not in vo:
             vo.update({"type": "backend"})
         return super().from_dict(vo)
+
+    def to_dict(self, row):
+        row.update({
+            "targets": json.loads(row.pop("targets_json")),
+            "persist": json.loads(row.pop("persist_json"))
+        })
+        return super().to_dict(row)
