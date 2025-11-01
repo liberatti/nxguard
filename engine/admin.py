@@ -10,8 +10,9 @@ from config import (
 
 
 def test_config():
+    # -p {APP_BASE}/test/nginx
     result = subprocess.Popen(
-        f"sudo {APP_BASE}/nginx/sbin/nginx -c {APP_BASE}/test/nginx/conf/nginx.conf  -t",
+        f"sudo {APP_BASE}/nginx/sbin/nginx -c {APP_BASE}/test/nginx/conf/nginx.conf -t",
         shell=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,

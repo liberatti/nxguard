@@ -1,16 +1,16 @@
-load_module modules/ngx_http_modsecurity_module.so;
-load_module modules/ngx_http_sticky_module.so;
+load_module {{APP_BASE}}/nginx/modules/ngx_http_modsecurity_module.so;
+load_module {{APP_BASE}}/nginx/modules/ngx_http_sticky_module.so;
 user nxguard nxguard;
-pid /opt/nxguard/run/nginx.pid;
+pid {{APP_BASE}}/run/nginx.pid;
 events {worker_connections 1024;}
 http {
  lua_shared_dict geoip_cache 10m;
  lua_shared_dict si_68e91d2946043e189ab49b96_cache 10m;
- client_body_temp_path /opt/nxguard/temp/client_body;
- fastcgi_temp_path /opt/nxguard/temp/fastcgi;
- proxy_temp_path /opt/nxguard/temp/proxy;
- scgi_temp_path /opt/nxguard/temp/scgi;
- uwsgi_temp_path /opt/nxguard/temp/uwsgi;
+ client_body_temp_path {{APP_BASE}}/temp/client_body;
+ fastcgi_temp_path {{APP_BASE}}/temp/fastcgi;
+ proxy_temp_path {{APP_BASE}}/temp/proxy;
+ scgi_temp_path {{APP_BASE}}/temp/scgi;
+ uwsgi_temp_path {{APP_BASE}}/temp/uwsgi;
  access_log off;error_log /dev/null crit;
  proxy_intercept_errors on;
  include mime.types;
@@ -31,9 +31,9 @@ http {
   default 0;
  }
  proxy_next_upstream error timeout invalid_header http_500 http_502 http_503 http_504;
- include upstreams.conf;
- include monitor.conf;
- {%- for u in upstreams %}
- include {{ u.name }}.conf;
+ include {%if IS_TEST%}test-{%-endif%}upstreams.conf;
+ include {%if IS_TEST%}test-{%-endif%}monitor.conf;
+ {%- for u in services %}
+ include {%if IS_TEST%}test-{%-endif%}service-{{ u.name }}.conf;
  {%- endfor %}
 }

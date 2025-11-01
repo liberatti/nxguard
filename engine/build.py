@@ -1,7 +1,9 @@
 import json
+import os
 
 import bcrypt
 
+import config
 from api.repository.certificate_model import CertificateDao
 from api.repository.config_model import ConfigDao
 from api.repository.oauth_model import UserDao
@@ -22,6 +24,10 @@ def create():
     with CertificateDao() as dao:
         c.update({"certificates": dao.get_all()['data']})
         logger.info(c)
+    c.update({
+        "NGINX_DIR": os.path.join(config.APP_BASE, "nginx"),
+        "APP_BASE": config.APP_BASE
+    })
     return c
 
 

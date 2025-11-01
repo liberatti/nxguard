@@ -14,6 +14,7 @@ APP_CONFIG_DIR = os.path.join(config.APP_BASE, "admin/config")
 def apply(conf=None):
     if not conf:
         conf = c_builder.create()
+
     c_render.generate(c_builder.validate(conf))
     c_admin.restart()
     if c_admin.is_running():
@@ -24,6 +25,11 @@ def test_config(config_file=os.path.join(APP_CONFIG_DIR, "init-data.json")):
     with open(config_file, "r") as f:
         data = json.load(f)
         conf = c_builder.validate(data)
+        conf.update({
+            "IS_TEST": True,
+            "APP_BASE": config.APP_BASE
+        })
+
         c_render.generate(conf, output_dir=os.path.join(config.APP_BASE, "test"))
         test_result = c_admin.test_config()
         logger.info(f"Test configuration. {test_result}")

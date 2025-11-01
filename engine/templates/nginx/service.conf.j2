@@ -2,7 +2,7 @@
 {%- if rate_limit %}
 limit_req_zone $binary_remote_addr zone={{name}}_rate:16m rate={{rate_limit_per_sec}}r/s;
 {%- endif %}
-proxy_cache_path /opt/nxguard/cache/{{name}} keys_zone={{name}}_cache:10m use_temp_path=off loader_threshold=300 loader_files=200 max_size=128m;
+proxy_cache_path {{APP_BASE}}/cache/{{name}} keys_zone={{name}}_cache:10m use_temp_path=off loader_threshold=300 loader_files=200 max_size=128m;
 server {
   lua_code_cache on;
   server_name {% for t in sans %}{{ t }} {% endfor %};
@@ -33,14 +33,14 @@ server {
   proxy_busy_buffers_size {{buffer}}k;
   add_header X-Request-Id $request_id always;
   {%- for header in headers %}
-  add_header {{ header.name }} {{ header.content }} always;
+  add_header {{ header.name }} '{{ header.content }}' always;
   {%- endfor %}
 
   modsecurity on;
   modsecurity_transaction_id "$request_id";
-  modsecurity_rules_file /opt/nxguard/modsec/conf/config.policy;
-  modsecurity_rules_file /opt/nxguard/modsec/conf/service-proxy.policy;
-  modsecurity_rules_file /opt/nxguard/modsec/conf/crs.policy;
+  modsecurity_rules_file {{APP_BASE}}/modsec/conf/config.policy;
+  modsecurity_rules_file {{APP_BASE}}/modsec/conf/service-proxy.policy;
+  modsecurity_rules_file {{APP_BASE}}/modsec/conf/crs.policy;
 
   {%- if ssl_enable %}
   ssl_protocols {% for t in ssl_protocols %}{{ t }} {% endfor %};
@@ -51,8 +51,8 @@ server {
   ssl_ecdh_curve secp384r1;
   ssl_stapling off;
   ssl_stapling_verify off;
-  ssl_certificate /opt/nxguard/keystore/{{certificate.name}}.crt;
-  ssl_certificate_key /opt/nxguard/keystore/{{certificate.name}}.key;
+  ssl_certificate {{APP_BASE}}/keystore/{%-if IS_TEST%}test-{%-endif%}{{certificate.name}}.crt;
+  ssl_certificate_key {{APP_BASE}}/keystore/{%-if IS_TEST%}test-{%-endif%}{{certificate.name}}.key;
   {%- endif %}
 
   location ^~ /.well-known/acme-challenge/ {
@@ -86,8 +86,8 @@ server {
    set $route_name '{{r.name}}';
    set $api_url 'http://127.0.0.1:5000/api';
    set $api_key VdE436BuYsgScw2WqoqDcisRfn0zBo0O;
-   access_by_lua_file  /opt/nxguard/lualib/share/lua/5.4/nxguard/deny_by_sensor.lua;
-   modsecurity_rules_file /opt/nxguard/modsec/conf/route-proxy-all-req.policy;
+   access_by_lua_file  {{APP_BASE}}/lualib/share/lua/5.4/nxguard/deny_by_sensor.lua;
+   modsecurity_rules_file {{APP_BASE}}/modsec/conf/{%-if IS_TEST%}test-{%-endif%}route-proxy-all-req.policy;
    set $upstream_id '{{r.upstream.name}}';
    proxy_http_version 1.1;
    proxy_intercept_errors on;
@@ -103,11 +103,11 @@ server {
 {%- endfor %}
 {%- endfor %}
 
-  access_log /opt/nxguard/logs/access_log-{{name}}.log logger-json;
-  error_log /opt/nxguard/logs/error_log-{{name}}.log;
+  access_log {{APP_BASE}}/logs/access_log-{{name}}.log logger-json;
+  error_log {{APP_BASE}}/logs/error_log-{{name}}.log;
   error_page 404 403 500 502 503 504 /custom_error;
   location = /custom_error {
    internal;
-   content_by_lua_file /opt/nxguard/lualib/share/lua/5.4/nxguard/content_by_custom_error.lua;
+   content_by_lua_file {{APP_BASE}}/lualib/share/lua/5.4/nxguard/content_by_custom_error.lua;
   }
 }
