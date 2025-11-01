@@ -12,5 +12,5 @@ routes = Blueprint("config", __name__)
 def health() -> Response:
     r = dict()
     with RedisCache() as cache:
-        r.update({"nodes": cache.get_keys_by_prefix("node_*")})
+        r.update({"nodes": cache.get_items_by_prefix("node_*")})
     return response_data(r)
