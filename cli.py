@@ -11,7 +11,9 @@ from basic4web.middleware.logging import logger
 APP_CONFIG_DIR = os.path.join(config.APP_BASE, "admin/config")
 
 
-def apply(conf):
+def apply(conf=None):
+    if not conf:
+        conf = c_builder.create()
     c_render.generate(c_builder.validate(conf))
     c_admin.restart()
     if c_admin.is_running():

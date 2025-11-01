@@ -1,4 +1,3 @@
-import json
 import os
 import threading
 import time
@@ -11,11 +10,9 @@ from flask_marshmallow import Marshmallow
 from flask_restful import Api
 
 import basic4web.config as basic4web_config
-import config
 import config as env_config
-from api.repository.redis_cache import RedisCache
 from api.routes import register as register_api_routes
-from basic4web.common_utils import get_server_id
+from api.tools.tasks import update_node_status
 from basic4web.controllers.base_controller import response_error_404, response_error_500
 from basic4web.middleware.logging import logger
 from basic4web.middleware.socket_manager import init_socketio
@@ -74,17 +71,10 @@ with app.app_context():
         'JWT_SECRET_KEY': 'nxguard-dev'
     })
 
-    if config.NXGUARD_ROLE == "main":
-        with RedisCache() as cache:
-            node = {
-                "_id": get_server_id(),
-                "status": "ACTIVE",
-                "role": config.NXGUARD_ROLE
-            }
-            cache.persist(f"node_{get_server_id()}", json.dumps(node))
-
     if not os.path.exists(f"{env_config.APP_BASE}/logs"):
         os.makedirs(f"{env_config.APP_BASE}/logs")
+
+    schedule.every(60).seconds.do(update_node_status)
 
     scheduler_thread = threading.Thread(target=_scheduler, daemon=True)
     scheduler_thread.start()

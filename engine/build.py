@@ -10,6 +10,20 @@ from api.tools.network_tool import NetworkTool
 from basic4web.common_utils import gen_random_string
 
 
+def create():
+    c = dict()
+    with ConfigDao() as dao:
+        c.update({"config": dao.get_active()})
+
+    with UpstreamDao() as dao:
+        c.update({"upstreams": dao.get_all(['data'])})
+
+    with CertificateDao() as dao:
+        c.update({"certificates": dao.get_all(['data'])})
+        
+    return c
+
+
 def export_config_json(data, json_file):
     with open(json_file, "w") as f:
         json.dump(data, f, indent=4)
