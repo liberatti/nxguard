@@ -41,7 +41,7 @@
       "type": "backend",
       "targets": [
         {
-          "host": "nxguard.local",
+          "host": "127.0.0.1",
           "port": 4200,
           "weight": 1
         }
@@ -66,7 +66,7 @@
       "type": "backend",
       "targets": [
         {
-          "host": "nxguard.local",
+          "host": "127.0.0.1",
           "port": 5000,
           "weight": 1
         }
@@ -84,7 +84,7 @@
   ],
   "services": [
     {
-      "name": "portainer",
+      "name": "local-dev",
       "rate_limit": true,
       "rate_limit_per_sec": 256,
       "active": true,
@@ -161,97 +161,7 @@
         }
       ],
       "sans": [
-        "admin.nxguard.com.br"
-      ],
-      "ssl_client_auth": false,
-      "ssl_client_ca": "",
-      "ssl_protocols": [
-        "TLSv1",
-        "TLSv1.1",
-        "TLSv1.2",
-        "TLSv1.3"
-      ],
-      "timeout": 120
-    },
-    {
-      "active": true,
-      "body_limit": 10,
-      "buffer": 256,
-      "name": "proxy",
-      "rate_limit": true,
-      "rate_limit_per_sec": 256,
-      "bindings": [
-        {
-          "port": 80,
-          "protocol": "HTTP",
-          "ssl_upgrade": false
-        },
-        {
-          "port": 443,
-          "protocol": "HTTPS",
-          "ssl_upgrade": true
-        }
-      ],
-      "certificate": {
-        "name": "nxguard-lets"
-      },
-      "compression": true,
-      "compression_types": [
-        "text/plain",
-        "text/css",
-        "application/json",
-        "application/javascript",
-        "application/x-javascript",
-        "text/xml",
-        "application/xml",
-        "application/xml+rss",
-        "text/javascript"
-      ],
-      "headers": [
-        {
-          "content": "NXGuard",
-          "name": "X-Powered-By"
-        },
-        {
-          "content": "1; mode=block",
-          "name": "X-XSS-Protection"
-        },
-        {
-          "content": "SAMEORIGIN",
-          "name": "X-Frame-Options"
-        }
-      ],
-      "routes": [
-        {
-          "cache_methods": [],
-          "filters": [],
-          "methods": [
-            "GET",
-            "POST",
-            "PUT",
-            "PATCH",
-            "DELETE"
-          ],
-          "monitor_only": false,
-          "name": "all-req",
-          "paths": [
-            "^/(.*)"
-          ],
-          "redirect": {
-            "code": 500,
-            "url": ""
-          },
-          "sensor": {
-            "name": "Default"
-          },
-          "type": "upstream",
-          "upstream": {
-            "name": "proxy"
-          }
-        }
-      ],
-      "sans": [
-        "proxy.nxguard.com.br"
+        "nxguard.local"
       ],
       "ssl_client_auth": false,
       "ssl_client_ca": "",

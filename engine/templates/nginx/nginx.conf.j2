@@ -13,15 +13,18 @@ http {
  uwsgi_temp_path {{APP_BASE}}/temp/uwsgi;
  access_log off;error_log /dev/null crit;
  proxy_intercept_errors on;
- include mime.types;
+ include {%if IS_TEST%}test-{%-endif%}mime.types;
  default_type  application/octet-stream;
  sendfile on;
  keepalive_timeout 65;
  log_format logger-json escape=json '{"time":"$time_local","service":"$service","route_name":"$route_name","upstream":"$upstream","target_addr":"$upstream_addr","sensor":"$sensor","uniqueid":"$request_id","host":"$http_host","remote_addr":"$remote_addr","remote_port":$remote_port,"server_port":$server_port,"request_line":"$request","method":"$real_method","status":$status,"bytes_in":$request_length,"bytes_out":$body_bytes_sent,"duration":$request_time,"uht":"$upstream_header_time","urt":"$upstream_response_time","referer":"$http_referer","user_agent":"$http_user_agent","limit_req_status":"$limit_req_status","geoip_status":"$geoip_status","rbl_status":"$rbl_status"}';
  large_client_header_buffers 4 32k;
  map $host $missing_domain_match {
-  admin.nxguard.com.br 0;
-  proxy.nxguard.com.br 0;
+ {%- for s in services %}
+  {%- for t in s.sans %}
+    {{ t }} 0;
+  {%- endfor %}
+ {%-endfor %}
   default 1;
  }
  map $http_upgrade $connection_upgrade {default upgrade;'' close;}

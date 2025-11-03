@@ -33,7 +33,7 @@ class UpstreamSchema(Schema):
     class Meta:
         unknown = EXCLUDE
 
-    _id = fields.String()
+    _id = fields.Integer()
     name = fields.String()
     description = fields.String()
     retry = fields.Integer()

@@ -26,7 +26,8 @@ import {MatChipsModule} from '@angular/material/chips';
 import {MatTooltip} from "@angular/material/tooltip";
 import {HttpClient} from "@angular/common/http";
 import {environment} from 'environments/environment';
-import {ConfigService} from "../../services/config.service";
+import {ConfigService, HealthService} from "../../services/config.service";
+import {Health} from "../../models/config";
 
 @Component({
     selector: 'app-admin-layout',
@@ -46,7 +47,7 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
     destroyed = new Subject<void>();
     currentScreenSize: string = "";
     updatePending: boolean = false;
-
+    health: Health={} as Health;
 
     displayNameMap = new Map([
         [Breakpoints.XSmall, 'XSmall'],
@@ -72,7 +73,8 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
         private configService: ConfigService,
         protected injector: Injector,
         private route: ActivatedRoute,
-        private router: Router
+        private router: Router,
+        private healthService: HealthService
     ) {
         this.httpClient = this.injector.get(HttpClient)
         breakpointObserver
@@ -135,7 +137,8 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
         }
     }
     healthCheck() {
-        this.configService.healthCheck().subscribe(data => {
+        this.healthService.check().subscribe(data => {
+            this.health = data
             if (data.apply_pendding) {
                 this.changes = data.apply_pendding;
                 if (this.changes && this.changes.length > 0) {

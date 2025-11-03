@@ -7,10 +7,10 @@ import config
 from api.repository.certificate_model import CertificateDao
 from api.repository.config_model import ConfigDao
 from api.repository.oauth_model import UserDao
+from api.repository.service_model import ServiceDao
 from api.repository.upstream_model import UpstreamDao
 from api.tools.network_tool import NetworkTool
 from basic4web.common_utils import gen_random_string
-from basic4web.middleware.logging import logger
 
 
 def create():
@@ -23,7 +23,10 @@ def create():
 
     with CertificateDao() as dao:
         c.update({"certificates": dao.get_all()['data']})
-        logger.info(c)
+
+    with ServiceDao() as dao:
+        c.update({"services": dao.get_all()['data']})
+
     c.update({
         "NGINX_DIR": os.path.join(config.APP_BASE, "nginx"),
         "APP_BASE": config.APP_BASE
@@ -63,6 +66,10 @@ def init_from_json(json_file):
         with CertificateDao() as dao:
             dao.create_schema()
             dao.persist_many(data['certificates'])
+
+        with ServiceDao() as dao:
+            dao.create_schema()
+            dao.persist_many(data['services'])
 
         return data
 

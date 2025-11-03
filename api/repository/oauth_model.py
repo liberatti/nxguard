@@ -19,7 +19,7 @@ class UserSchema(Schema):
     class Meta:
         unknown = EXCLUDE
 
-    _id = fields.String()
+    _id = fields.Integer()
     name = fields.String()
     email = fields.String()
     password = fields.String()
@@ -49,9 +49,9 @@ class UserDao(SQLite3DAO):
         try:
             query = f"SELECT * from {self.table_name} WHERE email = ?"
             v = self._query(query, (email,), fetch=True)
-            if v:
-                return super().to_dict(v)
-            return v
+            if v[0]:
+                return super().to_dict(v[0])
+            return None
         except Exception as e:
             logger.error(f"Error retrieving user by email: {str(e)}")
             raise

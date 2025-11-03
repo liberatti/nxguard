@@ -1,6 +1,6 @@
 import {Injectable, Injector} from "@angular/core";
 import {APIService} from "./api.service";
-import {Config} from "../models/config";
+import {Config, Health} from "../models/config";
 import {LocalStorageService} from "./localstorage.service";
 import {Observable} from "rxjs";
 import {Page} from "../models/shared";
@@ -28,10 +28,6 @@ export class ConfigService extends APIService<Config, string> {
         return this.httpClient.get<any>(this.END_POINT + "/health");
     }
 
-    getPending(): Observable<any> {
-        return this.httpClient.get<any>(this.END_POINT + "/changes");
-    }
-
     applyConfig(): Observable<any> {
         return this.httpClient.get<any>(this.END_POINT + "/apply");
     }
@@ -46,8 +42,19 @@ export class ConfigService extends APIService<Config, string> {
     uploadConfig(data: FormData): Observable<any> {
         return this.httpClient.post<any>(this.END_POINT + "/backup", data);
     }
+}
 
-    getNodes(): Observable<Page> {
-        return this.httpClient.get<Page>(this.END_POINT + "/nodes");
+@Injectable({
+    providedIn: 'root'
+})
+export class HealthService extends APIService<Health, string> {
+
+    constructor(
+        protected override injector: Injector
+    ) {
+        super(injector, 'config')
+    }
+    check(): Observable<any> {
+        return this.httpClient.get<any>(this.END_POINT + "/health");
     }
 }

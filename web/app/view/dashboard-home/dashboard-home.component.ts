@@ -21,7 +21,8 @@ import {MatDialog} from "@angular/material/dialog";
 import {NodeDetailsDialogComponent} from "../../components/node-details-dialog/node-details-dialog.component";
 import {NodeStatus} from "../../models/upstream";
 import {ByteFormatPipe} from "../../pipes/format_bytes.pipe";
-import {ConfigService} from "../../services/config.service";
+import {ConfigService, HealthService} from "../../services/config.service";
+import {EngineNode, Health} from "../../models/config";
 
 @Component({
     selector: 'app-account-form',
@@ -36,33 +37,26 @@ import {ConfigService} from "../../services/config.service";
     styleUrl: './dashboard-home.component.css'
 })
 export class DashboardHomeComponent implements OnInit {
-    nodeList: Array<NodeStatus> = [];
+
+    health: Health = {} as Health;
 
     constructor(
-        private configService: ConfigService,
-        private detailsDialog: MatDialog) {
+        private detailsDialog: MatDialog,
+        private healthService: HealthService) {
         Chart.register(ChartDataLabels);
         Chart.register(Zoom);
     }
 
     ngOnInit(): void {
-        this.refresh_nodes();
-    }
-
-    remove_node() {
-
-    }
-
-    show_details(nodeData: NodeStatus) {
-        this.detailsDialog.open(NodeDetailsDialogComponent, {
-            data: nodeData,
-            width: '450px'
+        this.healthService.check().subscribe(data => {
+            this.health = data
         });
     }
 
-    refresh_nodes() {
-        this.configService.getNodes().subscribe(data => {
-            this.nodeList = data.data;
+    show_details(nodeData: EngineNode) {
+        this.detailsDialog.open(NodeDetailsDialogComponent, {
+            data: nodeData,
+            width: '450px'
         });
     }
 }

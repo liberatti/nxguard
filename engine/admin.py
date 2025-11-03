@@ -3,33 +3,52 @@ import subprocess
 
 import psutil
 
+import config
+import engine.build as c_builder
+import engine.render as c_render
 from basic4web.middleware.logging import logger
 from config import (
     APP_BASE
 )
 
+APP_CONFIG_DIR = os.path.join(config.APP_BASE, "admin/config")
 
-def test_config():
-    # -p {APP_BASE}/test/nginx
+
+def install_from_json():
+    c_builder.init_from_json(os.path.join(APP_CONFIG_DIR, "init-data.json"))
+
+
+def apply(conf=None):
+    if not conf:
+        conf = c_builder.create()
+        conf = c_builder.validate(conf)
+    logger.info(conf)
+    c_render.generate(conf, test=True)
     result = subprocess.Popen(
-        f"sudo {APP_BASE}/nginx/sbin/nginx -c {APP_BASE}/test/nginx/conf/nginx.conf -t",
+        f"sudo {APP_BASE}/nginx/sbin/nginx -c {APP_BASE}/nginx/conf/test-nginx.conf -t",
         shell=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
     )
     stdout, stderr = result.communicate()
-    if result.returncode != 0:
-        logger.error(f"Nginx config test failed, {stderr.decode()}")
-        return {
-            "status": "error",
-            "message": stderr.decode().split('\n')
-        }
-    return {
-        "status": "ok"
-    }
+
+    if result.returncode == 0:
+        c_render.clean(conf, test=True)
+        logger.info(f"Config OK")
+
+        c_render.clean(conf, test=False)
+        c_render.generate(conf)
+
+        restart()
+        if is_running():
+            c_builder.export_config_json(conf, os.path.join(config.APP_BASE, "active.json"))
+        return {"status": "ok"}
+    msg = {"status": "error", "message": stderr.decode().split('\n')}
+    logger.error(msg)
+    return msg
 
 
-def is_running():
+def is_running() -> bool:
     pid_file = f"{APP_BASE}/run/nginx.pid"
     try:
         if os.path.exists(pid_file):
@@ -37,10 +56,10 @@ def is_running():
                 pid = int("".join(file.readlines()))
                 if pid:
                     process = psutil.Process(pid)
-                    is_running = process.is_running()
-                    if not is_running:
+                    is_r = process.is_running()
+                    if not is_r:
                         os.remove(pid_file)
-                    return is_running
+                    return is_r
     except Exception as e:
         logger.error("Failed to check engine, %s", e)
     return False
@@ -74,4 +93,4 @@ def restart():
         )
 
     stdout, stderr = result.communicate()
-    subprocess.run(f"sudo chmod -R 777 {APP_BASE}/logs", shell=True)
+    # subprocess.run(f"sudo chmod -R 777 {APP_BASE}/logs", shell=True)

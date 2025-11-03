@@ -22,3 +22,16 @@ export interface Config {
     archive: ConfigArchive;
     purge: ConfigPurge;
 }
+export interface EngineNode {
+    _id: string;
+    role: string;
+    scn: string;
+    status: string; // ACTIVE, ERROR
+    last_check: string;
+    version: string;
+    net_recv: number;
+    net_send: number;
+}
+export interface Health {
+    nodes: EngineNode[];
+}

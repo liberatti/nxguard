@@ -14,7 +14,7 @@ class CertificateSchema(Schema):
     class Meta:
         unknown = EXCLUDE
 
-    _id = fields.String()
+    _id = fields.Integer()
     name = fields.String()
     subjects = fields.List(fields.String())
     chain = fields.String()
@@ -30,8 +30,8 @@ class CertificateSchema(Schema):
 
 class CertificateDao(SQLite3DAO):
 
-    def __init__(self):
-        super().__init__(db_path=config.DB_PATH, table_name="certificate", schema=CertificateSchema)
+    def __init__(self, conn=None):
+        super().__init__(db_path=config.DB_PATH, table_name="certificate", schema=CertificateSchema, conn=conn)
 
     def create_schema(self):
         self.ddl(f"""

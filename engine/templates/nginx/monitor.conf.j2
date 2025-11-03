@@ -1,10 +1,10 @@
  server {
   server_name 127.0.0.1;
   listen 5001;
-  set $service_id 'monitor';
-  set $upstream_id '-';
+  set $service 'monitor';
+  set $upstream '-';
   set $route_name '-';
-  set $sensor_id '-';
+  set $sensor '-';
   set $geoip_status '-';
   set $rbl_status '-';
   set $real_method $request_method;
