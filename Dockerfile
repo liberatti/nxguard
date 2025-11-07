@@ -64,8 +64,8 @@ RUN pip3.12 install -r requirements.txt
 COPY *.py .
 COPY api api
 COPY engine engine
-RUN mkdir -p /opt/nxguard/lualib/share/lua/5.4/nxguard/
-COPY lualib /opt/nxguard/lualib/share/lua/5.4/nxguard/
+RUN mkdir -p /opt/nxguard/luajit/share/lua/5.1/nxguard/
+COPY lualib /opt/nxguard/luajit/share/lua/5.1/nxguard/
 
 COPY --from=frontend /app/web/dist /opt/nxguard/admin/static
 COPY --from=frontend /app/web/dist/index.html /opt/nxguard/admin/templates/

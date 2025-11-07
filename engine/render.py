@@ -96,6 +96,8 @@ def generate(data, output_dir=f"{APP_BASE}", test=False):
     if "services" in data:
         logger.info(f"[{output_dir}] - Generate Services")
         for service in data['services']:
+            service.update({"APP_BASE": data['APP_BASE'], "IS_TEST": test, "config": data['config']})
+            # logger.info(data['service'])
             os.makedirs(f"{output_dir}/cache/{service['name']}", exist_ok=True)
             logger.info(f"[{output_dir}] - Generate nginx/conf/{'test-' if test else ''}service-{service['name']}.conf")
             for b in service['bindings']:

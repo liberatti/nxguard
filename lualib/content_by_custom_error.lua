@@ -1,21 +1,30 @@
-local cjson = require "cjson"
+local cjson = require "cjson.safe"
 
-description = "Unexcepted error"
-if ngx.status == 404 then
-    description = "Resource not found"
-elseif ngx.status == 403 then
-    description = "Access forbidden"
-elseif ngx.status == 500 then
-    description = "Internal server error"
-end
+ngx.header["Content-Type"] = "application/json; charset=utf-8"
+ngx.header["Cache-Control"] = "no-cache, no-store, must-revalidate"
+ngx.header["Pragma"] = "no-cache"
+
+local status = ngx.status or 500
+local descriptions = {
+    [400] = "Bad request",
+    [401] = "Unauthorized",
+    [403] = "Access forbidden",
+    [404] = "Resource not found",
+    [500] = "Internal server error",
+    [502] = "Bad gateway",
+    [503] = "Service unavailable",
+    [504] = "Gateway timeout"
+}
+
+local description = descriptions[status] or "Unexpected error"
 
 local resposta = {
     remote_addr = ngx.var.remote_addr,
     request_id = ngx.var.request_id,
-    status = ngx.status,
+    status = status,
     description = description,
-    request = ngx.var.request
+    request = ngx.var.request_uri or ngx.var.request
 }
 
-ngx.header["Content-Type"] = "application/json"
-ngx.say(cjson.encode(resposta))
+local json = cjson.encode(resposta) or '{"error":"encoding failed"}'
+ngx.say(json)

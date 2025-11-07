@@ -72,8 +72,6 @@ rm -f /root/rpmbuild/BUILD/modsecurity-v3.0.12/coreruleset/REQUEST-901-INITIALIZ
 cd /root/rpmbuild/BUILD/openresty-1.27.1.1
 ./configure --with-compat --with-http_ssl_module --with-http_stub_status_module\
 	--with-http_v2_module\
-	--without-lua_redis_parser\
-	--without-lua_resty_redis\
 	--without-lua_resty_mysql\
 	--with-debug\
 	--with-cc-opt='-D FD_SETSIZE=32768'\
@@ -206,9 +204,11 @@ luarocks install --tree=/root/rpmbuild/BUILD/lualib base64 --lua-version=5.1
 install /root/rpmbuild/BUILD/lualib/share/lua/5.1/*.lua %{buildroot}/opt/nxguard/lualib/
 
 luarocks install --tree=/root/rpmbuild/BUILD/lualib lua-resty-http --lua-version=5.1
-
+luarocks install --tree=/root/rpmbuild/BUILD/lualib lua-resty-redis --lua-version=5.1
+luarocks install --tree=/root/rpmbuild/BUILD/lualib lua-resty-openssl --lua-version=5.1
 luarocks install --tree=/root/rpmbuild/BUILD/lualib lua-resty-jwt --lua-version=5.1
 install /root/rpmbuild/BUILD/lualib/share/lua/5.1/resty/*.lua %{buildroot}/opt/nxguard/lualib/resty
+
 install -d %{buildroot}/opt/nxguard/lualib/resty/openssl/x509/extension
 install /root/rpmbuild/BUILD/lualib/share/lua/5.1/resty/openssl/*.lua %{buildroot}/opt/nxguard/lualib/resty/openssl
 install /root/rpmbuild/BUILD/lualib/share/lua/5.1/resty/openssl/x509/*.lua %{buildroot}/opt/nxguard/lualib/resty/openssl/x509

@@ -2,10 +2,16 @@ load_module {{APP_BASE}}/nginx/modules/ngx_http_modsecurity_module.so;
 load_module {{APP_BASE}}/nginx/modules/ngx_http_sticky_module.so;
 user nxguard nxguard;
 pid {{APP_BASE}}/run/nginx.pid;
+worker_processes auto;
 events {worker_connections 1024;}
 http {
- lua_shared_dict geoip_cache 10m;
- lua_shared_dict si_68e91d2946043e189ab49b96_cache 10m;
+ lua_shared_dict log_buffer 16m;
+ init_worker_by_lua_block {
+   local flush = require "nxguard.log_flush"
+   flush.start("{{APP_BASE}}/logs/access.json", 2)  -- flush by 2s
+ }
+ #lua_shared_dict geoip_cache 10m;
+ #lua_shared_dict si_68e91d2946043e189ab49b96_cache 10m;
  client_body_temp_path {{APP_BASE}}/temp/client_body;
  fastcgi_temp_path {{APP_BASE}}/temp/fastcgi;
  proxy_temp_path {{APP_BASE}}/temp/proxy;
@@ -17,7 +23,6 @@ http {
  default_type  application/octet-stream;
  sendfile on;
  keepalive_timeout 65;
- log_format logger-json escape=json '{"time":"$time_local","service":"$service","route_name":"$route_name","upstream":"$upstream","target_addr":"$upstream_addr","sensor":"$sensor","uniqueid":"$request_id","host":"$http_host","remote_addr":"$remote_addr","remote_port":$remote_port,"server_port":$server_port,"request_line":"$request","method":"$real_method","status":$status,"bytes_in":$request_length,"bytes_out":$body_bytes_sent,"duration":$request_time,"uht":"$upstream_header_time","urt":"$upstream_response_time","referer":"$http_referer","user_agent":"$http_user_agent","limit_req_status":"$limit_req_status","geoip_status":"$geoip_status","rbl_status":"$rbl_status"}';
  large_client_header_buffers 4 32k;
  map $host $missing_domain_match {
  {%- for s in services %}

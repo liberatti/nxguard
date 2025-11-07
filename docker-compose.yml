@@ -33,12 +33,15 @@ services:
       SERVERID: "dev-node"
       PYTHONUNBUFFERED: 1
       REDIS_CACHE_PASS: "admin"
-    network_mode: "host"
+    ports:
+      - 5000:5000
+      - 80:80
+      - 443:443
     init: true
     volumes:
-      - .:/opt/nxguard/admin
-      - ./lualib:/opt/nxguard/lualib/share/lua/5.4/nxguard
-      - ./data:/data
+      - ./nxguard:/opt/nxguard/admin
+      - ./nxguard/lualib:/opt/nxguard/lualib/share/lua/5.4/nxguard
+      - ./nxguard/data:/data
       - /home/liberatti/workspace/.venv/lib/python3.12/site-packages:/opt/nxguard/site-packages
     deploy:
       resources:

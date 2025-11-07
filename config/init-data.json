@@ -1,5 +1,9 @@
 {
   "config": {
+    "cache": {
+      "host": "redis",
+      "port": 6379
+    },
     "archive": {
       "enabled": false
     },
@@ -156,7 +160,7 @@
           },
           "type": "upstream",
           "upstream": {
-            "name": "portainer"
+            "name": "NXGuard_API"
           }
         }
       ],

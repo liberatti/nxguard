@@ -34,10 +34,11 @@ JWT_AUD = "nxguard"
 CLUSTER_ENDPOINT = os.environ.get("CLUSTER_ENDPOINT")
 NXGUARD_ROLE = os.environ.get("NXGUARD_ROLE", "main")
 NXGUARD_API_KEY = os.environ.get("NXGUARD_API_KEY", "DEV")
+NXGUARD_IPDB_URL = os.environ.get("NXGUARD_IPDB_URL", "http://localhost:5000")
 
 REDIS_CACHE_HOST = os.environ.get("REDIS_CACHE_HOST", '127.0.0.1')
 REDIS_CACHE_PORT = os.environ.get("REDIS_CACHE_PORT", 6379)
-REDIS_CACHE_PASS = os.environ.get("REDIS_CACHE_PASS", 'admin')
+REDIS_CACHE_PASS = os.environ.get("REDIS_CACHE_PASS", None)
 
 CORS = {
     r"/*": {

@@ -4,7 +4,12 @@ limit_req_zone $binary_remote_addr zone={{name}}_rate:16m rate={{rate_limit_per_
 {%- endif %}
 proxy_cache_path {{APP_BASE}}/cache/{{name}} keys_zone={{name}}_cache:10m use_temp_path=off loader_threshold=300 loader_files=200 max_size=128m;
 server {
-  lua_code_cache on;
+#  lua_code_cache on;
+  access_log off;
+  error_log /opt/nxguard/logs/error.log warn;
+  log_by_lua_file {{APP_BASE}}/lualib/nxguard/log_by_custom.lua;
+  set $cache_server_url {{ config.cache.host }};
+  set $cache_server_port {{ config.cache.port }};
   server_name {% for t in sans %}{{ t }} {% endfor %};
   if ($missing_domain_match) {return 410;}
   {%- if rate_limit %}
@@ -12,7 +17,7 @@ server {
   {%- endif %}
   set $service '{{name}}';
   set $upstream '-';
-  set $route_name '-';
+  set $route '-';
   set $sensor '-';
   set $geoip_status '-';
   set $rbl_status '-';
@@ -61,9 +66,9 @@ server {
    proxy_pass http://acme;
    proxy_read_timeout 120s;
    proxy_connect_timeout 120s;
-   modsecurity_rules '
-    SecRuleRemoveById 920272
-   ';
+#   modsecurity_rules '
+#    SecRuleRemoveById 920272
+#   ';
   }
   proxy_ssl_server_name on;
   proxy_ssl_verify off;
@@ -82,13 +87,11 @@ server {
 {%- for r in routes %}
 {%- for p in r.paths %}
   location ~ {{p}}{
-   set $sensor_id '{{r.sensor.name}}';
-   set $route_name '{{r.name}}';
-   set $api_url 'http://127.0.0.1:5000/api';
-   set $api_key VdE436BuYsgScw2WqoqDcisRfn0zBo0O;
-   access_by_lua_file  {{APP_BASE}}/lualib/share/lua/5.4/nxguard/deny_by_sensor.lua;
+   set $sensor '{{r.sensor.name}}';
+   set $route '{{r.name}}';
+   access_by_lua_file  {{APP_BASE}}/lualib/nxguard/deny_by_sensor.lua;
 #   modsecurity_rules_file {{APP_BASE}}/modsec/conf/{%-if IS_TEST%}test-{%-endif%}route-proxy-all-req.policy;
-   set $upstream_id '{{r.upstream.name}}';
+   set $upstream '{{r.upstream.name}}';
    proxy_http_version 1.1;
    proxy_intercept_errors on;
    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -98,16 +101,15 @@ server {
    proxy_set_header Upgrade $http_upgrade;
    proxy_set_header Connection $connection_upgrade;
    proxy_redirect off;
-   proxy_pass http://proxy/$1$is_args$args;
+   proxy_pass http://{{r.upstream.name}}/$1$is_args$args;
   }
 {%- endfor %}
 {%- endfor %}
 
-  access_log {{APP_BASE}}/logs/access_log-{{name}}.log logger-json;
-  error_log {{APP_BASE}}/logs/error_log-{{name}}.log;
   error_page 404 403 500 502 503 504 /custom_error;
   location = /custom_error {
    internal;
-   content_by_lua_file {{APP_BASE}}/lualib/share/lua/5.4/nxguard/content_by_custom_error.lua;
+   content_by_lua_file {{APP_BASE}}/lualib/nxguard/content_by_custom_error.lua;
   }
+
 }
