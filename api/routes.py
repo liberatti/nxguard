@@ -1,13 +1,14 @@
 from flask import render_template, current_app
 
+import config
 from api.controller.config_controller import routes as config_routes
 from api.controller.oauth_controller import routes as oauth_routes
 from api.controller.upstream_controller import routes as upstream_routes
 
 routes = [
-    (upstream_routes, "/nxg/api/upstream"),
-    (oauth_routes, "/nxg/api/oauth"),
-    (config_routes, "/nxg/api/config")
+    (upstream_routes, f"{config.APP_CONTEXT}/api/upstream"),
+    (oauth_routes, f"{config.APP_CONTEXT}/api/oauth"),
+    (config_routes, f"{config.APP_CONTEXT}/api/config")
 ]
 
 

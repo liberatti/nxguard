@@ -2,15 +2,17 @@ import os
 
 import pytz
 
-APP_CONTEXT = os.getenv('APP_CONTEXT', "/")
+APP_CONTEXT = os.getenv('APP_CONTEXT', "/nxg")
 APP_VERSION = os.getenv('APP_VERSION', "v1.0.4")
 APP_PUBLIC_URL = os.getenv('APP_PUBLIC_URL', f"http://localhost:4200{APP_CONTEXT}")
 API_HEADERS = {"User-Agent": f"NXGuard/{APP_VERSION}"}
 
 APP_BASE = "/opt/nxguard"
+APP_CONFIG_DIR = os.path.join(APP_BASE, "admin/config")
+
 ENGINE_BASE = f"{APP_BASE}/nginx"
 ENGINE_VERSION = "1.27.1"
-
+REPLICATE_MAX_RETRIES = 3
 DATETIME_FMT = "%Y-%m-%dT%H:%M:%S.%fZ"
 TZ = pytz.timezone("UTC")
 
@@ -31,7 +33,7 @@ JWT_EXPIRE = 3600
 JWT_AUD = "nxguard"
 
 # Cluster config
-CLUSTER_ENDPOINT = os.environ.get("CLUSTER_ENDPOINT")
+CLUSTER_ENDPOINT = os.environ.get("CLUSTER_ENDPOINT", "http://localhost:5000/nxg")
 NXGUARD_ROLE = os.environ.get("NXGUARD_ROLE", "main")
 NXGUARD_API_KEY = os.environ.get("NXGUARD_API_KEY", "DEV")
 NXGUARD_IPDB_URL = os.environ.get("NXGUARD_IPDB_URL", "http://localhost:5000")

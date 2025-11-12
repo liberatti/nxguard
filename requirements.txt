@@ -6,7 +6,7 @@ Flask-PyMongo~=3.0.1
 Flask-RESTful~=0.3.10
 eventlet~=0.39.0
 psutil~=7.0.0
-gunicorn
+gunicorn >= 22,<24
 PyJWT~=2.10.1
 bcrypt~=4.3.0
 cryptography~=44.0.2

@@ -3,26 +3,24 @@ import subprocess
 
 import psutil
 
-import config
 import engine.build as c_builder
 import engine.render as c_render
+from basic4web.common_utils import gen_random_string
 from basic4web.middleware.logging import logger
 from config import (
     APP_BASE
 )
 
-APP_CONFIG_DIR = os.path.join(config.APP_BASE, "admin/config")
-
 
 def install_from_json():
-    c_builder.init_from_json(os.path.join(APP_CONFIG_DIR, "init-data.json"))
+    c_builder.init_from_json("init-data.json")
 
 
 def apply(conf=None):
     if not conf:
         conf = c_builder.create()
         conf = c_builder.validate(conf)
-    logger.info(conf)
+    # logger.info(conf)
     c_render.generate(conf, test=True)
     result = subprocess.Popen(
         f"sudo {APP_BASE}/nginx/sbin/nginx -c {APP_BASE}/nginx/conf/test-nginx.conf -t",
@@ -41,8 +39,9 @@ def apply(conf=None):
 
         restart()
         if is_running():
-            c_builder.export_config_json(conf, os.path.join(config.APP_BASE, "active.json"))
-        return {"status": "ok"}
+            conf.update({"scn": gen_random_string()})
+            c_builder.export_config_json(conf, "active.json")
+        return {"status": "ok", "scn": conf['scn']}
     msg = {"status": "error", "message": stderr.decode().split('\n')}
     logger.error(msg)
     return msg

@@ -38,6 +38,7 @@ services:
       - 80:80
       - 443:443
     init: true
+    user: 0
     volumes:
       - ./nxguard:/opt/nxguard/admin
       - ./nxguard/lualib:/opt/nxguard/lualib/share/lua/5.4/nxguard
@@ -46,7 +47,25 @@ services:
     deploy:
       resources:
         limits:
-          memory: 1512M
+          memory: 512M
+  api_w:
+    image: liberatti/nxguard:latest
+    environment:
+      NXGUARD_ROLE: "worker"
+      PYTHONUNBUFFERED: 1
+      CLUSTER_ENDPOINT: "http://api/nxg"
+    ports:
+      - 5010:5000
+      - 8010:80
+      - 9443:443
+    volumes:
+      - ./nxguard:/opt/nxguard/admin
+      - ./nxguard/lualib:/opt/nxguard/lualib/share/lua/5.4/nxguard
+      - /home/liberatti/workspace/.venv/lib/python3.12/site-packages:/opt/nxguard/site-packages
+    deploy:
+      resources:
+        limits:
+          memory: 256M
 
   export:
     image: liberatti/nxguard:export

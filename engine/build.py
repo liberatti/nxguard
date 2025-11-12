@@ -35,43 +35,48 @@ def create():
 
 
 def export_config_json(data, json_file):
-    with open(json_file, "w") as f:
+    with open(os.path.join(config.APP_CONFIG_DIR, json_file), "w") as f:
         json.dump(data, f, indent=4)
 
 
+def read_from_json(json_file):
+    if os.path.exists(os.path.join(config.APP_CONFIG_DIR, json_file)):
+        with open(os.path.join(config.APP_CONFIG_DIR, json_file), "r") as f:
+            return json.load(f)
+    return None
+
+
 def init_from_json(json_file):
-    with open(json_file, "r") as f:
-        data = json.load(f)
+    data = read_from_json(json_file)
+    with ConfigDao() as dao:
+        dao.create_schema()
+        data['config'].update({"cluster_id": gen_random_string(8)})
+        dao.persist(data['config'])
 
-        with ConfigDao() as dao:
-            dao.create_schema()
-            data['config'].update({"cluster_id": gen_random_string(8)})
-            dao.persist(data['config'])
+    with UserDao() as dao:
+        dao.create_schema()
+        encrypted_pass = bcrypt.hashpw(data['user']['password'].encode("utf8"), bcrypt.gensalt())
+        user = {
+            "name": data['user']['name'],
+            "password": encrypted_pass.decode("utf8"),
+            "email": data['user']['email'],
+            "role": data['user']['role']
+        }
+        dao.persist(user)
 
-        with UserDao() as dao:
-            dao.create_schema()
-            encrypted_pass = bcrypt.hashpw(data['user']['password'].encode("utf8"), bcrypt.gensalt())
-            user = {
-                "name": data['user']['name'],
-                "password": encrypted_pass.decode("utf8"),
-                "email": data['user']['email'],
-                "role": data['user']['role']
-            }
-            dao.persist(user)
+    with UpstreamDao() as dao:
+        dao.create_schema()
+        dao.persist_many(data['upstreams'])
 
-        with UpstreamDao() as dao:
-            dao.create_schema()
-            dao.persist_many(data['upstreams'])
+    with CertificateDao() as dao:
+        dao.create_schema()
+        dao.persist_many(data['certificates'])
 
-        with CertificateDao() as dao:
-            dao.create_schema()
-            dao.persist_many(data['certificates'])
+    with ServiceDao() as dao:
+        dao.create_schema()
+        dao.persist_many(data['services'])
 
-        with ServiceDao() as dao:
-            dao.create_schema()
-            dao.persist_many(data['services'])
-
-        return data
+    return data
 
 
 def validate(data):

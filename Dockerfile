@@ -79,5 +79,6 @@ EXPOSE 80
 EXPOSE 443
 
 VOLUME [ "/data" ]
-
-ENTRYPOINT ["gunicorn", "-k", "eventlet", "-w", "1", "main:app", "-b", "0.0.0.0:5000"]
+#ENV EVENTLET_NO_GREENDNS yes
+ENTRYPOINT ["gunicorn", "-c", "gunicorn.conf.py", "main:app"]
+#ENTRYPOINT ["gunicorn", "-k", "eventlet", "-w", "4", "main:app", "-b", "0.0.0.0:5000","--preload"]
