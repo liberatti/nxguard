@@ -65,9 +65,13 @@ def on_exit(server):
     print("[Master] Scheduler encerrado")
 
 
+# post_fork hook removed - monkey patching is now done in main.py before Flask imports
+# This ensures the patch is applied before any Flask/Werkzeug objects are created
+
+
 worker_class = "eventlet"
 workers = 4
-preload_app = True
+preload_app = False  # Disabled to allow monkey_patch to run before Flask imports in workers only
 bind = "0.0.0.0:5000"
 scheduler_started = False
 accesslog = "-"

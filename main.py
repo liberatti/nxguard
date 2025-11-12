@@ -1,6 +1,11 @@
+# Apply eventlet monkey patch BEFORE importing Flask
+# This must happen before any Flask/Werkzeug imports to avoid upgrade issues
+# With preload_app=False, this only runs in worker processes (not the master)
 from eventlet import monkey_patch
-
 monkey_patch()
+
+import os
+import sys
 import traceback
 
 from flask import Flask, Blueprint
