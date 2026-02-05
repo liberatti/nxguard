@@ -1,23 +1,16 @@
-# Apply eventlet monkey patch BEFORE importing Flask
-# This must happen before any Flask/Werkzeug imports to avoid upgrade issues
-# With preload_app=False, this only runs in worker processes (not the master)
-from eventlet import monkey_patch
-monkey_patch()
-
-import os
-import sys
 import traceback
 
+import basic4web.config as basic4web_config
+from basic4web.controllers.base_controller import response_error_404, response_error_500
+from basic4web.middleware.logging import logger
+from basic4web.middleware.socket_manager import init_socketio
 from flask import Flask, Blueprint
 from flask_cors import CORS
 from flask_marshmallow import Marshmallow
 from flask_restful import Api
 
-import basic4web.config as basic4web_config
+import config
 from api.routes import register as register_api_routes
-from basic4web.controllers.base_controller import response_error_404, response_error_500
-from basic4web.middleware.logging import logger
-from basic4web.middleware.socket_manager import init_socketio
 
 app = Flask(__name__)
 app.config["UPLOAD_FOLDER"] = "/tmp"
@@ -60,6 +53,6 @@ def handle_exception(error):
 
 with app.app_context():
     basic4web_config.init({
-        "LOG_LEVEL": 'DEBUG',
+        "LOGLEVEL": config.LOGLEVEL,
         'JWT_SECRET_KEY': 'nxguard-dev'
     })

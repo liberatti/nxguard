@@ -2,24 +2,17 @@ import os
 import subprocess
 
 import psutil
+from basic4web.common_utils import gen_random_string
+from basic4web.middleware.logging import logger
 
 import engine.build as c_builder
 import engine.render as c_render
-from basic4web.common_utils import gen_random_string
-from basic4web.middleware.logging import logger
 from config import (
     APP_BASE
 )
 
 
-def install_from_json():
-    c_builder.init_from_json("init-data.json")
-
-
-def apply(conf=None):
-    if not conf:
-        conf = c_builder.create()
-        conf = c_builder.validate(conf)
+def apply(conf):
     # logger.info(conf)
     c_render.generate(conf, test=True)
     result = subprocess.Popen(
@@ -52,7 +45,10 @@ def is_running() -> bool:
     try:
         if os.path.exists(pid_file):
             with open(pid_file, "r") as file:
-                pid = int("".join(file.readlines()))
+                content = file.read().strip()
+                if not content.isdigit():
+                    raise ValueError(f"PID inválido no arquivo: {content!r}")
+                pid = int(content)
                 if pid:
                     process = psutil.Process(pid)
                     is_r = process.is_running()
@@ -60,7 +56,7 @@ def is_running() -> bool:
                         os.remove(pid_file)
                     return is_r
     except Exception as e:
-        logger.error("Failed to check engine, %s", e)
+        logger.warn("Failed to check engine, %s", e)
     return False
 
 

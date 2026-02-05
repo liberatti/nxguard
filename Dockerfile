@@ -44,7 +44,7 @@ ENV PATH ${PATH}:/opt/nxguard/.local/bin:/opt/nxguard/nginx/sbin
 ENV LUA_PATH "/opt/nxguard/lualib/share/lua/5.4/?.lua;/opt/nxguard/lualib/share/lua/5.4/resty/?.lua;;"
 ENV LUA_CPATH "/opt/nxguard/lualib/lib64/lua/5.4/?.so;/opt/nxguard/lualib/lib/?.so;/opt/nxguard/lualib/?.so;;"
 ENV PYTHONUSERBASE /opt/nxguard/site-packages
-
+ENV PYTHONUNBUFFERED 1
 RUN microdnf install -y procps openssl bind-utils shadow-utils util-linux gcc-c++ \
     libX11 libXext libXi libXrender libXtst freetype sudo \
     python3.12 python3.12-devel python3.12-pip yajl lua wget git\
@@ -61,12 +61,14 @@ WORKDIR /opt/nxguard/admin
 COPY requirements.txt .
 RUN pip3.12 install -r requirements.txt
 
+RUN mkdir -p /opt/nxguard/luajit/share/lua/5.1/nxguard/\
+ && mkdir -p /data \
+ && chown -R nxguard /data
+
 COPY *.py .
 COPY api api
 COPY engine engine
-RUN mkdir -p /opt/nxguard/luajit/share/lua/5.1/nxguard/
 COPY lualib /opt/nxguard/luajit/share/lua/5.1/nxguard/
-
 COPY --from=frontend /app/web/dist /opt/nxguard/admin/static
 COPY --from=frontend /app/web/dist/index.html /opt/nxguard/admin/templates/
 
@@ -75,10 +77,6 @@ RUN chown -R nxguard /opt/nxguard
 USER nxguard
 
 EXPOSE 5000
-EXPOSE 80
-EXPOSE 443
 
 VOLUME [ "/data" ]
-#ENV EVENTLET_NO_GREENDNS yes
-ENTRYPOINT ["gunicorn", "-c", "gunicorn.conf.py", "main:app"]
-#ENTRYPOINT ["gunicorn", "-k", "eventlet", "-w", "4", "main:app", "-b", "0.0.0.0:5000","--preload"]
+ENTRYPOINT ["gunicorn", "-c", "api/gunicorn_config.py", "main:app"]

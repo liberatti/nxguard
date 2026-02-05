@@ -1,9 +1,9 @@
 import glob
 import os
 
+from basic4web.middleware.logging import logger
 from jinja2 import Environment, FileSystemLoader
 
-from basic4web.middleware.logging import logger
 from config import APP_BASE
 
 env = Environment(loader=FileSystemLoader('engine/templates'))
@@ -21,7 +21,8 @@ def clean(data, output_dir=f"{APP_BASE}", test=False):
     ]
     for f in files:
         try:
-            os.remove(f)
+            if os.path.exists(f):
+                os.remove(f)
         except Exception as e:
             logger.error(f"Error removing file {f}")
 

@@ -1,30 +1,30 @@
-import {Component, OnInit} from '@angular/core';
-import {MatTableDataSource, MatTableModule} from '@angular/material/table';
-import {MatPaginatorModule, PageEvent} from '@angular/material/paginator';
-import {MatDialog} from '@angular/material/dialog';
-import {CommonModule} from '@angular/common';
-import {ReactiveFormsModule} from '@angular/forms';
-import {MatMomentDateModule} from '@angular/material-moment-adapter';
-import {MatButtonModule} from '@angular/material/button';
-import {MatCardModule} from '@angular/material/card';
-import {MatFormFieldModule} from '@angular/material/form-field';
-import {MatIconModule} from '@angular/material/icon';
-import {MatInputModule} from '@angular/material/input';
-import {MatListModule} from '@angular/material/list';
-import {MatMenuModule} from '@angular/material/menu';
-import {MatProgressBarModule} from '@angular/material/progress-bar';
-import {MatSelectModule} from '@angular/material/select';
-import {MatSidenavModule} from '@angular/material/sidenav';
-import {MatSortModule} from '@angular/material/sort';
-import {MatTooltipModule} from '@angular/material/tooltip';
-import {RouterModule} from '@angular/router';
-import {TranslateModule} from '@ngx-translate/core';
-import {ConfirmDialogComponent} from 'app/components/confirm-dialog/confirm-dialog.component';
-import {DefaultPageMeta} from 'app/models/shared';
-import {NotificationService} from 'app/services/notification.service';
-import {MatChipsModule} from '@angular/material/chips';
-import {User} from "../../models/oauth";
-import {OAuthService, UserService} from "../../services/oauth.service";
+import { Component, OnInit } from '@angular/core';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule } from '@angular/forms';
+import { MatMomentDateModule } from '@angular/material-moment-adapter';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatListModule } from '@angular/material/list';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatSortModule } from '@angular/material/sort';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { RouterModule } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
+import { ConfirmDialogComponent } from 'app/components/confirm-dialog/confirm-dialog.component';
+import { DefaultPageMeta } from 'app/models/shared';
+import { NotificationService } from 'app/services/notification.service';
+import { MatChipsModule } from '@angular/material/chips';
+import { User } from "../../models/oauth";
+import { OAuthService, UserService } from "../../services/oauth.service";
 
 
 @Component({
@@ -37,7 +37,7 @@ import {OAuthService, UserService} from "../../services/oauth.service";
         MatListModule, MatCardModule, MatProgressBarModule, MatInputModule,
         MatTableModule, MatMenuModule, MatSortModule,
         MatTooltipModule, MatSelectModule, MatPaginatorModule,
-        MatFormFieldModule, MatChipsModule],
+        MatFormFieldModule, MatChipsModule, MatDialogModule],
     templateUrl: './user-list.component.html'
 })
 export class UserListComponent implements OnInit {
@@ -74,10 +74,10 @@ export class UserListComponent implements OnInit {
 
     onRemove(dto: User) {
         const dialogRef = this.confirmDialog.open(ConfirmDialogComponent, {
-            data: {title: "Confirm user removal ", message: "Remove " + dto.name},
+            data: { title: "Confirm user removal ", message: "Remove " + dto.name },
         });
 
-        dialogRef.afterClosed().subscribe(result => {
+        dialogRef.afterClosed().subscribe((result: any) => {
             // accepted
             if (result && dto._id) {
                 this.dictService.removeById(dto._id).subscribe(data => {

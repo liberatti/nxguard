@@ -5,5 +5,6 @@ export const environment = {
     production: false,
     apiUrl: "http://127.0.0.1:5000/nxg",
     apiDateFormat:"YYYY-MM-DDTHH:mm:ss.SSS[Z]",
-    version : packageJson.version + "-dev"
+    version : packageJson.version + "-dev",
+    appContext: "/nxg"
   };

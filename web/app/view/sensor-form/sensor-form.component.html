@@ -34,11 +34,12 @@
                                                 <mat-label>Transaction Analyzer Jail</mat-label>
                                                 <mat-select formControlName="jail" [compareWith]="compareFn"
                                                     (selectionChange)="onAddJail($event)" id="sensor-jail-select">
-                                                    <mat-option
-                                                        *ngFor="let c of formater.filterActive(_jails,form.value?.jails);"
-                                                        [value]="c" id="jail-option-{{c._id}}">
-                                                        {{ c.name }}
-                                                    </mat-option>
+                                                    @for (c of formater.filterActive(_jails,form.value.jails); track c.id) {
+                                                        <mat-option
+                                                                [value]="c" id="jail-option-{{c._id}}">
+                                                            {{ c.name }}
+                                                        </mat-option>
+                                                    }
                                                 </mat-select>
                                             </mat-form-field>
                                         </form>
