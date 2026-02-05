@@ -1,9 +1,10 @@
 from typing import Dict, Any, Optional
 
-import config as config
-from api.tools.network_tool import NetworkTool
 from basic4web.middleware.logging import logger
 from basic4web.repository.sqlite3_base_dao import SQLite3DAO
+
+import config as config
+from api.tools.network_tool import NetworkTool
 
 
 class GeoIpDao(SQLite3DAO):
@@ -18,7 +19,10 @@ class GeoIpDao(SQLite3DAO):
         """
         Initializes the DAO with the 'geoip' collection.
         """
-        super().__init__(db_path=config.DB_PATH, table_name="geoip")
+        super().__init__(
+            db_path=config.DB_PATH
+            , table_name="geoip"
+        )
 
     def find_by_ip(self, ip: str) -> Optional[Dict[str, Any]]:
         """

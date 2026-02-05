@@ -1,12 +1,12 @@
 from datetime import datetime
 from typing import Dict, Any, List
 
-from marshmallow import EXCLUDE, Schema, fields
-
-import config as config
 from basic4web.common_utils import replace_tz
 from basic4web.middleware.logging import logger
 from basic4web.repository.sqlite3_base_dao import SQLite3DAO
+from marshmallow import EXCLUDE, Schema, fields
+
+import config as config
 
 
 class JailEntrySchema(Schema):
@@ -69,7 +69,11 @@ class JailDao(SQLite3DAO):
         """
         Initializes the DAO with the 'jail' collection and schema.
         """
-        super().__init__(db_path=config.DB_PATH, table_name="jail", schema=JailSchema)
+        super().__init__(
+            db_path=config.DB_PATH
+            , table_name="jail"
+            , schema=JailSchema
+        )
 
     def get_by_type(self, t: str) -> List[Dict[str, Any]]:
         """

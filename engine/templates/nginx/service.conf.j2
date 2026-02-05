@@ -2,14 +2,16 @@
 {%- if rate_limit %}
 limit_req_zone $binary_remote_addr zone={{name}}_rate:16m rate={{rate_limit_per_sec}}r/s;
 {%- endif %}
-proxy_cache_path {{APP_BASE}}/cache/{{name}} keys_zone={{name}}_cache:10m use_temp_path=off loader_threshold=300 loader_files=200 max_size=128m;
+proxy_cache_path {{BASE_PATH}}/cache/{{name}} keys_zone={{name}}_cache:10m use_temp_path=off loader_threshold=300 loader_files=200 max_size=128m;
 server {
 #  lua_code_cache on;
   access_log off;
   error_log /opt/nxguard/logs/error.log warn;
-  log_by_lua_file {{APP_BASE}}/lualib/nxguard/log_by_custom.lua;
+  log_by_lua_file {{BASE_PATH}}/lualib/nxguard/log_by_custom.lua;
+  {%if config.cache and config.cache.enabled %}
   set $cache_server_url {{ config.cache.host }};
   set $cache_server_port {{ config.cache.port }};
+  {%endif%}
   server_name {% for t in sans %}{{ t }} {% endfor %};
   if ($missing_domain_match) {return 410;}
   {%- if rate_limit %}
@@ -43,9 +45,9 @@ server {
 
   modsecurity on;
   modsecurity_transaction_id "$request_id";
-#  modsecurity_rules_file {{APP_BASE}}/modsec/conf/config.policy;
-#  modsecurity_rules_file {{APP_BASE}}/modsec/conf/service-proxy.policy;
-#  modsecurity_rules_file {{APP_BASE}}/modsec/conf/crs.policy;
+#  modsecurity_rules_file {{BASE_PATH}}/modsec/conf/config.policy;
+#  modsecurity_rules_file {{BASE_PATH}}/modsec/conf/service-proxy.policy;
+#  modsecurity_rules_file {{BASE_PATH}}/modsec/conf/crs.policy;
 
   {%- if ssl_enable %}
   ssl_protocols {% for t in ssl_protocols %}{{ t }} {% endfor %};
@@ -56,8 +58,8 @@ server {
   ssl_ecdh_curve secp384r1;
   ssl_stapling off;
   ssl_stapling_verify off;
-  ssl_certificate {{APP_BASE}}/keystore/{%-if IS_TEST%}test-{%-endif%}{{certificate.name}}.crt;
-  ssl_certificate_key {{APP_BASE}}/keystore/{%-if IS_TEST%}test-{%-endif%}{{certificate.name}}.key;
+  ssl_certificate {{BASE_PATH}}/keystore/{%-if IS_TEST%}test-{%-endif%}{{certificate.name}}.crt;
+  ssl_certificate_key {{BASE_PATH}}/keystore/{%-if IS_TEST%}test-{%-endif%}{{certificate.name}}.key;
   {%- endif %}
 
   location ^~ /.well-known/acme-challenge/ {
@@ -89,8 +91,8 @@ server {
   location ~ {{p}}{
    set $sensor '{{r.sensor.name}}';
    set $route '{{r.name}}';
-   access_by_lua_file  {{APP_BASE}}/lualib/nxguard/deny_by_sensor.lua;
-#   modsecurity_rules_file {{APP_BASE}}/modsec/conf/{%-if IS_TEST%}test-{%-endif%}route-proxy-all-req.policy;
+   access_by_lua_file  {{BASE_PATH}}/lualib/nxguard/deny_by_sensor.lua;
+#   modsecurity_rules_file {{BASE_PATH}}/modsec/conf/{%-if IS_TEST%}test-{%-endif%}route-proxy-all-req.policy;
    set $upstream '{{r.upstream.name}}';
    proxy_http_version 1.1;
    proxy_intercept_errors on;
@@ -109,7 +111,7 @@ server {
   error_page 404 403 500 502 503 504 /custom_error;
   location = /custom_error {
    internal;
-   content_by_lua_file {{APP_BASE}}/lualib/nxguard/content_by_custom_error.lua;
+   content_by_lua_file {{BASE_PATH}}/lualib/nxguard/content_by_custom_error.lua;
   }
 
 }

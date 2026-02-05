@@ -18,11 +18,11 @@ export class ConfigService extends APIService<Config, string> {
     }
 
     getActive(): Observable<Config> {
-        return this.httpClient.get<Config>(this.END_POINT + "/");
+        return this.httpClient.get<Config>(this.END_POINT);
     }
 
     override update(id: string, data: Config): Observable<Config> {
-        return this.httpClient.put<Config>(this.END_POINT + "/", data);
+        return this.httpClient.put<Config>(this.END_POINT, data);
     }
     healthCheck(): Observable<any> {
         return this.httpClient.get<any>(this.END_POINT + "/health");

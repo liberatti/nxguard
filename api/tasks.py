@@ -21,7 +21,7 @@ def update_node_config() -> None:
     while attempt < config.REPLICATE_MAX_RETRIES:
         try:
             resp = requests.get(
-                f"{config.NXGUARD_ADMIN_ENDPOINT}/api/config/health",
+                f"{config.NXGUARD_ENDPOINT}/api/config/health",
                 headers=config.API_HEADERS,
             )
             if resp.status_code in [200, 201]:
@@ -29,7 +29,7 @@ def update_node_config() -> None:
                 if cnf and "scn" in cnf:
                     if "scn" not in check or not check["scn"] in cnf["scn"]:
                         resp = requests.get(
-                            f"{config.NXGUARD_ADMIN_ENDPOINT}/api/config",
+                            f"{config.NXGUARD_ENDPOINT}/api/config",
                             headers=config.API_HEADERS,
                         )
                         if resp.status_code in [200, 201]:
@@ -40,7 +40,7 @@ def update_node_config() -> None:
                             break
             else:
                 logger.error(
-                    f"[{resp.status_code}] Config, check {config.NXGUARD_ADMIN_ENDPOINT}"
+                    f"[{resp.status_code}] Config, check {config.NXGUARD_ENDPOINT}"
                 )
         except requests.RequestException as e:
             logger.error("Request failed: %s", e)
@@ -62,7 +62,7 @@ def update_node_status() -> None:
             "net_recv": 0,
             "net_send": 0,
         }
-        if os.path.exists(os.path.join(config.APP_CONFIG_DIR, 'active.json')):
+        if os.path.exists(os.path.join(config.CONFIG_PATH, 'active.json')):
             cnf = c_builder.read_from_json("active.json")
             node.update({"scn": cnf["scn"]})
         cache.persist(f"node_{get_server_id()}", json.dumps(node), expire=120)
@@ -70,8 +70,24 @@ def update_node_status() -> None:
 
 def update_main_config():
     """Apply configuration in background thread to avoid blocking server startup"""
-    if os.path.exists(os.path.join(config.APP_CONFIG_DIR, "active.json")):
+    if os.path.exists(os.path.join(config.CONFIG_PATH, "active.json")):
         cnf = c_builder.read_from_json("active.json")
         logger.info(f"Loading last active config: {cnf['scn']}")
         c_admin.apply(cnf)
     return schedule.CancelJob
+
+
+def install():
+    logger.info(f"Installing NXGuard")
+    os.makedirs(config.CONFIG_PATH, exist_ok=True)
+    if os.path.exists(f"{config.DB_PATH}/app.sqlite"):
+        os.remove(f"{config.DB_PATH}/app.sqlite")
+    c_builder.create_db()
+    if os.path.exists(f"{config.CONFIG_PATH}/init-data.json"):
+        c_builder.init_from_json("init-data.json")
+
+
+def apply():
+    conf = c_builder.create()
+    conf = c_builder.validate(conf)
+    c_admin.apply(conf)

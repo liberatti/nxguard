@@ -2,12 +2,12 @@ import json
 from datetime import datetime, timedelta
 from typing import Dict, Any
 
-from marshmallow import EXCLUDE, Schema, fields
-
-import config as config
 from basic4web.common_utils import replace_tz
 from basic4web.middleware.logging import logger
 from basic4web.repository.sqlite3_base_dao import SQLite3DAO
+from marshmallow import EXCLUDE, Schema, fields
+
+import config as config
 
 
 class CertificateSchema(Schema):
@@ -31,7 +31,12 @@ class CertificateSchema(Schema):
 class CertificateDao(SQLite3DAO):
 
     def __init__(self, conn=None):
-        super().__init__(db_path=config.DB_PATH, table_name="certificate", schema=CertificateSchema, conn=conn)
+        super().__init__(
+            db_path=config.DB_PATH
+            , table_name="certificate"
+            , schema=CertificateSchema
+            , conn=conn
+        )
 
     def create_schema(self):
         self.ddl(f"""

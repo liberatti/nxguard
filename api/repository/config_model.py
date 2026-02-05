@@ -1,11 +1,11 @@
 import json
 from typing import Dict, Any, Optional
 
+from basic4web.middleware.logging import logger
+from basic4web.repository.sqlite3_base_dao import SQLite3DAO
 from marshmallow import EXCLUDE, Schema, fields
 
 import config as config
-from basic4web.middleware.logging import logger
-from basic4web.repository.sqlite3_base_dao import SQLite3DAO
 
 
 class ConfigArchiveSchema(Schema):
@@ -39,7 +39,11 @@ class ConfigSchema(Schema):
 
 class ConfigDao(SQLite3DAO):
     def __init__(self):
-        super().__init__(db_path=config.DB_PATH, table_name="config", schema=ConfigSchema)
+        super().__init__(
+            db_path=config.DB_PATH
+            , table_name="config"
+            , schema=ConfigSchema
+        )
 
     def create_schema(self):
         self.ddl(f"""

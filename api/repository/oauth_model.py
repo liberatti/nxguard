@@ -1,10 +1,10 @@
 from typing import Dict, Any, Optional
 
+from basic4web.middleware.logging import logger
+from basic4web.repository.sqlite3_base_dao import SQLite3DAO
 from marshmallow import EXCLUDE, Schema, fields
 
 import config as config
-from basic4web.middleware.logging import logger
-from basic4web.repository.sqlite3_base_dao import SQLite3DAO
 
 
 class OIDCToken(Schema):
@@ -43,7 +43,11 @@ class UserDao(SQLite3DAO):
         )
 
     def __init__(self):
-        super().__init__(db_path=config.DB_PATH, table_name="users", schema=UserSchema)
+        super().__init__(
+            db_path=config.DB_PATH
+            , table_name="users"
+            , schema=UserSchema
+        )
 
     def get_by_email(self, email: str) -> Optional[Dict[str, Any]]:
         try:

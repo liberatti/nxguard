@@ -28,20 +28,20 @@ def create():
         c.update({"services": dao.get_all()['data']})
 
     c.update({
-        "NGINX_DIR": os.path.join(config.APP_BASE, "nginx"),
-        "APP_BASE": config.APP_BASE
+        "NGINX_DIR": os.path.join(config.BASE_PATH, "nginx"),
+        "BASE_PATH": config.BASE_PATH
     })
     return c
 
 
 def export_config_json(data, json_file):
-    with open(os.path.join(config.APP_CONFIG_DIR, json_file), "w") as f:
+    with open(os.path.join(config.CONFIG_PATH, json_file), "w") as f:
         json.dump(data, f, indent=4)
 
 
 def read_from_json(json_file):
-    if os.path.exists(os.path.join(config.APP_CONFIG_DIR, json_file)):
-        with open(os.path.join(config.APP_CONFIG_DIR, json_file), "r") as f:
+    if os.path.exists(os.path.join(config.CONFIG_PATH, json_file)):
+        with open(os.path.join(config.CONFIG_PATH, json_file), "r") as f:
             return json.load(f)
     return None
 
@@ -70,10 +70,12 @@ def create_db():
 def init_from_json(json_file):
     data = read_from_json(json_file)
     with ConfigDao() as dao:
+        dao.delete_all()
         data['config'].update({"cluster_id": gen_random_string(8)})
         dao.persist(data['config'])
 
     with UserDao() as dao:
+        dao.delete_all()
         encrypted_pass = bcrypt.hashpw(data['user']['password'].encode("utf8"), bcrypt.gensalt())
         user = {
             "name": data['user']['name'],
@@ -84,12 +86,15 @@ def init_from_json(json_file):
         dao.persist(user)
 
     with UpstreamDao() as dao:
+        dao.delete_all()
         dao.persist_many(data['upstreams'])
 
     with CertificateDao() as dao:
+        dao.delete_all()
         dao.persist_many(data['certificates'])
 
     with ServiceDao() as dao:
+        dao.delete_all()
         dao.persist_many(data['services'])
 
     return data

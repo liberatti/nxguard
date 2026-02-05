@@ -4,12 +4,13 @@ import os
 from basic4web.middleware.logging import logger
 from jinja2 import Environment, FileSystemLoader
 
-from config import APP_BASE
+import config
+from config import BASE_PATH
 
 env = Environment(loader=FileSystemLoader('engine/templates'))
 
 
-def clean(data, output_dir=f"{APP_BASE}", test=False):
+def clean(data, output_dir=f"{BASE_PATH}", test=False):
     logger.info(f"[{output_dir}] - Cleanup")
     files = [
         f"{output_dir}/nginx/conf/{'test-' if test else ''}mime.types",
@@ -39,7 +40,7 @@ def clean(data, output_dir=f"{APP_BASE}", test=False):
             logger.error(f"Error removing file {file_path}")
 
 
-def generate(data, output_dir=f"{APP_BASE}", test=False):
+def generate(data, output_dir=f"{BASE_PATH}", test=False):
     t_dir = [
         "client_body", "fastcgi", "proxy", "scgi", "uwsgi"
     ]
@@ -97,15 +98,16 @@ def generate(data, output_dir=f"{APP_BASE}", test=False):
     if "services" in data:
         logger.info(f"[{output_dir}] - Generate Services")
         for service in data['services']:
-            service.update({"APP_BASE": data['APP_BASE'], "IS_TEST": test, "config": data['config']})
+            service.update({"BASE_PATH": config.BASE_PATH, "IS_TEST": test, "config": data['config']})
             # logger.info(data['service'])
             os.makedirs(f"{output_dir}/cache/{service['name']}", exist_ok=True)
             logger.info(f"[{output_dir}] - Generate nginx/conf/{'test-' if test else ''}service-{service['name']}.conf")
-            for b in service['bindings']:
-                if b['protocol'] == 'HTTPS':
-                    service.update({"ssl_enable": True})
+            if "bindings" in service:
+                for b in service['bindings']:
+                    if b['protocol'] == 'HTTPS':
+                        service.update({"ssl_enable": True})
             with open(f"{output_dir}/nginx/conf/{'test-' if test else ''}service-{service['name']}.conf", "w") as f:
-                service.update({"APP_BASE": data['APP_BASE']})
+                service.update({"BASE_PATH": config.BASE_PATH})
                 template_content = env.get_template('nginx/service.conf.j2').render(service)
                 f.write(template_content)
 

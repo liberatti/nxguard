@@ -8,8 +8,9 @@ import schedule
 from basic4web.middleware.logging import logger
 
 import config as _config
-from api.tasks import update_node_status, update_node_config, update_main_config
-from cli import install
+import engine.admin as c_admin
+import engine.build as c_builder
+from api.tasks import update_node_status, update_node_config, update_main_config, install
 
 stop_event = threading.Event()
 
@@ -26,26 +27,26 @@ def _scheduler():
 
 def when_ready(server):
     nxg_role = "worker"
-    global scheduler_started
-    if not scheduler_started:
-        scheduler_started = True
-        lock_file = os.path.join(_config.DB_PATH, "db.lock")
-        with open(lock_file, "a+") as f:
-            try:
-                fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB)
-                if not os.path.exists(f"{_config.DB_PATH}/app.sqlite"):
-                    install()
-                schedule.every(10).seconds.do(update_main_config)
-                # threading.Thread(target=update_main_config, daemon=True).start()
-                nxg_role = "main"
-            except BlockingIOError:
-                schedule.every(60).seconds.do(update_node_config)
-                return
-            finally:
-                fcntl.flock(f, fcntl.LOCK_UN)
-        schedule.every(30).seconds.do(update_node_status)
-        threading.Thread(target=_scheduler, daemon=True).start()
-        logger.info(f"NXGuard started as {nxg_role}")
+    lock_file = os.path.join(_config.DB_PATH, "db.lock")
+    with open(lock_file, "a+") as f:
+        try:
+            fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            logger.info("Lock acquired, NXGuard is the main instance")
+            if not os.path.exists(f"{_config.DB_PATH}/app.sqlite"):
+                install()
+            if os.path.exists(f"{_config.CONFIG_PATH}/init-data.json"):
+                conf = c_builder.init_from_json(f"{_config.CONFIG_PATH}/init-data.json")
+                c_admin.apply(conf)
+            schedule.every(10).seconds.do(update_main_config)
+            nxg_role = "main"
+        except BlockingIOError:
+            schedule.every(60).seconds.do(update_node_config)
+            return
+        finally:
+            fcntl.flock(f, fcntl.LOCK_UN)
+    schedule.every(30).seconds.do(update_node_status)
+    threading.Thread(target=_scheduler, daemon=True).start()
+    logger.info(f"NXGuard started as {nxg_role}")
 
 
 def on_reload(server):

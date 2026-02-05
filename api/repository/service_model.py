@@ -1,13 +1,13 @@
 import json
 from typing import Dict, Any, List, Optional
 
+from basic4web.middleware.logging import logger
+from basic4web.repository.sqlite3_base_dao import SQLite3DAO
 from marshmallow import EXCLUDE, Schema, fields
 
 import config
 from api.repository.certificate_model import CertificateDao, CertificateSchema
 from api.repository.upstream_model import UpstreamSchema
-from basic4web.middleware.logging import logger
-from basic4web.repository.sqlite3_base_dao import SQLite3DAO
 
 
 class HeaderSchema(Schema):
@@ -95,7 +95,11 @@ class ServiceSchema(Schema):
 class RouteFilterDao(SQLite3DAO):
 
     def __init__(self):
-        super().__init__(db_path=config.DB_PATH, table_name="route_filters", schema=RouteFilterSchema)
+        super().__init__(
+            db_path=config.DB_PATH
+            , table_name="route_filters"
+            , schema=RouteFilterSchema
+        )
 
     def create_schema(self):
         self.ddl(f"""

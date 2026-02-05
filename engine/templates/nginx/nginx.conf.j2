@@ -1,22 +1,22 @@
-load_module {{APP_BASE}}/nginx/modules/ngx_http_modsecurity_module.so;
-load_module {{APP_BASE}}/nginx/modules/ngx_http_sticky_module.so;
+load_module {{BASE_PATH}}/nginx/modules/ngx_http_modsecurity_module.so;
+load_module {{BASE_PATH}}/nginx/modules/ngx_http_sticky_module.so;
 user nxguard nxguard;
-pid {{APP_BASE}}/run/nginx.pid;
+pid {{BASE_PATH}}/run/nginx.pid;
 worker_processes auto;
 events {worker_connections 1024;}
 http {
  lua_shared_dict log_buffer 16m;
  init_worker_by_lua_block {
    local flush = require "nxguard.log_flush"
-   flush.start("{{APP_BASE}}/logs/access.json", 2)  -- flush by 2s
+   flush.start("{{BASE_PATH}}/logs/access.json", 2)  -- flush by 2s
  }
  #lua_shared_dict geoip_cache 10m;
  #lua_shared_dict si_68e91d2946043e189ab49b96_cache 10m;
- client_body_temp_path {{APP_BASE}}/temp/client_body;
- fastcgi_temp_path {{APP_BASE}}/temp/fastcgi;
- proxy_temp_path {{APP_BASE}}/temp/proxy;
- scgi_temp_path {{APP_BASE}}/temp/scgi;
- uwsgi_temp_path {{APP_BASE}}/temp/uwsgi;
+ client_body_temp_path {{BASE_PATH}}/temp/client_body;
+ fastcgi_temp_path {{BASE_PATH}}/temp/fastcgi;
+ proxy_temp_path {{BASE_PATH}}/temp/proxy;
+ scgi_temp_path {{BASE_PATH}}/temp/scgi;
+ uwsgi_temp_path {{BASE_PATH}}/temp/uwsgi;
  access_log off;error_log /dev/null crit;
  proxy_intercept_errors on;
  include {%if IS_TEST%}test-{%-endif%}mime.types;

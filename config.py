@@ -3,14 +3,16 @@ import os
 import pytz
 
 APP_CONTEXT = os.getenv("APP_CONTEXT", "/nxg")
-APP_VERSION = os.getenv("APP_VERSION", "v1.0.4")
+APP_VERSION = os.getenv("APP_VERSION", "v1.0.6")
 API_HEADERS = {"User-Agent": f"NXGuard/{APP_VERSION}"}
 
-APP_BASE = "/opt/nxguard"
-APP_CONFIG_DIR = os.path.join(APP_BASE, "admin/config")
+BASE_PATH = "/opt/nxguard"
+CONFIG_PATH = os.environ.get("BASE_PATH", "/config")
+DB_PATH = os.environ.get("DB_PATH", "/data")
 
-ENGINE_BASE = f"{APP_BASE}/nginx"
+ENGINE_BASE = f"{BASE_PATH}/nginx"
 ENGINE_VERSION = "1.27.1"
+
 REPLICATE_MAX_RETRIES = 3
 DATETIME_FMT = "%Y-%m-%dT%H:%M:%S.%fZ"
 TZ = pytz.timezone("UTC")
@@ -24,18 +26,17 @@ TELEMETRY_URL = os.environ.get("TELEMETRY_URL", "https://nxguard.app.br")
 MAINTENANCE_WINDOW = "01:00"
 
 LOGLEVEL = os.environ.get("LOGLEVEL", "INFO").upper()
-DB_PATH = os.environ.get("DB_PATH", "/data")
 
 # Security config
 SECURITY_ENABLED = True
 KEY_SIZE = 2048
 JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "dev")
 JWT_EXPIRE = 3600
-JWT_AUD = "nxguard"
+JWT_AUD = "nxg"
 
 # Cluster config
-NXGUARD_ADMIN_ENDPOINT = os.environ.get(
-    "NXGUARD_ADMIN_ENDPOINT", "http://localhost:5000/nxg"
+NXGUARD_ENDPOINT = os.environ.get(
+    "NXGUARD_ENDPOINT", "http://localhost:5000/nxg"
 )
 
 NXGUARD_API_KEY = os.environ.get("NXGUARD_API_KEY", "DEV")

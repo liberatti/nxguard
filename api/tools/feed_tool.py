@@ -8,6 +8,7 @@ from datetime import datetime
 
 import geoip2.database
 import requests
+from basic4web.middleware.logging import logger
 from bson import ObjectId
 
 from api.repository.config_model import ConfigDao
@@ -16,8 +17,7 @@ from api.repository.geoip_model import GeoIpDao
 from api.repository.rbl_model import RBLDao
 from api.repository.redis_cache import RedisCache
 from api.tools.network_tool import NetworkTool
-from basic4web.middleware.logging import logger
-from config import APP_BASE, TZ
+from config import BASE_PATH, TZ
 
 
 def update():
@@ -125,10 +125,10 @@ def download_mmdb(key, edition_id):
     if response.status_code == 200:
         zip_content = io.BytesIO(response.content)
         with tarfile.open(fileobj=zip_content, mode="r:gz") as tar:
-            os.makedirs(f"{APP_BASE}/data", exist_ok=True)
+            os.makedirs(f"{BASE_PATH}/data", exist_ok=True)
             for m in tar.getmembers():
                 if m.isfile() and m.name.endswith(".mmdb"):
-                    dest_path = f"{APP_BASE}/data/{edition_id}.mmdb"
+                    dest_path = f"{BASE_PATH}/data/{edition_id}.mmdb"
                     extracted = tar.extractfile(m)
                     if extracted is not None:
                         with open(dest_path, "wb") as out_f:
@@ -154,9 +154,9 @@ def geo_info(ip):
             }
         )
     for db in ["ASN", "City"]:
-        if os.path.exists(f"{APP_BASE}/data/GeoLite2-{db}.mmdb"):
+        if os.path.exists(f"{BASE_PATH}/data/GeoLite2-{db}.mmdb"):
             with geoip2.database.Reader(
-                    f"{APP_BASE}/data/GeoLite2-{db}.mmdb"
+                    f"{BASE_PATH}/data/GeoLite2-{db}.mmdb"
             ) as reader:
                 try:
                     if "ASN" in db:

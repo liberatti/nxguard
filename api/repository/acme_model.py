@@ -1,11 +1,11 @@
 from typing import Optional, Dict, Any
 
+from basic4web.middleware.logging import logger
+from basic4web.repository.sqlite3_base_dao import SQLite3DAO
 from flask_marshmallow import Schema
 from marshmallow import EXCLUDE, fields
 
 import config as config
-from basic4web.middleware.logging import logger
-from basic4web.repository.sqlite3_base_dao import SQLite3DAO
 
 
 class ChallengeSchema(Schema):
@@ -20,7 +20,10 @@ class ChallengeSchema(Schema):
 class ChallengeDao(SQLite3DAO):
 
     def __init__(self):
-        super().__init__(db_path=config.DB_PATH, table_name="challenge")
+        super().__init__(
+            db_path=config.DB_PATH
+            , table_name="challenge"
+        )
 
     def create_schema(self):
         self.ddl(f"""

@@ -8,7 +8,7 @@ from basic4web.middleware.logging import logger
 import engine.build as c_builder
 import engine.render as c_render
 from config import (
-    APP_BASE
+    BASE_PATH
 )
 
 
@@ -16,7 +16,7 @@ def apply(conf):
     # logger.info(conf)
     c_render.generate(conf, test=True)
     result = subprocess.Popen(
-        f"sudo {APP_BASE}/nginx/sbin/nginx -c {APP_BASE}/nginx/conf/test-nginx.conf -t",
+        f"sudo {BASE_PATH}/nginx/sbin/nginx -c {BASE_PATH}/nginx/conf/test-nginx.conf -t",
         shell=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
@@ -41,7 +41,7 @@ def apply(conf):
 
 
 def is_running() -> bool:
-    pid_file = f"{APP_BASE}/run/nginx.pid"
+    pid_file = f"{BASE_PATH}/run/nginx.pid"
     try:
         if os.path.exists(pid_file):
             with open(pid_file, "r") as file:
@@ -61,11 +61,11 @@ def is_running() -> bool:
 
 
 def restart():
-    subprocess.run(f"sudo chmod -R 777 {APP_BASE}/logs", shell=True)
+    subprocess.run(f"sudo chmod -R 777 {BASE_PATH}/logs", shell=True)
     if is_running():
         logger.info(f"Nginx is running, reload required")
         result = subprocess.Popen(
-            f"sudo {APP_BASE}/nginx/sbin/nginx -s reload",
+            f"sudo {BASE_PATH}/nginx/sbin/nginx -s reload",
             shell=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -73,7 +73,7 @@ def restart():
         if not is_running():
             logger.info(f"Nginx reload failed, start required")
             result = subprocess.Popen(
-                f"sudo {APP_BASE}/nginx/sbin/nginx",
+                f"sudo {BASE_PATH}/nginx/sbin/nginx",
                 shell=True,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
@@ -81,7 +81,7 @@ def restart():
     else:
         logger.info(f"Nginx is not running, start required")
         result = subprocess.Popen(
-            f"sudo {APP_BASE}/nginx/sbin/nginx",
+            f"sudo {BASE_PATH}/nginx/sbin/nginx",
             shell=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,

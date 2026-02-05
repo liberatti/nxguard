@@ -1,14 +1,14 @@
 from datetime import datetime
 from typing import Dict, Any
 
+from basic4web.middleware.logging import logger
+from basic4web.repository.sqlite3_base_dao import SQLite3DAO
 from bson import ObjectId
 from marshmallow import EXCLUDE, Schema, fields
 
 import config as config
 from api.repository.feed_model import FeedSchema
 from api.tools.network_tool import NetworkTool
-from basic4web.middleware.logging import logger
-from basic4web.repository.sqlite3_base_dao import SQLite3DAO
 
 
 class RBLSchema(Schema):
@@ -42,7 +42,11 @@ class RBLDao(SQLite3DAO):
         """
         Initializes the DAO with the 'rbl' collection and schema.
         """
-        super().__init__(db_path=config.DB_PATH, table_name="rbl", schema=FeedSchema)
+        super().__init__(
+            db_path=config.DB_PATH
+            , table_name="rbl"
+            , schema=FeedSchema
+        )
 
     def check_by_ip(self, ip: str, sensor: Dict[str, Any]) -> Dict[str, bool]:
         """

@@ -1,10 +1,10 @@
 from typing import Dict, Any, List, Optional
 
+from basic4web.middleware.logging import logger
+from basic4web.repository.sqlite3_base_dao import SQLite3DAO
 from marshmallow import EXCLUDE, Schema, fields
 
 import config as config
-from basic4web.middleware.logging import logger
-from basic4web.repository.sqlite3_base_dao import SQLite3DAO
 
 
 class FeedSchema(Schema):
@@ -44,7 +44,11 @@ class FeedDao(SQLite3DAO):
         """
         Initializes the DAO with the 'feeds' collection and schema.
         """
-        super().__init__(db_path=config.DB_PATH, table_name="feeds", schema=FeedSchema)
+        super().__init__(
+            db_path=config.DB_PATH
+            , table_name="feeds"
+            , schema=FeedSchema
+        )
 
     def get_by_slug(self, slug: str) -> Optional[Dict[str, Any]]:
         """
