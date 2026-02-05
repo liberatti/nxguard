@@ -97,7 +97,7 @@ def init_from_json(json_file):
         dao.delete_all()
         dao.persist_many(data['services'])
 
-    return data
+    return read_from_json(json_file)
 
 
 def validate(data):

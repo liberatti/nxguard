@@ -47,7 +47,7 @@ def generate(data, output_dir=f"{BASE_PATH}", test=False):
     for t in t_dir:
         os.makedirs(f"{output_dir}/temp/{t}", exist_ok=True)
 
-    data.update({"IS_TEST": test})
+    data.update({"IS_TEST": test, 'BASE_PATH': config.BASE_PATH})
 
     with open(f"{output_dir}/nginx/conf/{'test-' if test else ''}mime.types", "w") as f:
         template_content = env.get_template('nginx/mime.types.j2').render(data)
