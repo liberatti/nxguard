@@ -1,33 +1,33 @@
-import {BreakpointObserver, Breakpoints} from '@angular/cdk/layout';
-import {AfterViewInit, ChangeDetectorRef, Component, Injector, OnDestroy, OnInit} from '@angular/core';
-import {MatButtonModule} from '@angular/material/button';
-import {MatIconModule} from '@angular/material/icon';
-import {MatListModule} from '@angular/material/list';
-import {MatMenuModule} from '@angular/material/menu';
-import {MatSidenavModule} from '@angular/material/sidenav';
-import {MatToolbarModule} from '@angular/material/toolbar';
-import {ActivatedRoute, Router, RouterModule} from '@angular/router';
-import {TranslateModule, TranslateService} from '@ngx-translate/core';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { AfterViewInit, ChangeDetectorRef, Component, Injector, OnDestroy, OnInit } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatListModule } from '@angular/material/list';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import * as moment from 'moment';
-import {Subject, takeUntil} from 'rxjs';
-import {FrontendConfig, MenuLink} from 'app/models/shared';
-import {LocalStorageService} from 'app/services/localstorage.service';
-import {MatDialog, MatDialogRef} from '@angular/material/dialog';
-import {AboutDialogComponent} from 'app/components/about-dialog/about-dialog.component';
-import {ApplyDialogComponent} from 'app/components/apply-dialog/apply-dialog.component';
-import {MatBadgeModule} from '@angular/material/badge';
-import {CommonModule} from '@angular/common';
-import {MatCardModule} from '@angular/material/card';
-import {MatProgressBarModule} from '@angular/material/progress-bar';
-import {OAuthService} from 'app/services/oauth.service';
-import {io} from 'socket.io-client';
-import {REST_API_URL} from 'app/app.config';
-import {MatChipsModule} from '@angular/material/chips';
-import {MatTooltip} from "@angular/material/tooltip";
-import {HttpClient} from "@angular/common/http";
-import {environment} from 'environments/environment';
-import {ConfigService, HealthService} from "../../services/config.service";
-import {Health} from "../../models/config";
+import { Subject, takeUntil } from 'rxjs';
+import { FrontendConfig, MenuLink } from 'app/models/shared';
+import { LocalStorageService } from 'app/services/localstorage.service';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { AboutDialogComponent } from 'app/components/about-dialog/about-dialog.component';
+import { ApplyDialogComponent } from 'app/components/apply-dialog/apply-dialog.component';
+import { MatBadgeModule } from '@angular/material/badge';
+import { CommonModule } from '@angular/common';
+import { MatCardModule } from '@angular/material/card';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { OAuthService } from 'app/services/oauth.service';
+import { io } from 'socket.io-client';
+import { REST_API_URL } from 'app/app.config';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatTooltip } from "@angular/material/tooltip";
+import { HttpClient } from "@angular/common/http";
+import { environment } from 'environments/environment';
+import { ConfigService, HealthService } from "../../services/config.service";
+import { Health } from "../../models/config";
 
 @Component({
     selector: 'app-admin-layout',
@@ -43,11 +43,11 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
 
     title: string = environment.name;
     version: string = environment.version;
-    config: FrontendConfig = <FrontendConfig>{locale: {key: 'en_US'}, navResource: "transaction", sidenavOpened: false};
+    config: FrontendConfig = <FrontendConfig>{ locale: { key: 'en_US' }, navResource: "transaction", sidenavOpened: false };
     destroyed = new Subject<void>();
     currentScreenSize: string = "";
     updatePending: boolean = false;
-    health: Health={} as Health;
+    health: Health = {} as Health;
 
     displayNameMap = new Map([
         [Breakpoints.XSmall, 'XSmall'],
@@ -193,7 +193,9 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
             console.error('REST_API_URL not found in injector');
             return;
         }
-        this.socket = io(apiUrl, {
+        const url = new URL(apiUrl);
+        this.socket = io(url.origin, {
+            path: `${url.pathname}/socket.io`.replace('//', '/'),
             reconnection: true,
             reconnectionAttempts: 5,
             reconnectionDelay: 10000,
@@ -208,13 +210,13 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
             this.applyDialogRef?.close();
         });
         this.configService.healthCheck().subscribe(data => {
-                this.changes = data.apply_pendding;
-                if (this.changes && this.changes.length > 0) {
-                    this.trackingEvt = true;
-                }
-                if (data.apply_active) {
-                    this.onApply();
-                }
+            this.changes = data.apply_pendding;
+            if (this.changes && this.changes.length > 0) {
+                this.trackingEvt = true;
+            }
+            if (data.apply_active) {
+                this.onApply();
+            }
         });
     }
 

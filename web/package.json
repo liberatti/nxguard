@@ -5,7 +5,7 @@
     "ng": "ng",
     "start": "ng serve",
     "container": "ng serve --configuration production",
-    "build": "ng build"
+    "build": "ng build --configuration production"
   },
   "private": true,
   "dependencies": {

@@ -4,7 +4,6 @@ import pytz
 
 APP_CONTEXT = os.getenv("APP_CONTEXT", "/nxg")
 APP_VERSION = os.getenv("APP_VERSION", "v1.0.4")
-APP_PUBLIC_URL = os.getenv("APP_PUBLIC_URL", f"http://localhost:4200{APP_CONTEXT}")
 API_HEADERS = {"User-Agent": f"NXGuard/{APP_VERSION}"}
 
 APP_BASE = "/opt/nxguard"

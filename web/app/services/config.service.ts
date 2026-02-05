@@ -1,9 +1,9 @@
-import {Injectable, Injector} from "@angular/core";
-import {APIService} from "./api.service";
-import {Config, Health} from "../models/config";
-import {LocalStorageService} from "./localstorage.service";
-import {Observable} from "rxjs";
-import {Page} from "../models/shared";
+import { Injectable, Injector } from "@angular/core";
+import { APIService } from "./api.service";
+import { Config, Health } from "../models/config";
+import { LocalStorageService } from "./localstorage.service";
+import { Observable } from "rxjs";
+import { Page } from "../models/shared";
 
 @Injectable({
     providedIn: 'root'
@@ -18,11 +18,11 @@ export class ConfigService extends APIService<Config, string> {
     }
 
     getActive(): Observable<Config> {
-        return this.httpClient.get<Config>(this.END_POINT + "/config");
+        return this.httpClient.get<Config>(this.END_POINT + "/");
     }
 
     override update(id: string, data: Config): Observable<Config> {
-        return this.httpClient.put<Config>(this.END_POINT + "/config", data);
+        return this.httpClient.put<Config>(this.END_POINT + "/", data);
     }
     healthCheck(): Observable<any> {
         return this.httpClient.get<any>(this.END_POINT + "/health");

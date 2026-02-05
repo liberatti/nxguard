@@ -12,9 +12,7 @@ import { provideHighlightOptions } from 'ngx-highlightjs';
 export const REST_API_URL = new InjectionToken<string>('REST_API_URL');
 export const API_DATA_FORMAT = new InjectionToken<string>('API_DATA_FORMAT');
 
-import { provideTranslateService, provideTranslateLoader } from "@ngx-translate/core";
-
-
+import { provideTranslateService } from "@ngx-translate/core";
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -37,11 +35,11 @@ export const appConfig: ApplicationConfig = {
     ),
     provideTranslateService({
       loader: provideTranslateHttpLoader({
-        prefix: '/assets/i18n/',
+        prefix: './assets/i18n/',
         suffix: '.json'
       }),
-      fallbackLang: 'en',
-      lang: 'en'
+      fallbackLang: 'en_US',
+      lang: 'en_US'
     })
   ]
 };
