@@ -12,7 +12,6 @@ from basic4web.middleware.logging import logger
 import config
 import engine.admin as c_admin
 import engine.build as c_builder
-from api.repository.redis_cache import RedisCache
 
 
 def update_node_config() -> None:
@@ -51,21 +50,22 @@ def update_node_config() -> None:
 
 
 def update_node_status() -> None:
-    with RedisCache() as cache:
-        st = "ACTIVE" if c_admin.is_running() else "STOPPED"
-        node = {
-            "_id": get_server_id(),
-            "status": st,
-            "scn": None,
-            "last_check": datetime.datetime.now(config.TZ).isoformat(),
-            "version": config.APP_VERSION,
-            "net_recv": 0,
-            "net_send": 0,
-        }
-        if os.path.exists(os.path.join(config.CONFIG_PATH, 'active.json')):
-            cnf = c_builder.read_from_json("active.json")
-            node.update({"scn": cnf["scn"]})
-        cache.persist(f"node_{get_server_id()}", json.dumps(node), expire=120)
+    k = f"node:{get_server_id()}"
+    st = "ACTIVE" if c_admin.is_running() else "STOPPED"
+    node = {
+        "status": st,
+        "scn": None,
+        "last_check": datetime.datetime.now(config.TZ).isoformat(),
+        "version": config.APP_VERSION,
+        "net_recv": 0,
+        "net_send": 0,
+    }
+    if os.path.exists(os.path.join(config.DB_PATH, "active.json")):
+        active_cnf = c_builder.read_from_json("active.json")
+        node.update({"scn": active_cnf["scn"]})
+
+    config.cache_db.setex(k, 60, json.dumps(node))
+    config.cache_db.sadd("idx:nodes", k)
 
 
 def update_main_config():

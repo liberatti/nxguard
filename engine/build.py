@@ -35,13 +35,13 @@ def create():
 
 
 def export_config_json(data, json_file):
-    with open(os.path.join(config.CONFIG_PATH, json_file), "w") as f:
+    with open(os.path.join(config.DB_PATH, json_file), "w") as f:
         json.dump(data, f, indent=4)
 
 
-def read_from_json(json_file):
-    if os.path.exists(os.path.join(config.CONFIG_PATH, json_file)):
-        with open(os.path.join(config.CONFIG_PATH, json_file), "r") as f:
+def read_from_json(json_file, data_dir=config.DB_PATH):
+    if os.path.exists(os.path.join(data_dir, json_file)):
+        with open(os.path.join(data_dir, json_file), "r") as f:
             return json.load(f)
     return None
 
@@ -68,7 +68,7 @@ def create_db():
 
 
 def init_from_json(json_file):
-    data = read_from_json(json_file)
+    data = read_from_json(json_file, config.CONFIG_PATH)
     with ConfigDao() as dao:
         dao.delete_all()
         data['config'].update({"cluster_id": gen_random_string(8)})

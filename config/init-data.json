@@ -46,7 +46,7 @@
       "type": "backend",
       "targets": [
         {
-          "host": "127.0.0.1",
+          "host": "host.docker.internal",
           "port": 4200,
           "weight": 1
         }
@@ -71,7 +71,7 @@
       "type": "backend",
       "targets": [
         {
-          "host": "127.0.0.1",
+          "host": "host.docker.internal",
           "port": 5000,
           "weight": 1
         }
@@ -150,7 +150,7 @@
           "monitor_only": false,
           "name": "all-req",
           "paths": [
-            "^/(.*)"
+            "^/nxg/(api.*)"
           ],
           "redirect": {
             "code": 500,
@@ -162,6 +162,33 @@
           "type": "upstream",
           "upstream": {
             "name": "NXGuard_API"
+          }
+        },
+        {
+          "cache_methods": [],
+          "filters": [],
+          "methods": [
+            "GET",
+            "POST",
+            "PUT",
+            "PATCH",
+            "DELETE"
+          ],
+          "monitor_only": false,
+          "name": "all-req",
+          "paths": [
+            "^/nxg/(.*)"
+          ],
+          "redirect": {
+            "code": 500,
+            "url": ""
+          },
+          "sensor": {
+            "name": "Default"
+          },
+          "type": "upstream",
+          "upstream": {
+            "name": "NXGuard_Frontend"
           }
         }
       ],

@@ -68,7 +68,8 @@ RUN mkdir -p /opt/nxguard/luajit/share/lua/5.1/nxguard/\
 COPY *.py .
 COPY api api
 COPY engine engine
-COPY lualib /opt/nxguard/luajit/share/lua/5.1/nxguard/
+COPY config /config
+COPY lualib /opt/nxguard/luajit/share/lua/5.1/nxguard
 COPY --from=frontend /app/web/dist /opt/nxguard/admin/static
 COPY --from=frontend /app/web/dist/index.html /opt/nxguard/admin/templates/
 

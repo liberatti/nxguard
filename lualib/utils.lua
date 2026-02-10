@@ -1,6 +1,8 @@
 local cjson = require "cjson"
 
-local function get_client_ip()
+local _M = {}
+
+function _M.get_client_ip()
     local ip = ngx.var.http_x_forwarded_for
     if ip == nil or ip == "" then
         ip = ngx.var.http_x_real_ip
@@ -15,8 +17,12 @@ local function get_client_ip()
     return ngx.var.remote_addr
 end
 
-local function respond(code, _msg)
+function _M.respond(code, ...)
+    local args = {...}
+    local _msg = table.concat(args, "")
     ngx.status = code
     ngx.say(cjson.encode({ error = "Access forbidden", message = _msg }))
     -- ngx.log(ngx.ERR, _msg)
 end
+
+return _M

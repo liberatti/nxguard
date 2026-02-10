@@ -34,9 +34,13 @@ def when_ready(server):
             logger.info("Lock acquired, NXGuard is the main instance")
             if not os.path.exists(f"{_config.DB_PATH}/app.sqlite"):
                 install()
-            if os.path.exists(f"{_config.CONFIG_PATH}/init-data.json"):
-                conf = c_builder.init_from_json(f"{_config.CONFIG_PATH}/init-data.json")
+                if os.path.exists(f"{_config.CONFIG_PATH}/init-data.json"):
+                    conf = c_builder.init_from_json(f"{_config.CONFIG_PATH}/init-data.json")
+                    c_admin.apply(conf)
+            if os.path.exists(f"{_config.DB_PATH}/active.json"):
+                conf = c_builder.read_from_json(f"active.json")
                 c_admin.apply(conf)
+
             schedule.every(10).seconds.do(update_main_config)
             nxg_role = "main"
         except BlockingIOError:
@@ -62,6 +66,7 @@ def on_exit(server):
 
 
 workers = 4
+threads = 8
 preload_app = False
 bind = "0.0.0.0:5000"
 scheduler_started = False

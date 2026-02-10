@@ -5,7 +5,8 @@ local utils = require "nxguard.utils"
 local src_ip = utils.get_client_ip()
 
 -- Check RBL -----------------------------------------------------------------
-if not ngx.var.cache_server_url == ngx.null then
+--[[
+if ngx.var.cache_server_url and ngx.var.cache_server_url ~= "" then
     local red = redis:new()
     red:set_timeout(1000)
 
@@ -20,9 +21,10 @@ if not ngx.var.cache_server_url == ngx.null then
         ngx.exit(ngx.HTTP_FORBIDDEN)
     end
 
-    if not rbl_check == ngx.null then
+    if rbl_check ~= ngx.null then
         utils.respond(ngx.HTTP_FORBIDDEN, "IP '", src_ip, "' blocked by RBL.")
         ngx.exit(ngx.HTTP_FORBIDDEN)
     end
     red:set_keepalive(10000, 100)
 end
+]]

@@ -1,6 +1,7 @@
 import os
 
 import pytz
+import redis
 
 APP_CONTEXT = os.getenv("APP_CONTEXT", "/nxg")
 APP_VERSION = os.getenv("APP_VERSION", "v1.0.6")
@@ -35,16 +36,25 @@ JWT_EXPIRE = 3600
 JWT_AUD = "nxg"
 
 # Cluster config
-NXGUARD_ENDPOINT = os.environ.get(
-    "NXGUARD_ENDPOINT", "http://localhost:5000/nxg"
-)
+NXGUARD_ENDPOINT = os.environ.get("NXGUARD_ENDPOINT", "http://localhost:5000/nxg")
 
 NXGUARD_API_KEY = os.environ.get("NXGUARD_API_KEY", "DEV")
 NXGUARD_IPDB_URL = os.environ.get("NXGUARD_IPDB_URL", "http://localhost:5000")
 
 REDIS_CACHE_HOST = os.environ.get("REDIS_CACHE_HOST", "127.0.0.1")
-REDIS_CACHE_PORT = os.environ.get("REDIS_CACHE_PORT", 6379)
+REDIS_CACHE_PORT = int(os.environ.get("REDIS_CACHE_PORT", 6379))
 REDIS_CACHE_PASS = os.environ.get("REDIS_CACHE_PASS", None)
+
+cache_db = redis.Redis(
+    host=REDIS_CACHE_HOST,
+    port=REDIS_CACHE_PORT,
+    password=REDIS_CACHE_PASS,
+    db=0,
+    decode_responses=True,
+    socket_timeout=5,
+    socket_connect_timeout=5,
+    retry_on_timeout=True,
+)
 
 CORS = {
     r"/*": {
