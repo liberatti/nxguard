@@ -1,13 +1,13 @@
-Name:		nxguard-openresty
-Version:	1.0
-Release:	alpha%{?dist}
+Name:		nxguard-engine
+Version:	1.27.1
+Release:	1%{?dist}
 Summary:	nxguard engine powered by openresty
 
 License:	Apache-2.0
 Source0:	%{name}-%{version}.tar.gz    
 
-BuildRequires: openldap-devel luarocks wget openssl-devel gcc gcc-c++ zlib-devel openssl-devel make automake libtool readline-devel libinput libcurl-devel pcre2-devel libxml2-devel libxslt-devel libgcrypt-devel gd-devel perl-ExtUtils-Embed 
-Requires: bash, lua, ssdeep = 2.14.1, shadow-utils, util-linux, wget, gcc, sudo
+BuildRequires: openldap-devel luarocks openssl-devel gcc gcc-c++ zlib-devel openssl-devel make automake libtool readline-devel libinput libcurl-devel pcre2-devel libxml2-devel libxslt-devel libgcrypt-devel gd-devel perl-ExtUtils-Embed
+Requires: bash, lua, ssdeep = 2.14.1, shadow-utils, util-linux, gcc, sudo
 
 %undefine __brp_mangle_shebangs 
 
@@ -16,44 +16,12 @@ Requires: bash, lua, ssdeep = 2.14.1, shadow-utils, util-linux, wget, gcc, sudo
 
 cd /root/rpmbuild/BUILD
 
-if [[ ! -e  openresty-1.27.1.1.tar.gz ]];then
-	wget https://openresty.org/download/openresty-1.27.1.1.tar.gz
-	tar -xf openresty-1.27.1.1.tar.gz
-	install -d openresty-1.27.1.1/modules
-fi
+install -d openresty-1.27.1.1/modules
+mv modsecurity-nginx-v1.0.3 openresty-1.27.1.1/modules/
+mv nginx-sticky-module-ng-1.2.6 openresty-1.27.1.1/modules/
+mv nginx_upstream_check_module-0.4.1 openresty-1.27.1.1/modules/
+mv nginx_ajp_module-1.0.0 openresty-1.27.1.1/modules/
 
-if [[ ! -e modsecurity-v3.0.12.tar.gz ]];then
-	wget https://github.com/SpiderLabs/ModSecurity/releases/download/v3.0.12/modsecurity-v3.0.12.tar.gz 
-	tar -xf modsecurity-v3.0.12.tar.gz 
-fi
-
-if [[ ! -e modsecurity-nginx-v1.0.3.tar.gz ]];then
-	wget https://github.com/SpiderLabs/ModSecurity-nginx/releases/download/v1.0.3/modsecurity-nginx-v1.0.3.tar.gz
-	tar -xf modsecurity-nginx-v1.0.3.tar.gz
-	mv modsecurity-nginx-v1.0.3 openresty-1.27.1.1/modules/
-fi
-
-if [[ ! -e 1.2.6.tar.gz ]];then
-	wget https://github.com/liberatti/nginx-sticky-module-ng/archive/refs/tags/1.2.6.tar.gz
-	tar -xf 1.2.6.tar.gz
-	mv nginx-sticky-module-ng-1.2.6 openresty-1.27.1.1/modules/
-fi
-
-if [[ ! -e 0.4.1.tar.gz ]];then
-	wget https://github.com/liberatti/nginx_upstream_check_module/archive/refs/tags/0.4.1.tar.gz
-	tar -xf 0.4.1.tar.gz
-	mv nginx_upstream_check_module-0.4.1 openresty-1.27.1.1/modules/
-fi
-
-if [[ ! -e v1.0.0.tar.gz ]];then
-	wget https://github.com/liberatti/nginx_ajp_module/archive/refs/tags/v1.0.0.tar.gz
-	tar -xf v1.0.0.tar.gz
-	mv nginx_ajp_module-1.0.0 openresty-1.27.1.1/modules/
-fi
-if [[ ! -e lua-5.1.5.tar.gz ]];then
-	wget https://www.lua.org/ftp/lua-5.1.5.tar.gz
-	tar -xf lua-5.1.5.tar.gz
-fi
 
 %build
 cd /root/rpmbuild/BUILD/lua-5.1.5
@@ -211,6 +179,9 @@ cp -r /root/rpmbuild/BUILD/lualib/share/lua/5.1/resty/* %{buildroot}/opt/nxguard
 
 install /root/rpmbuild/BUILD/lualib/lib64/lua/5.1/* %{buildroot}/opt/nxguard/lualib/
 
+install -d %{buildroot}/opt/nxguard/luajit/share/lua/5.1/nxguard
+cp -r %{_builddir}/luajit/* %{buildroot}/opt/nxguard/luajit/share/lua/5.1/nxguard
+
 cd /root/rpmbuild/BUILD/openresty-1.27.1.1/build/nginx-1.27.1
 install -c objs/nginx %{buildroot}/opt/nxguard/nginx/sbin/nginx
 install -c conf/* %{buildroot}/opt/nxguard/nginx/conf
@@ -244,6 +215,7 @@ install -c -m 644 modsecurity.pc %{buildroot}/opt/nxguard/modsec/lib/pkgconfig/
 %attr(0744, root, root) /opt/nxguard/logs
 %attr(0744, root, root) /opt/nxguard/run
 %attr(0744, root, root) /opt/nxguard/cache
+%attr(0755, nxguard, nxguard) /opt/nxguard/luajit/share/lua/5.1/nxguard
 
 %post
 PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/sbin"

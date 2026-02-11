@@ -1,6 +1,6 @@
 Name:		nxguard-crs
 Version:	3.3.6
-Release:	alpha%{?dist}
+Release:	1%{?dist}
 Summary:	OWASP Core Rule Set for nxguard
 BuildArch:	noarch
 
@@ -8,17 +8,13 @@ License:	Apache-2.0
 Source0:	%{name}-%{version}.tar.gz    
 
 BuildRequires:	wget unzip
-Requires:	nxguard-openresty
+#Requires:	nxguard-engine>=1.27.1
 
 %description
 OWASP Core Rule Set (CRS) for ModSecurity on nxguard.
 
 %prep
 cd /root/rpmbuild/BUILD
-if [[ ! -e v3.3.6.zip ]];then
-	wget https://github.com/coreruleset/coreruleset/archive/refs/tags/v3.3.6.zip
-	unzip -o v3.3.6.zip
-fi
 
 %build
 # No compilation required for rules
