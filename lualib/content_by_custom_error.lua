@@ -10,6 +10,7 @@ local descriptions = {
     [401] = "Unauthorized",
     [403] = "Access forbidden",
     [404] = "Resource not found",
+    [429] = "RateLimit Triggered",
     [500] = "Internal server error",
     [502] = "Bad gateway",
     [503] = "Service unavailable",

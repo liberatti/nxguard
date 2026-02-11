@@ -35,6 +35,9 @@ RUN wget https://www.lua.org/ftp/lua-5.1.5.tar.gz\
 RUN wget https://github.com/coreruleset/coreruleset/archive/refs/tags/v3.3.6.zip\
     && unzip -o v3.3.6.zip
 RUN wget https://dl.fedoraproject.org/pub/epel/9/Everything/x86_64/Packages/l/luarocks-3.9.2-5.el9.noarch.rpm
+RUN wget -O ssdeep-release-2.14.1.tar.gz \
+  https://github.com/ssdeep-project/ssdeep/archive/refs/tags/release-2.14.1.tar.gz \
+    && tar -xf ssdeep-release-2.14.1.tar.gz
 
 RUN rpm -ivh luarocks-3.9.2-5.el9.noarch.rpm
 
@@ -47,7 +50,6 @@ RUN rpmbuild -bb ssdeep.spec\
 COPY packages/nxguard-crs.spec .
 RUN rpmbuild -bb nxguard-crs.spec
 
-COPY lualib /root/rpmbuild/BUILD/luajit
 COPY packages/nxguard-engine.spec /root/rpmbuild/SPECS/
 RUN rpmbuild --nobuild nxguard-engine.spec\
     && rpmbuild -bb nxguard-engine.spec
@@ -55,36 +57,40 @@ RUN rpmbuild --nobuild nxguard-engine.spec\
 # Estágio 2: Construção do Frontend (Angular/Web)
 FROM --platform=${BUILDPLATFORM:-linux/amd64} node:lts AS build_frontend
 
-WORKDIR /app
-RUN mkdir web
-COPY web/package*.json web/
-RUN cd web \
- && npm install \
- && npm cache clean --force
+WORKDIR /app/web
 
-COPY web web
-COPY *.json web/
+COPY web/package*.json .
+RUN npm install
 
-RUN cd web && npm run build
+COPY web /app/web
+COPY *.json /app/web/
+
+RUN npm run build
 
 # Estágio 3: Construção do Backend Administrativo (Python/Admin)
 FROM --platform=${BUILDPLATFORM:-linux/amd64} rockylinux:9 AS build_admin
-ENV PYTHONUSERBASE /opt/nxguard/site-packages
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONUSERBASE=/opt/nxguard/site-packages
+ENV PYTHONUNBUFFERED=1
 
 RUN dnf -y install rpm-build rpmdevtools python3.12 python3.12-pip git gcc gcc-c++ libffi-devel openssl-devel \
     && rpmdev-setuptree
 
+WORKDIR /root/rpmbuild/BUILD
+
+COPY requirements.txt requirements.txt
+RUN export PYTHONUSERBASE=/root/rpmbuild/BUILD/site-packages \
+    && pip3.12 install --user -r requirements.txt
+
 WORKDIR /root/rpmbuild/BUILD/admin
 
-COPY requirements.txt /root/rpmbuild/BUILD
+COPY --from=build_frontend /app/web/dist /root/rpmbuild/BUILD/admin/static
+COPY --from=build_frontend /app/web/dist/index.html /root/rpmbuild/BUILD/admin/templates/
+
 COPY *.py .
 COPY api api
 COPY engine engine
 COPY config config
-
-COPY --from=build_frontend /app/web/dist /root/rpmbuild/BUILD/admin/static
-COPY --from=build_frontend /app/web/dist/index.html /root/rpmbuild/BUILD/admin/templates/
+COPY lualib /root/rpmbuild/BUILD/luajit
 
 WORKDIR /root/rpmbuild/SPECS
 COPY packages/nxguard-admin.spec .
@@ -99,12 +105,17 @@ ENV LUA_PATH "/opt/nxguard/lualib/share/lua/5.4/?.lua;/opt/nxguard/lualib/share/
 ENV LUA_CPATH "/opt/nxguard/lualib/lib64/lua/5.4/?.so;/opt/nxguard/lualib/lib/?.so;/opt/nxguard/lualib/?.so;;"
 ENV PYTHONUSERBASE /opt/nxguard/site-packages
 ENV PYTHONUNBUFFERED 1
-RUN microdnf install -y procps openssl bind-utils shadow-utils util-linux gcc-c++ \
-    libX11 libXext libXi libXrender libXtst freetype sudo \
-    python3.12 python3.12-devel python3.12-pip yajl lua wget git \
-  && microdnf clean all \
-  && python3.12 -m pip install --upgrade pip \
-  && python3.12 -m pip install --upgrade setuptools
+RUN microdnf install -y \
+    procps \
+    openssl \
+    bind-utils \
+    shadow-utils \
+    util-linux \
+    sudo \
+    python3.12 \
+    yajl \
+    lua \
+  && microdnf clean all
 
 COPY --from=build_engine /root/rpmbuild/RPMS/**/*.rpm /RPMS/
 COPY --from=build_admin /root/rpmbuild/RPMS/**/*.rpm /RPMS/
@@ -113,11 +124,10 @@ RUN rpm -ivh /RPMS/*.rpm && rm -rf /RPMS
 
 WORKDIR /opt/nxguard/admin
 
-RUN chown -R nxguard /opt/nxguard
-
 USER nxguard
 
 EXPOSE 5000
 
 VOLUME [ "/data" ]
+
 ENTRYPOINT ["gunicorn", "-c", "api/gunicorn_config.py", "main:app"]

@@ -45,4 +45,6 @@ http {
  {%- for u in services %}
  include {%if IS_TEST%}test-{%-endif%}service-{{ u.name }}.conf;
  {%- endfor %}
+ limit_req_status 429;
+ error_page 429 = @rate_limited;
 }

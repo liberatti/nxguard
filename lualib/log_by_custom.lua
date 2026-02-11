@@ -1,13 +1,23 @@
 local cjson = require "cjson.safe"
 local log_buffer = ngx.shared.log_buffer
+
+local map = {
+    PASSED = "allowed",
+    DELAYED = "delayed",
+    REJECTED = "blocked"
+}
+local raw_status = ngx.var.limit_req_status
+local rate_limit_action = map[raw_status] or raw_status or "-"
+
 local log_data = {
     time = ngx.localtime(),
+    uniqueid = ngx.var.request_id or "-",
     service = ngx.var.service or "-",
     route = ngx.var.route or "-",
-    upstream = ngx.var.upstream or "-",
-    target_addr = ngx.var.upstream_addr or "-",
-    sensor = ngx.var.sensor or "-",
-    uniqueid = ngx.var.request_id or "-",
+    upstream = {
+        name = ngx.var.upstream or "-",
+        target = ngx.var.upstream_addr or "-"
+    },
     host = ngx.var.http_host or "-",
     remote_addr = ngx.var.remote_addr or "-",
     remote_port = tonumber(ngx.var.remote_port) or 0,
@@ -22,9 +32,21 @@ local log_data = {
     urt = tonumber(ngx.var.upstream_response_time) or 0,
     referer = ngx.var.http_referer or "-",
     user_agent = ngx.var.http_user_agent or "-",
-    limit_req_status = ngx.var.limit_req_status or "-",
-    geoip_status = ngx.var.geoip_status or "-",
-    rbl_status = ngx.var.rbl_status or "-"
+    sensor = ngx.ctx.sensor,
+    rate_limit = {
+        action = rate_limit_action
+    },
+    geoip = {
+        ans_number = ngx.ctx.geoip_ans_number or "-",
+        ans_description = ngx.ctx.geoip_ans_description or "-",
+        country_code = ngx.ctx.geoip_country_code or "-",
+        action = ngx.ctx.geoip_action
+    },
+    reputation = ngx.ctx.reputation,
+    mtls = {
+        enabled = ngx.var.ssl_client_verify and true or false,
+        verified = ngx.var.ssl_client_verify == "SUCCESS"
+    }
 }
 
 local json_line = cjson.encode(log_data)

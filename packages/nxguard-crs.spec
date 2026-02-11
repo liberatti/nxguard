@@ -5,9 +5,8 @@ Summary:	OWASP Core Rule Set for nxguard
 BuildArch:	noarch
 
 License:	Apache-2.0
-Source0:	%{name}-%{version}.tar.gz    
+Source0:	%{name}-%{version}.tar.gz
 
-BuildRequires:	wget unzip
 #Requires:	nxguard-engine>=1.27.1
 
 %description

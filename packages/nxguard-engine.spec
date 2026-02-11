@@ -7,7 +7,7 @@ License:	Apache-2.0
 Source0:	%{name}-%{version}.tar.gz    
 
 BuildRequires: openldap-devel luarocks openssl-devel gcc gcc-c++ zlib-devel openssl-devel make automake libtool readline-devel libinput libcurl-devel pcre2-devel libxml2-devel libxslt-devel libgcrypt-devel gd-devel perl-ExtUtils-Embed
-Requires: bash, lua, ssdeep = 2.14.1, shadow-utils, util-linux, gcc, sudo
+Requires: bash, lua, ssdeep = 2.14.1, shadow-utils, util-linux, sudo
 
 %undefine __brp_mangle_shebangs 
 
@@ -179,9 +179,6 @@ cp -r /root/rpmbuild/BUILD/lualib/share/lua/5.1/resty/* %{buildroot}/opt/nxguard
 
 install /root/rpmbuild/BUILD/lualib/lib64/lua/5.1/* %{buildroot}/opt/nxguard/lualib/
 
-install -d %{buildroot}/opt/nxguard/luajit/share/lua/5.1/nxguard
-cp -r %{_builddir}/luajit/* %{buildroot}/opt/nxguard/luajit/share/lua/5.1/nxguard
-
 cd /root/rpmbuild/BUILD/openresty-1.27.1.1/build/nginx-1.27.1
 install -c objs/nginx %{buildroot}/opt/nxguard/nginx/sbin/nginx
 install -c conf/* %{buildroot}/opt/nxguard/nginx/conf
@@ -203,19 +200,18 @@ install -c -m 644 examples/reading_logs_via_rule_message/reading_logs_via_rule_m
 install -c -m 644 modsecurity.pc %{buildroot}/opt/nxguard/modsec/lib/pkgconfig/
 
 %files
-%attr(0744, root, root) /opt/nxguard/modsec
-%attr(0744, root, root) /opt/nxguard/bin
-%attr(0744, root, root) /opt/nxguard/luajit
-%attr(0744, root, root) /opt/nxguard/lualib
-%attr(0744, root, root) /opt/nxguard/nginx
-%attr(0744, root, root) /opt/nxguard/pod
-%attr(0744, root, root) /opt/nxguard/resty.index
-%attr(0744, root, root) /opt/nxguard/COPYRIGHT
-%attr(0744, root, root) /opt/nxguard/html
-%attr(0744, root, root) /opt/nxguard/logs
-%attr(0744, root, root) /opt/nxguard/run
-%attr(0744, root, root) /opt/nxguard/cache
-%attr(0755, nxguard, nxguard) /opt/nxguard/luajit/share/lua/5.1/nxguard
+%attr(0744, nxguard, nxguard) /opt/nxguard/modsec
+%attr(0744, nxguard, nxguard) /opt/nxguard/bin
+%attr(0744, nxguard, nxguard) /opt/nxguard/luajit
+%attr(0744, nxguard, nxguard) /opt/nxguard/lualib
+%attr(0744, nxguard, nxguard) /opt/nxguard/nginx
+%attr(0744, nxguard, nxguard) /opt/nxguard/pod
+%attr(0744, nxguard, nxguard) /opt/nxguard/resty.index
+%attr(0744, nxguard, nxguard) /opt/nxguard/COPYRIGHT
+%attr(0744, nxguard, nxguard) /opt/nxguard/html
+%attr(0744, nxguard, nxguard) /opt/nxguard/logs
+%attr(0744, nxguard, nxguard) /opt/nxguard/run
+%attr(0744, nxguard, nxguard) /opt/nxguard/cache
 
 %post
 PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/sbin"
