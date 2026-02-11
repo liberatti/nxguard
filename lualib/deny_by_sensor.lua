@@ -1,9 +1,33 @@
 local redis = require "resty.redis"
 local utils = require "nxguard.utils"
+local cjson = require "cjson"
+local http_ok, http = pcall(require, "resty.http")
 
 -- Sensor security blocking -------------------------------------------------
 local src_ip = utils.get_client_ip()
 
+if http_ok and ngx.var.ipdb_url and ngx.var.ipdb_url ~= "" then
+    local httpc = http.new()
+    local res, err = httpc:request_uri(ngx.var.ipdb_url .. "/api/ip/" .. src_ip, {
+        method = "GET",
+        headers = { ["Content-Type"] = "application/json" }
+    })
+
+    if res and (res.status == 200 or res.status == 201) then
+        local data, decode_err = cjson.decode(res.body)
+        if data then
+            if data.blocked then
+                utils.respond(403, "IP '", src_ip, "' blocked by RBL.")
+                ngx.log(ngx.ERR, "IPDB data: ", data)
+                ngx.exit(403)
+            end
+        else
+            ngx.log(ngx.ERR, "Error decoding IPDB data: ", decode_err or "unknown error")
+        end
+    elseif err then
+        ngx.log(ngx.ERR, "IPDB request failed: ", err)
+    end
+end
 -- Check RBL -----------------------------------------------------------------
 --[[
 if ngx.var.cache_server_url and ngx.var.cache_server_url ~= "" then

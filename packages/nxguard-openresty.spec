@@ -25,9 +25,6 @@ fi
 if [[ ! -e modsecurity-v3.0.12.tar.gz ]];then
 	wget https://github.com/SpiderLabs/ModSecurity/releases/download/v3.0.12/modsecurity-v3.0.12.tar.gz 
 	tar -xf modsecurity-v3.0.12.tar.gz 
-
-	wget https://github.com/coreruleset/coreruleset/archive/refs/tags/v3.3.6.zip
-	unzip v3.3.6.zip
 fi
 
 if [[ ! -e modsecurity-nginx-v1.0.3.tar.gz ]];then
@@ -66,11 +63,14 @@ cd /root/rpmbuild/BUILD/modsecurity-v3.0.12
 ./configure --prefix=/opt/nxguard/modsec --with-yajl --with-pcre2 --with-ssdeep --with-lua
 make -j 4
 make install
-mv /root/rpmbuild/BUILD/coreruleset-3.3.6/rules  /root/rpmbuild/BUILD/modsecurity-v3.0.12/coreruleset
-rm -f /root/rpmbuild/BUILD/modsecurity-v3.0.12/coreruleset/REQUEST-901-INITIALIZATION.conf
 
 cd /root/rpmbuild/BUILD/openresty-1.27.1.1
-./configure --with-compat --with-http_ssl_module --with-http_stub_status_module\
+./configure --with-compat\
+    --with-http_ssl_module\
+    --with-stream \
+    --with-stream_ssl_module \
+    --with-stream_ssl_preread_module \
+    --with-http_stub_status_module\
 	--with-http_v2_module\
 	--without-lua_resty_mysql\
 	--with-debug\
@@ -207,12 +207,8 @@ luarocks install --tree=/root/rpmbuild/BUILD/lualib lua-resty-http --lua-version
 luarocks install --tree=/root/rpmbuild/BUILD/lualib lua-resty-redis --lua-version=5.1
 luarocks install --tree=/root/rpmbuild/BUILD/lualib lua-resty-openssl --lua-version=5.1
 luarocks install --tree=/root/rpmbuild/BUILD/lualib lua-resty-jwt --lua-version=5.1
-install /root/rpmbuild/BUILD/lualib/share/lua/5.1/resty/*.lua %{buildroot}/opt/nxguard/lualib/resty
+cp -r /root/rpmbuild/BUILD/lualib/share/lua/5.1/resty/* %{buildroot}/opt/nxguard/lualib/resty/
 
-install -d %{buildroot}/opt/nxguard/lualib/resty/openssl/x509/extension
-install /root/rpmbuild/BUILD/lualib/share/lua/5.1/resty/openssl/*.lua %{buildroot}/opt/nxguard/lualib/resty/openssl
-install /root/rpmbuild/BUILD/lualib/share/lua/5.1/resty/openssl/x509/*.lua %{buildroot}/opt/nxguard/lualib/resty/openssl/x509
-install /root/rpmbuild/BUILD/lualib/share/lua/5.1/resty/openssl/x509/extension/*.lua %{buildroot}/opt/nxguard/lualib/resty/openssl/x509/extension
 install /root/rpmbuild/BUILD/lualib/lib64/lua/5.1/* %{buildroot}/opt/nxguard/lualib/
 
 cd /root/rpmbuild/BUILD/openresty-1.27.1.1/build/nginx-1.27.1
@@ -226,11 +222,9 @@ install -d %{buildroot}/opt/nxguard/modsec/conf
 install -d %{buildroot}/opt/nxguard/modsec/lib/pkgconfig
 install -d %{buildroot}/opt/nxguard/modsec/include/modsecurity/actions
 install -d %{buildroot}/opt/nxguard/modsec/include/modsecurity/collection
-install -d %{buildroot}/opt/nxguard/modsec/coreruleset
 
 install -c tools/rules-check/modsec-rules-check %{buildroot}/opt/nxguard/modsec/bin/modsec-rules-check
 install -c src/.libs/* %{buildroot}/opt/nxguard/modsec/lib/
-install -c coreruleset/* %{buildroot}/opt/nxguard/modsec/coreruleset/
 install -c -m 644 headers/modsecurity/actions/*.h %{buildroot}/opt/nxguard/modsec/include/modsecurity/actions/
 install -c -m 644 headers/modsecurity/collection/*.h %{buildroot}/opt/nxguard/modsec/include/modsecurity/collection/
 install -c -m 644 headers/modsecurity/*.h %{buildroot}/opt/nxguard/modsec/include/modsecurity/

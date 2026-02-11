@@ -1,15 +1,21 @@
 {
   "config": {
+    "dns_resolver": "127.0.0.11",
     "cache": {
       "host": "redis",
       "port": 6379,
-      "enabled": false
+      "enabled": true
     },
-    "archive": {
-      "enabled": false
+    "ipdb": {
+      "url": "http://ipdb:5000"
     },
-    "purge": {
-      "enabled": false
+    "logging": {
+      "archive": {
+        "enabled": false
+      },
+      "purge": {
+        "enabled": false
+      }
     }
   },
   "user": {
@@ -33,6 +39,50 @@
         "admin.nxguard.com.br",
         "proxy.nxguard.com.br"
       ]
+    }
+  ],
+  "sensors": [
+    {
+      "name": "Default",
+      "description": "",
+      "categories": [
+        "METHOD-ENFORCEMENT",
+        "SCANNER-DETECTION",
+        "PROTOCOL-ENFORCEMENT",
+        "PROTOCOL-ATTACK",
+        "PROTOCOL-ATTACK",
+        "APPLICATION-ATTACK-LFI",
+        "APPLICATION-ATTACK-RFI",
+        "APPLICATION-ATTACK-RCE",
+        "APPLICATION-ATTACK-PHP",
+        "APPLICATION-ATTACK-NODEJS",
+        "APPLICATION-ATTACK-XSS",
+        "APPLICATION-ATTACK-SQLI",
+        "APPLICATION-ATTACK-SESSION-FIXATION",
+        "APPLICATION-ATTACK-JAVA",
+        "DATA-LEAKAGES",
+        "DATA-LEAKAGES-SQL",
+        "DATA-LEAKAGES-JAVA",
+        "DATA-LEAKAGES-PHP",
+        "DATA-LEAKAGES-IIS",
+        "global"
+      ],
+      "exclusions": [],
+      "blocked": {
+        "geo_codes": [
+          "US"
+        ],
+        "rbl": [
+          "compromised_ips"
+        ],
+        "jails": []
+      },
+      "bypass_src": [],
+      "score": {
+        "inbound": 15,
+        "outbound": 15
+      },
+      "inspect_level": 3
     }
   ],
   "upstreams": [
@@ -150,7 +200,7 @@
           "monitor_only": false,
           "name": "all-req",
           "paths": [
-            "^/nxg/(api.*)"
+            "^/(nxg/api.*)"
           ],
           "redirect": {
             "code": 500,
@@ -168,16 +218,12 @@
           "cache_methods": [],
           "filters": [],
           "methods": [
-            "GET",
-            "POST",
-            "PUT",
-            "PATCH",
-            "DELETE"
+            "GET"
           ],
           "monitor_only": false,
           "name": "all-req",
           "paths": [
-            "^/nxg/(.*)"
+            "^/(nxg/.*)"
           ],
           "redirect": {
             "code": 500,
@@ -203,7 +249,13 @@
         "TLSv1.2",
         "TLSv1.3"
       ],
-      "timeout": 120
+      "timeout": 120,
+      "BASE_PATH": "/opt/nxguard",
+      "IS_TEST": false,
+      "ssl_enable": true
     }
-  ]
+  ],
+  "IS_TEST": false,
+  "BASE_PATH": "/opt/nxguard",
+  "RESOLVERS": "127.0.0.11"
 }

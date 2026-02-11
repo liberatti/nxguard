@@ -6,6 +6,7 @@ proxy_cache_path {{BASE_PATH}}/cache/{{name}} keys_zone={{name}}_cache:10m use_t
 server {
   lua_code_cache on;
 
+  set $ipdb_url {{ config.ipdb.url }};
   {%if config.cache and config.cache.enabled %}
   set $cache_server_url {{ config.cache.host }};
   set $cache_server_port {{ config.cache.port }};
@@ -87,9 +88,13 @@ server {
 {%- for r in routes %}
 {%- for p in r.paths %}
   location ~ {{p}}{
-   set $sensor '{{r.sensor.name}}';
    set $route '{{r.name}}';
+
+   set $sensor '{{r.sensor.name}}';
+   set $blq_rbl '{{r.sensor.blq_rbl}}';
+   set $blq_geo '{{r.sensor.blq_geo}}';
    access_by_lua_file  {{BASE_PATH}}/luajit/share/lua/5.1/nxguard/deny_by_sensor.lua;
+
 #   modsecurity_rules_file {{BASE_PATH}}/modsec/conf/{%-if IS_TEST%}test-{%-endif%}route-proxy-all-req.policy;
    set $upstream '{{r.upstream.name}}';
    proxy_http_version 1.1;

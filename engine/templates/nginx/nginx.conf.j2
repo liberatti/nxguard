@@ -5,6 +5,7 @@ pid {{BASE_PATH}}/run/nginx.pid;
 worker_processes auto;
 events {worker_connections 1024;}
 http {
+ resolver {{config.dns_resolver}} valid=30s;
  lua_shared_dict log_buffer 16m;
  init_worker_by_lua_block {
    local flush = require "nxguard.log_flush"
