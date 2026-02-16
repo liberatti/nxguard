@@ -1,5 +1,6 @@
 import sys
 
+import engine.seclang.seclang_indexer as indexer
 from api.tasks import install, apply
 
 if __name__ == "__main__":
@@ -9,7 +10,8 @@ if __name__ == "__main__":
 
     switch = {
         "apply": apply,
-        "install": install
+        "install": install,
+        "index": indexer.index
     }
 
     fn = switch.get(sys.argv[1])

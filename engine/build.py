@@ -68,7 +68,7 @@ def create_db():
 
 
 def init_from_json(json_file):
-    data = read_from_json(json_file, config.CONFIG_PATH)
+    data = read_from_json(json_file, config.DB_PATH)
     with ConfigDao() as dao:
         dao.delete_all()
         data['config'].update({"cluster_id": gen_random_string(8)})

@@ -12,10 +12,11 @@ from basic4web.middleware.logging import logger
 import config
 import engine.admin as c_admin
 import engine.build as c_builder
+import engine.seclang.seclang_indexer as indexer
 
 
 def update_node_config() -> None:
-    cnf = c_builder.read_from_json("active.json")
+    cnf = c_builder.read_from_json("config.json")
     attempt = 0
     while attempt < config.REPLICATE_MAX_RETRIES:
         try:
@@ -35,7 +36,7 @@ def update_node_config() -> None:
                             cnf = resp.json()
                             cst = c_admin.apply(cnf)
                             if "ok" in cst["status"]:
-                                c_builder.export_config_json(cnf, "active.json")
+                                c_builder.export_config_json(cnf, "config.json")
                             break
             else:
                 logger.error(
@@ -60,8 +61,8 @@ def update_node_status() -> None:
         "net_recv": 0,
         "net_send": 0,
     }
-    if os.path.exists(os.path.join(config.DB_PATH, "active.json")):
-        active_cnf = c_builder.read_from_json("active.json")
+    if os.path.exists(os.path.join(config.DB_PATH, "config.json")):
+        active_cnf = c_builder.read_from_json("config.json")
         node.update({"scn": active_cnf["scn"]})
 
     config.cache_db.setex(k, 60, json.dumps(node))
@@ -70,8 +71,8 @@ def update_node_status() -> None:
 
 def update_main_config():
     """Apply configuration in background thread to avoid blocking server startup"""
-    if os.path.exists(os.path.join(config.CONFIG_PATH, "active.json")):
-        cnf = c_builder.read_from_json("active.json")
+    if os.path.exists(os.path.join(config.DB_PATH, "config.json")):
+        cnf = c_builder.read_from_json("config.json")
         logger.info(f"Loading last active config: {cnf['scn']}")
         c_admin.apply(cnf)
     return schedule.CancelJob
@@ -79,12 +80,14 @@ def update_main_config():
 
 def install():
     logger.info(f"Installing NXGuard")
-    os.makedirs(config.CONFIG_PATH, exist_ok=True)
+    os.makedirs(config.DB_PATH, exist_ok=True)
     if os.path.exists(f"{config.DB_PATH}/app.sqlite"):
         os.remove(f"{config.DB_PATH}/app.sqlite")
     c_builder.create_db()
-    if os.path.exists(f"{config.CONFIG_PATH}/init-data.json"):
+    indexer.index()
+    if os.path.exists(f"{config.DB_PATH}/init-data.json"):
         c_builder.init_from_json("init-data.json")
+    indexer.index()
 
 
 def apply():

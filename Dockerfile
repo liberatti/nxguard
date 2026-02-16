@@ -89,7 +89,6 @@ COPY --from=build_frontend /app/web/dist/index.html /root/rpmbuild/BUILD/admin/t
 COPY *.py .
 COPY api api
 COPY engine engine
-COPY config config
 COPY lualib /root/rpmbuild/BUILD/luajit
 
 WORKDIR /root/rpmbuild/SPECS

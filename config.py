@@ -8,8 +8,7 @@ APP_VERSION = os.getenv("APP_VERSION", "v1.0.6")
 API_HEADERS = {"User-Agent": f"NXGuard/{APP_VERSION}"}
 
 BASE_PATH = "/opt/nxguard"
-CONFIG_PATH = os.environ.get("BASE_PATH", "/config")
-DB_PATH = os.environ.get("DB_PATH", "/data")
+DB_PATH = os.environ.get("BASE_PATH", "/data")
 
 ENGINE_BASE = f"{BASE_PATH}/nginx"
 ENGINE_VERSION = "1.27.1"
@@ -37,9 +36,7 @@ JWT_AUD = "nxg"
 
 # Cluster config
 NXGUARD_ENDPOINT = os.environ.get("NXGUARD_ENDPOINT", "http://localhost:5000/nxg")
-
 NXGUARD_API_KEY = os.environ.get("NXGUARD_API_KEY", "DEV")
-NXGUARD_IPDB_URL = os.environ.get("NXGUARD_IPDB_URL", "http://localhost:5000")
 
 REDIS_CACHE_HOST = os.environ.get("REDIS_CACHE_HOST", "127.0.0.1")
 REDIS_CACHE_PORT = int(os.environ.get("REDIS_CACHE_PORT", 6379))

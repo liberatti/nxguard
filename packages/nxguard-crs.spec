@@ -21,7 +21,7 @@ cd /root/rpmbuild/BUILD
 %install
 install -d %{buildroot}/opt/nxguard/modsec/coreruleset
 cp -r /root/rpmbuild/BUILD/coreruleset-3.3.6/rules/* %{buildroot}/opt/nxguard/modsec/coreruleset/
-rm -f %{buildroot}/opt/nxguard/modsec/coreruleset/REQUEST-901-INITIALIZATION.conf
+#rm -f %{buildroot}/opt/nxguard/modsec/coreruleset/REQUEST-901-INITIALIZATION.conf
 
 %files
 %attr(0744, nxguard, nxguard) /opt/nxguard/modsec/coreruleset

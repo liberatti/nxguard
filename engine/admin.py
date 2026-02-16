@@ -33,7 +33,7 @@ def apply(conf):
         restart()
         if is_running():
             conf.update({"scn": gen_random_string()})
-            c_builder.export_config_json(conf, "active.json")
+            c_builder.export_config_json(conf, "config.json")
         return {"status": "ok", "scn": conf['scn']}
     msg = {"status": "error", "message": stderr.decode().split('\n')}
     logger.error(msg)

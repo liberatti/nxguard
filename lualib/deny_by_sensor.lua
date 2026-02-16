@@ -13,9 +13,13 @@ ngx.ctx.sensor = {
 
 if http_ok and ngx.var.ipdb_url and ngx.var.ipdb_url ~= "" then
     local httpc = http.new()
+    httpc:set_timeout(5000)  -- 5 seconds
     local res, err = httpc:request_uri(ngx.var.ipdb_url .. "/api/ip/" .. src_ip, {
         method = "GET",
-        headers = { ["Content-Type"] = "application/json" }
+        headers = {
+            ["Content-Type"] = "application/json",
+            ["x-api-key"] = ngx.var.ipdb_key
+        },
     })
 
     if res and (res.status == 200 or res.status == 201) then
@@ -26,13 +30,13 @@ if http_ok and ngx.var.ipdb_url and ngx.var.ipdb_url ~= "" then
                 sources = {}
             }
             if data.reputation then
-                local bypass_rep = {}
+                local reputation_check_list = {}
                 for feed in string.gmatch(ngx.var.blq_rbl or "", "([^|]+)") do
-                    bypass_rep[feed] = true
+                    reputation_check_list[feed] = true
                 end
                 for _, item in ipairs(data.reputation) do
                     if item.feed then
-                        if bypass_rep[item.feed] then
+                        if reputation_check_list[item.feed] then
                             if item.cls == 'deny' then
                                 ngx.ctx.reputation.action = "blocked"
                                 ngx.ctx.sensor.action = "blocked"
@@ -42,8 +46,22 @@ if http_ok and ngx.var.ipdb_url and ngx.var.ipdb_url ~= "" then
                     end
                 end
             end
-            ngx.ctx.geoip = data.geoip
-            ngx.ctx.geoip_action = "allowed"
+            if data.geoip then
+                ngx.ctx.geoip_action = "allowed"
+                ngx.ctx.geoip = data.geoip
+                local geoip_check_list = {}
+                for g in string.gmatch(ngx.var.blq_geo or "", "([^|]+)") do
+                    geoip_check_list[g] = true
+                end
+                for _, item in ipairs(data.geoip) do
+                    if item.country_code then
+                        if geoip_check_list[item.country_code] then
+                            ngx.ctx.geo.action = "blocked"
+                            ngx.ctx.sensor.action = "blocked"
+                        end
+                    end
+                end
+            end
         else
             ngx.log(ngx.ERR, "Error decoding IPDB data: ", decode_err or "unknown error")
         end

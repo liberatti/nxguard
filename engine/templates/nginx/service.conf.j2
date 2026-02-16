@@ -8,6 +8,7 @@ server {
   lua_code_cache on;
 
   set $ipdb_url {{ config.ipdb.url }};
+  set $ipdb_key {{ config.ipdb.key }};
   {%if config.cache and config.cache.enabled %}
   set $cache_server_url {{ config.cache.host }};
   set $cache_server_port {{ config.cache.port }};

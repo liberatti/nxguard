@@ -26,5 +26,5 @@ def health() -> Response:
 
 @routes.route("", methods=["GET"])
 def config() -> Response:
-    r = c_build.read_from_json("active.json")
+    r = c_build.read_from_json("config.json")
     return response_data(r)

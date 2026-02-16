@@ -1,0 +1,486 @@
+{
+  "variables": [
+    {
+      "name": "sensor.paranoia_level",
+      "default_value": 3
+    },
+    {
+      "name": "sensor.inbound_anomaly_score_threshold",
+      "default_value": 15
+    },
+    {
+      "name": "sensor.outbound_anomaly_score_threshold",
+      "default_value": 15
+    },
+    {
+      "name": "sensor.allowed_http_versions",
+      "default_value": "HTTP/1.0 HTTP/1.1 HTTP/2 HTTP/2.0"
+    },
+    {
+      "name": "sensor.max_file_size",
+      "default_value": 1048576
+    },
+    {
+      "name": "sensor.route.allowed_methods",
+      "default_value": "GET HEAD POST OPTIONS PUT PATCH DELETE"
+    },
+    {
+      "name": "sensor.route.allowed_content_type",
+      "default_value": "|application/x-www-form-urlencoded| |multipart/form-data| |multipart/related| |text/xml| |application/xml| |application/soap+xml| |application/json| |application/cloudevents+json| |application/cloudevents-batch+json|"
+    },
+    {
+      "name": "sensor.route.max_num_args",
+      "default_value": 255
+    },
+    {
+      "name": "sensor.route.arg_name_length",
+      "default_value": 100
+    },
+    {
+      "name": "sensor.route.arg_length",
+      "default_value": 400
+    }
+  ],
+  "setup": [
+    {
+      "schema_type": "SecRule",
+      "phase": 1,
+      "seq": 0,
+      "code": 50,
+      "action": "deny",
+      "scope": [
+        "TX:/^MSC_/"
+      ],
+      "condition": "!@streq 0",
+      "t": [
+        "none"
+      ],
+      "msg": "'ModSecurity internal error flagged: %{MATCHED_VAR_NAME}'",
+      "logging": "nolog"
+    },
+    {
+      "schema_type": "SecRule",
+      "phase": 1,
+      "seq": 1,
+      "code": 51,
+      "action": "deny",
+      "scope": [
+        "MULTIPART_UNMATCHED_BOUNDARY"
+      ],
+      "condition": "!@eq 0",
+      "t": [
+        "none"
+      ],
+      "msg": "'Multipart parser detected a possible unmatched boundary.'",
+      "logging": "log"
+    },
+    {
+      "schema_type": "SecRule",
+      "phase": 1,
+      "seq": 2,
+      "code": 52,
+      "action": "pass",
+      "scope": [
+        "REQUEST_HEADERS:Content-Type"
+      ],
+      "condition": "(?:application(?:/soap\\+|/)|text/)xml",
+      "t": [
+        "none",
+        "lowercase"
+      ],
+      "ctl": [
+        "requestBodyProcessor=XML"
+      ],
+      "logging": "nolog"
+    },
+    {
+      "schema_type": "SecRule",
+      "phase": 1,
+      "seq": 3,
+      "code": 53,
+      "action": "pass",
+      "scope": [
+        "REQUEST_HEADERS:Content-Type"
+      ],
+      "condition": "(?:application(?:/json\\+|/))json",
+      "t": [
+        "none",
+        "lowercase"
+      ],
+      "ctl": [
+        "requestBodyProcessor=JSON"
+      ],
+      "logging": "nolog"
+    },
+    {
+      "schema_type": "SecRule",
+      "phase": 2,
+      "seq": 4,
+      "code": 55,
+      "action": "deny",
+      "scope": [
+        "REQBODY_ERROR"
+      ],
+      "condition": "!@eq 0",
+      "t": [
+        "none"
+      ],
+      "ctl": [
+        "requestBodyProcessor=JSON"
+      ],
+      "logging": "nolog",
+      "severity": "2",
+      "msg": "'Failed to parse request body.'",
+      "logdata": "'%{reqbody_error_msg}'"
+    },
+    {
+      "code": 900010,
+      "phase": 1,
+      "seq": 5,
+      "action": "pass",
+      "logging": "nolog",
+      "audit_log": "noauditlog",
+      "schema_type": "SecAction",
+      "t": [
+        "none"
+      ],
+      "setvar": [
+        "tx.enforce_bodyproc_urlencoded=1"
+      ]
+    },
+    {
+      "code": 900320,
+      "phase": 1,
+      "seq": 6,
+      "action": "pass",
+      "logging": "nolog",
+      "audit_log": "noauditlog",
+      "schema_type": "SecAction",
+      "t": [
+        "none"
+      ],
+      "setvar": [
+        "tx.crs_setup_version=336"
+      ]
+    },
+    {
+      "code": 900001,
+      "phase": 1,
+      "seq": 7,
+      "action": "pass",
+      "logging": "nolog",
+      "audit_log": "noauditlog",
+      "schema_type": "SecAction",
+      "t": [
+        "none"
+      ],
+      "setvar": [
+        "tx.executing_paranoia_level=%{sensor.paranoia_level}"
+      ]
+    },
+    {
+      "code": 900110,
+      "phase": 1,
+      "seq": 8,
+      "action": "pass",
+      "logging": "nolog",
+      "audit_log": "noauditlog",
+      "schema_type": "SecAction",
+      "t": [
+        "none"
+      ],
+      "setvar": [
+        "tx.inbound_anomaly_score_threshold=%{sensor.inbound_anomaly_score_threshold}",
+        "tx.inbound_anomaly_score_threshold=%{sensor.outbound_anomaly_score_threshold}"
+      ]
+    },
+    {
+      "code": 900230,
+      "phase": 1,
+      "seq": 9,
+      "action": "pass",
+      "logging": "nolog",
+      "audit_log": "noauditlog",
+      "schema_type": "SecAction",
+      "t": [
+        "none"
+      ],
+      "setvar": [
+        "tx.allowed_http_versions=%{sensor.allowed_http_versions}"
+      ]
+    },
+    {
+      "code": 900340,
+      "phase": 1,
+      "seq": 10,
+      "action": "pass",
+      "logging": "nolog",
+      "audit_log": "noauditlog",
+      "schema_type": "SecAction",
+      "t": [
+        "none"
+      ],
+      "setvar": [
+        "tx.max_file_size=%{sensor.max_file_size}"
+      ]
+    },
+    {
+      "code": 900200,
+      "phase": 1,
+      "seq": 11,
+      "action": "pass",
+      "logging": "nolog",
+      "audit_log": "noauditlog",
+      "schema_type": "SecAction",
+      "t": [
+        "none"
+      ],
+      "setvar": [
+        "tx.allowed_methods=%{sensor.route.allowed_methods}"
+      ]
+    },
+    {
+      "code": 900220,
+      "phase": 1,
+      "seq": 12,
+      "action": "pass",
+      "logging": "nolog",
+      "audit_log": "noauditlog",
+      "schema_type": "SecAction",
+      "t": [
+        "none"
+      ],
+      "setvar": [
+        "tx.allowed_request_content_type=%{sensor.route.allowed_content_type}"
+      ]
+    },
+    {
+      "code": 900240,
+      "phase": 1,
+      "seq": 13,
+      "action": "pass",
+      "logging": "nolog",
+      "audit_log": "noauditlog",
+      "schema_type": "SecAction",
+      "t": [
+        "none"
+      ],
+      "setvar": [
+        "tx.restricted_extensions=%{sensor.route.restricted_extensions}"
+      ]
+    },
+    {
+      "code": 900300,
+      "phase": 1,
+      "seq": 14,
+      "action": "pass",
+      "logging": "nolog",
+      "audit_log": "noauditlog",
+      "schema_type": "SecAction",
+      "t": [
+        "none"
+      ],
+      "setvar": [
+        "tx.max_num_args=%{sensor.route.max_num_args}"
+      ]
+    },
+    {
+      "code": 900310,
+      "phase": 1,
+      "seq": 15,
+      "action": "pass",
+      "logging": "nolog",
+      "audit_log": "noauditlog",
+      "schema_type": "SecAction",
+      "t": [
+        "none"
+      ],
+      "setvar": [
+        "tx.arg_name_length=%{sensor.route.arg_name_length}"
+      ]
+    },
+    {
+      "code": 900320,
+      "phase": 1,
+      "seq": 16,
+      "action": "pass",
+      "logging": "nolog",
+      "audit_log": "noauditlog",
+      "schema_type": "SecAction",
+      "t": [
+        "none"
+      ],
+      "setvar": [
+        "tx.arg_length=%{sensor.route.arg_length}"
+      ]
+    }
+  ],
+  "categories": [
+    {
+      "scope": "config",
+      "file": "REQUEST-901-INITIALIZATION.conf",
+      "name": "901-INITIALIZATION",
+      "seq": 0,
+      "system": true
+    },
+    {
+      "scope": "request",
+      "name": "903.9001-DRUPAL-EXCLUSION-RULES",
+      "file": "REQUEST-903.9001-DRUPAL-EXCLUSION-RULES.conf",
+      "seq": 1
+    },
+    {
+      "scope": "request",
+      "name": "903.9002-WORDPRESS-EXCLUSION-RULES",
+      "file": "REQUEST-903.9002-WORDPRESS-EXCLUSION-RULES.conf",
+      "seq": 2
+    },
+    {
+      "scope": "request",
+      "name": "903.9003-NEXTCLOUD-EXCLUSION-RULES",
+      "file": "REQUEST-903.9003-NEXTCLOUD-EXCLUSION-RULES.conf",
+      "seq": 3
+    },
+    {
+      "scope": "request",
+      "name": "903.9004-DOKUWIKI-EXCLUSION-RULES",
+      "file": "REQUEST-903.9004-DOKUWIKI-EXCLUSION-RULES.conf",
+      "seq": 4
+    },
+    {
+      "scope": "request",
+      "name": "903.9005-CPANEL-EXCLUSION-RULES",
+      "file": "REQUEST-903.9005-CPANEL-EXCLUSION-RULES.conf",
+      "seq": 5
+    },
+    {
+      "scope": "request",
+      "name": "903.9006-XENFORO-EXCLUSION-RULES",
+      "file": "REQUEST-903.9006-XENFORO-EXCLUSION-RULES.conf",
+      "seq": 6
+    },
+    {
+      "scope": "request",
+      "name": "905-COMMON-EXCEPTIONS",
+      "file": "REQUEST-905-COMMON-EXCEPTIONS.conf",
+      "seq": 7
+    },
+    {
+      "scope": "request",
+      "name": "911-METHOD-ENFORCEMENT",
+      "file": "REQUEST-911-METHOD-ENFORCEMENT.conf",
+      "seq": 8
+    },
+    {
+      "scope": "request",
+      "name": "913-SCANNER-DETECTION",
+      "file": "REQUEST-913-SCANNER-DETECTION.conf",
+      "seq": 9
+    },
+    {
+      "scope": "request",
+      "name": "920-PROTOCOL-ENFORCEMENT",
+      "file": "REQUEST-920-PROTOCOL-ENFORCEMENT.conf",
+      "seq": 10
+    },
+    {
+      "scope": "request",
+      "name": "921-PROTOCOL-ATTACK",
+      "file": "REQUEST-921-PROTOCOL-ATTACK.conf",
+      "seq": 11
+    },
+    {
+      "scope": "request",
+      "name": "922-MULTIPART-ATTACK",
+      "file": "REQUEST-922-MULTIPART-ATTACK.conf",
+      "seq": 12
+    },
+    {
+      "scope": "request",
+      "name": "930-APPLICATION-ATTACK-LFI",
+      "file": "REQUEST-930-APPLICATION-ATTACK-LFI.conf",
+      "seq": 13
+    },
+    {
+      "scope": "request",
+      "name": "931-APPLICATION-ATTACK-RFI",
+      "file": "REQUEST-931-APPLICATION-ATTACK-RFI.conf",
+      "seq": 14
+    },
+    {
+      "scope": "request",
+      "name": "932-APPLICATION-ATTACK-RCE",
+      "file": "REQUEST-932-APPLICATION-ATTACK-RCE.conf",
+      "seq": 15
+    },
+    {
+      "scope": "request",
+      "name": "933-APPLICATION-ATTACK-PHP",
+      "file": "REQUEST-933-APPLICATION-ATTACK-PHP.conf",
+      "seq": 16
+    },
+    {
+      "scope": "request",
+      "name": "934-APPLICATION-ATTACK-NODEJS",
+      "file": "REQUEST-934-APPLICATION-ATTACK-NODEJS.conf",
+      "seq": 17
+    },
+    {
+      "scope": "request",
+      "name": "944-APPLICATION-ATTACK-JAVA",
+      "file": "REQUEST-944-APPLICATION-ATTACK-JAVA.conf",
+      "seq": 21
+    },
+    {
+      "scope": "request",
+      "name": "949-BLOCKING-EVALUATION",
+      "file": "REQUEST-949-BLOCKING-EVALUATION.conf",
+      "seq": 22,
+      "system": true
+    },
+    {
+      "scope": "response",
+      "name": "950-DATA-LEAKAGES",
+      "file": "RESPONSE-950-DATA-LEAKAGES.conf",
+      "seq": 23
+    },
+    {
+      "scope": "response",
+      "name": "951-DATA-LEAKAGES-SQL",
+      "file": "RESPONSE-951-DATA-LEAKAGES-SQL.conf",
+      "seq": 24
+    },
+    {
+      "scope": "response",
+      "name": "952-DATA-LEAKAGES-JAVA",
+      "file": "RESPONSE-952-DATA-LEAKAGES-JAVA.conf",
+      "seq": 25
+    },
+    {
+      "scope": "response",
+      "name": "953-DATA-LEAKAGES-PHP",
+      "file": "RESPONSE-953-DATA-LEAKAGES-PHP.conf",
+      "seq": 26
+    },
+    {
+      "scope": "response",
+      "name": "954-DATA-LEAKAGES-IIS",
+      "file": "RESPONSE-954-DATA-LEAKAGES-IIS.conf",
+      "seq": 27
+    },
+    {
+      "scope": "response",
+      "name": "BLOCKING-EVALUATION",
+      "file": "RESPONSE-959-BLOCKING-EVALUATION.conf",
+      "seq": 28,
+      "system": true
+    },
+    {
+      "scope": "response",
+      "name": "980-CORRELATION",
+      "file": "RESPONSE-980-CORRELATION.conf",
+      "seq": 29,
+      "system": true
+    }
+  ]
+}
