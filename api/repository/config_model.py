@@ -58,7 +58,7 @@ class ConfigDao(SQLite3DAO):
                 cache_json TEXT,
                 purge_json TEXT,
                 dns_resolver TEXT,
-                ipdb_json TEXT
+                ipguard_json TEXT
             );
         """)
 
@@ -69,8 +69,8 @@ class ConfigDao(SQLite3DAO):
             vo.update({"purge_json": json.dumps(vo.pop('purge'))})
         if "cache" in vo:
             vo.update({"cache_json": json.dumps(vo.pop('cache'))})
-        if "ipdb" in vo:
-            vo.update({"ipdb_json": json.dumps(vo.pop('ipdb'))})
+        if "ipguard" in vo:
+            vo.update({"ipguard_json": json.dumps(vo.pop('ipguard'))})
         return super().from_dict(vo)
 
     def to_dict(self, row):
@@ -81,8 +81,8 @@ class ConfigDao(SQLite3DAO):
                 row.update({"purge": json.loads(row.pop('purge_json'))})
             if "cache_json" in row:
                 row.update({"cache": json.loads(row.pop('cache_json'))})
-            if "ipdb_json" in row:
-                row.update({"ipdb": json.loads(row.pop('ipdb_json'))})
+            if "ipguard_json" in row:
+                row.update({"ipguard": json.loads(row.pop('ipguard_json'))})
         return super().to_dict(row)
 
     def get_active(self) -> Optional[Dict[str, Any]]:

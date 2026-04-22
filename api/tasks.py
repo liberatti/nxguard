@@ -84,9 +84,7 @@ def install():
     if os.path.exists(f"{config.DB_PATH}/app.sqlite"):
         os.remove(f"{config.DB_PATH}/app.sqlite")
     c_builder.create_db()
-    indexer.index()
-    if os.path.exists(f"{config.DB_PATH}/init-data.json"):
-        c_builder.init_from_json("init-data.json")
+    c_builder.init_from_json("init-with-sample.json", data_dir=f"{config.ENGINE_BASE}/engine")
     indexer.index()
 
 

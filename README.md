@@ -40,7 +40,7 @@ services:
     environment:
       NXGUARD_ROLE: "main"
       SERVERID: "nxguard-admin"
-      NXGUARD_IPDB_URL: "http://ipdb:5000"
+      NXGUARD_IPGUARD_URL: "http://ipguard:5000"
       REDIS_CACHE_HOST: redis
     ports:
       - 5000:5000
@@ -51,17 +51,17 @@ services:
         limits:
           memory: 256M
 
-  ipdb:
-    image: liberatti/nxguard-ipdb:latest
+  ipguard:
+    image: liberatti/ipguard:latest
     volumes:
-      - ipdb_data:/opt/nxguard-ipdb/data
+      - ipguard_data:/opt/ipguard/data
     deploy:
       resources:
         limits:
           memory: 64M
       replicas: 2
 volumes:
-  ipdb_data:
+  ipguard_data:
 ``` 
 
 **Managment interface: ** [http://localhost:5000](http://localhost:5000)
