@@ -7,7 +7,8 @@ from api.core.controllers.base_controller import (
     response_error_parse,
     response_ok,
     get_pagination,
-    has_any_authority
+    has_any_authority,
+    response_data_removed
 )
 
 from api.core.middleware.socket_manager import emit_event
@@ -21,10 +22,10 @@ routes = Blueprint("jail", __name__)
 def after(response: Response) -> Response:
     """
     Track changes after jail modifications.
-    
+
     Args:
         response: The Flask response object
-        
+
     Returns:
         Response: The modified response object
     """
@@ -41,10 +42,10 @@ def after(response: Response) -> Response:
 def get(jail_id: str) -> Response:
     """
     Retrieve a specific jail by ID.
-    
+
     Args:
         jail_id: The unique identifier of the jail
-        
+
     Returns:
         Response: JSON response containing the jail data or 404 error
     """
@@ -58,7 +59,7 @@ def get(jail_id: str) -> Response:
 def save() -> Response:
     """
     Create a new jail.
-    
+
     Returns:
         Response: JSON response containing the created jail or error message
     """
@@ -77,7 +78,7 @@ def save() -> Response:
 def search() -> Response:
     """
     Search and list all jails.
-    
+
     Returns:
         Response: JSON response containing paginated jail list or 404 error
     """
@@ -91,10 +92,10 @@ def search() -> Response:
 def update(jail_id: str) -> Response:
     """
     Update an existing jail.
-    
+
     Args:
         jail_id: The unique identifier of the jail to update
-        
+
     Returns:
         Response: JSON response containing the updated jail or error message
     """
@@ -112,10 +113,10 @@ def update(jail_id: str) -> Response:
 def delete(jail_id: str) -> Response:
     """
     Delete a jail.
-    
+
     Args:
         jail_id: The unique identifier of the jail to delete
-        
+
     Returns:
         Response: Success message or error response
     """
@@ -129,11 +130,11 @@ def delete(jail_id: str) -> Response:
 def add_to_jail(jail_id: str, addr: str) -> Response:
     """
     Add an IP address to a jail.
-    
+
     Args:
         jail_id: The unique identifier of the jail
         addr: The IP address to add
-        
+
     Returns:
         Response: Success message or error response
     """
@@ -152,11 +153,11 @@ def add_to_jail(jail_id: str, addr: str) -> Response:
 def del_to_jail(jail_id: str, addr: str) -> Response:
     """
     Remove an IP address from a jail.
-    
+
     Args:
         jail_id: The unique identifier of the jail
         addr: The IP address to remove
-        
+
     Returns:
         Response: Success message or error response
     """

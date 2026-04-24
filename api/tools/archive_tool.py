@@ -4,7 +4,7 @@ from elasticsearch import Elasticsearch
 
 from api.core.middleware.logging import logger
 
-from api.common_utils import  deep_date_str
+from api.common_utils import deep_date_str
 from api.model.upstream_model import NodeStatusDao
 from api.model.transaction_model import TransactionDao
 from api.tools.cluster_tool import ClusterTool
@@ -64,8 +64,6 @@ class LogArchiverTool:
                 except Exception as e:
                     logger.error(e)
 
-            
-
 
 class ElasticTool:
     def __init__(self):
@@ -82,7 +80,7 @@ class ElasticTool:
             else:
                 self.database = Elasticsearch([arch_c["url"]])
         except ConnectionError as e:
-            logger.info(f"Failed to connect %s", e)
+            logger.info("Failed to connect %s", e)
 
     def create_schema(self):
         with open("config/elasticsearch-schema.json", "r") as file:

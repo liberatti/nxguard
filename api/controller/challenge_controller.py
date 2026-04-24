@@ -13,10 +13,10 @@ routes = Blueprint("acme", __name__)
 def get_config(key: str) -> Response:
     """
     Retrieve ACME challenge configuration for a given key.
-    
+
     Args:
         key: The unique identifier for the ACME challenge
-        
+
     Returns:
         Response: Plain text response with challenge content or 404 error
     """

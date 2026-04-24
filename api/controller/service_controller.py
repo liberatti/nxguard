@@ -8,7 +8,8 @@ from api.core.controllers.base_controller import (
     response_ok,
     response_error,
     get_pagination,
-    has_any_authority
+    has_any_authority,
+    response_data_removed
 )
 
 from api.common_utils import (
@@ -25,10 +26,10 @@ routes = Blueprint("service", __name__)
 def after(response: Response) -> Response:
     """
     Track changes after service modifications.
-    
+
     Args:
         response: The Flask response object
-        
+
     Returns:
         Response: The modified response object
     """
@@ -45,10 +46,10 @@ def after(response: Response) -> Response:
 def get(service_id: str) -> Response:
     """
     Retrieve a specific service by ID.
-    
+
     Args:
         service_id: The unique identifier of the service
-        
+
     Returns:
         Response: JSON response containing the service data or 404 error
     """
@@ -63,7 +64,7 @@ def save() -> Response:
     """
     Create a new service.
     Checks if the domains (SANS) are already in use before creating.
-    
+
     Returns:
         Response: JSON response containing the created service or error message
     """
@@ -86,7 +87,7 @@ def save() -> Response:
 def search() -> Response:
     """
     Search and list all services.
-    
+
     Returns:
         Response: JSON response containing paginated service list or 404 error
     """
@@ -100,10 +101,10 @@ def search() -> Response:
 def partial_update(service_id: str) -> Response:
     """
     Partially update a service with specific fields.
-    
+
     Args:
         service_id: The unique identifier of the service to update
-        
+
     Returns:
         Response: Success message or error response
     """
@@ -123,10 +124,10 @@ def update(service_id: str) -> Response:
     """
     Update an existing service.
     Checks if the domains (SANS) are already in use before updating.
-    
+
     Args:
         service_id: The unique identifier of the service to update
-        
+
     Returns:
         Response: JSON response containing the updated service or error message
     """
@@ -136,7 +137,7 @@ def update(service_id: str) -> Response:
         sv_check = dao.get_by_sans(service_dict['sans'])
         if sv_check and service_id not in sv_check['_id']:
             return response_error('Domains in use', code=406)
-            
+
         dao.update_by_id(service_id, service_dict)
         return response_data(dao.get_by_id(service_id), dao.schema)
     except ValidationError as err:
@@ -148,10 +149,10 @@ def update(service_id: str) -> Response:
 def delete(service_id: str) -> Response:
     """
     Delete a service.
-    
+
     Args:
         service_id: The unique identifier of the service to delete
-        
+
     Returns:
         Response: Success message or error response
     """

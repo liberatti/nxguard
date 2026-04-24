@@ -6,7 +6,9 @@ from api.core.controllers.base_controller import (
     response_error_404,
     response_error_parse,
     get_pagination,
-    has_any_authority
+    has_any_authority,
+    response_data_removed,
+    response_error_500
 )
 
 
@@ -23,10 +25,10 @@ routes = Blueprint("sensor", __name__)
 def after(response: Response) -> Response:
     """
     Track changes after sensor modifications.
-    
+
     Args:
         response: The Flask response object
-        
+
     Returns:
         Response: The modified response object
     """
@@ -43,10 +45,10 @@ def after(response: Response) -> Response:
 def get(sensor_id: str) -> Response:
     """
     Retrieve a specific sensor by ID.
-    
+
     Args:
         sensor_id: The unique identifier of the sensor
-        
+
     Returns:
         Response: JSON response containing the sensor data or 404 error
     """
@@ -60,7 +62,7 @@ def get(sensor_id: str) -> Response:
 def save() -> Response:
     """
     Create a new sensor.
-    
+
     Returns:
         Response: JSON response containing the created sensor or error message
     """
@@ -79,7 +81,7 @@ def save() -> Response:
 def search() -> Response:
     """
     Search and list all sensors.
-    
+
     Returns:
         Response: JSON response containing paginated sensor list or 404 error
     """
@@ -93,10 +95,10 @@ def search() -> Response:
 def update(sensor_id: str) -> Response:
     """
     Update an existing sensor.
-    
+
     Args:
         sensor_id: The unique identifier of the sensor to update
-        
+
     Returns:
         Response: JSON response containing the updated sensor or error message
     """
@@ -114,10 +116,10 @@ def update(sensor_id: str) -> Response:
 def delete(sensor_id: str) -> Response:
     """
     Delete a sensor.
-    
+
     Args:
         sensor_id: The unique identifier of the sensor to delete
-        
+
     Returns:
         Response: Success message or error response
     """
@@ -127,20 +129,20 @@ def delete(sensor_id: str) -> Response:
 
 
 @routes.route("/<sensor_id>/check/<ipaddr>", methods=["GET"])
-@has_any_authority( _internal=True)
+@has_any_authority(_internal=True)
 def geoip_info(ipaddr: str) -> Response:
     """
     Check GeoIP information for an IP address.
-    
+
     Args:
         ipaddr: The IP address to check
-        
+
     Returns:
         Response: JSON response containing GeoIP information or error response
     """
     if not ClusterTool.CONFIG:
         return response_error_500("System not ready")
-    
+
     geo = SecurityFeedTool.geo_info(ipaddr)
     ip_info = {"country": geo["country"]}
     return response_data(ip_info)

@@ -103,30 +103,30 @@ class AcmeTool:
 
     @classmethod
     def auto_renew(cls):
-            cls.clean_expired_challenges()
-            dao_service = ServiceDao()
-            services = dao_service.get_all()
-            crt_count = 0
-            if "data" in services:
-                for service in services["data"]:
-                    if "certificate" in service:
-                        renew_date = datetime.now() - timedelta(
-                            days=cls.__CERTIFICATE_RENEW
-                        )
-                        renew_date = replace_tz(renew_date)
-                        certificate = service["certificate"]
-                        if (
-                            certificate["force_renew"] == True
-                            or replace_tz(certificate["not_after"]) < renew_date
-                        ):
-                            try:
-                                if "MANAGED" in certificate["provider"]:
-                                    cls.renew_lets(certificate)
-                                if "SELF" in certificate["provider"]:
-                                    cls.renew_self(certificate)
-                                crt_count += 1
-                            except Exception as e:
-                                stack_trace = traceback.format_exc()
-                                logger.error(f"{e}, {stack_trace}")
-                logger.info(f"{crt_count} certificate renewed")
-            return crt_count
+        cls.clean_expired_challenges()
+        dao_service = ServiceDao()
+        services = dao_service.get_all()
+        crt_count = 0
+        if "data" in services:
+            for service in services["data"]:
+                if "certificate" in service:
+                    renew_date = datetime.now() - timedelta(
+                        days=cls.__CERTIFICATE_RENEW
+                    )
+                    renew_date = replace_tz(renew_date)
+                    certificate = service["certificate"]
+                    if (
+                        certificate["force_renew"]
+                        or replace_tz(certificate["not_after"]) < renew_date
+                    ):
+                        try:
+                            if "MANAGED" in certificate["provider"]:
+                                cls.renew_lets(certificate)
+                            if "SELF" in certificate["provider"]:
+                                cls.renew_self(certificate)
+                            crt_count += 1
+                        except Exception as e:
+                            stack_trace = traceback.format_exc()
+                            logger.error(f"{e}, {stack_trace}")
+            logger.info(f"{crt_count} certificate renewed")
+        return crt_count

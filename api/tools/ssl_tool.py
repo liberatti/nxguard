@@ -14,14 +14,15 @@ from cryptography.x509.oid import NameOID
 
 from api.core.middleware.logging import logger
 
-from api.common_utils import  replace_tz
+from api.common_utils import replace_tz
 from api.model.acme_model import ChallengeDao
 from api.model.config_model import ConfigDao
 from config import APP_BASE, KEY_SIZE, TZ
 
+
 class SSLTool:
     """SSL/TLS certificate management utility class.
-    
+
     This class provides methods for:
     - Private key generation and management
     - Certificate signing request (CSR) generation
@@ -29,15 +30,15 @@ class SSLTool:
     - Certificate creation and management
     - Certificate information extraction
     """
-    
+
     @classmethod
     def private_from_pem(cls, pem: str, password: Optional[str] = None) -> rsa.RSAPrivateKey:
         """Load a private key from PEM format.
-        
+
         Args:
             pem: Private key in PEM format
             password: Optional password for encrypted private key
-            
+
         Returns:
             RSAPrivateKey object
         """
@@ -46,10 +47,10 @@ class SSLTool:
     @classmethod
     def private_to_pem(cls, pk: rsa.RSAPrivateKey) -> str:
         """Convert a private key to PEM format.
-        
+
         Args:
             pk: RSAPrivateKey object
-            
+
         Returns:
             Private key in PEM format as string
         """
@@ -62,10 +63,10 @@ class SSLTool:
     @classmethod
     def crt_to_pem(cls, crt: x509.Certificate) -> str:
         """Convert a certificate to PEM format.
-        
+
         Args:
             crt: Certificate object
-            
+
         Returns:
             Certificate in PEM format as string
         """
@@ -74,10 +75,10 @@ class SSLTool:
     @classmethod
     def crt_from_pem(cls, pem: str) -> x509.Certificate:
         """Load a certificate from PEM format.
-        
+
         Args:
             pem: Certificate in PEM format
-            
+
         Returns:
             Certificate object
         """
@@ -86,7 +87,7 @@ class SSLTool:
     @classmethod
     def generate_private_key(cls) -> rsa.RSAPrivateKey:
         """Generate a new RSA private key.
-        
+
         Returns:
             RSAPrivateKey object
         """
@@ -95,11 +96,11 @@ class SSLTool:
     @classmethod
     def gen_csr(cls, domain_names: List[str], pk: rsa.RSAPrivateKey) -> bytes:
         """Generate a certificate signing request (CSR).
-        
+
         Args:
             domain_names: List of domain names to include in the CSR
             pk: Private key to use for signing the CSR
-            
+
         Returns:
             CSR in DER format
         """
@@ -113,11 +114,11 @@ class SSLTool:
     @classmethod
     def gen_ca(cls, crt_cn: str, crt_org: Optional[str] = "nxguard-CA") -> Dict[str, Union[x509.Certificate, rsa.RSAPrivateKey]]:
         """Generate a self-signed certificate authority (CA).
-        
+
         Args:
             crt_cn: Common name for the CA certificate
             crt_org: Optional organization name for the CA certificate
-            
+
         Returns:
             Dictionary containing the CA certificate and private key
         """
@@ -154,18 +155,18 @@ class SSLTool:
 
     @classmethod
     def create_certificate(
-        cls, 
-        domain: str, 
-        sans: Optional[List[str]] = None, 
+        cls,
+        domain: str,
+        sans: Optional[List[str]] = None,
         ca: Optional[Dict[str, Union[x509.Certificate, rsa.RSAPrivateKey]]] = None
     ) -> Dict:
         """Create a new SSL/TLS certificate.
-        
+
         Args:
             domain: Main domain name for the certificate
             sans: Optional list of subject alternative names
             ca: Optional CA certificate and key to use for signing
-            
+
         Returns:
             Dictionary containing the certificate, chain, private key and metadata
         """
@@ -227,20 +228,20 @@ class SSLTool:
     @classmethod
     def extract_info_from_crt(cls, crt: x509.Certificate) -> Dict:
         """Extract information from a certificate.
-        
+
         Args:
             crt: Certificate to extract information from
-            
+
         Returns:
             Dictionary containing certificate subjects, validity dates
         """
         if not crt:
             raise ValueError("Certificate object is None or invalid")
-        
+
         subjects = []
         for c in crt.subject.get_attributes_for_oid(x509.NameOID.COMMON_NAME):
             subjects.append(c.value)
-        
+
         try:
             san_extension = crt.extensions.get_extension_for_class(x509.SubjectAlternativeName)
             for c in san_extension.value:
@@ -257,23 +258,23 @@ class SSLTool:
 
 class SSLLetsEncryptTool:
     """Let's Encrypt certificate management utility class.
-    
+
     This class provides methods for:
     - Let's Encrypt account management
     - Automated certificate issuance
     - HTTP-01 challenge handling
     """
-    
+
     __re_pem = "(-+BEGIN (?:.+)-+[\\r\\n]+(?:[A-Za-z0-9+/=]{1,64}[\\r\\n]+)+-+END (?:.+)-+[\\r\\n]+)"
     __max_attempts = 3
 
     @classmethod
     def account(cls, email: str) -> Dict:
         """Get or create a Let's Encrypt account.
-        
+
         Args:
             email: Email address for the account
-            
+
         Returns:
             Dictionary containing account key and registration
         """
@@ -308,18 +309,18 @@ class SSLLetsEncryptTool:
 
     @classmethod
     def create_certificate(
-        cls, 
-        domain: str, 
-        sans: Optional[List[str]] = None, 
+        cls,
+        domain: str,
+        sans: Optional[List[str]] = None,
         email: str = "fake@tooka.com.br"
     ) -> Optional[Dict]:
         """Create a new Let's Encrypt certificate.
-        
+
         Args:
             domain: Main domain name for the certificate
             sans: Optional list of subject alternative names
             email: Email address for the Let's Encrypt account
-            
+
         Returns:
             Dictionary containing the certificate, chain, private key and metadata,
             or None if certificate creation failed
@@ -378,10 +379,10 @@ class SSLLetsEncryptTool:
     @classmethod
     def challenge_body(cls, new_order: messages.OrderResource) -> List[challenges.HTTP01]:
         """Extract HTTP-01 challenges from a new order.
-        
+
         Args:
             new_order: Let's Encrypt order resource
-            
+
         Returns:
             List of HTTP-01 challenges
         """

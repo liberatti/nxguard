@@ -14,6 +14,7 @@ from api.model.transaction_model import TransactionDao
 from api.tools.feed_tool import SecurityFeedTool
 import config as env_config
 
+
 class LogParserTool:
 
     telemetry = {
@@ -41,7 +42,7 @@ class LogParserTool:
         }
 
     @classmethod
-    def send_telemetry(cls,t):
+    def send_telemetry(cls, t):
         conf = ConfigDao().get_active()
         if env_config.TELEMETRY_ENABLE:
             t.update({"version": env_config.APP_VERSION})
@@ -84,17 +85,17 @@ class LogParserTool:
                             merged = deep_merge(log, audit)
                             merged.update({"archived": False})
                             log.update({"flushed": True})
-                            cls.telemetry["net_send"] += merged["http"]["response"]["bytes"] / 1048576.0 # MB
-                            cls.telemetry["net_recv"] += merged["http"]["request"]["bytes"] / 1048576.0 # MB
+                            cls.telemetry["net_send"] += merged["http"]["response"]["bytes"] / 1048576.0  # MB
+                            cls.telemetry["net_recv"] += merged["http"]["request"]["bytes"] / 1048576.0  # MB
                             model.persist(merged)
                             break
                 cache.audit_log = []
                 cache.error_log = []
                 t_arr = []
-                for l in cache.access_log:
-                    if "flushed" not in l:
-                        t_arr.append(l)
-                cls.telemetry["req_total"] += (len(cache.access_log) - len(t_arr)) / 1000.0 # K requests
+                for log_item in cache.access_log:
+                    if "flushed" not in log_item:
+                        t_arr.append(log_item)
+                cls.telemetry["req_total"] += (len(cache.access_log) - len(t_arr)) / 1000.0  # K requests
                 cache.access_log = t_arr
                 cls.telemetry["c_interval"] += 1
                 if cls.telemetry["c_interval"] >= env_config.TELEMETRY_INTERVAL:
@@ -111,7 +112,7 @@ class LogParserTool:
                 )
 
             time.sleep(10)
-        logger.debug(f"merge_transactions shutdown")
+        logger.debug("merge_transactions shutdown")
 
     @classmethod
     def follow_file(cls, cache, file_path, log_type):

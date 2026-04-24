@@ -6,7 +6,8 @@ from api.core.controllers.base_controller import (
     response_error_404,
     response_error_parse,
     get_pagination,
-    has_any_authority
+    has_any_authority,
+    response_data_removed
 )
 
 from api.core.middleware.socket_manager import emit_event
@@ -15,14 +16,15 @@ from api.model.service_model import RouteFilterDao
 
 routes = Blueprint("route_filter", __name__)
 
+
 @routes.after_request
 def after(response: Response) -> Response:
     """
     Track changes after route filter modifications.
-    
+
     Args:
         response: The Flask response object
-        
+
     Returns:
         Response: The modified response object
     """
@@ -39,7 +41,7 @@ def after(response: Response) -> Response:
 def search() -> Response:
     """
     Search and list all route filters.
-    
+
     Returns:
         Response: JSON response containing paginated route filter list or 404 error
     """
@@ -53,10 +55,10 @@ def search() -> Response:
 def get(route_filter_id: str) -> Response:
     """
     Retrieve a specific route filter by ID.
-    
+
     Args:
         route_filter_id: The unique identifier of the route filter
-        
+
     Returns:
         Response: JSON response containing the route filter data or 404 error
     """
@@ -70,7 +72,7 @@ def get(route_filter_id: str) -> Response:
 def save() -> Response:
     """
     Create a new route filter.
-    
+
     Returns:
         Response: JSON response containing the created route filter or error message
     """
@@ -88,10 +90,10 @@ def save() -> Response:
 def update(route_filter_id: str) -> Response:
     """
     Update an existing route filter.
-    
+
     Args:
         route_filter_id: The unique identifier of the route filter to update
-        
+
     Returns:
         Response: JSON response containing the updated route filter or error message
     """
@@ -109,10 +111,10 @@ def update(route_filter_id: str) -> Response:
 def delete(route_filter_id: str) -> Response:
     """
     Delete a route filter.
-    
+
     Args:
         route_filter_id: The unique identifier of the route filter to delete
-        
+
     Returns:
         Response: Success message or error response
     """

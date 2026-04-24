@@ -5,10 +5,10 @@ from api.core.controllers.base_controller import (
     response_data,
     response_error_404,
     get_pagination,
-    has_any_authority   
+    has_any_authority
 )
 
-from api.common_utils import  replace_tz
+from api.common_utils import replace_tz
 from api.model.transaction_model import TransactionDao
 from config import DATETIME_FMT
 

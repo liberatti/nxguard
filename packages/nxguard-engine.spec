@@ -1,6 +1,6 @@
 Name:		nxguard-engine
 Version:	1.29.2
-Release:	3%{?dist}
+Release:	4%{?dist}
 Summary:	nxguard engine powered by openresty
 
 License:	Apache-2.0
@@ -235,5 +235,8 @@ fi
 chown -R nxguard:nxguard /opt/nxguard
 
 %changelog
+* Fri Apr 24 2026 Gustavo Liberatti <gustavo@liberatti.com.br> - 1.29.2-4
+- Update project license to Apache 2.0 and improve documentation
+
 * Tue Feb 04 2025 Gustavo Liberatti <gustavo@liberatti.com.br> - 1.29.2-3
 - Create nxguard openresty with modsecurity 3x

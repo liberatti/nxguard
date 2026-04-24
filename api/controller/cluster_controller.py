@@ -23,14 +23,15 @@ from api.tools.mongo_tool import MongoTool
 
 routes = Blueprint("cluster", __name__)
 
+
 @routes.after_request
 def after(response: Response) -> Response:
     """
     Track changes after cluster modifications.
-    
+
     Args:
         response: The Flask response object
-        
+
     Returns:
         Response: The modified response object
     """
@@ -47,7 +48,7 @@ def after(response: Response) -> Response:
 def restore() -> Response:
     """
     Restore cluster configuration from a backup file.
-    
+
     Returns:
         Response: Success message or error response
     """
@@ -74,7 +75,7 @@ def restore() -> Response:
 def backup() -> Response:
     """
     Create a backup of the cluster configuration.
-    
+
     Returns:
         Response: Backup file download or error response
     """
@@ -87,7 +88,7 @@ def backup() -> Response:
 def get_node_status() -> Response:
     """
     Retrieve the status of all cluster nodes including health and telemetry data.
-    
+
     Returns:
         Response: JSON response containing node status information or 404 error
     """
@@ -121,7 +122,7 @@ def get_node_status() -> Response:
 def get_config() -> Response:
     """
     Retrieve the active cluster configuration.
-    
+
     Returns:
         Response: JSON response containing the configuration or 404 error
     """
@@ -135,7 +136,7 @@ def get_config() -> Response:
 def save() -> Response:
     """
     Update the cluster configuration.
-    
+
     Returns:
         Response: JSON response containing the updated configuration or error message
     """
@@ -153,11 +154,11 @@ def save() -> Response:
 def health_check() -> Response:
     """
     Retrieve the health status of the node.
-    
+
     Returns:
         Response: JSON response containing the node health status information
     """
-    st=ClusterTool.node_monitor()
+    st = ClusterTool.node_monitor()
     if st:
         dao = ChangeDao()
         result = dao.get_all()
@@ -167,72 +168,73 @@ def health_check() -> Response:
         return response_data(st, NodeStatusSchema())
     return response_data({}, NodeStatusSchema())
 
+
 @routes.route("/apply", methods=["GET"])
 @has_any_authority(authorities=["superuser"])
 def apply() -> Response:
     """
     Apply pending configuration changes and handle certificate auto-renewal.
-    
+
     Returns:
         Response: Success message or error response
     """
     dao = ChangeDao()
     changes = dao.get_all()
     action_result = ClusterTool.apply_config(reconfigure=True)
-    
+
     if action_result["succeed"]:
         renewed_certs = AcmeTool.auto_renew()
         if renewed_certs > 0:
             action_result = ClusterTool.apply_config(reconfigure=True)
-        
+
         if action_result["succeed"]:
             for change in changes["data"]:
                 dao.delete_by_id(change["_id"])
             emit_event("tracking_aply")
             return response_data(action_result)
-    
+
     return response_error_500(action_result["message"])
 
 
 @routes.route("/geoip_info/<ipaddr>", methods=["GET"])
-@has_any_authority( _internal=True)
+@has_any_authority(_internal=True)
 def geoip_info(ipaddr: str) -> Response:
     """
     Retrieve GeoIP information for a given IP address.
-    
+
     Args:
         ipaddr: The IP address to look up
-        
+
     Returns:
         Response: JSON response containing GeoIP information or error response
     """
     if not ClusterTool.CONFIG:
         return response_error_500("System not ready")
-    
+
     info = SecurityFeedTool.geo_info(ipaddr)
     return response_data(info)
 
 
 @routes.route("/rbl/blocked/<sensor_id>/<ipaddr>", methods=["GET"])
-@has_any_authority( _internal=True)
+@has_any_authority(_internal=True)
 def rbl_status(ipaddr: str, sensor_id: str) -> Response:
     """
     Check if an IP address is blocked by RBL for a specific sensor.
-    
+
     Args:
         ipaddr: The IP address to check
         sensor_id: The ID of the sensor to check against
-        
+
     Returns:
         Response: JSON response containing RBL check results or error response
     """
     if not ClusterTool.CONFIG:
         return response_error_500("System not ready")
-    
+
     for sensor in ClusterTool.CONFIG["sensors"]:
         if sensor["_id"] == sensor_id:
             model = RBLDao()
             rbl_result = model.check_by_ip(ipaddr, sensor)
             return response_data(rbl_result)
-    
+
     return response_error_500("Failed checking RBL")

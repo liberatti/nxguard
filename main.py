@@ -36,6 +36,7 @@ app.register_blueprint(bp)
 def not_found_error(error):
     return response_error_404()
 
+
 @app.errorhandler(500)
 def internal_error(error):
     stack_trace = traceback.format_exc()
