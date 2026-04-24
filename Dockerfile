@@ -1,7 +1,3 @@
-# Dockerfile para o projeto nxguard
-# Este arquivo utiliza build multi-stage para compilar componentes do motor (engine),
-# frontend e backend administrativo, resultando em uma imagem final otimizada.
-
 # Estágio 1: Compilação das dependências do motor (OpenResty, ModSecurity, etc.)
 FROM --platform=${BUILDPLATFORM:-linux/amd64} rockylinux:9 AS build_engine
 
@@ -18,10 +14,10 @@ RUN dnf -y install 'dnf-command(config-manager)' \
 
 WORKDIR /root/rpmbuild/BUILD
 
-RUN	wget https://openresty.org/download/openresty-1.27.1.1.tar.gz\
-    && tar -xf openresty-1.27.1.1.tar.gz
-RUN wget https://github.com/SpiderLabs/ModSecurity/releases/download/v3.0.12/modsecurity-v3.0.12.tar.gz\
-    && tar -xf modsecurity-v3.0.12.tar.gz
+RUN	wget https://openresty.org/download/openresty-1.29.2.3.tar.gz\
+    && tar -xf openresty-1.29.2.3.tar.gz
+RUN wget https://github.com/SpiderLabs/ModSecurity/releases/download/v3.0.14/modsecurity-v3.0.14.tar.gz\
+    && tar -xf modsecurity-v3.0.14.tar.gz
 RUN wget https://github.com/SpiderLabs/ModSecurity-nginx/releases/download/v1.0.3/modsecurity-nginx-v1.0.3.tar.gz\
     && tar -xf modsecurity-nginx-v1.0.3.tar.gz
 RUN wget https://github.com/liberatti/nginx-sticky-module-ng/archive/refs/tags/1.2.6.tar.gz\
@@ -32,8 +28,8 @@ RUN wget https://github.com/liberatti/nginx_ajp_module/archive/refs/tags/v1.0.0.
     && tar -xf v1.0.0.tar.gz
 RUN wget https://www.lua.org/ftp/lua-5.1.5.tar.gz\
     && tar -xf lua-5.1.5.tar.gz
-RUN wget https://github.com/coreruleset/coreruleset/archive/refs/tags/v3.3.6.zip\
-    && unzip -o v3.3.6.zip
+RUN wget https://github.com/coreruleset/coreruleset/archive/refs/tags/v3.3.9.zip\
+    && unzip -o v3.3.9.zip
 RUN wget https://dl.fedoraproject.org/pub/epel/9/Everything/x86_64/Packages/l/luarocks-3.9.2-5.el9.noarch.rpm
 RUN wget -O ssdeep-release-2.14.1.tar.gz \
   https://github.com/ssdeep-project/ssdeep/archive/refs/tags/release-2.14.1.tar.gz \
@@ -98,7 +94,7 @@ RUN rpmbuild --nobuild nxguard-admin.spec \
 
 # Estágio 4: Imagem Final (Runtime)
 FROM --platform=${BUILDPLATFORM:-linux/amd64} rockylinux:9-minimal AS main
-
+ENV APP_BASE=/opt/nxguard
 ENV PATH ${PATH}:/opt/nxguard/.local/bin:/opt/nxguard/nginx/sbin:/opt/nxguard/site-packages/bin
 ENV LUA_PATH "/opt/nxguard/lualib/share/lua/5.4/?.lua;/opt/nxguard/lualib/share/lua/5.4/resty/?.lua;;"
 ENV LUA_CPATH "/opt/nxguard/lualib/lib64/lua/5.4/?.so;/opt/nxguard/lualib/lib/?.so;/opt/nxguard/lualib/?.so;;"

@@ -79,7 +79,7 @@ def update_main_config():
 
 
 def install():
-    logger.info(f"Installing NXGuard")
+    logger.info("Installing NXGuard")
     os.makedirs(config.DB_PATH, exist_ok=True)
     if os.path.exists(f"{config.DB_PATH}/app.sqlite"):
         os.remove(f"{config.DB_PATH}/app.sqlite")

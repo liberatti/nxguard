@@ -38,7 +38,7 @@ def when_ready(server):
                     conf = c_builder.init_from_json(f"{_config.DB_PATH}/init-data.json")
                     c_admin.apply(conf)
             if os.path.exists(f"{_config.DB_PATH}/config.json"):
-                conf = c_builder.read_from_json(f"config.json")
+                conf = c_builder.read_from_json("config.json")
                 c_admin.apply(conf)
 
             schedule.every(10).seconds.do(update_main_config)
@@ -62,7 +62,7 @@ def on_reload(server):
 
 def on_exit(server):
     stop_event.set()
-    logger.info(f"NXGuard stopped")
+    logger.info("NXGuard stopped")
 
 
 workers = 4

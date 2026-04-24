@@ -7,7 +7,7 @@ from basic4web.middleware.logging import logger
 
 class NetworkTool:
     """Network utility class for handling IP addresses and network operations.
-    
+
     This class provides methods for:
     - IP address resolution and validation
     - Network address manipulation
@@ -18,10 +18,10 @@ class NetworkTool:
     @classmethod
     def hostbyname(cls, ns: str) -> Optional[str]:
         """Resolve a hostname to its IP address.
-        
+
         Args:
             ns: Hostname to resolve
-            
+
         Returns:
             IP address as string if resolution successful, None otherwise
         """
@@ -34,10 +34,10 @@ class NetworkTool:
     @classmethod
     def id(cls, ip: str) -> str:
         """Convert an IP address to its expanded form.
-        
+
         Args:
             ip: IP address to expand
-            
+
         Returns:
             Expanded IP address as string
         """
@@ -46,10 +46,10 @@ class NetworkTool:
     @classmethod
     def is_host(cls, ip: str) -> bool:
         """Check if a string is a valid IP address.
-        
+
         Args:
             ip: String to validate as IP address
-            
+
         Returns:
             True if valid IP address, False otherwise
         """
@@ -62,10 +62,10 @@ class NetworkTool:
     @classmethod
     def is_network(cls, net: str) -> bool:
         """Check if a string is a valid network address.
-        
+
         Args:
             net: String to validate as network address
-            
+
         Returns:
             True if valid network address, False otherwise
         """
@@ -80,10 +80,10 @@ class NetworkTool:
     @classmethod
     def aggregate(cls, addr_list: List[str]) -> List[str]:
         """Aggregate a list of IP addresses/networks into the most efficient network ranges.
-        
+
         Args:
             addr_list: List of IP addresses or networks to aggregate
-            
+
         Returns:
             List of aggregated network ranges
         """
@@ -100,10 +100,10 @@ class NetworkTool:
     @classmethod
     def hosts_from_net(cls, masked_ip: str) -> List[str]:
         """Get all host IP addresses from a network.
-        
+
         Args:
             masked_ip: Network address in CIDR notation
-            
+
         Returns:
             List of host IP addresses in the network
         """
@@ -117,10 +117,10 @@ class NetworkTool:
     @classmethod
     def is_ipv4(cls, ip: str) -> bool:
         """Check if an IP address is IPv4.
-        
+
         Args:
             ip: IP address to check
-            
+
         Returns:
             True if IPv4 address, False otherwise
         """
@@ -132,13 +132,13 @@ class NetworkTool:
     @classmethod
     def expand_ip(cls, ip):
         """Expand an IP address to its full form.
-        
+
         For IPv4 addresses, pads each octet with leading zeros.
         For IPv6 addresses, expands to full form.
-        
+
         Args:
             ip: IP address to expand
-            
+
         Returns:
             Expanded IP address as string
         """
@@ -151,11 +151,11 @@ class NetworkTool:
     @classmethod
     def masklen_from_network(cls, addr: str, netmask: str) -> int:
         """Calculate network mask length from address and netmask.
-        
+
         Args:
             addr: Network address
             netmask: Network mask
-            
+
         Returns:
             Mask length as integer
         """

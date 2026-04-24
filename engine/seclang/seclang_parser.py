@@ -136,63 +136,68 @@ class RuleSetParser:
             rule_content = matcher.group(2)
             if rule_content:
                 for token in re.split(",(?=(?:[^']*'[^']*')*[^']*$)", rule_content):
-                    key_pair = re.split(":(?=(?:[^']*'[^']*')*[^']*$)", token)
-
-                    if len(key_pair) > 1:
-                        key = key_pair[0].strip()
-                        if key == "id":
-                            rule["code"] = int(key_pair[1])
-                        elif key == "ver":
-                            rule["version"] = key_pair[1]
-                        elif key == "phase":
-                            rule["phase"] = int(key_pair[1])
-                        elif key == "tag":
-                            rule["tags"].append(key_pair[1])
-                        elif key == "t":
-                            rule["t"].append(str(key_pair[1]))
-                        elif key == "setvar":
-                            rule["setvar"].append(key_pair[1])
-                        elif key == "expirevar":
-                            rule["expirevar"].append(key_pair[1])
-                        elif key == "logdata":
-                            rule["logdata"] = key_pair[1]
-                        elif key == "ctl":
-                            rule["ctl"].append(key_pair[1])
-                        elif key == "msg":
-                            rule["msg"] = key_pair[1]
-                        elif key == "skipAfter":
-                            rule["skip_after"] = key_pair[1]
-                        elif key == "severity":
-                            rule["severity"] = key_pair[1]
-                        elif key == "status":
-                            rule["status"] = int(key_pair[1])
-                        else:
-                            logger.error(
-                                f"parseRule Unknown key [{key}/{key_pair[1]}] from {line}"
-                            )
-                    else:
-                        token = token.strip().replace(",", "")
-                        if token.lower() in ["pass", "deny", "block", "config"]:
-                            rule["action"] = token
-                        elif "audit" in token:
-                            rule["audit_log"] = token
-                        elif "log" in token:
-                            rule["logging"] = token
-                        elif token.lower() == "multimatch":
-                            rule["multi_match"] = True
-                        elif token.lower() == "chain":
-                            rule["chain_starter"] = True
-                        elif token.lower() == "capture":
-                            rule["capture"] = True
-                        else:
-                            logger.error(
-                                f"parseRule Unknown token [{token}] from {rule_content}"
-                            )
+                    self._process_rule_token(rule, token, line, rule_content)
 
         self.line_index += 1
         logger.debug(rule)
 
         return rule
+
+    def _process_rule_token(self, rule, token, line, rule_content):
+        key_pair = re.split(":(?=(?:[^']*'[^']*')*[^']*$)", token)
+
+        if len(key_pair) > 1:
+            self._process_rule_key(rule, key_pair[0].strip(), key_pair[1], line)
+        else:
+            self._process_rule_action(rule, token, rule_content)
+
+    def _process_rule_key(self, rule, key, val, line):
+        if key == "id":
+            rule["code"] = int(val)
+        elif key == "ver":
+            rule["version"] = val
+        elif key == "phase":
+            rule["phase"] = int(val)
+        elif key == "tag":
+            rule["tags"].append(val)
+        elif key == "t":
+            rule["t"].append(str(val))
+        elif key == "setvar":
+            rule["setvar"].append(val)
+        elif key == "expirevar":
+            rule["expirevar"].append(val)
+        elif key == "logdata":
+            rule["logdata"] = val
+        elif key == "ctl":
+            rule["ctl"].append(val)
+        elif key == "msg":
+            rule["msg"] = val
+        elif key == "skipAfter":
+            rule["skip_after"] = val
+        elif key == "severity":
+            rule["severity"] = val
+        elif key == "status":
+            rule["status"] = int(val)
+        else:
+            logger.error(f"parseRule Unknown key [{key}/{val}] from {line}")
+
+    def _process_rule_action(self, rule, token, rule_content):
+        token = token.strip().replace(",", "")
+        token_lower = token.lower()
+        if token_lower in ["pass", "deny", "block", "config"]:
+            rule["action"] = token
+        elif "audit" in token_lower:
+            rule["audit_log"] = token
+        elif "log" in token_lower:
+            rule["logging"] = token
+        elif token_lower == "multimatch":
+            rule["multi_match"] = True
+        elif token_lower == "chain":
+            rule["chain_starter"] = True
+        elif token_lower == "capture":
+            rule["capture"] = True
+        else:
+            logger.error(f"parseRule Unknown token [{token}] from {rule_content}")
 
     def _parse_from_file(self, source, base_path):
         dts = []

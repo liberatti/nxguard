@@ -1,10 +1,12 @@
+import json
 import os
 
 import pytz
 import redis
 
+APP_BASE = os.environ.get("APP_BASE", ".")
 APP_CONTEXT = os.getenv("APP_CONTEXT", "/nxg")
-APP_VERSION = os.getenv("APP_VERSION", "v1.0.6")
+APP_VERSION = json.load(open(os.path.join(APP_BASE, "package.json")))['version']
 API_HEADERS = {"User-Agent": f"NXGuard/{APP_VERSION}"}
 
 BASE_PATH = "/opt/nxguard"

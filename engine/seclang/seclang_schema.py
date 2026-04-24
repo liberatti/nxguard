@@ -4,7 +4,7 @@ from marshmallow import EXCLUDE, Schema, fields
 class DataObjectSchema(Schema):
     """
     Schema for data object validation and serialization.
-    
+
     This schema defines the structure and validation rules for data objects.
     """
 
@@ -19,7 +19,7 @@ class DataObjectSchema(Schema):
 class SecBaseSchema(Schema):
     """
     Base schema for security language validation and serialization.
-    
+
     This schema defines the common structure and validation rules
     for security language documents.
     """
@@ -41,13 +41,13 @@ class SecBaseSchema(Schema):
     def schema_class(cls, schema_type: str) -> type:
         """
         Returns the appropriate schema class based on the schema type.
-        
+
         Args:
             schema_type (str): Type of schema to return
-            
+
         Returns:
             type: Schema class
-            
+
         Raises:
             ValueError: If the schema type is unknown
         """
@@ -67,7 +67,7 @@ class SecBaseSchema(Schema):
 class SecAction(SecBaseSchema):
     """
     Schema for security action validation and serialization.
-    
+
     This schema defines the structure and validation rules for security actions.
     """
 
@@ -84,7 +84,7 @@ class SecAction(SecBaseSchema):
 class SecComponentSignature(SecBaseSchema):
     """
     Schema for component signature validation and serialization.
-    
+
     This schema defines the structure and validation rules for component signatures.
     """
 
@@ -97,7 +97,7 @@ class SecComponentSignature(SecBaseSchema):
 class SecMarker(SecBaseSchema):
     """
     Schema for security marker validation and serialization.
-    
+
     This schema defines the structure and validation rules for security markers.
     """
 
@@ -110,7 +110,7 @@ class SecMarker(SecBaseSchema):
 class SecRule(SecBaseSchema):
     """
     Schema for security rule validation and serialization.
-    
+
     This schema defines the structure and validation rules for security rules.
     """
 
@@ -140,7 +140,7 @@ class SecRule(SecBaseSchema):
 class RuleCategorySchema(Schema):
     """
     Schema for rule category validation and serialization.
-    
+
     This schema defines the structure and validation rules for rule categories.
     """
 

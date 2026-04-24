@@ -12,7 +12,7 @@ import config as config
 class JailEntrySchema(Schema):
     """
     Schema for jail entry validation and serialization.
-    
+
     This schema defines the structure and validation rules for jail entries.
     """
 
@@ -26,7 +26,7 @@ class JailEntrySchema(Schema):
 class JailRulesSchema(Schema):
     """
     Schema for jail rules validation and serialization.
-    
+
     This schema defines the structure and validation rules for jail rules.
     """
 
@@ -40,7 +40,7 @@ class JailRulesSchema(Schema):
 class JailSchema(Schema):
     """
     Schema for jail validation and serialization.
-    
+
     This schema defines the structure and validation rules for jail documents.
     """
 
@@ -59,7 +59,7 @@ class JailSchema(Schema):
 class JailDao(SQLite3DAO):
     """
     DAO for managing jail data.
-    
+
     This class extends MongoDAO to provide specific operations
     related to jail management, including retrieval by type
     and persistence of jail entries.
@@ -70,21 +70,21 @@ class JailDao(SQLite3DAO):
         Initializes the DAO with the 'jail' collection and schema.
         """
         super().__init__(
-            db_path=config.DB_PATH
-            , table_name="jail"
-            , schema=JailSchema
+            db_path=config.DB_PATH,
+            table_name="jail",
+            schema=JailSchema
         )
 
     def get_by_type(self, t: str) -> List[Dict[str, Any]]:
         """
         Retrieves jails by their type.
-        
+
         Args:
             t (str): Jail type to search for
-            
+
         Returns:
             List[Dict[str, Any]]: List of jail documents matching the type
-            
+
         Raises:
             PyMongoError: If an error occurs during the search operation
         """
@@ -102,13 +102,13 @@ class JailDao(SQLite3DAO):
     def persist(self, vo: Dict[str, Any]) -> str:
         """
         Persists a new jail with default dates for entries if not provided.
-        
+
         Args:
             vo (Dict[str, Any]): Jail data dictionary
-            
+
         Returns:
             str: ID of the inserted jail
-            
+
         Raises:
             PyMongoError: If an error occurs during the insert operation
         """

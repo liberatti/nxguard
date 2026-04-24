@@ -44,9 +44,9 @@ class UserDao(SQLite3DAO):
 
     def __init__(self):
         super().__init__(
-            db_path=config.DB_PATH
-            , table_name="users"
-            , schema=UserSchema
+            db_path=config.DB_PATH,
+            table_name="users",
+            schema=UserSchema
         )
 
     def get_by_email(self, email: str) -> Optional[Dict[str, Any]]:

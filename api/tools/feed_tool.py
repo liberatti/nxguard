@@ -29,7 +29,7 @@ def update():
                 download_mmdb(conf["maxmind_key"], "GeoLite2-ASN")
                 download_mmdb(conf["maxmind_key"], "GeoLite2-City")
             except Exception as e:
-                logger.error(f"Failed to download GeoLite2: %s", e)
+                logger.error("Failed to download GeoLite2: %s", e)
 
         for feed in feed_dao.get_by_type("network"):
             if "source" in feed and len(feed["source"]) > 1:
@@ -55,8 +55,8 @@ def update():
                             lines = resp.text.splitlines()
                         if "cdir_gz" in feed["format"]:
                             with gzip.GzipFile(fileobj=io.BytesIO(resp.content)) as gz:
-                                for l in gz:
-                                    lines.append(l.decode("utf-8").strip())
+                                for line in gz:
+                                    lines.append(line.decode("utf-8").strip())
                         rbl_dao.delete_by_provider("feed", feed["_id"])
                         fc = 0
                         for line in lines:
@@ -93,7 +93,7 @@ def update():
 def download_ip2asn(feed="ip2asn-combined"):
     response = requests.get(f"https://iptoasn.com/data/{feed}.tsv.gz")
     if response.status_code == 200:
-        with RedisCache() as cache:
+        with RedisCache() as cache, GeoIpDao() as dao:
             zip_content = io.BytesIO(response.content)
             with gzip.open(zip_content, "rt", encoding="utf-8") as file:
                 reader = csv.reader(file, delimiter="\t")

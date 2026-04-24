@@ -24,13 +24,13 @@ def clean(data, output_dir=f"{BASE_PATH}", test=False):
         try:
             if os.path.exists(f):
                 os.remove(f)
-        except Exception as e:
+        except Exception:
             logger.error(f"Error removing file {f}")
 
     for file_path in glob.glob(f"{output_dir}/keystore/{'test-' if test else ''}*"):
         try:
             os.remove(file_path)
-        except Exception as e:
+        except Exception:
             logger.error(f"Error removing file {file_path}")
 
     for file_path in glob.glob(
@@ -38,7 +38,7 @@ def clean(data, output_dir=f"{BASE_PATH}", test=False):
     ):
         try:
             os.remove(file_path)
-        except Exception as e:
+        except Exception:
             logger.error(f"Error removing file {file_path}")
 
 

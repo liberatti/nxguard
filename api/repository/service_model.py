@@ -96,9 +96,9 @@ class RouteFilterDao(SQLite3DAO):
 
     def __init__(self):
         super().__init__(
-            db_path=config.DB_PATH
-            , table_name="route_filters"
-            , schema=RouteFilterSchema
+            db_path=config.DB_PATH,
+            table_name="route_filters",
+            schema=RouteFilterSchema
         )
 
     def create_schema(self):
@@ -107,7 +107,7 @@ class RouteFilterDao(SQLite3DAO):
                 _id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT,
                 description TEXT,
-                type TEXT, 
+                type TEXT,
                 ssl_dn_regex TEXT,
                 ssl_fingerprints TEXT,
                 ldap_host TEXT,

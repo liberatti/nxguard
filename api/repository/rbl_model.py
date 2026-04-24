@@ -14,7 +14,7 @@ from api.tools.network_tool import NetworkTool
 class RBLSchema(Schema):
     """
     Schema for RBL validation and serialization.
-    
+
     This schema defines the structure and validation rules for RBL documents.
     """
 
@@ -33,7 +33,7 @@ class RBLSchema(Schema):
 class RBLDao(SQLite3DAO):
     """
     DAO for managing RBL (Real-time Blackhole List) data.
-    
+
     This class extends MongoDAO to provide specific operations
     related to RBL management, including IP checking and provider management.
     """
@@ -43,22 +43,22 @@ class RBLDao(SQLite3DAO):
         Initializes the DAO with the 'rbl' collection and schema.
         """
         super().__init__(
-            db_path=config.DB_PATH
-            , table_name="rbl"
-            , schema=FeedSchema
+            db_path=config.DB_PATH,
+            table_name="rbl",
+            schema=FeedSchema
         )
 
     def check_by_ip(self, ip: str, sensor: Dict[str, Any]) -> Dict[str, bool]:
         """
         Checks if an IP address is blocked by any RBL providers.
-        
+
         Args:
             ip (str): IP address to check
             sensor (Dict[str, Any]): Sensor configuration with provider lists
-            
+
         Returns:
             Dict[str, bool]: Dictionary with 'blocked' status
-            
+
         Raises:
             PyMongoError: If an error occurs during the check operation
         """
@@ -134,11 +134,11 @@ class RBLDao(SQLite3DAO):
     def delete_by_provider(self, provider_type: str, provider_id: str) -> None:
         """
         Deletes all RBL entries for a specific provider.
-        
+
         Args:
             provider_type (str): Type of provider
             provider_id (str): ID of the provider
-            
+
         Raises:
             PyMongoError: If an error occurs during the delete operation
         """
@@ -157,12 +157,12 @@ class RBLDao(SQLite3DAO):
     def delete_expired(self, provider_type: str, provider_id: str, bantime_limit: datetime) -> None:
         """
         Deletes expired RBL entries for a specific provider.
-        
+
         Args:
             provider_type (str): Type of provider
             provider_id (str): ID of the provider
             bantime_limit (datetime): Cutoff date for expiration
-            
+
         Raises:
             PyMongoError: If an error occurs during the delete operation
         """

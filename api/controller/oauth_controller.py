@@ -46,7 +46,7 @@ def refresh_token() -> Response:
             },
             status=200
         )
-    except Exception as e:
+    except Exception:
         return response_error_500(msg=f"Authorization failed for {r_token}", details=traceback.format_exc())
 
 

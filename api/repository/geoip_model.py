@@ -10,7 +10,7 @@ from api.tools.network_tool import NetworkTool
 class GeoIpDao(SQLite3DAO):
     """
     DAO for managing GeoIP data.
-    
+
     This class extends MongoDAO to provide specific operations
     related to GeoIP lookups and IP address geolocation.
     """
@@ -20,20 +20,20 @@ class GeoIpDao(SQLite3DAO):
         Initializes the DAO with the 'geoip' collection.
         """
         super().__init__(
-            db_path=config.DB_PATH
-            , table_name="geoip"
+            db_path=config.DB_PATH,
+            table_name="geoip"
         )
 
     def find_by_ip(self, ip: str) -> Optional[Dict[str, Any]]:
         """
         Finds GeoIP information for a given IP address.
-        
+
         Args:
             ip (str): IP address to look up
-            
+
         Returns:
             Optional[Dict[str, Any]]: GeoIP document or None if not found
-            
+
         Raises:
             PyMongoError: If an error occurs during the search operation
         """

@@ -22,7 +22,7 @@ def register(app, bp):
         if "." in path and not path.endswith("/"):
             try:
                 return current_app.send_static_file(path)
-            except:
+            except Exception:
                 pass
         return render_template("index.html")
 

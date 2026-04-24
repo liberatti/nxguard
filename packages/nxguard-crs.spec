@@ -1,5 +1,5 @@
 Name:		nxguard-crs
-Version:	3.3.6
+Version:	3.3.9
 Release:	1%{?dist}
 Summary:	OWASP Core Rule Set for nxguard
 BuildArch:	noarch
@@ -20,7 +20,7 @@ cd /root/rpmbuild/BUILD
 
 %install
 install -d %{buildroot}/opt/nxguard/modsec/coreruleset
-cp -r /root/rpmbuild/BUILD/coreruleset-3.3.6/rules/* %{buildroot}/opt/nxguard/modsec/coreruleset/
+cp -r /root/rpmbuild/BUILD/coreruleset-3.3.9/rules/* %{buildroot}/opt/nxguard/modsec/coreruleset/
 #rm -f %{buildroot}/opt/nxguard/modsec/coreruleset/REQUEST-901-INITIALIZATION.conf
 
 %files

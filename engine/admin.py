@@ -25,7 +25,7 @@ def apply(conf):
 
     if result.returncode == 0:
         c_render.clean(conf, test=True)
-        logger.info(f"Config OK")
+        logger.info("Config OK")
 
         c_render.clean(conf, test=False)
         c_render.generate(conf)
@@ -63,7 +63,7 @@ def is_running() -> bool:
 def restart():
     subprocess.run(f"sudo chmod -R 777 {BASE_PATH}/logs", shell=True)
     if is_running():
-        logger.info(f"Nginx is running, reload required")
+        logger.info("Nginx is running, reload required")
         result = subprocess.Popen(
             f"sudo {BASE_PATH}/nginx/sbin/nginx -s reload",
             shell=True,
@@ -71,7 +71,7 @@ def restart():
             stderr=subprocess.PIPE,
         )
         if not is_running():
-            logger.info(f"Nginx reload failed, start required")
+            logger.info("Nginx reload failed, start required")
             result = subprocess.Popen(
                 f"sudo {BASE_PATH}/nginx/sbin/nginx",
                 shell=True,
@@ -79,7 +79,7 @@ def restart():
                 stderr=subprocess.PIPE,
             )
     else:
-        logger.info(f"Nginx is not running, start required")
+        logger.info("Nginx is not running, start required")
         result = subprocess.Popen(
             f"sudo {BASE_PATH}/nginx/sbin/nginx",
             shell=True,

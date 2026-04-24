@@ -10,7 +10,7 @@ import config as config
 class FeedSchema(Schema):
     """
     Schema for feed validation and serialization.
-    
+
     This schema defines the structure and validation rules for feed documents.
     """
 
@@ -35,7 +35,7 @@ class FeedSchema(Schema):
 class FeedDao(SQLite3DAO):
     """
     DAO for managing feed data.
-    
+
     This class extends MongoDAO to provide specific operations
     related to feed management, including retrieval by slug and type.
     """
@@ -45,21 +45,21 @@ class FeedDao(SQLite3DAO):
         Initializes the DAO with the 'feeds' collection and schema.
         """
         super().__init__(
-            db_path=config.DB_PATH
-            , table_name="feeds"
-            , schema=FeedSchema
+            db_path=config.DB_PATH,
+            table_name="feeds",
+            schema=FeedSchema
         )
 
     def get_by_slug(self, slug: str) -> Optional[Dict[str, Any]]:
         """
         Retrieves a feed by its slug.
-        
+
         Args:
             slug (str): Feed slug
-            
+
         Returns:
             Optional[Dict[str, Any]]: Feed document or None if not found
-            
+
         Raises:
             PyMongoError: If an error occurs during the search operation
         """
@@ -74,13 +74,13 @@ class FeedDao(SQLite3DAO):
     def get_by_type(self, _type: str) -> List[Dict[str, Any]]:
         """
         Retrieves feeds by their type.
-        
+
         Args:
             _type (str): Feed type to search for
-            
+
         Returns:
             List[Dict[str, Any]]: List of feed documents matching the type
-            
+
         Raises:
             PyMongoError: If an error occurs during the search operation
         """

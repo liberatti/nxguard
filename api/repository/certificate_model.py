@@ -32,10 +32,10 @@ class CertificateDao(SQLite3DAO):
 
     def __init__(self, conn=None):
         super().__init__(
-            db_path=config.DB_PATH
-            , table_name="certificate"
-            , schema=CertificateSchema
-            , conn=conn
+            db_path=config.DB_PATH,
+            table_name="certificate",
+            schema=CertificateSchema,
+            conn=conn
         )
 
     def create_schema(self):

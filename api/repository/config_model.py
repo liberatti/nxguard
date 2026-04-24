@@ -40,9 +40,9 @@ class ConfigSchema(Schema):
 class ConfigDao(SQLite3DAO):
     def __init__(self):
         super().__init__(
-            db_path=config.DB_PATH
-            , table_name="config"
-            , schema=ConfigSchema
+            db_path=config.DB_PATH,
+            table_name="config",
+            schema=ConfigSchema
         )
 
     def create_schema(self):
