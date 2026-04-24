@@ -1,0 +1,40 @@
+# @name FullIpInfo
+# Retrieves comprehensive GeoIP, ASN, and reputation data for a specific IP address.
+GET http://localhost:5002/api/ip/info/14.152.94.1
+content-type: application/json
+
+response:
+```json
+{
+  "ip": {
+    "address": "14.152.94.1",
+    "broadcast": "14.152.95.255",
+    "network": "14.152.80.0",
+    "prefix": 20,
+    "version": 4
+  },
+  "location": {
+    "city": null,
+    "continent": "Asia",
+    "country": "China",
+    "country_code": "CN",
+    "country_name": "China",
+    "latitude": 34.7732,
+    "longitude": 113.722,
+    "region": null
+  },
+  "organization": {
+    "asn_description": "",
+    "asn_name": "CT-DONGGUAN-IDC CHINANET Guangdong province network",
+    "asn_number": 134763
+  },
+  "security": {
+    "action": "deny",
+    "is_permitted": false,
+    "reasons": [
+      "rbl:firehol_level1"
+    ],
+    "risk_score": 100
+  }
+}
+```

@@ -1,0 +1,17 @@
+ upstream acme {
+  server 127.0.0.1:5000 max_fails=3 weight=1 fail_timeout=300 ;
+ }
+
+{%- for u in upstreams %}
+ upstream {{ u.name }} {
+  check interval=5000 fall=3 rise=1 default_down=true type=tcp;
+  {%- if u.persist %}
+   {%- if u.persist.type == 'COOKIE' %}
+  sticky name={{u.persist.cookie_name}} path={{u.persist.cookie_path}} hash=md5;
+   {%- endif %}
+  {%- endif %}
+  {%- for t in u.targets %}
+  server {{t.host}}:{{t.port}} max_fails=3 weight={{t.weight}} fail_timeout=300 {{t.state}};
+  {%- endfor %}
+ }
+{% endfor %}

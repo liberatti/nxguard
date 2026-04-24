@@ -1,0 +1,27 @@
+Flask~=3.1.0
+Flask-SocketIO~=5.6.0
+Flask-CORS~=5.0.1
+Flask-Marshmallow~=1.4.0
+Flask-PyMongo~=3.0.1
+Flask-RESTful~=0.3.10
+eventlet~=0.40.4
+psutil~=7.0.0
+gunicorn[gevent]~=25.0.1
+PyJWT~=2.11.0
+bcrypt~=4.3.0
+cryptography~=46.0.4
+marshmallow~=3.26.1
+multidict
+schedule~=1.2.2
+requests~=2.32.3
+geoip2~=5.0.1
+acme~=3.2.0
+ua-parser~=0.18.0
+pytz~=2025.1
+elasticsearch~=9.3.0
+cuttlepool
+setuptools_rust
+setuptools~=75.8.2
+josepy~=1.15.0
+Jinja2~=3.1.4
+basic4web[web,sqlite,redis] @ git+https://github.com/liberatti/basic4web.git@develop
