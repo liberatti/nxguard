@@ -14,9 +14,14 @@ response:
     "version": 4
   },
   "location": {
+    "city": null,
     "continent": "Asia",
+    "country": "China",
     "country_code": "CN",
-    "country_name": "China"
+    "country_name": "China",
+    "latitude": 34.7732,
+    "longitude": 113.722,
+    "region": null
   },
   "organization": {
     "asn_description": "",
@@ -24,12 +29,12 @@ response:
     "asn_number": 134763
   },
   "security": {
-    "action": "allow",
-    "is_permitted": true,
+    "action": "deny",
+    "is_permitted": false,
     "reasons": [
       "rbl:firehol_level1"
     ],
-    "risk_score": 0
+    "risk_score": 100
   }
 }
 ```
