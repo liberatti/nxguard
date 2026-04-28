@@ -29,7 +29,7 @@ import {EngineNode, Health} from "../../models/config";
     imports: [RouterModule, FormsModule, ReactiveFormsModule, CommonModule,
         MatIconModule, MatButtonModule, MatFormFieldModule,
         MatCardModule, MatProgressBarModule, MatInputModule, MatTooltipModule,
-        MatSelectModule, MatOptionModule, MatGridListModule, DateFormatPipe, MatChip, ByteFormatPipe
+        MatSelectModule, MatOptionModule, MatGridListModule
     ],
 
     templateUrl: './dashboard-home.component.html',

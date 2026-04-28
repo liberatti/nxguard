@@ -34,7 +34,7 @@ import { Health } from "../../models/config";
     standalone: true,
     imports: [RouterModule, CommonModule, TranslateModule, MatProgressBarModule,
         MatSidenavModule, MatIconModule, MatToolbarModule, MatCardModule, MatChipsModule,
-        MatButtonModule, MatListModule, MatMenuModule, MatBadgeModule, MatTooltip
+        MatButtonModule, MatListModule, MatMenuModule, MatBadgeModule
     ],
     templateUrl: './admin-layout.component.html',
     styleUrl: './admin-layout.component.css'

@@ -1,38 +1,42 @@
-<div id="sign-layout" class="login-background">
-    <mat-card class="login-card" id="sign-in-card">
-        <div class="mat-row">
-            <div class="mat-col-12" style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
-                <img ngSrc="assets/logo-w-white.png"
-                     class="login-logo"
-                     height="218" width="205" alt="logo" id="sign-in-logo"/>
-                <h2 class="login-title" id="sign-in-title">NXGuard</h2>
-                <p class="login-subtitle" id="sign-in-subtitle">A user-friendly admin interface for the sophisticated Nginx solution with ModSecurity.</p>
+<div class="login-background">
+    <mat-card class="login-card glass-effect" id="sign-in-card">
+        <div class="flex-column flex-center">
+            <div style="position: relative;">
+                <mat-icon style="font-size: 80px; width: 80px; height: 80px; color: var(--primary);">shield</mat-icon>
             </div>
+            <h1 class="gradient-text" style="font-size: 2.5rem; margin: 12px 0 0; letter-spacing: -1px;">NXGUARD</h1>
+            <p class="text-dim" style="margin-top: 4px; font-size: 0.85rem; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase;">Proxies & Security Management</p>
+        </div>
+        
+        <div style="margin: 32px 0 24px; position: relative; height: 1px;">
+            <div style="position: absolute; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, var(--border-dim), transparent);"></div>
+        </div>
+
+        <form [formGroup]="form" id="sign-in-form" class="flex-column" style="gap: 12px;">
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Email Address</mat-label>
+                <input id="sign-in-email" matInput formControlName="email"
+                       autocomplete="email" type="email" placeholder="admin@nxguard.com">
+                <mat-icon matSuffix style="color: var(--text-muted)">alternate_email</mat-icon>
+            </mat-form-field>
             
-            <div class="login-divider" id="sign-in-divider"></div>
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Password</mat-label>
+                <input id="sign-in-password" matInput formControlName="password" 
+                       type="password" autocomplete="current-password" placeholder="••••••••">
+                <mat-icon matSuffix style="color: var(--text-muted)">lock_outline</mat-icon>
+            </mat-form-field>
             
-            <div class="mat-col-12">
-                <form [formGroup]="form" id="sign-in-form" class="login-form">
-                    <mat-form-field class="full-width">
-                        <mat-label>Email</mat-label>
-                        <input id="sign-in-email" matInput formControlName="email"
-                               autocomplete="email" type="text">
-                        <mat-icon matSuffix>email</mat-icon>
-                    </mat-form-field>
-                    
-                    <mat-form-field class="full-width">
-                        <mat-label>Password</mat-label>
-                        <input id="sign-in-password" matInput formControlName="password" 
-                               type="password" autocomplete="current-password">
-                        <mat-icon matSuffix>lock</mat-icon>
-                    </mat-form-field>
-                    
-                    <button mat-raised-button id="sign-in-button" color="primary" class="login-button" (click)="login()">
-                        <mat-icon>login</mat-icon>
-                        <span>Sign In</span>
-                    </button>
-                </form>
-            </div>
+            <button mat-flat-button id="sign-in-button" color="primary" 
+                    style="height: 52px; margin-top: 16px; font-size: 1rem;"
+                    (click)="login()">
+                <mat-icon style="margin-right: 8px;">login</mat-icon>
+                <span>Sign in to Dashboard</span>
+            </button>
+        </form>
+
+        <div style="margin-top: 32px; font-size: 0.65rem; letter-spacing: 1.5px; text-transform: uppercase;" class="text-muted">
+            Authorized Personnel Only
         </div>
     </mat-card>
 </div>

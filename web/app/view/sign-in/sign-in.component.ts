@@ -25,7 +25,7 @@ import {NgOptimizedImage} from "@angular/common";
     imports: [RouterModule, FormsModule, ReactiveFormsModule,
         MatIconModule, MatButtonModule, MatFormFieldModule,
         MatCardModule, MatProgressBarModule, MatInputModule,
-        MatTooltipModule, MatSelectModule, MatOptionModule, MatGridListModule, NgOptimizedImage
+        MatTooltipModule, MatSelectModule, MatOptionModule, MatGridListModule
     ],
 
     templateUrl: './sign-in.component.html',
