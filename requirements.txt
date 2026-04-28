@@ -17,4 +17,4 @@ setuptools_rust
 setuptools~=75.8.2
 josepy~=1.15.0
 Jinja2~=3.1.4
-nxcore[web,sqlite,redis] @ git+https://github.com/liberatti/nxcore@v1.0.2
+nxcore[web,sqlite,redis] @ git+https://github.com/liberatti/nxcore@v1.0.3

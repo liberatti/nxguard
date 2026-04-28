@@ -3,8 +3,8 @@ import traceback
 import nxcore.config as nxcore_config
 from nxcore.controllers.base_controller import response_error_404, response_error_500
 from nxcore.middleware.logging import logger
-import nxcore.middleware.socket_manager as sm
-from flask_socketio import SocketIO
+from nxcore.middleware.socket_manager import init_socketio
+
 from flask import Flask, Blueprint
 from flask_cors import CORS
 from flask_marshmallow import Marshmallow
@@ -24,8 +24,7 @@ cors.init_app(app)
 ma = Marshmallow()
 ma.init_app(app)
 
-sm.socketio = SocketIO(app, cors_allowed_origins="*", async_mode="gevent")
-socketio = sm.socketio
+socketio = init_socketio(app)
 
 api = Api(app)
 

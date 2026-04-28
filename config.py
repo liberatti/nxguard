@@ -9,7 +9,7 @@ APP_BASE = os.environ.get("APP_BASE", ".")
 APP_CONTEXT = os.getenv("APP_CONTEXT", "/nxg")
 try:
     APP_VERSION = json.load(open(os.path.join(APP_BASE, "package.json")))['version']
-except:
+except Exception:
     APP_VERSION = "develop"
 
 API_HEADERS = {"User-Agent": f"NXGuard/{APP_VERSION}"}
