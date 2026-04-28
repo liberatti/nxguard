@@ -81,6 +81,7 @@ WORKDIR /root/rpmbuild/BUILD/admin
 
 COPY --from=build_frontend /app/web/dist /root/rpmbuild/BUILD/admin/static
 COPY --from=build_frontend /app/web/dist/index.html /root/rpmbuild/BUILD/admin/templates/
+COPY --from=build_frontend /app/web/package.json /root/rpmbuild/BUILD/admin/
 
 COPY *.py .
 COPY api api

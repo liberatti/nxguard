@@ -2,9 +2,9 @@ import json
 from datetime import datetime, timedelta
 from typing import Dict, Any
 
-from basic4web.common_utils import replace_tz
-from basic4web.middleware.logging import logger
-from basic4web.repository.sqlite3_base_dao import SQLite3DAO
+from nxcore.common_utils import replace_tz
+from nxcore.middleware.logging import logger
+from nxcore.repository.sqlite3_base_dao import SQLite3DAO
 from marshmallow import EXCLUDE, Schema, fields
 
 import config as config

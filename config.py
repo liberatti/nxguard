@@ -1,12 +1,17 @@
 import json
 import os
+import secrets
 
 import pytz
 import redis
 
 APP_BASE = os.environ.get("APP_BASE", ".")
 APP_CONTEXT = os.getenv("APP_CONTEXT", "/nxg")
-APP_VERSION = json.load(open(os.path.join(APP_BASE, "package.json")))['version']
+try:
+    APP_VERSION = json.load(open(os.path.join(APP_BASE, "package.json")))['version']
+except:
+    APP_VERSION = "develop"
+
 API_HEADERS = {"User-Agent": f"NXGuard/{APP_VERSION}"}
 
 BASE_PATH = "/opt/nxguard"
@@ -32,13 +37,13 @@ LOGLEVEL = os.environ.get("LOGLEVEL", "INFO").upper()
 # Security config
 SECURITY_ENABLED = True
 KEY_SIZE = 2048
-JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "dev")
+JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", secrets.token_urlsafe(32))
 JWT_EXPIRE = 3600
 JWT_AUD = "nxg"
 
 # Cluster config
 NXGUARD_ENDPOINT = os.environ.get("NXGUARD_ENDPOINT", "http://localhost:5000/nxg")
-NXGUARD_API_KEY = os.environ.get("NXGUARD_API_KEY", "DEV")
+NXGUARD_API_KEY = os.environ.get("NXGUARD_API_KEY", secrets.token_urlsafe(32))
 
 REDIS_CACHE_HOST = os.environ.get("REDIS_CACHE_HOST", "127.0.0.1")
 REDIS_CACHE_PORT = int(os.environ.get("REDIS_CACHE_PORT", 6379))

@@ -4,8 +4,8 @@ from typing import Dict, Any, List
 from marshmallow import EXCLUDE, Schema, fields
 
 import config as config
-from basic4web.middleware.logging import logger
-from basic4web.repository.sqlite3_base_dao import SQLite3DAO
+from nxcore.middleware.logging import logger
+from nxcore.repository.sqlite3_base_dao import SQLite3DAO
 
 
 class UpstreamTargetSchema(Schema):

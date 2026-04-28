@@ -3,23 +3,16 @@
     "dns_resolver": "127.0.0.11 8.8.8.8 1.1.1.1",
     "cache": {
       "host": "redis",
-      "port": 6379,
-      "enabled": true
+      "port": 6379
     },
-    "ipguard": {
-      "url": "http://ipguard:5000",
+    "ipxa": {
+      "url": "http://ipxa:5000",
       "key": "tZzDBUSnoy76LLSvu1Vg3e9vdFJINMT2"
-    },
-    "archive": {
-      "enabled": false
-    },
-    "purge": {
-      "enabled": false
     }
   },
   "user": {
     "name": "Default admin user",
-    "password": "admin",
+    "unencrypted_password": "admin",
     "email": "admin@nxguard.local",
     "role": "superuser"
   },
@@ -76,11 +69,10 @@
           "UK"
         ],
         "rbl": [
-          "compromised_ips|cisco"
-        ],
-        "jails": []
+          "compromised_ips"
+        ]
       },
-      "bypass_src": [],
+      "bypass_src": ["192.168.0.0/16"],
       "score": {
         "inbound": 15,
         "outbound": 15
@@ -106,7 +98,6 @@
       ],
       "persist": {
         "type": "COOKIE",
-        "enabled": true,
         "cookie_name": "LB-X-NxGuard",
         "cookie_path": "/",
         "cookie_domain": "nxguard.local",
@@ -131,7 +122,6 @@
       ],
       "persist": {
         "type": "COOKIE",
-        "enabled": true,
         "cookie_name": "LB-X-NxGuard",
         "cookie_path": "/",
         "cookie_domain": "nxguard.local",
@@ -143,7 +133,6 @@
   "services": [
     {
       "name": "local-dev",
-      "rate_limit": true,
       "rate_limit_per_sec": 256,
       "active": true,
       "body_limit": 10,
@@ -152,18 +141,17 @@
         {
           "port": 80,
           "protocol": "HTTP",
-          "ssl_upgrade": false
+          "ssl_upgrade": true,
+          "ssl_port":443
         },
         {
           "port": 443,
-          "protocol": "HTTPS",
-          "ssl_upgrade": true
+          "protocol": "HTTPS"
         }
       ],
       "certificate": {
         "name": "nxguard-lets"
       },
-      "compression": true,
       "compression_types": [
         "text/plain",
         "text/css",
@@ -210,9 +198,7 @@
             "url": ""
           },
           "sensor": {
-            "name": "Default",
-            "blq_rbl": "compromised_ips|cisco",
-            "blq_geo": "US|UK"
+            "name": "Default"
           },
           "type": "upstream",
           "upstream": {
@@ -235,9 +221,7 @@
             "url": ""
           },
           "sensor": {
-            "name": "Default",
-            "blq_rbl": "compromised_ips|cisco",
-            "blq_geo": "US|UK"
+            "name": "Default"
           },
           "type": "upstream",
           "upstream": {
@@ -248,7 +232,6 @@
       "sans": [
         "nxguard.local"
       ],
-      "ssl_client_auth": false,
       "ssl_client_ca": "",
       "ssl_protocols": [
         "TLSv1",

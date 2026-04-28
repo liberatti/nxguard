@@ -1,5 +1,5 @@
 import config
-from basic4web.repository.redis_base_dao import RedisDAO
+from nxcore.repository.redis_base_dao import RedisDAO
 
 
 class RedisCache(RedisDAO):

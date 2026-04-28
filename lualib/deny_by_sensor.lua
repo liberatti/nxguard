@@ -11,14 +11,14 @@ ngx.ctx.sensor = {
     action = "allowed"
 }
 
-if http_ok and ngx.var.ipguard_url and ngx.var.ipguard_url ~= "" then
+if http_ok and ngx.var.ipxa_url and ngx.var.ipxa_url ~= "" then
     local httpc = http.new()
     httpc:set_timeout(5000)  -- 5 seconds
-    local res, err = httpc:request_uri(ngx.var.ipguard_url .. "/api/ip/" .. src_ip, {
+    local res, err = httpc:request_uri(ngx.var.ipxa_url .. "/api/ip/" .. src_ip, {
         method = "GET",
         headers = {
             ["Content-Type"] = "application/json",
-            ["x-api-key"] = ngx.var.ipguard_key
+            ["x-api-key"] = ngx.var.ipxa_key
         },
     })
 
@@ -63,10 +63,10 @@ if http_ok and ngx.var.ipguard_url and ngx.var.ipguard_url ~= "" then
                 end
             end
         else
-            ngx.log(ngx.ERR, "Error decoding ipguard data: ", decode_err or "unknown error")
+            ngx.log(ngx.ERR, "Error decoding ipxa data: ", decode_err or "unknown error")
         end
     elseif err then
-        ngx.log(ngx.ERR, "ipguard request failed: ", err)
+        ngx.log(ngx.ERR, "ipxa request failed: ", err)
     end
 end
 if ngx.ctx.sensor.action == "blocked" then

@@ -1,7 +1,7 @@
 import re
 from typing import List
 
-from basic4web.middleware.logging import logger
+from nxcore.middleware.logging import logger
 from marshmallow import ValidationError
 
 from engine.seclang.seclang_schema import (

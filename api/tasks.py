@@ -6,8 +6,8 @@ import traceback
 
 import requests
 import schedule
-from basic4web.common_utils import get_server_id
-from basic4web.middleware.logging import logger
+from nxcore.common_utils import get_server_id
+from nxcore.middleware.logging import logger
 
 import config
 import engine.admin as c_admin
@@ -84,7 +84,7 @@ def install():
     if os.path.exists(f"{config.DB_PATH}/app.sqlite"):
         os.remove(f"{config.DB_PATH}/app.sqlite")
     c_builder.create_db()
-    c_builder.init_from_json("init-with-sample.json", data_dir=f"{config.ENGINE_BASE}/engine")
+    c_builder.init_from_json("init-with-sample.json", data_dir=f"{config.BASE_PATH}/admin/engine")
     indexer.index()
 
 

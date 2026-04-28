@@ -1,8 +1,8 @@
 import json
 from typing import Dict, Any, Optional
 
-from basic4web.middleware.logging import logger
-from basic4web.repository.sqlite3_base_dao import SQLite3DAO
+from nxcore.middleware.logging import logger
+from nxcore.repository.sqlite3_base_dao import SQLite3DAO
 from marshmallow import EXCLUDE, Schema, fields
 
 import config as config
@@ -58,7 +58,7 @@ class ConfigDao(SQLite3DAO):
                 cache_json TEXT,
                 purge_json TEXT,
                 dns_resolver TEXT,
-                ipguard_json TEXT
+                ipxa_json TEXT
             );
         """)
 
@@ -69,8 +69,8 @@ class ConfigDao(SQLite3DAO):
             vo.update({"purge_json": json.dumps(vo.pop('purge'))})
         if "cache" in vo:
             vo.update({"cache_json": json.dumps(vo.pop('cache'))})
-        if "ipguard" in vo:
-            vo.update({"ipguard_json": json.dumps(vo.pop('ipguard'))})
+        if "ipxa" in vo:
+            vo.update({"ipxa_json": json.dumps(vo.pop('ipxa'))})
         return super().from_dict(vo)
 
     def to_dict(self, row):
@@ -81,8 +81,8 @@ class ConfigDao(SQLite3DAO):
                 row.update({"purge": json.loads(row.pop('purge_json'))})
             if "cache_json" in row:
                 row.update({"cache": json.loads(row.pop('cache_json'))})
-            if "ipguard_json" in row:
-                row.update({"ipguard": json.loads(row.pop('ipguard_json'))})
+            if "ipxa_json" in row:
+                row.update({"ipxa": json.loads(row.pop('ipxa_json'))})
         return super().to_dict(row)
 
     def get_active(self) -> Optional[Dict[str, Any]]:

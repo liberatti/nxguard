@@ -1,3 +1,9 @@
+try:
+    import gevent.monkey
+    gevent.monkey.patch_all()
+except ImportError:
+    pass
+
 import fcntl
 import os
 import threading
@@ -5,7 +11,7 @@ import time
 import traceback
 
 import schedule
-from basic4web.middleware.logging import logger
+from nxcore.middleware.logging import logger
 
 import config as _config
 import engine.admin as c_admin
@@ -13,6 +19,15 @@ import engine.build as c_builder
 from api.tasks import update_node_status, update_node_config, update_main_config, install
 
 stop_event = threading.Event()
+
+lock_handle = open(os.path.join(_config.DB_PATH, "db.lock"), "a+")
+
+try:
+    fcntl.flock(lock_handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    logger.info("Lock acquired, NXGuard is the main instance")
+    is_main = True
+except BlockingIOError:
+    is_main = False
 
 
 def _scheduler():
@@ -27,27 +42,21 @@ def _scheduler():
 
 def when_ready(server):
     nxg_role = "worker"
-    lock_file = os.path.join(_config.DB_PATH, "db.lock")
-    with open(lock_file, "a+") as f:
-        try:
-            fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB)
-            logger.info("Lock acquired, NXGuard is the main instance")
-            if not os.path.exists(f"{_config.DB_PATH}/app.sqlite"):
-                install()
-                if os.path.exists(f"{_config.DB_PATH}/init-data.json"):
-                    conf = c_builder.init_from_json(f"{_config.DB_PATH}/init-data.json")
-                    c_admin.apply(conf)
-            if os.path.exists(f"{_config.DB_PATH}/config.json"):
-                conf = c_builder.read_from_json("config.json")
+    if is_main:
+        logger.info("Lock acquired, NXGuard is the main instance")
+        if not os.path.exists(f"{_config.DB_PATH}/app.sqlite"):
+            install()
+            if os.path.exists(f"{_config.DB_PATH}/init-data.json"):
+                conf = c_builder.read_from_json("init-data.json")
+                c_builder.init_from_data(conf)
                 c_admin.apply(conf)
-
-            schedule.every(10).seconds.do(update_main_config)
-            nxg_role = "main"
-        except BlockingIOError:
-            schedule.every(60).seconds.do(update_node_config)
-            return
-        finally:
-            fcntl.flock(f, fcntl.LOCK_UN)
+        if os.path.exists(f"{_config.DB_PATH}/config.json"):
+            conf = c_builder.read_from_json("config.json")
+            c_admin.apply(conf)
+        schedule.every(10).seconds.do(update_main_config)
+        nxg_role = "main"
+    else:
+        schedule.every(60).seconds.do(update_node_config)
     schedule.every(30).seconds.do(update_node_status)
     threading.Thread(target=_scheduler, daemon=True).start()
     logger.info(f"NXGuard started as {nxg_role}")
@@ -66,7 +75,8 @@ def on_exit(server):
 
 
 workers = 4
-threads = 8
+worker_class = "gevent"
+async_mode = "gevent"
 preload_app = False
 bind = "0.0.0.0:5000"
 scheduler_started = False

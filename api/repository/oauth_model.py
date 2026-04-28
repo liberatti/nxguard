@@ -1,7 +1,7 @@
 from typing import Dict, Any, Optional
 
-from basic4web.middleware.logging import logger
-from basic4web.repository.sqlite3_base_dao import SQLite3DAO
+from nxcore.middleware.logging import logger
+from nxcore.repository.sqlite3_base_dao import SQLite3DAO
 from marshmallow import EXCLUDE, Schema, fields
 
 import config as config
@@ -53,7 +53,7 @@ class UserDao(SQLite3DAO):
         try:
             query = f"SELECT * from {self.table_name} WHERE email = ?"
             v = self._query(query, (email,), fetch=True)
-            if v[0]:
+            if v and v[0]:
                 return super().to_dict(v[0])
             return None
         except Exception as e:

@@ -8,7 +8,7 @@ from datetime import datetime
 
 import geoip2.database
 import requests
-from basic4web.middleware.logging import logger
+from nxcore.middleware.logging import logger
 from bson import ObjectId
 
 from api.repository.config_model import ConfigDao

@@ -2,22 +2,22 @@ import traceback
 from typing import Dict
 
 import bcrypt
-from flask import Blueprint, request, Response
-from marshmallow import ValidationError
-
-from api.repository.oauth_model import OIDCToken, UserDao
-from basic4web.controllers.base_controller import (
+from nxcore.controllers.base_controller import (
     response_data,
     response_error_parse,
     response_error_500,
     response_error_401
 )
-from basic4web.middleware.jwt import (
+from nxcore.middleware.jwt import (
     jwt_decode,
     jwt_create_access_token,
     jwt_create_refresh_token,
     jwt_get_refresh
 )
+from flask import Blueprint, request, Response
+from marshmallow import ValidationError
+
+from api.repository.oauth_model import OIDCToken, UserDao
 from config import JWT_EXPIRE
 
 routes = Blueprint("oauth", __name__)

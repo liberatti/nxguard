@@ -1,9 +1,10 @@
 import traceback
 
-import basic4web.config as basic4web_config
-from basic4web.controllers.base_controller import response_error_404, response_error_500
-from basic4web.middleware.logging import logger
-from basic4web.middleware.socket_manager import init_socketio
+import nxcore.config as nxcore_config
+from nxcore.controllers.base_controller import response_error_404, response_error_500
+from nxcore.middleware.logging import logger
+import nxcore.middleware.socket_manager as sm
+from flask_socketio import SocketIO
 from flask import Flask, Blueprint
 from flask_cors import CORS
 from flask_marshmallow import Marshmallow
@@ -23,7 +24,8 @@ cors.init_app(app)
 ma = Marshmallow()
 ma.init_app(app)
 
-socketio = init_socketio(app)
+sm.socketio = SocketIO(app, cors_allowed_origins="*", async_mode="gevent")
+socketio = sm.socketio
 
 api = Api(app)
 
@@ -52,7 +54,7 @@ def handle_exception(error):
 
 
 with app.app_context():
-    basic4web_config.init({
+    nxcore_config.init({
         "LOGLEVEL": config.LOGLEVEL,
-        'JWT_SECRET_KEY': 'nxguard-dev'
+        'JWT_SECRET_KEY': config.JWT_SECRET_KEY
     })

@@ -3,7 +3,7 @@ from flask import Blueprint, request
 from marshmallow import ValidationError
 
 from api.repository.oauth_model import UserDao
-from basic4web.controllers.base_controller import (
+from nxcore.controllers.base_controller import (
     response_data,
     response_error_404,
     response_error_parse,
@@ -11,7 +11,7 @@ from basic4web.controllers.base_controller import (
     has_any_authority,
     response_error_403, response_data_removed
 )
-from basic4web.middleware.jwt import (
+from nxcore.middleware.jwt import (
     jwt_decode,
     jwt_get
 )

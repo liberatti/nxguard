@@ -2,8 +2,8 @@ import os
 import subprocess
 
 import psutil
-from basic4web.common_utils import gen_random_string
-from basic4web.middleware.logging import logger
+from nxcore.common_utils import gen_random_string
+from nxcore.middleware.logging import logger
 
 import engine.build as c_builder
 import engine.render as c_render

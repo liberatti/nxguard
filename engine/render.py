@@ -1,7 +1,7 @@
 import glob
 import os
 
-from basic4web.middleware.logging import logger
+from nxcore.middleware.logging import logger
 from jinja2 import Environment, FileSystemLoader
 
 import config

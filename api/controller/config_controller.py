@@ -1,6 +1,6 @@
 import json
 
-from basic4web.controllers.base_controller import response_data
+from nxcore.controllers.base_controller import response_data
 from flask import Blueprint, Response
 
 import engine.build as c_build

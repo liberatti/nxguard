@@ -4,7 +4,9 @@
 [![Version](https://img.shields.io/badge/Version-v1.0.6-green.svg)](https://github.com/liberatti/nxguard)
 [![Platform](https://img.shields.io/badge/Platform-Docker-blue.svg)](https://www.docker.com/)
 
-**NXGuard** is a high-performance, secure API Gateway and Reverse Proxy powered by **OpenResty** and **ModSecurity**. It provides a robust layer of protection for your API ecosystem, ensuring scalability, security, and operational simplicity.
+**NXGuard** is a high-performance, secure API Gateway and Reverse Proxy powered by **OpenResty** and **ModSecurity**. It
+provides a robust layer of protection for your API ecosystem, ensuring scalability, security, and operational
+simplicity.
 
 ---
 
@@ -37,7 +39,7 @@
 
 ### Quick Start with Docker Compose
 
-Deploy a full NXGuard stack including the Management UI and IPGuard in seconds:
+Deploy a full NXGuard stack including the Management UI and ipxa in seconds:
 
 ```yaml
 services:
@@ -50,7 +52,7 @@ services:
     environment:
       NXGUARD_ROLE: "main"
       SERVERID: "nxguard-admin"
-      NXGUARD_IPGUARD_URL: "http://ipguard:5000"
+      NXGUARD_ipxa_URL: "http://ipxa:5000"
       REDIS_CACHE_HOST: redis
     ports:
       - 5000:5000
@@ -61,10 +63,10 @@ services:
         limits:
           memory: 256M
 
-  ipguard:
-    image: liberatti/ipguard:latest
+  ipxa:
+    image: liberatti/ipxa:latest
     volumes:
-      - ipguard_data:/opt/ipguard/data
+      - ipxa_data:/opt/ipxa/data
     deploy:
       resources:
         limits:
@@ -72,7 +74,7 @@ services:
       replicas: 2
 
 volumes:
-  ipguard_data:
+  ipxa_data:
 ```
 
 - **Management Interface:** [http://localhost:5000](http://localhost:5000)
@@ -93,20 +95,22 @@ docker run --rm -v ${PWD}/reports:/app/reports \
 
 ## 🔢 WAF Rule ID Reservations
 
-| Range | Description |
-| :--- | :--- |
-| **1 - 99,999** | Local/Internal Use |
-| **100,000 - 199,999** | Oracle Published Rules |
-| **200,000 - 299,999** | Comodo Published Rules |
-| **300,000 - 399,999** | GotRoot.com Rules |
-| **900,000 - 999,999** | OWASP Core Rule Set (CRS) |
+| Range                     | Description                |
+|:--------------------------|:---------------------------|
+| **1 - 99,999**            | Local/Internal Use         |
+| **100,000 - 199,999**     | Oracle Published Rules     |
+| **200,000 - 299,999**     | Comodo Published Rules     |
+| **300,000 - 399,999**     | GotRoot.com Rules          |
+| **900,000 - 999,999**     | OWASP Core Rule Set (CRS)  |
 | **2,000,000 - 2,999,999** | Trustwave SpiderLabs Rules |
 
 ---
 
 ## 📡 Telemetry Notice
 
-To improve our security engine, NXGuard collects anonymous traffic statistics over 24-hour cycles. **No sensitive, personal, or request-specific data is ever collected.** This information is used solely to enhance threat detection accuracy.
+To improve our security engine, NXGuard collects anonymous traffic statistics over 24-hour cycles. **No sensitive,
+personal, or request-specific data is ever collected.** This information is used solely to enhance threat detection
+accuracy.
 
 ---
 

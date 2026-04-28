@@ -2,7 +2,7 @@ import json
 import os
 
 import bcrypt
-from basic4web.common_utils import gen_random_string
+from nxcore.common_utils import gen_random_string
 
 import config
 from api.repository.certificate_model import CertificateDao
@@ -67,8 +67,7 @@ def create_db():
         dao.create_schema()
 
 
-def init_from_json(json_file, data_dir=config.DB_PATH):
-    data = read_from_json(json_file, data_dir)
+def init_from_data(data):
     with ConfigDao() as dao:
         dao.delete_all()
         data['config'].update({"cluster_id": gen_random_string(8)})
@@ -76,7 +75,7 @@ def init_from_json(json_file, data_dir=config.DB_PATH):
 
     with UserDao() as dao:
         dao.delete_all()
-        encrypted_pass = bcrypt.hashpw(data['user']['password'].encode("utf8"), bcrypt.gensalt())
+        encrypted_pass = bcrypt.hashpw(data['user']['unencrypted_password'].encode("utf8"), bcrypt.gensalt())
         user = {
             "name": data['user']['name'],
             "password": encrypted_pass.decode("utf8"),
@@ -97,7 +96,7 @@ def init_from_json(json_file, data_dir=config.DB_PATH):
         dao.delete_all()
         dao.persist_many(data['services'])
 
-    return read_from_json(json_file)
+    return data
 
 
 def validate(data):
