@@ -116,7 +116,9 @@ RUN microdnf install -y \
 COPY --from=build_engine /root/rpmbuild/RPMS/**/*.rpm /RPMS/
 COPY --from=build_admin /root/rpmbuild/RPMS/**/*.rpm /RPMS/
 
-RUN rpm -ivh /RPMS/*.rpm && rm -rf /RPMS
+RUN rpm -ivh /RPMS/*.rpm && rm -rf /RPMS\
+ && mkdir -p /data\
+ && chmod 777 /data
 
 WORKDIR /opt/nxguard/admin
 

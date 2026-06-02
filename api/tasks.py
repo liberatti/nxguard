@@ -12,7 +12,8 @@ from nxcore.middleware.logging import logger
 import config
 import engine.admin as c_admin
 import engine.build as c_builder
-import engine.seclang.seclang_indexer as indexer
+import engine.seclang.seclang_indexer as seclang_indexer
+from api.repository.upstream_model import NodeStatusDao
 
 
 def update_node_config() -> None:
@@ -65,8 +66,8 @@ def update_node_status() -> None:
         active_cnf = c_builder.read_from_json("config.json")
         node.update({"scn": active_cnf["scn"]})
 
-    config.cache_db.setex(k, 60, json.dumps(node))
-    config.cache_db.sadd("idx:nodes", k)
+    with NodeStatusDao() as node_dao:
+        node_dao.register_node(k, node)
 
 
 def update_main_config():
@@ -81,11 +82,10 @@ def update_main_config():
 def install():
     logger.info("Installing NXGuard")
     os.makedirs(config.DB_PATH, exist_ok=True)
-    if os.path.exists(f"{config.DB_PATH}/app.sqlite"):
-        os.remove(f"{config.DB_PATH}/app.sqlite")
+    if os.path.exists(f"{config.DB_PATH}/app.duckdb"):
+        os.remove(f"{config.DB_PATH}/app.duckdb")
     c_builder.create_db()
-    c_builder.init_from_json("init-with-sample.json", data_dir=f"{config.BASE_PATH}/admin/engine")
-    indexer.index()
+    seclang_indexer.index()
 
 
 def apply():

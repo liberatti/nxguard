@@ -6,12 +6,12 @@ from datetime import datetime
 import requests
 from ua_parser import user_agent_parser
 
-from api.core.middleware.logging import logger
+from nxcore.middleware.logging import logger
 
-from api.model.config_model import ConfigDao
-from api.common_utils import deep_merge, get_server_id
-from api.model.transaction_model import TransactionDao
-from api.tools.feed_tool import SecurityFeedTool
+from api.repository.config_model import ConfigDao
+from nxcore.common_utils import deep_merge, get_server_id
+from api.repository.transaction_model import TransactionDao
+from api.tools.feed_service import SecurityFeedService
 import config as env_config
 
 
@@ -269,7 +269,7 @@ class LogParserTool:
                 "source": {
                     "ip": dto["remote_addr"],
                     "port": dto["remote_port"],
-                    "geo": SecurityFeedTool.geo_info(dto["remote_addr"]),
+                    "geo": SecurityFeedService.geo_info(dto["remote_addr"]),
                 },
                 "destination": {"ip": "", "port": dto["server_port"]},
                 "http": {

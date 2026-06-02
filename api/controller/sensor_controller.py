@@ -16,7 +16,7 @@ from api.core.middleware.socket_manager import emit_event
 from api.model.config_model import ChangeDao
 from api.model.sensor_model import SensorDao
 from api.tools.cluster_tool import ClusterTool
-from api.tools.feed_tool import SecurityFeedTool
+from api.tools.feed_service import SecurityFeedService
 
 routes = Blueprint("sensor", __name__)
 
@@ -143,6 +143,6 @@ def geoip_info(ipaddr: str) -> Response:
     if not ClusterTool.CONFIG:
         return response_error_500("System not ready")
 
-    geo = SecurityFeedTool.geo_info(ipaddr)
+    geo = SecurityFeedService.geo_info(ipaddr)
     ip_info = {"country": geo["country"]}
     return response_data(ip_info)

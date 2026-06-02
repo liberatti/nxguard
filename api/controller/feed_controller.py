@@ -1,10 +1,9 @@
-from bson import ObjectId
 from typing import Dict
 
 from flask import Blueprint, request, Response
 from marshmallow import ValidationError
 
-from api.core.controllers.base_controller import (
+from nxcore.controllers.base_controller import (
     response_data,
     response_error_404,
     response_error_parse,
@@ -13,11 +12,9 @@ from api.core.controllers.base_controller import (
     response_data_removed
 )
 
-from api.core.middleware.socket_manager import emit_event
-from api.model.config_model import ChangeDao
-from api.model.feed_model import FeedDao
-from api.model.rbl_model import RBLDao
-from api.tools.network_tool import NetworkTool
+from nxcore.middleware.socket_manager import emit_event
+from api.repository.config_model import ChangeDao
+from api.services.ipxa_services import IPXAService
 
 routes = Blueprint("feed", __name__)
 
@@ -53,7 +50,7 @@ def get(feed_id: str) -> Response:
     Returns:
         Response: JSON response containing the feed data or 404 error
     """
-    dao = FeedDao()
+    dao = IPXAService.feeds
     feed = dao.get_by_id(feed_id)
     return response_data(feed, dao.schema) if feed else response_error_404()
 
@@ -68,7 +65,7 @@ def save() -> Response:
     Returns:
         Response: JSON response containing the created feed or error message
     """
-    dao = FeedDao()
+    dao = IPXAService.feeds
     try:
         feed_dict = dao.json_load(request.json)
         pk = dao.persist(feed_dict)
@@ -91,7 +88,7 @@ def search() -> Response:
     Returns:
         Response: JSON response containing paginated feed list or 404 error
     """
-    dao = FeedDao()
+    dao = IPXAService.feeds
     result = dao.get_all(pagination=get_pagination())
     return response_data(result, dao.pageSchema) if result["metadata"]["total_elements"] > 0 else response_error_404()
 
@@ -109,7 +106,7 @@ def update(feed_id: str) -> Response:
     Returns:
         Response: JSON response containing the updated feed or error message
     """
-    dao = FeedDao()
+    dao = IPXAService.feeds
     try:
         feed_dict = dao.json_load(request.json)
         if "network_static" in feed_dict["type"]:
@@ -132,7 +129,7 @@ def delete(feed_id: str) -> Response:
     Returns:
         Response: Success message or error response
     """
-    dao = FeedDao()
+    dao = IPXAService.feeds
     result = dao.delete_by_id(feed_id)
     return response_data_removed(feed_id) if result else response_error_404()
 
@@ -140,18 +137,5 @@ def delete(feed_id: str) -> Response:
 def __rebuild_feed(feed_dict: Dict) -> None:
     """
     Rebuild the feed by processing its content and updating RBL entries.
-
-    Args:
-        feed_dict: The feed dictionary containing content to process
     """
-    rbl_dao = RBLDao()
-    rbl_dao.delete_by_provider("feed", feed_dict["_id"])
-
-    for content in feed_dict["content"]:
-        rbl = dict(NetworkTool.range_from_network(content))
-        rbl.update({
-            "provider_type": "feed",
-            "provider_id": ObjectId(feed_dict["_id"]),
-            "action": feed_dict["action"],
-        })
-        rbl_dao.persist(rbl)
+    pass

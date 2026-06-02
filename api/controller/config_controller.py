@@ -4,23 +4,15 @@ from nxcore.controllers.base_controller import response_data
 from flask import Blueprint, Response
 
 import engine.build as c_build
-from config import cache_db
+from api.repository.upstream_model import NodeStatusDao
 
 routes = Blueprint("config", __name__)
 
 
 @routes.route("/health", methods=["GET"])
 def health() -> Response:
-    nodes = []
-
-    for key in cache_db.smembers("idx:nodes"):
-        val = cache_db.get(key)
-        if val:
-            node = json.loads(val)
-            node.update({"_id": key})
-            nodes.append(node)
-        else:
-            cache_db.srem("idx:nodes", key)
+    with NodeStatusDao() as node_dao:
+        nodes = node_dao.get_active_nodes()
     return response_data({"nodes": nodes})
 
 

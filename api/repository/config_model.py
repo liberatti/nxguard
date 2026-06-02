@@ -2,7 +2,7 @@ import json
 from typing import Dict, Any, Optional
 
 from nxcore.middleware.logging import logger
-from nxcore.repository.sqlite3_base_dao import SQLite3DAO
+from .duck_db import DuckDAO
 from marshmallow import EXCLUDE, Schema, fields
 
 import config as config
@@ -37,7 +37,7 @@ class ConfigSchema(Schema):
     purge = fields.Nested(ConfigPurgeSchema)
 
 
-class ConfigDao(SQLite3DAO):
+class ConfigDao(DuckDAO):
     def __init__(self):
         super().__init__(
             db_path=config.DB_PATH,
@@ -76,13 +76,17 @@ class ConfigDao(SQLite3DAO):
     def to_dict(self, row):
         if row:
             if "archive_json" in row:
-                row.update({"archive": json.loads(row.pop('archive_json'))})
+                val = row.pop('archive_json')
+                row.update({"archive": json.loads(val) if val else None})
             if "purge_json" in row:
-                row.update({"purge": json.loads(row.pop('purge_json'))})
+                val = row.pop('purge_json')
+                row.update({"purge": json.loads(val) if val else None})
             if "cache_json" in row:
-                row.update({"cache": json.loads(row.pop('cache_json'))})
+                val = row.pop('cache_json')
+                row.update({"cache": json.loads(val) if val else None})
             if "ipxa_json" in row:
-                row.update({"ipxa": json.loads(row.pop('ipxa_json'))})
+                val = row.pop('ipxa_json')
+                row.update({"ipxa": json.loads(val) if val else None})
         return super().to_dict(row)
 
     def get_active(self) -> Optional[Dict[str, Any]]:
@@ -95,7 +99,7 @@ class ConfigDao(SQLite3DAO):
             raise
 
 
-class ChangeDao(SQLite3DAO):
+class ChangeDao(DuckDAO):
     def __init__(self):
         super().__init__(db_path=config.DB_PATH, table_name="changes", schema=ConfigSchema)
 

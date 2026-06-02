@@ -1,0 +1,160 @@
+@baseUrl = http://localhost:5000
+#@ip = 172.20.0.1
+@ip = 14.152.94.1
+@mail = admin@local
+@password = admin
+@api_key = dev_api_key
+
+###
+# @name oauth_login
+POST {{baseUrl}}/api/oauth/login
+Content-Type: application/json
+
+{
+  "email": "{{mail}}",
+  "password": "{{password}}"
+}
+
+###
+# Captura automática dos tokens
+@access_token = {{oauth_login.response.body.access_token}}
+@refresh_token = {{oauth_login.response.body.refresh_token}}
+
+###
+# @name oauth_refresh
+GET {{baseUrl}}/api/oauth/token
+Content-Type: application/json
+Refresh-Token: {{refresh_token}}
+
+###
+# Captura automática dos tokens
+@access_token = {{oauth_refresh.response.body.access_token}}
+
+###
+
+# @name Info
+# Retrieves comprehensive GeoIP, ASN, and reputation data for a specific IP address.
+GET {{baseUrl}}/api/ip/info/{{ip}}?wid=2
+content-type: application/json
+
+response_headers:
+```
+Content-Type: application/json
+x-risk-score: 9
+x-cache: miss
+x-country-code: CN
+x-trusted: False
+```
+
+response:
+```json
+{
+  "ip": {
+    "address": "14.152.94.1",
+    "broadcast": "14.152.95.255",
+    "network": "14.152.80.0",
+    "prefix": 20,
+    "version": 4
+  },
+  "location": {
+    "city": null,
+    "continent": "Asia",
+    "country": "China",
+    "country_code": "CN",
+    "country_name": "China",
+    "latitude": 34.7732,
+    "longitude": 113.722,
+    "region": null
+  },
+  "organization": {
+    "asn_description": "",
+    "asn_name": "CT-DONGGUAN-IDC CHINANET Guangdong province network",
+    "asn_number": 134763
+  },
+  "security": {
+    "reasons": [
+      "rbl:firehol_level1"
+    ],
+    "risk_score": 9,
+    "trusted": false
+  }
+}
+```
+###
+
+# @name Check
+# Simplified response focused on reputation and risk assessment.
+GET {{baseUrl}}/api/ip/check/{{ip}}
+
+response_headers:
+```
+Content-Type: application/json
+x-risk-score: 9
+x-cache: miss
+x-trusted: False
+```
+
+response:
+```json
+{
+  "ip": "14.152.94.1",
+  "reasons": [
+    "rbl:firehol_level1"
+  ],
+  "risk_score": 9
+}
+```
+###
+
+# @name Quick
+# Optimized for firewalls and middleware. Returns risk score in body and X-Risk-Score header.
+GET {{baseUrl}}/api/ip/quick/{{ip}}
+
+response_headers:
+```
+Content-Type: application/json
+x-risk-score: 9
+x-cache: miss
+x-trusted: False
+```
+
+response:
+```json
+
+{
+  "risk_score": 9
+}
+```
+
+###
+
+# @name get all feeds
+GET {{baseUrl}}/api/feed?type=bypass
+x-api-key: {{api_key}}
+
+response_headers:
+```
+Content-Type: application/json
+```
+
+response:
+```json
+
+{
+  "feeds": [
+    {
+      "id": 1,
+      "name": "FeedTest",
+      "type": "reputation",
+      "url": "http://example.com/feed",
+      "description": "Feed de testes"
+    }
+  ],
+  "pagination": {
+    "total": 1,
+    "page": 1,
+    "per_page": 10
+  }
+}
+```
+###

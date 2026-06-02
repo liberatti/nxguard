@@ -1,4 +1,6 @@
- # service: {{name}}
+#####################################################################
+# service: {{name}}
+#####################################################################
 {%- if rate_limit %}
 limit_req_zone $binary_remote_addr zone={{name}}_rate:16m rate={{rate_limit_per_sec}}r/s;
 {%- endif %}

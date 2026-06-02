@@ -40,19 +40,16 @@ def _scheduler():
         time.sleep(1)
 
 
-def when_ready(server):
+def post_fork(server, worker):
     nxg_role = "worker"
     if is_main:
         logger.info("Lock acquired, NXGuard is the main instance")
-        if not os.path.exists(f"{_config.DB_PATH}/app.sqlite"):
+        if not os.path.exists(f"{_config.DB_PATH}/app.duckdb"):
             install()
             if os.path.exists(f"{_config.DB_PATH}/init-data.json"):
                 conf = c_builder.read_from_json("init-data.json")
                 c_builder.init_from_data(conf)
-                c_admin.apply(conf)
-        if os.path.exists(f"{_config.DB_PATH}/config.json"):
-            conf = c_builder.read_from_json("config.json")
-            c_admin.apply(conf)
+                c_admin.apply(c_builder.get_config())
         schedule.every(10).seconds.do(update_main_config)
         nxg_role = "main"
     else:
@@ -66,7 +63,6 @@ def on_reload(server):
     global scheduler_started
     stop_event.set()
     scheduler_started = False
-    when_ready(server)
 
 
 def on_exit(server):
@@ -74,7 +70,7 @@ def on_exit(server):
     logger.info("NXGuard stopped")
 
 
-workers = 4
+workers = 1
 worker_class = "gevent"
 async_mode = "gevent"
 preload_app = False

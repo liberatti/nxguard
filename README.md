@@ -52,8 +52,6 @@ services:
     environment:
       NXGUARD_ROLE: "main"
       SERVERID: "nxguard-admin"
-      NXGUARD_ipxa_URL: "http://ipxa:5000"
-      REDIS_CACHE_HOST: redis
     ports:
       - 5000:5000
       - 80:80

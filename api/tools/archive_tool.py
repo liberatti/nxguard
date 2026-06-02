@@ -2,11 +2,11 @@ import json
 from datetime import datetime, timedelta
 from elasticsearch import Elasticsearch
 
-from api.core.middleware.logging import logger
+from nxcore.middleware.logging import logger
 
-from api.common_utils import deep_date_str
-from api.model.upstream_model import NodeStatusDao
-from api.model.transaction_model import TransactionDao
+from nxcore.common_utils import deep_date_str
+from api.repository.upstream_model import NodeStatusDao
+from api.repository.transaction_model import TransactionDao
 from api.tools.cluster_tool import ClusterTool
 from config import TZ
 

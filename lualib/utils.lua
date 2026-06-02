@@ -1,6 +1,30 @@
-local cjson = require "cjson.safe"
-
 local _M = {}
+
+function _M.parse_countries(str)
+    local t = {}
+    if not str then return t end
+
+    for code in string.gmatch(str, "([^,]+)") do
+        code = string.upper((code:gsub("%s+", "")))
+        t[code] = true
+    end
+
+    return t
+end
+
+function _M.get_header(headers, name)
+    if not headers then
+        return nil
+    end
+
+    for k, v in pairs(headers) do
+        if string.lower(k) == string.lower(name) then
+            return v
+        end
+    end
+
+    return nil
+end
 
 function _M.get_client_ip()
     local ip = ngx.var.http_x_forwarded_for
@@ -14,7 +38,6 @@ function _M.get_client_ip()
     end
 
     if ip then
-        -- pega apenas o primeiro IP da lista
         local first_ip = ip:match("([^,%s]+)")
         return first_ip or ip
     end
@@ -23,18 +46,10 @@ function _M.get_client_ip()
 end
 
 function _M.respond(code, _msg)
-    ngx.ctx.response_blocked = true
-    ngx.ctx.response_message = _msg
-
-    ngx.status = code
-    ngx.header["Content-Type"] = "application/json; charset=utf-8"
-
-    local body = {
-        error = "Access forbidden",
-        message = _msg
-    }
-
-    ngx.say(cjson.encode(body))
+    local request_id = ngx.var.request_id
+    ngx.header["X-Message"] = _msg
+    ngx.header["X-Request-Id"] = request_id
+    ngx.log(ngx.ERR, "[block] [", request_id, "]: ", _msg)
     return ngx.exit(code)
 end
 

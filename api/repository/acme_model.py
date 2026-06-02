@@ -1,7 +1,7 @@
 from typing import Optional, Dict, Any
 
 from nxcore.middleware.logging import logger
-from nxcore.repository.sqlite3_base_dao import SQLite3DAO
+from .duck_db import DuckDAO
 from flask_marshmallow import Schema
 from marshmallow import EXCLUDE, fields
 
@@ -17,7 +17,7 @@ class ChallengeSchema(Schema):
     content = fields.String()
 
 
-class ChallengeDao(SQLite3DAO):
+class ChallengeDao(DuckDAO):
 
     def __init__(self):
         super().__init__(

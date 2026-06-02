@@ -4,7 +4,7 @@ from typing import Dict, Any
 
 from nxcore.common_utils import replace_tz
 from nxcore.middleware.logging import logger
-from nxcore.repository.sqlite3_base_dao import SQLite3DAO
+from .duck_db import DuckDAO
 from marshmallow import EXCLUDE, Schema, fields
 
 import config as config
@@ -28,7 +28,7 @@ class CertificateSchema(Schema):
     force_renew = fields.Boolean(required=False, load_default=False, dump_default=False)
 
 
-class CertificateDao(SQLite3DAO):
+class CertificateDao(DuckDAO):
 
     def __init__(self, conn=None):
         super().__init__(

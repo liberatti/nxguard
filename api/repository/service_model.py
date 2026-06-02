@@ -2,7 +2,7 @@ import json
 from typing import Dict, Any, List, Optional
 
 from nxcore.middleware.logging import logger
-from nxcore.repository.sqlite3_base_dao import SQLite3DAO
+from .duck_db import DuckDAO
 from marshmallow import EXCLUDE, Schema, fields
 
 import config
@@ -92,7 +92,7 @@ class ServiceSchema(Schema):
     ssl_client_auth = fields.Boolean(load_default=False, dump_default=False)
 
 
-class RouteFilterDao(SQLite3DAO):
+class RouteFilterDao(DuckDAO):
 
     def __init__(self):
         super().__init__(
@@ -119,7 +119,7 @@ class RouteFilterDao(SQLite3DAO):
         """)
 
 
-class ServiceDao(SQLite3DAO):
+class ServiceDao(DuckDAO):
     def __init__(self):
         super().__init__(db_path=config.DB_PATH, table_name="service", schema=ServiceSchema)
         self.certificateDao = CertificateDao()
@@ -177,30 +177,38 @@ class ServiceDao(SQLite3DAO):
         return super().from_dict(vo)
 
     def to_dict(self, vo: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+        if not vo:
+            return vo
         super().to_dict(vo)
 
         if "certificate_id" in vo:
             crt_id = vo.pop("certificate_id")
-            vo.update({"certificate": self.certificateDao.get_by_id(crt_id)})
+            vo.update({"certificate": self.certificateDao.get_by_id(crt_id) if crt_id else None})
 
         if "routes_json" in vo:
-            vo.update({"routes": json.loads(vo.pop("routes_json"))})
+            val = vo.pop("routes_json")
+            vo.update({"routes": json.loads(val) if val else []})
 
         if "bindings_json" in vo:
-            vo.update({"bindings": json.loads(vo.pop("bindings_json"))})
+            val = vo.pop("bindings_json")
+            vo.update({"bindings": json.loads(val) if val else []})
 
         if "headers_json" in vo:
-            vo.update({"headers": json.loads(vo.pop("headers_json"))})
+            val = vo.pop("headers_json")
+            vo.update({"headers": json.loads(val) if val else []})
 
         if "compression_types_json" in vo:
-            vo.update({"compression_types": json.loads(vo.pop('compression_types_json'))})
+            val = vo.pop('compression_types_json')
+            vo.update({"compression_types": json.loads(val) if val else []})
 
         if "sans_json" in vo:
             logger.info(vo)
-            vo.update({"sans": json.loads(vo.pop('sans_json'))})
+            val = vo.pop('sans_json')
+            vo.update({"sans": json.loads(val) if val else []})
 
         if "ssl_protocols_json" in vo:
-            vo.update({"ssl_protocols": json.loads(vo.pop('ssl_protocols_json'))})
+            val = vo.pop('ssl_protocols_json')
+            vo.update({"ssl_protocols": json.loads(val) if val else []})
 
         # if "sensor_id" in route:
         #    sensor_id = route.pop("sensor_id")

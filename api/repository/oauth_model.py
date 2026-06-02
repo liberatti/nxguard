@@ -1,7 +1,7 @@
 from typing import Dict, Any, Optional
 
 from nxcore.middleware.logging import logger
-from nxcore.repository.sqlite3_base_dao import SQLite3DAO
+from .duck_db import DuckDAO
 from marshmallow import EXCLUDE, Schema, fields
 
 import config as config
@@ -27,7 +27,7 @@ class UserSchema(Schema):
     role = fields.String()
 
 
-class UserDao(SQLite3DAO):
+class UserDao(DuckDAO):
     def create_schema(self):
         # self.ddl(f"DROP TABLE {self.table_name};")
         self.ddl(

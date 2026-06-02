@@ -1,31 +1,31 @@
-local cjson = require "cjson.safe"
+local cjson = require "cjson"
 
-ngx.header["Content-Type"] = "application/json; charset=utf-8"
-ngx.header["Cache-Control"] = "no-cache, no-store, must-revalidate"
-ngx.header["Pragma"] = "no-cache"
-
-local status = ngx.status or 500
-local descriptions = {
-    [400] = "Bad request",
-    [401] = "Unauthorized",
-    [403] = "Access forbidden",
-    [404] = "Resource not found",
-    [429] = "RateLimit Triggered",
-    [500] = "Internal server error",
-    [502] = "Bad gateway",
-    [503] = "Service unavailable",
-    [504] = "Gateway timeout"
+local errors = {
+    [ngx.HTTP_BAD_REQUEST] = "Bad Request",
+    [ngx.HTTP_UNAUTHORIZED] = "Unauthorized",
+    [ngx.HTTP_FORBIDDEN] = "Forbidden",
+    [ngx.HTTP_NOT_FOUND] = "Not Found",
+    [ngx.HTTP_NOT_ALLOWED] = "Method Not Allowed",
+    [ngx.HTTP_INTERNAL_SERVER_ERROR] = "Internal Server Error",
+    [ngx.HTTP_BAD_GATEWAY] = "Bad Gateway",
+    [ngx.HTTP_SERVICE_UNAVAILABLE] = "Service Unavailable",
+    [ngx.HTTP_GATEWAY_TIMEOUT] = "Gateway Timeout"
 }
 
-local description = descriptions[status] or "Unexpected error"
+local status = ngx.status
+local default_error = errors[status] or "Error"
+local message = ngx.header["X-Message"] or default_error
 
-local resposta = {
-    remote_addr = ngx.var.remote_addr,
-    request_id = ngx.var.request_id,
+ngx.header["X-Message"] = nil
+local request_id = ngx.var.request_id
+
+ngx.status = status
+ngx.header["X-Request-Id"] = request_id
+ngx.header.content_type = "application/json"
+ngx.say(cjson.encode({
     status = status,
-    description = description,
-    request = ngx.var.request_uri or ngx.var.request
-}
-
-local json = cjson.encode(resposta) or '{"error":"encoding failed"}'
-ngx.say(json)
+    error = default_error,
+    message = message,
+    request_id = request_id
+}))
+return ngx.exit(ngx.HTTP_OK)

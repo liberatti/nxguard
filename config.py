@@ -45,20 +45,8 @@ JWT_AUD = "nxg"
 NXGUARD_ENDPOINT = os.environ.get("NXGUARD_ENDPOINT", "http://localhost:5000/nxg")
 NXGUARD_API_KEY = os.environ.get("NXGUARD_API_KEY", secrets.token_urlsafe(32))
 
-REDIS_CACHE_HOST = os.environ.get("REDIS_CACHE_HOST", "127.0.0.1")
 REDIS_CACHE_PORT = int(os.environ.get("REDIS_CACHE_PORT", 6379))
 REDIS_CACHE_PASS = os.environ.get("REDIS_CACHE_PASS", None)
-
-cache_db = redis.Redis(
-    host=REDIS_CACHE_HOST,
-    port=REDIS_CACHE_PORT,
-    password=REDIS_CACHE_PASS,
-    db=0,
-    decode_responses=True,
-    socket_timeout=5,
-    socket_connect_timeout=5,
-    retry_on_timeout=True,
-)
 
 CORS = {
     r"/*": {
