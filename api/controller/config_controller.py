@@ -1,10 +1,8 @@
-import json
-
 from nxcore.controllers.base_controller import response_data
 from flask import Blueprint, Response
 
 import engine.build as c_build
-from api.repository.upstream_model import NodeStatusDao
+from api.model.upstream_model import NodeStatusDao
 
 routes = Blueprint("config", __name__)
 

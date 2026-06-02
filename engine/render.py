@@ -144,7 +144,6 @@ def generate(data, output_dir=f"{BASE_PATH}", test=False):
                     "w",
             ) as f:
                 service.update({"BASE_PATH": config.BASE_PATH})
-                logger.info(service)
                 template_content = env.get_template("nginx/service.conf.j2").render(
                     service
                 )

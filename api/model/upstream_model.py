@@ -186,4 +186,3 @@ class NodeStatusDao(DuckDAO):
         except Exception as e:
             logger.error(f"Error purging node status: {e}")
             raise
-

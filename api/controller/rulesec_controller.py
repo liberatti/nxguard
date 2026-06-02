@@ -32,6 +32,6 @@ def get(rule_code: int) -> Response:
                 "msg": "'Method is not allowed by route'"
             },)
         case _:
-            dao = RuleDao()
-            vo = dao.get_by_code(rule_code)
-            return response_data(vo) if vo else response_error_404()
+            with RuleDao() as dao:
+                vo = dao.get_by_code(rule_code)
+                return response_data(vo) if vo else response_error_404()

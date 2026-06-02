@@ -3,7 +3,6 @@ import os
 import secrets
 
 import pytz
-import redis
 
 APP_BASE = os.environ.get("APP_BASE", ".")
 APP_CONTEXT = os.getenv("APP_CONTEXT", "/nxg")

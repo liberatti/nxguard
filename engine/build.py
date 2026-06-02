@@ -1,4 +1,3 @@
-from acme.challenges import logger
 import json
 import os
 
@@ -6,15 +5,16 @@ import bcrypt
 from nxcore.common_utils import gen_random_string
 
 import config
-from api.repository.certificate_model import CertificateDao
-from api.repository.config_model import ConfigDao
-from api.repository.oauth_model import UserDao
-from api.repository.sensor_model import SensorDao
-from api.repository.service_model import ServiceDao
-from api.repository.upstream_model import UpstreamDao, NodeStatusDao
-from api.repository.transaction_model import TransactionDao
+from api.model.certificate_model import CertificateDao
+from api.model.config_model import ConfigDao
+from api.model.oauth_model import UserDao
+from api.model.sensor_model import SensorDao
+from api.model.service_model import ServiceDao
+from api.model.upstream_model import UpstreamDao, NodeStatusDao
+from api.model.transaction_model import TransactionDao
 from api.tools.network_tool import NetworkTool
 from nxcore.middleware.logging import logger
+
 
 def get_config():
     c = dict()
@@ -118,6 +118,7 @@ def init_from_data(data):
         dao.delete_all()
         dao.persist_many(data['sensors'])
         logger.info(f"Sensors: {len(data['sensors'])}")
+
 
 def validate(data):
     for u in data['upstreams']:

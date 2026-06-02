@@ -3,8 +3,8 @@ import json
 from flask import Blueprint, request
 from marshmallow import ValidationError
 
-from api.repository.config_model import ChangeDao
-from api.repository.upstream_model import UpstreamDao
+from api.model.config_model import ChangeDao
+from api.model.upstream_model import UpstreamDao
 from nxcore.controllers.base_controller import (
     response_data,
     response_error_404,

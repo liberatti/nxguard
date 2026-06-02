@@ -1,3 +1,4 @@
+from api.services.ipxa_services import IPXAService
 import json
 import threading
 import time
@@ -8,10 +9,9 @@ from ua_parser import user_agent_parser
 
 from nxcore.middleware.logging import logger
 
-from api.repository.config_model import ConfigDao
+from api.model.config_model import ConfigDao
 from nxcore.common_utils import deep_merge, get_server_id
 from api.repository.transaction_model import TransactionDao
-from api.tools.feed_service import SecurityFeedService
 import config as env_config
 
 
@@ -269,7 +269,7 @@ class LogParserTool:
                 "source": {
                     "ip": dto["remote_addr"],
                     "port": dto["remote_port"],
-                    "geo": SecurityFeedService.geo_info(dto["remote_addr"]),
+                    "geo": IPXAService.geo_info(dto["remote_addr"]),
                 },
                 "destination": {"ip": "", "port": dto["server_port"]},
                 "http": {

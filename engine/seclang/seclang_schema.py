@@ -36,6 +36,7 @@ class SecBaseSchema(Schema):
     logging = fields.String()
     audit_log = fields.String()
     version = fields.String()
+    raw = fields.String(allow_none=True)
 
     @classmethod
     def schema_class(cls, schema_type: str) -> type:

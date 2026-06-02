@@ -17,7 +17,7 @@ from nxcore.middleware.jwt import (
 from flask import Blueprint, request, Response
 from marshmallow import ValidationError
 
-from api.repository.oauth_model import OIDCToken, UserDao
+from api.model.oauth_model import OIDCToken, UserDao
 from config import JWT_EXPIRE
 
 routes = Blueprint("oauth", __name__)

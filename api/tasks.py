@@ -1,5 +1,4 @@
 import datetime
-import json
 import os
 import time
 import traceback
@@ -13,7 +12,7 @@ import config
 import engine.admin as c_admin
 import engine.build as c_builder
 import engine.seclang.seclang_indexer as seclang_indexer
-from api.repository.upstream_model import NodeStatusDao
+from api.model.upstream_model import NodeStatusDao
 
 
 def update_node_config() -> None:

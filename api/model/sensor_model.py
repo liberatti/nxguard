@@ -1,7 +1,6 @@
 import json
 from typing import Dict, Any, Optional
 
-from nxcore.middleware.logging import logger
 from .duck_db import DuckDAO
 from marshmallow import EXCLUDE, Schema, fields
 

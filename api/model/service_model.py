@@ -6,8 +6,8 @@ from .duck_db import DuckDAO
 from marshmallow import EXCLUDE, Schema, fields
 
 import config
-from api.repository.certificate_model import CertificateDao, CertificateSchema
-from api.repository.upstream_model import UpstreamSchema
+from api.model.certificate_model import CertificateDao, CertificateSchema
+from api.model.upstream_model import UpstreamSchema
 
 
 class HeaderSchema(Schema):
