@@ -41,7 +41,7 @@ class RuleDao(DuckDAO):
                 msg TEXT,
                 logdata TEXT,
                 raw TEXT,
-                attachment TEXT, 
+                attachment TEXT,
                 phase INTEGER,
                 seq INTEGER,
                 tags_json TEXT

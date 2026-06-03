@@ -48,19 +48,19 @@ class RuleSetParser:
 
     def _parse_signature(self, line) -> SecComponentSignature:
         m = SecComponentSignature().load(
-            {"schema_type": "SecComponentSignature", "msg": line.split('"')[1],"raw":line}
+            {"schema_type": "SecComponentSignature", "msg": line.split('"')[1], "raw": line}
         )
         self.line_index += 1
         return m
 
     def _parse_marker(self, line) -> SecMarker:
-        m = SecMarker().load({"schema_type": "SecMarker", "msg": line.split('"')[1],"raw":line})
+        m = SecMarker().load({"schema_type": "SecMarker", "msg": line.split('"')[1], "raw": line})
         self.line_index += 1
         return m
 
     def _parse_action(self, line) -> SecAction:
         a = SecAction().load(
-            {"schema_type": "SecAction","raw":line}
+            {"schema_type": "SecAction", "raw": line}
         )
 
         pattern = re.compile('"(.*)"')
@@ -103,7 +103,7 @@ class RuleSetParser:
                 "scope": self._parse_scope(line[fi: line.index(" ", fi + 1)]),
                 "tags": [],
                 "chain_starter": False,
-                "raw":line
+                "raw": line
             }
         )
 
@@ -139,7 +139,7 @@ class RuleSetParser:
         elif key == "phase":
             rule["phase"] = int(val)
         elif key == "tag":
-            rule["tags"].append(val.replace("'",''))
+            rule["tags"].append(val.replace("'", ''))
         elif key == "logdata":
             rule["logdata"] = val
         elif key == "msg":
@@ -170,7 +170,7 @@ class RuleSetParser:
             pattern = re.compile(r"@(pmFromFile|ipMatchFromFile|pmf) (.*)")
             m = pattern.search(source)
             if m:
-                f_name=m.group(2)
+                f_name = m.group(2)
                 if f_name:
                     data_lines = []
                     with open(f"{base_path}/{f_name}", "r", encoding=self.charset) as file:

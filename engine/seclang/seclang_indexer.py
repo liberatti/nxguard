@@ -22,22 +22,22 @@ def index(config_file=f"{config.BASE_PATH}/admin/engine/seclang/crs-config.json"
             cat_dao.persist(c)
             parser = RuleSetParser()
             rules = parser.load(c['file'], base_path)
-            s=1
+            s = 1
             for rule in rules:
                 if rule.get("schema_type") == "SecRule":
                     rule_doc = {
                         "_id": f"{rule.get('code')}",
                         "code": rule.get("code"),
                         "category_id": c['_id'],
-                        "raw":rule.get("raw"),
-                        "attachment":rule.get("attachment"),
+                        "raw": rule.get("raw"),
+                        "attachment": rule.get("attachment"),
                         "action": rule.get("action"),
                         "scope": rule.get("scope"),
                         "tags": rule.get("tags"),
                         "msg": rule.get("msg"),
                         "logdata": rule.get("logdata"),
                         "phase": rule.get("phase"),
-                        "seq":s
+                        "seq": s
                     }
                     rule_dao.persist(rule_doc)
-                    s+=1
+                    s += 1
