@@ -14,7 +14,7 @@ class RuleDao(DuckDAO):
     def __init__(self):
         super().__init__(
             db_path=config.DB_PATH,
-            table_name="seclang_rule",
+            table_name="rules",
             schema=SecRule
         )
 
@@ -41,7 +41,10 @@ class RuleDao(DuckDAO):
                 msg TEXT,
                 logdata TEXT,
                 raw TEXT,
-                phase INTEGER
+                attachment TEXT, 
+                phase INTEGER,
+                seq INTEGER,
+                tags_json TEXT
             );
         """)
 
@@ -49,6 +52,8 @@ class RuleDao(DuckDAO):
         vo = vo.copy()
         if "scope" in vo:
             vo.update({"scope_json": json.dumps(vo.pop("scope"))})
+        if "tags" in vo:
+            vo.update({"tags_json": json.dumps(vo.pop("tags"))})
         return super().from_dict(vo)
 
     def to_dict(self, row):
@@ -57,6 +62,9 @@ class RuleDao(DuckDAO):
             if "scope_json" in row:
                 val = row.pop("scope_json")
                 row.update({"scope": json.loads(val) if val else []})
+            if "tags_json" in row:
+                val = row.pop("tags_json")
+                row.update({"tags": json.loads(val) if val else []})
         return super().to_dict(row)
 
     def get_by_code(self, rule_code: int) -> Optional[Dict[str, Any]]:
@@ -78,7 +86,7 @@ class RuleCategoryDao(DuckDAO):
     def __init__(self):
         super().__init__(
             db_path=config.DB_PATH,
-            table_name="rule_category",
+            table_name="categories",
             schema=RuleCategorySchema
         )
 
@@ -101,7 +109,10 @@ class RuleCategoryDao(DuckDAO):
                 name TEXT,
                 phase INTEGER,
                 file TEXT,
-                exclusions_json TEXT
+                exclusions_json TEXT DEFAULT '[]',
+                scope TEXT,
+                seq INTEGER,
+                system BOOLEAN DEFAULT FALSE
             );
         """)
 

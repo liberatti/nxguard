@@ -19,37 +19,25 @@ def index(config_file=f"{config.BASE_PATH}/admin/engine/seclang/crs-config.json"
         rule_dao.delete_all()
 
         for c in meta['categories']:
+            cat_dao.persist(c)
             parser = RuleSetParser()
             rules = parser.load(c['file'], base_path)
-
-            # Determine category phase based on rules, default to 2
-            cat_phase = 2
-            for rule in rules:
-                if rule.get("schema_type") == "SecRule" and rule.get("phase"):
-                    cat_phase = rule.get("phase")
-                    break
-
-            cat_id = c['name']
-            category_doc = {
-                "_id": cat_id,
-                "name": c['name'],
-                "phase": cat_phase,
-                "file": c['file'],
-                "exclusions": c.get("exclusions", [])
-            }
-            cat_dao.persist(category_doc)
-
+            s=1
             for rule in rules:
                 if rule.get("schema_type") == "SecRule":
                     rule_doc = {
-                        "_id": f"{cat_id}_{rule.get('code')}",
+                        "_id": f"{rule.get('code')}",
                         "code": rule.get("code"),
-                        "category_id": cat_id,
+                        "category_id": c['_id'],
+                        "raw":rule.get("raw"),
+                        "attachment":rule.get("attachment"),
                         "action": rule.get("action"),
                         "scope": rule.get("scope"),
+                        "tags": rule.get("tags"),
                         "msg": rule.get("msg"),
                         "logdata": rule.get("logdata"),
-                        "raw": rule.get("raw"),
-                        "phase": rule.get("phase")
+                        "phase": rule.get("phase"),
+                        "seq":s
                     }
                     rule_dao.persist(rule_doc)
+                    s+=1

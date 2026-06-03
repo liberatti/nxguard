@@ -2,14 +2,12 @@ import re
 from typing import List
 
 from nxcore.middleware.logging import logger
-from marshmallow import ValidationError
 
 from engine.seclang.seclang_schema import (
     SecComponentSignature,
     SecMarker,
     SecAction,
     SecRule,
-    DataObjectSchema,
     SecBaseSchema
 )
 
@@ -50,19 +48,19 @@ class RuleSetParser:
 
     def _parse_signature(self, line) -> SecComponentSignature:
         m = SecComponentSignature().load(
-            {"schema_type": "SecComponentSignature", "text": line.split('"')[1]}
+            {"schema_type": "SecComponentSignature", "msg": line.split('"')[1],"raw":line}
         )
         self.line_index += 1
         return m
 
     def _parse_marker(self, line) -> SecMarker:
-        m = SecMarker().load({"schema_type": "SecMarker", "text": line.split('"')[1]})
+        m = SecMarker().load({"schema_type": "SecMarker", "msg": line.split('"')[1],"raw":line})
         self.line_index += 1
         return m
 
     def _parse_action(self, line) -> SecAction:
         a = SecAction().load(
-            {"schema_type": "SecAction", "t": [], "setvar": [], "ctl": [], "initcol": []}
+            {"schema_type": "SecAction","raw":line}
         )
 
         pattern = re.compile('"(.*)"')
@@ -79,22 +77,10 @@ class RuleSetParser:
                         key_pair[1] = key_pair[1].strip()
                         if key_pair[0] == "id":
                             a["code"] = int(key_pair[1])
-                        elif key_pair[0] == "initcol":
-                            a["initcol"].append(key_pair[1])
                         elif key_pair[0] == "ver":
                             a["version"] = key_pair[1]
-                        elif key_pair[0] == "t":
-                            a["t"].append(key_pair[1])
-                        elif key_pair[0] == "ctl":
-                            a["ctl"].append(key_pair[1])
                         elif key_pair[0] == "phase":
                             a["phase"] = int(key_pair[1])
-                        elif key_pair[0] == "setvar":
-                            a["setvar"].append(key_pair[1])
-                        else:
-                            logger.error(
-                                f"parseRule Unknown key [{key_pair[0]}] from {line}"
-                            )
                     else:
                         if key_pair[0].lower() in ["pass", "deny", "block", "config"]:
                             a["action"] = key_pair[0]
@@ -115,9 +101,9 @@ class RuleSetParser:
             {
                 "schema_type": "SecRule",
                 "scope": self._parse_scope(line[fi: line.index(" ", fi + 1)]),
-                "raw": line,
+                "tags": [],
                 "chain_starter": False,
-                "chain": [],
+                "raw":line
             }
         )
 
@@ -126,6 +112,7 @@ class RuleSetParser:
 
         matcher = regex.search(rule_data)
         if matcher:
+            rule["attachment"] = self._parse_from_file(matcher.group(1), base_path=base_path)
             rule_content = matcher.group(2)
             if rule_content:
                 for token in re.split(",(?=(?:[^']*'[^']*')*[^']*$)", rule_content):
@@ -147,48 +134,52 @@ class RuleSetParser:
     def _process_rule_key(self, rule, key, val, line):
         if key == "id":
             rule["code"] = int(val)
+        elif key == "ver":
+            rule["version"] = val
         elif key == "phase":
             rule["phase"] = int(val)
-        elif key == "msg":
-            rule["msg"] = val
+        elif key == "tag":
+            rule["tags"].append(val.replace("'",''))
         elif key == "logdata":
             rule["logdata"] = val
+        elif key == "msg":
+            rule["msg"] = val
+        elif key == "severity":
+            rule["severity"] = val
 
     def _process_rule_action(self, rule, token, rule_content):
         token = token.strip().replace(",", "")
         token_lower = token.lower()
         if token_lower in ["pass", "deny", "block", "config"]:
             rule["action"] = token
+        elif "audit" in token_lower:
+            rule["audit_log"] = token
+        elif "log" in token_lower:
+            rule["logging"] = token
+        elif token_lower == "multimatch":
+            rule["multi_match"] = True
         elif token_lower == "chain":
             rule["chain_starter"] = True
+        elif token_lower == "capture":
+            rule["capture"] = True
+        else:
+            logger.error(f"parseRule Unknown token [{token}] from {rule_content}")
 
     def _parse_from_file(self, source, base_path):
-        dts = []
-
         if source:
             pattern = re.compile(r"@(pmFromFile|ipMatchFromFile|pmf) (.*)")
             m = pattern.search(source)
             if m:
-                for val in m.group(2).split(" "):
-                    if val:
-                        data_lines = []
-                        with open(
-                                f"{base_path}/{val}", "r", encoding=self.charset
-                        ) as file:
-                            for line in file:
-                                if not line.startswith("#"):
-                                    data_lines.append(line.strip())
-                        try:
-                            dt = DataObjectSchema().load(
-                                {
-                                    "name": val.strip(),
-                                    "content": data_lines,
-                                }
-                            )
-                            dts.append(dt)
-                        except ValidationError as e:
-                            logger.error(f"Object load failed: {e.messages}")
-        return dts
+                f_name=m.group(2)
+                if f_name:
+                    data_lines = []
+                    with open(f"{base_path}/{f_name}", "r", encoding=self.charset) as file:
+                        file_content = file.readlines()
+                        for line in file_content:
+                            if not line.startswith("#"):
+                                data_lines.append(line.strip())
+                return '\n'.join(data_lines)
+        return None
 
     def _load_file(self, ruleset_file, base_path):
         e_lines = []
@@ -247,7 +238,7 @@ class RuleSetParser:
                 elif key == "SecRule":
                     r = self._parse_rule(line, base_path)
                     if chain_starter:
-                        ruleset[-1]["chain"].append(r)
+                        ruleset[-1]["raw"] += '\n' + r['raw']
                     else:
                         r["comment"] = comment
                         ruleset.append(r)

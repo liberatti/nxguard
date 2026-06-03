@@ -30,13 +30,13 @@ class SecBaseSchema(Schema):
     _id = fields.String(allow_none=True)
     schema_type = fields.String()
     code = fields.Integer()
-    rule_order = fields.Integer(allow_none=True)
+    seq = fields.Integer(allow_none=True)
     phase = fields.Integer()
     action = fields.String()
     logging = fields.String()
     audit_log = fields.String()
     version = fields.String()
-    raw = fields.String(allow_none=True)
+    raw = fields.String()
 
     @classmethod
     def schema_class(cls, schema_type: str) -> type:
@@ -120,23 +120,13 @@ class SecRule(SecBaseSchema):
 
     msg = fields.String(allow_none=True)
     comment = fields.String(allow_none=True)
-    skip_after = fields.String(allow_none=True)
     logdata = fields.String(allow_none=True)
     severity = fields.String(allow_none=True)
     condition = fields.String(allow_none=True)
-    t = fields.List(fields.String(), allow_none=True)
-    ctl = fields.List(fields.String(), allow_none=True)
     scope = fields.List(fields.String(), allow_none=True)
     tags = fields.List(fields.String(), allow_none=True)
-    setvar = fields.List(fields.String(), allow_none=True)
-    expirevar = fields.List(fields.String(), allow_none=True)
-    capture = fields.Boolean(allow_none=True)
-    multi_match = fields.Boolean(allow_none=True)
-    status = fields.Integer(allow_none=True)
-    files = fields.List(fields.Nested(DataObjectSchema), allow_none=True)
+    attachment = fields.String(allow_none=True)
     chain_starter = fields.Boolean(allow_none=False, load_default=False, dump_default=False)
-    chain = fields.Nested("SecRule", many=True, allow_none=True)
-
 
 class RuleCategorySchema(Schema):
     """
@@ -150,7 +140,9 @@ class RuleCategorySchema(Schema):
 
     _id = fields.String()
     name = fields.String(required=True)
-    phase = fields.Integer(required=True)
+    phase = fields.Integer(required=True) # 1-config, 2-request, 3-request-block, 4-response, 5-response-block, 6-correlation
     file = fields.String(required=False)
+    scope = fields.String(required=False)
     rules = fields.Nested(SecBaseSchema, many=True)
     exclusions = fields.List(fields.Integer(), allow_none=True)
+    system = fields.Boolean(required=False)

@@ -202,7 +202,6 @@ class ServiceDao(DuckDAO):
             vo.update({"compression_types": json.loads(val) if val else []})
 
         if "sans_json" in vo:
-            logger.info(vo)
             val = vo.pop('sans_json')
             vo.update({"sans": json.loads(val) if val else []})
 

@@ -15,6 +15,7 @@ services:
       - "./api:/opt/nxguard/admin/api"
       - "./engine:/opt/nxguard/admin/engine"
       - "./lualib:/opt/nxguard/luajit/share/lua/5.1/nxguard"
+      - "./data:/data"
       - "./docs/init-with-sample.json:/data/init-data.json"
     extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - "host.docker.internal:host-gateway" 

@@ -20,7 +20,7 @@ from api.tasks import update_node_status, update_node_config, update_main_config
 
 stop_event = threading.Event()
 
-lock_handle = open(os.path.join(_config.DB_PATH, "db.lock"), "a+")
+lock_handle = open(os.path.join(_config.DB_PATH, "nxguard.lock"), "a+")
 
 try:
     fcntl.flock(lock_handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
