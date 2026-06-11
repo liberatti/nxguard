@@ -49,11 +49,11 @@ def post_fork(server, worker):
             if os.path.exists(f"{_config.DB_PATH}/init-data.json"):
                 conf = c_builder.read_from_json("init-data.json")
                 c_builder.init_from_data(conf)
-                c_admin.apply(c_builder.get_config())
         schedule.every(10).seconds.do(update_main_config)
         nxg_role = "main"
     else:
         schedule.every(60).seconds.do(update_node_config)
+    c_admin.apply(c_builder.get_config())
     schedule.every(30).seconds.do(update_node_status)
     threading.Thread(target=_scheduler, daemon=True).start()
     logger.info(f"NXGuard started as {nxg_role}")

@@ -59,18 +59,18 @@
         "954-DATA-LEAKAGES-IIS"
       ],
       "exclusions": [],
-      "blocked": {
+      "security": {
         "geo_codes": [
           "US",
           "UK"
         ],
-        "rbl": [
-          "compromised_ips"
+        "reputation": [
+          "firehol_level1"
+        ],
+        "trusted": [
+          "lan_bypass"
         ]
       },
-      "bypass_src": [
-        "192.168.0.0/16"
-      ],
       "score": {
         "inbound": 15,
         "outbound": 15

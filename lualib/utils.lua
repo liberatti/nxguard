@@ -1,6 +1,6 @@
 local _M = {}
 
-function _M.parse_countries(str)
+function _M.parse_list(str)
     local t = {}
     if not str then return t end
 

@@ -7,7 +7,6 @@ from jinja2 import Environment, FileSystemLoader
 import config
 from config import BASE_PATH
 
-env = Environment(loader=FileSystemLoader("engine/templates"))
 
 
 def clean(data, output_dir=f"{BASE_PATH}", test=False):
@@ -48,6 +47,7 @@ def generate(data, output_dir=f"{BASE_PATH}", test=False):
         os.makedirs(f"{output_dir}/temp/{t}", exist_ok=True)
 
     data.update({"IS_TEST": test, "BASE_PATH": config.BASE_PATH})
+    env = Environment(loader=FileSystemLoader("engine/templates"))
 
     with open(f"{output_dir}/nginx/conf/{'test-' if test else ''}mime.types", "w") as f:
         template_content = env.get_template("nginx/mime.types.j2").render(data)
@@ -109,6 +109,24 @@ def generate(data, output_dir=f"{BASE_PATH}", test=False):
                 )
                 f.write(template_content)
 
+    if "sensors" in data:
+        logger.info(f"[{output_dir}] - Generate sensor")
+        for sensor in data["sensors"]:
+            sensor.update({
+                "BASE_PATH": config.BASE_PATH,
+                "ipxa_url": data['config']['ipxa']['url'],
+                "ipxa_key": data['config']['ipxa']['key'],
+                "blq_geo": ",".join(sensor['security']['geo_codes']),
+                "blq_rbl": ",".join(sensor['security']['reputation']),
+                "trusted": ",".join(sensor['security']['trusted'])
+            })
+            with open(
+                    f"{config.BASE_PATH}/luajit/share/lua/5.1/nxguard/sensor-{sensor['name']}.lua",
+                    "w",
+            ) as f:
+                template_content = env.get_template("sensor.lua").render(sensor)
+                f.write(template_content)
+
     if "services" in data:
         logger.info(f"[{output_dir}] - Generate Services")
         for service in data["services"]:
@@ -124,18 +142,6 @@ def generate(data, output_dir=f"{BASE_PATH}", test=False):
                 f"[{output_dir}] - Generate nginx/conf/{'test-' if test else ''}service-{service['name']}.conf"
             )
             if "bindings" in service:
-                for r in service["routes"]:
-                    sensor = next(
-                        (s for s in data["sensors"] if s["name"] in r['sensor']["name"]),
-                        None
-                    )
-                    r.update({
-                        "sensor": {
-                            "name": sensor['name'],
-                            "blq_rbl": "|".join(sensor['blocked']['rbl']),
-                            "blq_geo": "|".join(sensor['blocked']['geo_codes'])
-                        }
-                    })
                 for b in service["bindings"]:
                     if b["protocol"] == "HTTPS":
                         service.update({"ssl_enable": True})
@@ -148,6 +154,8 @@ def generate(data, output_dir=f"{BASE_PATH}", test=False):
                     service
                 )
                 f.write(template_content)
+
+
 
     logger.info(
         f"[{output_dir}] - Generate nginx/conf/{'test-' if test else ''}fastcgi.conf"

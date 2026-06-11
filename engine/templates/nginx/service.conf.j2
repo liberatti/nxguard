@@ -96,11 +96,9 @@ server {
 {%- for p in r.paths %}
   location ~ {{p}}{
    set $route '{{r.name}}';
-
    set $sensor '{{r.sensor.name}}';
-   set $blq_rbl '{{r.sensor.blq_rbl}}';
-   set $blq_geo '{{r.sensor.blq_geo}}';
-   access_by_lua_file  {{BASE_PATH}}/luajit/share/lua/5.1/nxguard/deny_by_sensor.lua;
+   
+   access_by_lua_file  {{BASE_PATH}}/luajit/share/lua/5.1/nxguard/sensor-{{r.sensor.name}}.lua;
 
 #   modsecurity_rules_file {{BASE_PATH}}/modsec/conf/{%-if IS_TEST%}test-{%-endif%}route-proxy-all-req.policy;
    set $upstream '{{r.upstream.name}}';

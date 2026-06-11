@@ -12,8 +12,8 @@ class SensorBlockedSchema(Schema):
         unknown = EXCLUDE
 
     geo_codes = fields.List(fields.String(), allow_none=True)
-    rbl = fields.List(fields.String(), allow_none=True)
-
+    reputations = fields.List(fields.String(), allow_none=True)
+    trusted = fields.List(fields.String(), allow_none=True)
 
 class SensorScoreSchema(Schema):
     class Meta:
@@ -54,8 +54,7 @@ class SensorDao(DuckDAO):
                 description TEXT,
                 categories_json TEXT,
                 exclusions_json TEXT,
-                blocked_json TEXT,
-                bypass_src_json TEXT,
+                security_json TEXT,
                 score_json TEXT,
                 inspect_level INTEGER
             );
@@ -66,10 +65,8 @@ class SensorDao(DuckDAO):
             vo.update({"categories_json": json.dumps(vo.pop('categories'))})
         if "exclusions" in vo:
             vo.update({"exclusions_json": json.dumps(vo.pop('exclusions'))})
-        if "blocked" in vo:
-            vo.update({"blocked_json": json.dumps(vo.pop('blocked'))})
-        if "bypass_src" in vo:
-            vo.update({"bypass_src_json": json.dumps(vo.pop('bypass_src'))})
+        if "security" in vo:
+            vo.update({"security_json": json.dumps(vo.pop('security'))})
         if "score" in vo:
             vo.update({"score_json": json.dumps(vo.pop('score'))})
         return super().from_dict(vo)
@@ -82,12 +79,9 @@ class SensorDao(DuckDAO):
             if "exclusions_json" in row:
                 val = row.pop('exclusions_json')
                 row.update({"exclusions": json.loads(val) if val else []})
-            if "blocked_json" in row:
-                val = row.pop('blocked_json')
-                row.update({"blocked": json.loads(val) if val else {}})
-            if "bypass_src_json" in row:
-                val = row.pop('bypass_src_json')
-                row.update({"bypass_src": json.loads(val) if val else []})
+            if "security_json" in row:
+                val = row.pop('security_json')
+                row.update({"security": json.loads(val) if val else {}})
             if "score_json" in row:
                 val = row.pop('score_json')
                 row.update({"score": json.loads(val) if val else {}})

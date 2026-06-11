@@ -1,10 +1,11 @@
 local http_ok, http = pcall(require, "resty.http")
-local config = require("config")
 local cache = require("cache").new(1000, 30)
 local utils = require("utils")
 local cjson = require("cjson")
 
-local BLOCKED_COUNTRIES = utils.parse_countries(config.BLOCKED_COUNTRIES)
+local BLOCKED_COUNTRIES = utils.parse_list("{{blq_geo}}")
+local BLOCKED_RBL = utils.parse_list("{{blq_rbl}}")
+local TRUSTED = utils.parse_list("{{trusted}}")
 
 local ip = utils.get_client_ip()
 
@@ -25,10 +26,11 @@ else
     local httpc = http.new()
     httpc:set_timeout(2000)
 
-    local res, err = httpc:request_uri(config.API .. "/api/ip/info/" .. ip, {
+    local res, err = httpc:request_uri("{{ipxa_url}}/api/ip/info/" .. ip, {
         method = "GET",
         headers = {
-            ["Content-Type"] = "application/json",
+            ["content-type"] = "application/json",
+            ["x-api-key"] = "{{ipxa_key}}",
         },
     })
 
