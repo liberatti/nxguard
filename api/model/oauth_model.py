@@ -1,6 +1,6 @@
 from typing import Dict, Any, Optional
 
-from nxcore.middleware.logging import logger
+from nxcore.middleware.logging_manager import logger
 from .duck_db import DuckDAO
 from marshmallow import EXCLUDE, Schema, fields
 
@@ -43,11 +43,7 @@ class UserDao(DuckDAO):
         )
 
     def __init__(self):
-        super().__init__(
-            db_path=config.DB_PATH,
-            table_name="users",
-            schema=UserSchema
-        )
+        super().__init__(db_path=config.DB_PATH, table_name="users", schema=UserSchema)
 
     def get_by_email(self, email: str) -> Optional[Dict[str, Any]]:
         try:

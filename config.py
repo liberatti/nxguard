@@ -7,7 +7,7 @@ import pytz
 APP_BASE = os.environ.get("APP_BASE", ".")
 APP_CONTEXT = os.getenv("APP_CONTEXT", "/nxg")
 try:
-    APP_VERSION = json.load(open(os.path.join(APP_BASE, "package.json")))['version']
+    APP_VERSION = json.load(open(os.path.join(APP_BASE, "package.json")))["version"]
 except Exception:
     APP_VERSION = "develop"
 
@@ -34,7 +34,7 @@ MAINTENANCE_WINDOW = "01:00"
 LOGLEVEL = os.environ.get("LOGLEVEL", "INFO").upper()
 
 # Security config
-SECURITY_ENABLED = True
+SECURITY_ENABLED = bool(os.environ.get("SECURITY_ENABLED", "true"))
 KEY_SIZE = 2048
 JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", secrets.token_urlsafe(32))
 JWT_EXPIRE = 3600

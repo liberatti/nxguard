@@ -4,7 +4,7 @@ import re
 
 from marshmallow import Schema, fields
 
-from nxcore.middleware.logging import logger
+from nxcore.middleware.logging_manager import logger
 from nxcore.repository.schemas.page_meta_schema import PageMetaSchema
 
 
@@ -17,12 +17,12 @@ class DuckDAO:
     """
 
     def __init__(
-            self,
-            db_path: str,
-            table_name: str,
-            schema: type[Schema] | None = None,
-            conn: duckdb.DuckDBPyConnection | None = None,
-            auto_commit: bool = True,
+        self,
+        db_path: str,
+        table_name: str,
+        schema: type[Schema] | None = None,
+        conn: duckdb.DuckDBPyConnection | None = None,
+        auto_commit: bool = True,
     ):
         """
         Initializes the DuckDAO with connection details and optional schema.
@@ -88,7 +88,9 @@ class DuckDAO:
         try:
             self.conn.commit()
         except Exception as e:
-            logger.debug(f"DuckDAO commit exception (possibly no active transaction): {e}")
+            logger.debug(
+                f"DuckDAO commit exception (possibly no active transaction): {e}"
+            )
 
     def to_dict(self, row):
         """
@@ -384,7 +386,9 @@ class DuckDAO:
         sql_upper = sql.upper()
         if "AUTOINCREMENT" in sql_upper:
             # Extract table name from: CREATE TABLE IF NOT EXISTS table_name ( ...
-            match = re.search(r"CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?(\w+)", sql, re.IGNORECASE)
+            match = re.search(
+                r"CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?(\w+)", sql, re.IGNORECASE
+            )
             if match:
                 table_name = match.group(1)
                 seq_name = f"seq_{table_name}"
@@ -398,7 +402,7 @@ class DuckDAO:
                     r"INTEGER\s+PRIMARY\s+KEY\s+AUTOINCREMENT",
                     f"INTEGER PRIMARY KEY DEFAULT nextval('{seq_name}')",
                     sql,
-                    flags=re.IGNORECASE
+                    flags=re.IGNORECASE,
                 )
         logger.debug(sql)
         cursor = self.conn.cursor()

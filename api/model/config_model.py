@@ -1,7 +1,7 @@
 import json
 from typing import Dict, Any, Optional
 
-from nxcore.middleware.logging import logger
+from nxcore.middleware.logging_manager import logger
 from .duck_db import DuckDAO
 from marshmallow import EXCLUDE, Schema, fields
 
@@ -40,13 +40,12 @@ class ConfigSchema(Schema):
 class ConfigDao(DuckDAO):
     def __init__(self):
         super().__init__(
-            db_path=config.DB_PATH,
-            table_name="config",
-            schema=ConfigSchema
+            db_path=config.DB_PATH, table_name="config", schema=ConfigSchema
         )
 
     def create_schema(self):
-        self.ddl(f"""
+        self.ddl(
+            f"""
             CREATE TABLE IF NOT EXISTS {self.table_name} (
                 _id INTEGER PRIMARY KEY AUTOINCREMENT,
                 cluster_id TEXT,
@@ -60,32 +59,33 @@ class ConfigDao(DuckDAO):
                 dns_resolver TEXT,
                 ipxa_json TEXT
             );
-        """)
+        """
+        )
 
     def from_dict(self, vo):
         if "archive" in vo:
-            vo.update({"archive_json": json.dumps(vo.pop('archive'))})
+            vo.update({"archive_json": json.dumps(vo.pop("archive"))})
         if "purge" in vo:
-            vo.update({"purge_json": json.dumps(vo.pop('purge'))})
+            vo.update({"purge_json": json.dumps(vo.pop("purge"))})
         if "cache" in vo:
-            vo.update({"cache_json": json.dumps(vo.pop('cache'))})
+            vo.update({"cache_json": json.dumps(vo.pop("cache"))})
         if "ipxa" in vo:
-            vo.update({"ipxa_json": json.dumps(vo.pop('ipxa'))})
+            vo.update({"ipxa_json": json.dumps(vo.pop("ipxa"))})
         return super().from_dict(vo)
 
     def to_dict(self, row):
         if row:
             if "archive_json" in row:
-                val = row.pop('archive_json')
+                val = row.pop("archive_json")
                 row.update({"archive": json.loads(val) if val else None})
             if "purge_json" in row:
-                val = row.pop('purge_json')
+                val = row.pop("purge_json")
                 row.update({"purge": json.loads(val) if val else None})
             if "cache_json" in row:
-                val = row.pop('cache_json')
+                val = row.pop("cache_json")
                 row.update({"cache": json.loads(val) if val else None})
             if "ipxa_json" in row:
-                val = row.pop('ipxa_json')
+                val = row.pop("ipxa_json")
                 row.update({"ipxa": json.loads(val) if val else None})
         return super().to_dict(row)
 
@@ -101,12 +101,16 @@ class ConfigDao(DuckDAO):
 
 class ChangeDao(DuckDAO):
     def __init__(self):
-        super().__init__(db_path=config.DB_PATH, table_name="changes", schema=ConfigSchema)
+        super().__init__(
+            db_path=config.DB_PATH, table_name="changes", schema=ConfigSchema
+        )
 
     def create_schema(self):
-        self.ddl(f"""
+        self.ddl(
+            f"""
             CREATE TABLE IF NOT EXISTS {self.table_name} (
                 _id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT
             );
-        """)
+        """
+        )

@@ -6,7 +6,7 @@ import traceback
 import requests
 import schedule
 from nxcore.common_utils import get_server_id
-from nxcore.middleware.logging import logger
+from nxcore.middleware.logging_manager import logger
 
 import config
 import engine.admin as c_admin

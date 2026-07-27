@@ -1,5 +1,6 @@
 try:
     import gevent.monkey
+
     gevent.monkey.patch_all()
 except ImportError:
     pass
@@ -11,12 +12,17 @@ import time
 import traceback
 
 import schedule
-from nxcore.middleware.logging import logger
+from nxcore.middleware.logging_manager import logger
 
 import config as _config
 import engine.admin as c_admin
 import engine.build as c_builder
-from api.tasks import update_node_status, update_node_config, update_main_config, install
+from api.tasks import (
+    update_node_status,
+    update_node_config,
+    update_main_config,
+    install,
+)
 
 stop_event = threading.Event()
 

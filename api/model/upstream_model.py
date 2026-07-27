@@ -5,7 +5,7 @@ import datetime
 from marshmallow import EXCLUDE, Schema, fields
 
 import config as config
-from nxcore.middleware.logging import logger
+from nxcore.middleware.logging_manager import logger
 from .duck_db import DuckDAO
 
 
@@ -53,13 +53,12 @@ class UpstreamDao(DuckDAO):
 
     def __init__(self):
         super().__init__(
-            db_path=config.DB_PATH,
-            table_name="upstream",
-            schema=UpstreamSchema
+            db_path=config.DB_PATH, table_name="upstream", schema=UpstreamSchema
         )
 
     def create_schema(self):
-        self.ddl(f"""
+        self.ddl(
+            f"""
             CREATE TABLE IF NOT EXISTS {self.table_name} (
                 _id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
@@ -75,7 +74,8 @@ class UpstreamDao(DuckDAO):
                 target_index TEXT,
                 target_content TEXT
             );
-        """)
+        """
+        )
 
     def get_all_by_type(self, t: str) -> List[Dict[str, Any]]:
         try:
@@ -89,14 +89,10 @@ class UpstreamDao(DuckDAO):
             raise
 
     def from_dict(self, vo: Dict[str, Any]) -> Dict[str, Any]:
-        if 'targets' in vo:
-            vo.update({
-                "targets_json": json.dumps(vo.pop('targets'))
-            })
-        if 'persist' in vo:
-            vo.update({
-                "persist_json": json.dumps(vo.pop('persist'))
-            })
+        if "targets" in vo:
+            vo.update({"targets_json": json.dumps(vo.pop("targets"))})
+        if "persist" in vo:
+            vo.update({"persist_json": json.dumps(vo.pop("persist"))})
 
         if "type" not in vo:
             vo.update({"type": "backend"})
@@ -106,10 +102,12 @@ class UpstreamDao(DuckDAO):
         if row:
             targets_val = row.pop("targets_json") if "targets_json" in row else None
             persist_val = row.pop("persist_json") if "persist_json" in row else None
-            row.update({
-                "targets": json.loads(targets_val) if targets_val else [],
-                "persist": json.loads(persist_val) if persist_val else {}
-            })
+            row.update(
+                {
+                    "targets": json.loads(targets_val) if targets_val else [],
+                    "persist": json.loads(persist_val) if persist_val else {},
+                }
+            )
         return super().to_dict(row)
 
 
@@ -129,13 +127,12 @@ class NodeStatusSchema(Schema):
 class NodeStatusDao(DuckDAO):
     def __init__(self):
         super().__init__(
-            db_path=config.DB_PATH,
-            table_name="node_status",
-            schema=NodeStatusSchema
+            db_path=config.DB_PATH, table_name="node_status", schema=NodeStatusSchema
         )
 
     def create_schema(self):
-        self.ddl(f"""
+        self.ddl(
+            f"""
             CREATE TABLE IF NOT EXISTS {self.table_name} (
                 _id TEXT PRIMARY KEY,
                 status TEXT,
@@ -145,7 +142,8 @@ class NodeStatusDao(DuckDAO):
                 net_recv DOUBLE,
                 net_send DOUBLE
             );
-        """)
+        """
+        )
 
     def register_node(self, k: str, node: dict):
         self.connect()
@@ -157,7 +155,9 @@ class NodeStatusDao(DuckDAO):
             self.persist(node_copy)
 
     def get_active_nodes(self) -> list:
-        limit_time = (datetime.datetime.now(config.TZ) - datetime.timedelta(seconds=60)).isoformat()
+        limit_time = (
+            datetime.datetime.now(config.TZ) - datetime.timedelta(seconds=60)
+        ).isoformat()
         self.connect()
         # Clean up nodes older than 60 seconds
         delete_sql = f"DELETE FROM {self.table_name} WHERE last_check < ?"
@@ -171,9 +171,15 @@ class NodeStatusDao(DuckDAO):
 
     def purge_before_date(self, limit_date):
         try:
-            limit_str = limit_date.isoformat() if hasattr(limit_date, 'isoformat') else str(limit_date)
+            limit_str = (
+                limit_date.isoformat()
+                if hasattr(limit_date, "isoformat")
+                else str(limit_date)
+            )
             self.connect()
-            count_query = f"SELECT COUNT(*) AS total FROM {self.table_name} WHERE last_check < ?"
+            count_query = (
+                f"SELECT COUNT(*) AS total FROM {self.table_name} WHERE last_check < ?"
+            )
             count_res = self._query(count_query, (limit_str,), fetch=True)
             to_delete = count_res[0]["total"] if count_res else 0
 

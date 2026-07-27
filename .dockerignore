@@ -54,3 +54,7 @@ web/node_modules/
 web/.angular/
 web/dist/
 
+.agents
+.github
+.agent
+.docs

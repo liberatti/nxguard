@@ -1,7 +1,7 @@
 import requests
 from datetime import datetime
 from typing import Dict, Any
-from nxcore.middleware.logging import logger
+from nxcore.middleware.logging_manager import logger
 from api.model.config_model import ConfigDao
 from marshmallow import EXCLUDE, Schema, fields
 from nxcore.repository.schemas.page_meta_schema import PageMetaSchema
@@ -25,7 +25,9 @@ class FeedSchema(Schema):
     source = fields.String()
     description = fields.String()
     update_interval = fields.String()
-    updated_on = fields.DateTime(format=config.DATETIME_FMT, allow_none=True, required=False)
+    updated_on = fields.DateTime(
+        format=config.DATETIME_FMT, allow_none=True, required=False
+    )
 
 
 class JailEntrySchema(Schema):
@@ -33,7 +35,9 @@ class JailEntrySchema(Schema):
         unknown = EXCLUDE
 
     ipaddr = fields.String()
-    banned_on = fields.DateTime(format=config.DATETIME_FMT, allow_none=True, required=False)
+    banned_on = fields.DateTime(
+        format=config.DATETIME_FMT, allow_none=True, required=False
+    )
 
 
 class JailRulesSchema(Schema):
@@ -88,20 +92,22 @@ class FeedService:
 
                 mapped_feeds = []
                 for f in feeds:
-                    mapped_feeds.append({
-                        "_id": str(f.get("id", "")),
-                        "name": f.get("name"),
-                        "slug": f.get("name"),
-                        "type": f.get("type"),
-                        "source": f.get("url"),
-                        "description": f.get("description"),
-                        "provider": f.get("provider", "ipxa"),
-                        "version": f.get("version", "1.0"),
-                        "action": f.get("action", "deny"),
-                        "scope": f.get("scope", "system"),
-                        "update_interval": f.get("update_interval", "daily"),
-                        "updated_on": f.get("updated_on")
-                    })
+                    mapped_feeds.append(
+                        {
+                            "_id": str(f.get("id", "")),
+                            "name": f.get("name"),
+                            "slug": f.get("name"),
+                            "type": f.get("type"),
+                            "source": f.get("url"),
+                            "description": f.get("description"),
+                            "provider": f.get("provider", "ipxa"),
+                            "version": f.get("version", "1.0"),
+                            "action": f.get("action", "deny"),
+                            "scope": f.get("scope", "system"),
+                            "update_interval": f.get("update_interval", "daily"),
+                            "updated_on": f.get("updated_on"),
+                        }
+                    )
 
                 pag = res_data.get("pagination", {})
                 total = pag.get("total", len(mapped_feeds))
@@ -109,17 +115,20 @@ class FeedService:
                 pagination_meta = {
                     "total_elements": total,
                     "page": pag.get("page", 1),
-                    "per_page": pag.get("per_page", 10)
+                    "per_page": pag.get("per_page", 10),
                 }
 
-                return {
-                    "metadata": pagination_meta,
-                    "data": mapped_feeds
-                }
-            return {"metadata": {"total_elements": 0, "page": 1, "per_page": 10}, "data": []}
+                return {"metadata": pagination_meta, "data": mapped_feeds}
+            return {
+                "metadata": {"total_elements": 0, "page": 1, "per_page": 10},
+                "data": [],
+            }
         except Exception as e:
             logger.error(f"Error fetching feeds from IPXA: {e}")
-            return {"metadata": {"total_elements": 0, "page": 1, "per_page": 10}, "data": []}
+            return {
+                "metadata": {"total_elements": 0, "page": 1, "per_page": 10},
+                "data": [],
+            }
 
     def get_by_id(self, _id):
         try:
@@ -139,7 +148,7 @@ class FeedService:
                     "action": f.get("action", "deny"),
                     "scope": f.get("scope", "system"),
                     "update_interval": f.get("update_interval", "daily"),
-                    "updated_on": f.get("updated_on")
+                    "updated_on": f.get("updated_on"),
                 }
             return None
         except Exception as e:
@@ -153,7 +162,7 @@ class FeedService:
                 "name": vo.get("name"),
                 "type": vo.get("type"),
                 "url": vo.get("source"),
-                "description": vo.get("description")
+                "description": vo.get("description"),
             }
             response = requests.post(url, headers=headers, json=ipxa_feed, timeout=5)
             if response.status_code in [200, 201]:
@@ -171,7 +180,7 @@ class FeedService:
                 "name": vo.get("name"),
                 "type": vo.get("type"),
                 "url": vo.get("source"),
-                "description": vo.get("description")
+                "description": vo.get("description"),
             }
             response = requests.put(url, headers=headers, json=ipxa_feed, timeout=5)
             return response.status_code in [200, 204]
@@ -219,15 +228,17 @@ class JailService:
                 jails = res_data.get("jails", [])
                 mapped_jails = []
                 for j in jails:
-                    mapped_jails.append({
-                        "_id": str(j.get("id", "")),
-                        "name": j.get("name"),
-                        "bantime": j.get("bantime"),
-                        "occurrence": j.get("occurrence"),
-                        "interval": j.get("interval"),
-                        "content": j.get("content", []),
-                        "rules": j.get("rules", [])
-                    })
+                    mapped_jails.append(
+                        {
+                            "_id": str(j.get("id", "")),
+                            "name": j.get("name"),
+                            "bantime": j.get("bantime"),
+                            "occurrence": j.get("occurrence"),
+                            "interval": j.get("interval"),
+                            "content": j.get("content", []),
+                            "rules": j.get("rules", []),
+                        }
+                    )
 
                 pag = res_data.get("pagination", {})
                 total = pag.get("total", len(mapped_jails))
@@ -235,17 +246,20 @@ class JailService:
                 pagination_meta = {
                     "total_elements": total,
                     "page": pag.get("page", 1),
-                    "per_page": pag.get("per_page", 10)
+                    "per_page": pag.get("per_page", 10),
                 }
 
-                return {
-                    "metadata": pagination_meta,
-                    "data": mapped_jails
-                }
-            return {"metadata": {"total_elements": 0, "page": 1, "per_page": 10}, "data": []}
+                return {"metadata": pagination_meta, "data": mapped_jails}
+            return {
+                "metadata": {"total_elements": 0, "page": 1, "per_page": 10},
+                "data": [],
+            }
         except Exception as e:
             logger.error(f"Error fetching jails from IPXA: {e}")
-            return {"metadata": {"total_elements": 0, "page": 1, "per_page": 10}, "data": []}
+            return {
+                "metadata": {"total_elements": 0, "page": 1, "per_page": 10},
+                "data": [],
+            }
 
     def get_by_id(self, _id):
         try:
@@ -260,7 +274,7 @@ class JailService:
                     "occurrence": j.get("occurrence"),
                     "interval": j.get("interval"),
                     "content": j.get("content", []),
-                    "rules": j.get("rules", [])
+                    "rules": j.get("rules", []),
                 }
             return None
         except Exception as e:
@@ -270,11 +284,20 @@ class JailService:
     def persist(self, vo: Dict[str, Any]) -> str:
         try:
             from nxcore.common_utils import replace_tz
+
             default_date = replace_tz(datetime.now()).replace(microsecond=0)
             if "content" in vo:
                 for c in vo["content"]:
                     if "banned_on" not in c:
-                        c.update({"banned_on": default_date.isoformat() if hasattr(default_date, 'isoformat') else str(default_date)})
+                        c.update(
+                            {
+                                "banned_on": (
+                                    default_date.isoformat()
+                                    if hasattr(default_date, "isoformat")
+                                    else str(default_date)
+                                )
+                            }
+                        )
 
             url, headers = IPXAService.get_api_config("/api/jail")
             ipxa_jail = {
@@ -283,7 +306,7 @@ class JailService:
                 "occurrence": vo.get("occurrence"),
                 "interval": vo.get("interval"),
                 "content": vo.get("content", []),
-                "rules": vo.get("rules", [])
+                "rules": vo.get("rules", []),
             }
             response = requests.post(url, headers=headers, json=ipxa_jail, timeout=5)
             if response.status_code in [200, 201]:
@@ -303,7 +326,7 @@ class JailService:
                 "occurrence": vo.get("occurrence"),
                 "interval": vo.get("interval"),
                 "content": vo.get("content", []),
-                "rules": vo.get("rules", [])
+                "rules": vo.get("rules", []),
             }
             response = requests.put(url, headers=headers, json=ipxa_jail, timeout=5)
             return response.status_code in [200, 204]
@@ -364,25 +387,32 @@ class IPXAService:
                 org = data.get("organization", {})
                 asn_number = org.get("asn_number")
 
-                ip_info.update({
-                    "country": loc.get("country_code"),
-                    "ans_number": str(asn_number) if asn_number is not None else None,
-                    "organization": org.get("asn_name"),
-                    "latitude": loc.get("latitude"),
-                    "longitude": loc.get("longitude"),
-                })
+                ip_info.update(
+                    {
+                        "country": loc.get("country_code"),
+                        "ans_number": (
+                            str(asn_number) if asn_number is not None else None
+                        ),
+                        "organization": org.get("asn_name"),
+                        "latitude": loc.get("latitude"),
+                        "longitude": loc.get("longitude"),
+                    }
+                )
 
                 ip_data = data.get("ip", {})
                 network = ip_data.get("network")
                 prefix = ip_data.get("prefix")
                 if network is not None and prefix is not None:
                     from api.tools.network_tool import NetworkTool
+
                     try:
                         r = NetworkTool.range_from_network(f"{network}/{prefix}")
-                        ip_info.update({
-                            "net_start": r.get("net_start"),
-                            "net_end": r.get("net_end")
-                        })
+                        ip_info.update(
+                            {
+                                "net_start": r.get("net_start"),
+                                "net_end": r.get("net_end"),
+                            }
+                        )
                     except Exception:
                         pass
         except Exception as e:

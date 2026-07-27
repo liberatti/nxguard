@@ -8,7 +8,7 @@ from api.controller.upstream_controller import routes as upstream_routes
 routes = [
     (upstream_routes, f"{config.APP_CONTEXT}/api/upstream"),
     (oauth_routes, f"{config.APP_CONTEXT}/api/oauth"),
-    (config_routes, f"{config.APP_CONTEXT}/api/config")
+    (config_routes, f"{config.APP_CONTEXT}/api/config"),
 ]
 
 

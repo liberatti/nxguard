@@ -9,12 +9,10 @@ from nxcore.controllers.base_controller import (
     response_error_parse,
     get_pagination,
     has_any_authority,
-    response_error_403, response_data_removed
+    response_error_403,
+    response_data_removed,
 )
-from nxcore.middleware.jwt import (
-    jwt_decode,
-    jwt_get
-)
+from nxcore.middleware.jwt_manager import JWTManager
 
 routes = Blueprint("user", __name__)
 
@@ -54,7 +52,7 @@ def search():
     with UserDao() as dao:
         result = dao.get_all(pagination=get_pagination())
         if result["metadata"]["total_elements"] > 0:
-            for user in result['data']:
+            for user in result["data"]:
                 if "password" in user:
                     user.pop("password")
             return response_data(result, dao.pageSchema)
@@ -67,12 +65,14 @@ def search():
 def account_update(user_id):
     try:
         with UserDao() as dao:
-            jwt_token = jwt_get()
+            jwt_token = JWTManager.get_current_instance().get_token_from_request()
             vo = dao.json_load(request.json)
-            claims = jwt_decode(jwt_token)
+            claims = JWTManager.get_current_instance().decode(jwt_token)
             if claims["sub"] == user_id:
                 if "password" in vo and len(vo["password"]) > 1:
-                    hashed = bcrypt.hashpw(vo["password"].encode("utf8"), bcrypt.gensalt())
+                    hashed = bcrypt.hashpw(
+                        vo["password"].encode("utf8"), bcrypt.gensalt()
+                    )
                     vo.update({"password": hashed.decode("utf-8")})
                 result = dao.update_by_id(user_id, vo)
                 return response_data(result, dao.schema)

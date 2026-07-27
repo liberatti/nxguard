@@ -1,14 +1,14 @@
 import re
 from typing import List
 
-from nxcore.middleware.logging import logger
+from nxcore.middleware.logging_manager import logger
 
 from engine.seclang.seclang_schema import (
     SecComponentSignature,
     SecMarker,
     SecAction,
     SecRule,
-    SecBaseSchema
+    SecBaseSchema,
 )
 
 
@@ -48,20 +48,24 @@ class RuleSetParser:
 
     def _parse_signature(self, line) -> SecComponentSignature:
         m = SecComponentSignature().load(
-            {"schema_type": "SecComponentSignature", "msg": line.split('"')[1], "raw": line}
+            {
+                "schema_type": "SecComponentSignature",
+                "msg": line.split('"')[1],
+                "raw": line,
+            }
         )
         self.line_index += 1
         return m
 
     def _parse_marker(self, line) -> SecMarker:
-        m = SecMarker().load({"schema_type": "SecMarker", "msg": line.split('"')[1], "raw": line})
+        m = SecMarker().load(
+            {"schema_type": "SecMarker", "msg": line.split('"')[1], "raw": line}
+        )
         self.line_index += 1
         return m
 
     def _parse_action(self, line) -> SecAction:
-        a = SecAction().load(
-            {"schema_type": "SecAction", "raw": line}
-        )
+        a = SecAction().load({"schema_type": "SecAction", "raw": line})
 
         pattern = re.compile('"(.*)"')
         matcher = pattern.search(line)
@@ -100,19 +104,21 @@ class RuleSetParser:
         rule = SecRule().load(
             {
                 "schema_type": "SecRule",
-                "scope": self._parse_scope(line[fi: line.index(" ", fi + 1)]),
+                "scope": self._parse_scope(line[fi : line.index(" ", fi + 1)]),
                 "tags": [],
                 "chain_starter": False,
-                "raw": line
+                "raw": line,
             }
         )
 
-        rule_data = line[line.index(" ", fi + 1):]
+        rule_data = line[line.index(" ", fi + 1) :]
         regex = re.compile('"(.*?)(?<!\\\\)"(?:\\s+"(.*)")?')
 
         matcher = regex.search(rule_data)
         if matcher:
-            rule["attachment"] = self._parse_from_file(matcher.group(1), base_path=base_path)
+            rule["attachment"] = self._parse_from_file(
+                matcher.group(1), base_path=base_path
+            )
             rule_content = matcher.group(2)
             if rule_content:
                 for token in re.split(",(?=(?:[^']*'[^']*')*[^']*$)", rule_content):
@@ -139,7 +145,7 @@ class RuleSetParser:
         elif key == "phase":
             rule["phase"] = int(val)
         elif key == "tag":
-            rule["tags"].append(val.replace("'", ''))
+            rule["tags"].append(val.replace("'", ""))
         elif key == "logdata":
             rule["logdata"] = val
         elif key == "msg":
@@ -173,12 +179,14 @@ class RuleSetParser:
                 f_name = m.group(2)
                 if f_name:
                     data_lines = []
-                    with open(f"{base_path}/{f_name}", "r", encoding=self.charset) as file:
+                    with open(
+                        f"{base_path}/{f_name}", "r", encoding=self.charset
+                    ) as file:
                         file_content = file.readlines()
                         for line in file_content:
                             if not line.startswith("#"):
                                 data_lines.append(line.strip())
-                return '\n'.join(data_lines)
+                return "\n".join(data_lines)
         return None
 
     def _load_file(self, ruleset_file, base_path):
@@ -238,7 +246,7 @@ class RuleSetParser:
                 elif key == "SecRule":
                     r = self._parse_rule(line, base_path)
                     if chain_starter:
-                        ruleset[-1]["raw"] += '\n' + r['raw']
+                        ruleset[-1]["raw"] += "\n" + r["raw"]
                     else:
                         r["comment"] = comment
                         ruleset.append(r)

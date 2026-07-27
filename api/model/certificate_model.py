@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from typing import Dict, Any
 
 from nxcore.common_utils import replace_tz
-from nxcore.middleware.logging import logger
+from nxcore.middleware.logging_manager import logger
 from .duck_db import DuckDAO
 from marshmallow import EXCLUDE, Schema, fields
 
@@ -21,8 +21,12 @@ class CertificateSchema(Schema):
     certificate = fields.String()
     private_key = fields.String()
     ssl_client_ca = fields.String()
-    not_before = fields.DateTime(format=config.DATETIME_FMT, allow_none=True, required=False)
-    not_after = fields.DateTime(format=config.DATETIME_FMT, allow_none=True, required=False)
+    not_before = fields.DateTime(
+        format=config.DATETIME_FMT, allow_none=True, required=False
+    )
+    not_after = fields.DateTime(
+        format=config.DATETIME_FMT, allow_none=True, required=False
+    )
     status = fields.String(required=False)
     provider = fields.String(required=False)
     force_renew = fields.Boolean(required=False, load_default=False, dump_default=False)
@@ -35,11 +39,12 @@ class CertificateDao(DuckDAO):
             db_path=config.DB_PATH,
             table_name="certificate",
             schema=CertificateSchema,
-            conn=conn
+            conn=conn,
         )
 
     def create_schema(self):
-        self.ddl(f"""
+        self.ddl(
+            f"""
             CREATE TABLE IF NOT EXISTS {self.table_name} (
                 _id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
@@ -54,7 +59,8 @@ class CertificateDao(DuckDAO):
                 provider TEXT,
                 force_renew BOOLEAN DEFAULT 0
             );
-        """)
+        """
+        )
 
     def from_dict(self, vo):
         if "subjects" in vo:
@@ -63,9 +69,8 @@ class CertificateDao(DuckDAO):
 
     def persist(self, o: Dict[str, Any]) -> str:
         try:
-            default_date = (
-                replace_tz((datetime.now() - timedelta(days=1)))
-                .replace(microsecond=0)
+            default_date = replace_tz((datetime.now() - timedelta(days=1))).replace(
+                microsecond=0
             )
             if "not_after" not in o:
                 o.update({"not_after": default_date})

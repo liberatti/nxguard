@@ -1,7 +1,7 @@
 import json
 from typing import Dict, Any, List, Optional
 
-from nxcore.middleware.logging import logger
+from nxcore.middleware.logging_manager import logger
 from .duck_db import DuckDAO
 from marshmallow import EXCLUDE, Schema, fields
 
@@ -96,13 +96,12 @@ class RouteFilterDao(DuckDAO):
 
     def __init__(self):
         super().__init__(
-            db_path=config.DB_PATH,
-            table_name="route_filters",
-            schema=RouteFilterSchema
+            db_path=config.DB_PATH, table_name="route_filters", schema=RouteFilterSchema
         )
 
     def create_schema(self):
-        self.ddl(f"""
+        self.ddl(
+            f"""
             CREATE TABLE IF NOT EXISTS {self.table_name} (
                 _id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT,
@@ -116,17 +115,21 @@ class RouteFilterDao(DuckDAO):
                 ldap_bind_password TEXT,
                 ldap_group_dn TEXT
             );
-        """)
+        """
+        )
 
 
 class ServiceDao(DuckDAO):
     def __init__(self):
-        super().__init__(db_path=config.DB_PATH, table_name="service", schema=ServiceSchema)
+        super().__init__(
+            db_path=config.DB_PATH, table_name="service", schema=ServiceSchema
+        )
         self.certificateDao = CertificateDao()
         self.certificateDao.connect()
 
     def create_schema(self):
-        self.ddl(f"""
+        self.ddl(
+            f"""
             CREATE TABLE IF NOT EXISTS {self.table_name} (
                 _id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT,
@@ -147,7 +150,8 @@ class ServiceDao(DuckDAO):
                 ssl_client_ca TEXT,
                 ssl_client_auth BOOLEAN DEFAULT 0
             );
-        """)
+        """
+        )
 
     def from_dict(self, vo: Dict[str, Any]) -> Dict[str, Any]:
         if "certificate" in vo:
@@ -155,25 +159,33 @@ class ServiceDao(DuckDAO):
             if "_id" in certificate:
                 vo.update({"certificate_id": certificate["_id"]})
             if "name" in certificate:
-                vo.update({"certificate_id": self.certificateDao.get_by_name(certificate["name"])["_id"]})
+                vo.update(
+                    {
+                        "certificate_id": self.certificateDao.get_by_name(
+                            certificate["name"]
+                        )["_id"]
+                    }
+                )
 
         if "routes" in vo:
-            vo.update({"routes_json": json.dumps(vo.pop('routes'))})
+            vo.update({"routes_json": json.dumps(vo.pop("routes"))})
 
         if "bindings" in vo:
-            vo.update({"bindings_json": json.dumps(vo.pop('bindings'))})
+            vo.update({"bindings_json": json.dumps(vo.pop("bindings"))})
 
         if "compression_types" in vo:
-            vo.update({"compression_types_json": json.dumps(vo.pop('compression_types'))})
+            vo.update(
+                {"compression_types_json": json.dumps(vo.pop("compression_types"))}
+            )
 
         if "sans" in vo:
-            vo.update({"sans_json": json.dumps(vo.pop('sans'))})
+            vo.update({"sans_json": json.dumps(vo.pop("sans"))})
 
         if "headers" in vo:
-            vo.update({"headers_json": json.dumps(vo.pop('headers'))})
+            vo.update({"headers_json": json.dumps(vo.pop("headers"))})
 
         if "ssl_protocols" in vo:
-            vo.update({"ssl_protocols_json": json.dumps(vo.pop('ssl_protocols'))})
+            vo.update({"ssl_protocols_json": json.dumps(vo.pop("ssl_protocols"))})
         return super().from_dict(vo)
 
     def to_dict(self, vo: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
@@ -183,7 +195,13 @@ class ServiceDao(DuckDAO):
 
         if "certificate_id" in vo:
             crt_id = vo.pop("certificate_id")
-            vo.update({"certificate": self.certificateDao.get_by_id(crt_id) if crt_id else None})
+            vo.update(
+                {
+                    "certificate": (
+                        self.certificateDao.get_by_id(crt_id) if crt_id else None
+                    )
+                }
+            )
 
         if "routes_json" in vo:
             val = vo.pop("routes_json")
@@ -198,15 +216,15 @@ class ServiceDao(DuckDAO):
             vo.update({"headers": json.loads(val) if val else []})
 
         if "compression_types_json" in vo:
-            val = vo.pop('compression_types_json')
+            val = vo.pop("compression_types_json")
             vo.update({"compression_types": json.loads(val) if val else []})
 
         if "sans_json" in vo:
-            val = vo.pop('sans_json')
+            val = vo.pop("sans_json")
             vo.update({"sans": json.loads(val) if val else []})
 
         if "ssl_protocols_json" in vo:
-            val = vo.pop('ssl_protocols_json')
+            val = vo.pop("ssl_protocols_json")
             vo.update({"ssl_protocols": json.loads(val) if val else []})
 
         # if "sensor_id" in route:
@@ -215,9 +233,13 @@ class ServiceDao(DuckDAO):
         #    route.update({"sensor": sen_dao.get_descr_by_id(sensor_id)})
         return vo
 
-    def get_by_sans(self, sans: List[str], active: Optional[bool] = None) -> Optional[Dict[str, Any]]:
+    def get_by_sans(
+        self, sans: List[str], active: Optional[bool] = None
+    ) -> Optional[Dict[str, Any]]:
         try:
-            query = f"SELECT * from {self.table_name} WHERE sans_json LIKE '%{sans[0]}%'"
+            query = (
+                f"SELECT * from {self.table_name} WHERE sans_json LIKE '%{sans[0]}%'"
+            )
             if active is not None:
                 query += f" AND active = {active}"
 

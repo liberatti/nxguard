@@ -7,7 +7,7 @@ from datetime import datetime
 import requests
 from ua_parser import user_agent_parser
 
-from nxcore.middleware.logging import logger
+from nxcore.middleware.logging_manager import logger
 
 from api.model.config_model import ConfigDao
 from nxcore.common_utils import deep_merge, get_server_id
@@ -49,7 +49,13 @@ class LogParserTool:
             t.update({"interval": env_config.TELEMETRY_INTERVAL})
             t.update({"cluster_id": conf["cluster_id"]})
             t.update({"server_id": get_server_id()})
-            t.update({"logtime": datetime.now(env_config.TZ).strftime(env_config.DATETIME_FMT)})
+            t.update(
+                {
+                    "logtime": datetime.now(env_config.TZ).strftime(
+                        env_config.DATETIME_FMT
+                    )
+                }
+            )
             try:
                 env_config.API_HEADERS.update({"Content-Type": "application/json"})
                 response = requests.post(
@@ -59,9 +65,7 @@ class LogParserTool:
                     timeout=10,
                 )
                 if response.status_code not in [200, 201]:
-                    logger.warn(
-                        f"[{response.status_code}]:{response.text}"
-                    )
+                    logger.warn(f"[{response.status_code}]:{response.text}")
             except Exception as e:
                 logger.error(f"Failed to send telemetry, {e}")
 
@@ -85,8 +89,12 @@ class LogParserTool:
                             merged = deep_merge(log, audit)
                             merged.update({"archived": False})
                             log.update({"flushed": True})
-                            cls.telemetry["net_send"] += merged["http"]["response"]["bytes"] / 1048576.0  # MB
-                            cls.telemetry["net_recv"] += merged["http"]["request"]["bytes"] / 1048576.0  # MB
+                            cls.telemetry["net_send"] += (
+                                merged["http"]["response"]["bytes"] / 1048576.0
+                            )  # MB
+                            cls.telemetry["net_recv"] += (
+                                merged["http"]["request"]["bytes"] / 1048576.0
+                            )  # MB
                             model.persist(merged)
                             break
                 cache.audit_log = []
@@ -95,7 +103,9 @@ class LogParserTool:
                 for log_item in cache.access_log:
                     if "flushed" not in log_item:
                         t_arr.append(log_item)
-                cls.telemetry["req_total"] += (len(cache.access_log) - len(t_arr)) / 1000.0  # K requests
+                cls.telemetry["req_total"] += (
+                    len(cache.access_log) - len(t_arr)
+                ) / 1000.0  # K requests
                 cache.access_log = t_arr
                 cls.telemetry["c_interval"] += 1
                 if cls.telemetry["c_interval"] >= env_config.TELEMETRY_INTERVAL:
@@ -257,7 +267,9 @@ class LogParserTool:
         try:
             dto = json.loads(line)
             record = {
-                "logtime": datetime.strptime(dto["time"], st_format).astimezone(env_config.TZ),
+                "logtime": datetime.strptime(dto["time"], st_format).astimezone(
+                    env_config.TZ
+                ),
                 "unique_id": dto["uniqueid"],
                 "server_id": server_id,
                 "service": {"_id": dto["service_id"]},

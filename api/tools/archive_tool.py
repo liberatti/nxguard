@@ -2,7 +2,7 @@ import json
 from datetime import datetime, timedelta
 from elasticsearch import Elasticsearch
 
-from nxcore.middleware.logging import logger
+from nxcore.middleware.logging_manager import logger
 
 from nxcore.common_utils import deep_date_str
 from api.repository.upstream_model import NodeStatusDao
@@ -26,7 +26,7 @@ class LogArchiverTool:
                     purge_config = ClusterTool.CONFIG["config"]["purge"]
                     try:
                         t_purged = trn_dao.purge_before_date(
-                                now - timedelta(days=purge_config["purge_after"])
+                            now - timedelta(days=purge_config["purge_after"])
                         )
                         if t_purged > 0:
                             logger.info(f"Purged {t_purged} transactions")

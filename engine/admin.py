@@ -3,13 +3,11 @@ import subprocess
 
 import psutil
 from nxcore.common_utils import gen_random_string
-from nxcore.middleware.logging import logger
+from nxcore.middleware.logging_manager import logger
 
 import engine.build as c_builder
 import engine.render as c_render
-from config import (
-    BASE_PATH
-)
+from config import BASE_PATH
 
 
 def apply(conf):
@@ -34,8 +32,8 @@ def apply(conf):
         if is_running():
             conf.update({"scn": gen_random_string()})
             c_builder.export_config_json(conf, "config.json")
-        return {"status": "ok", "scn": conf['scn']}
-    msg = {"status": "error", "message": stderr.decode().split('\n')}
+        return {"status": "ok", "scn": conf["scn"]}
+    msg = {"status": "error", "message": stderr.decode().split("\n")}
     logger.error(msg)
     return msg
 

@@ -2,7 +2,7 @@ import json
 from datetime import datetime
 from typing import Dict, Any, List, Optional
 
-from nxcore.middleware.logging import logger
+from nxcore.middleware.logging_manager import logger
 from .duck_db import DuckDAO
 from marshmallow import EXCLUDE, Schema, fields
 
@@ -44,11 +44,12 @@ class TransactionDao(DuckDAO):
         super().__init__(
             db_path=config.DB_PATH,
             table_name="transaction_logs",
-            schema=TransactionSchema
+            schema=TransactionSchema,
         )
 
     def create_schema(self):
-        self.ddl(f"""
+        self.ddl(
+            f"""
             CREATE TABLE IF NOT EXISTS {self.table_name} (
                 _id INTEGER PRIMARY KEY AUTOINCREMENT,
                 logtime TEXT,
@@ -71,7 +72,8 @@ class TransactionDao(DuckDAO):
                 upstream_json TEXT,
                 audit_json TEXT
             );
-        """)
+        """
+        )
 
     def from_dict(self, vo: Dict[str, Any]) -> Dict[str, Any]:
         if "logtime" in vo and isinstance(vo["logtime"], datetime):
@@ -96,7 +98,14 @@ class TransactionDao(DuckDAO):
 
     def to_dict(self, row: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
         if row:
-            for key in ["user_agent", "source", "destination", "http", "upstream", "audit"]:
+            for key in [
+                "user_agent",
+                "source",
+                "destination",
+                "http",
+                "upstream",
+                "audit",
+            ]:
                 json_key = f"{key}_json"
                 if json_key in row:
                     val = row.pop(json_key)
@@ -180,10 +189,7 @@ class TransactionDao(DuckDAO):
         rs = self._query(sql, params, fetch=True)
         rows = [self.to_dict(row) for row in rs] if rs else []
 
-        return {
-            "metadata": pagination,
-            "data": rows
-        }
+        return {"metadata": pagination, "data": rows}
 
     def get_tpm(self, st_date, ed_date, filters=None) -> List[Dict[str, Any]]:
         start_str = st_date.strftime(config.DATETIME_FMT) if st_date else None
@@ -249,16 +255,20 @@ class TransactionDao(DuckDAO):
         tpm = []
         if rs:
             for r in rs:
-                tpm.append({
-                    "_id": {
-                        "year": int(r["year"]) if r["year"] is not None else 0,
-                        "month": int(r["month"]) if r["month"] is not None else 0,
-                        "day": int(r["day"]) if r["day"] is not None else 0,
-                        "hour": int(r["hour"]) if r["hour"] is not None else 0,
-                        "minute": int(r["minute"]) if r["minute"] is not None else 0
-                    },
-                    "count": int(r["count"]) if r["count"] is not None else 0
-                })
+                tpm.append(
+                    {
+                        "_id": {
+                            "year": int(r["year"]) if r["year"] is not None else 0,
+                            "month": int(r["month"]) if r["month"] is not None else 0,
+                            "day": int(r["day"]) if r["day"] is not None else 0,
+                            "hour": int(r["hour"]) if r["hour"] is not None else 0,
+                            "minute": (
+                                int(r["minute"]) if r["minute"] is not None else 0
+                            ),
+                        },
+                        "count": int(r["count"]) if r["count"] is not None else 0,
+                    }
+                )
         return tpm
 
     def get_node_bandwidth(self, node_name: str) -> List[Dict[str, Any]]:
@@ -283,8 +293,14 @@ class TransactionDao(DuckDAO):
 
     def purge_before_date(self, limit_date) -> int:
         try:
-            limit_str = limit_date.strftime(config.DATETIME_FMT) if hasattr(limit_date, 'strftime') else str(limit_date)
-            count_query = f"SELECT COUNT(*) AS total FROM {self.table_name} WHERE logtime < ?"
+            limit_str = (
+                limit_date.strftime(config.DATETIME_FMT)
+                if hasattr(limit_date, "strftime")
+                else str(limit_date)
+            )
+            count_query = (
+                f"SELECT COUNT(*) AS total FROM {self.table_name} WHERE logtime < ?"
+            )
             count_res = self._query(count_query, (limit_str,), fetch=True)
             to_delete = count_res[0]["total"] if count_res else 0
 

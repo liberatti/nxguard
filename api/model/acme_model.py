@@ -1,6 +1,6 @@
 from typing import Optional, Dict, Any
 
-from nxcore.middleware.logging import logger
+from nxcore.middleware.logging_manager import logger
 from .duck_db import DuckDAO
 from flask_marshmallow import Schema
 from marshmallow import EXCLUDE, fields
@@ -20,19 +20,18 @@ class ChallengeSchema(Schema):
 class ChallengeDao(DuckDAO):
 
     def __init__(self):
-        super().__init__(
-            db_path=config.DB_PATH,
-            table_name="challenge"
-        )
+        super().__init__(db_path=config.DB_PATH, table_name="challenge")
 
     def create_schema(self):
-        self.ddl(f"""
+        self.ddl(
+            f"""
             CREATE TABLE IF NOT EXISTS {self.table_name} (
                 _id INTEGER PRIMARY KEY AUTOINCREMENT,
                 key TEXT,
                 content TEXT
             );
-        """)
+        """
+        )
 
     def get_by_key(self, key: str) -> Optional[Dict[str, Any]]:
         try:
