@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {MatTableDataSource, MatTableModule} from '@angular/material/table';
 import {MatPaginatorModule, PageEvent} from '@angular/material/paginator';
 import {MatDialog} from '@angular/material/dialog';
-import {TranslateModule, TranslateService} from '@ngx-translate/core';
+import {TranslatePipe, TranslateService} from '@ngx-translate/core';
 import moment from 'moment';
 import {DefaultPageMeta, PageMeta} from 'app/models/shared';
 import {ConfirmDialogComponent} from 'app/components/confirm-dialog/confirm-dialog.component';
@@ -32,7 +32,7 @@ import {OAuthService} from "../../services/oauth.service";
     selector: 'app-certificate-list',
     standalone: true,
     imports: [RouterModule, CommonModule,
-        ReactiveFormsModule, TranslateModule,
+        ReactiveFormsModule, TranslatePipe,
         MatMomentDateModule,
         MatSidenavModule, MatIconModule, MatButtonModule,
         MatListModule, MatCardModule, MatProgressBarModule, MatInputModule,

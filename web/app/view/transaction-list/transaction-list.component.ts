@@ -21,7 +21,7 @@ import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import {MatSortModule} from '@angular/material/sort';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {RouterModule} from '@angular/router';
-import {TranslateModule} from '@ngx-translate/core';
+import {TranslatePipe} from '@ngx-translate/core';
 import {DefaultPageMeta} from 'app/models/shared';
 import {TransactionFilter, TransactionLog} from 'app/models/transaction';
 import {TransactionService} from 'app/services/transaction.service';
@@ -64,7 +64,7 @@ import {DatetimeFieldComponent} from '../../components/datetime-field/datetime-f
         ])
     ],
     imports: [RouterModule, CommonModule, MatButtonToggleModule,
-        ReactiveFormsModule, TranslateModule, MatTabsModule, MatDatepickerModule,
+        ReactiveFormsModule, TranslatePipe, MatTabsModule, MatDatepickerModule,
         MatMomentDateModule, ByteFormatPipe, DateFormatPipe, TimeFormatPipe,
         MatSidenavModule, MatIconModule, MatButtonModule, MatGridListModule,
         MatListModule, MatCardModule, MatProgressBarModule, MatInputModule,

@@ -10,7 +10,7 @@ import {HttpClient} from '@angular/common/http';
 import {MatTabChangeEvent, MatTabsModule} from '@angular/material/tabs';
 import {CommonModule} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
-import {TranslateModule} from '@ngx-translate/core';
+import {TranslatePipe} from '@ngx-translate/core';
 import {RouterModule} from '@angular/router';
 import {NotificationService} from "../../services/notification.service";
 import { environment } from 'environments/environment';
@@ -30,7 +30,7 @@ import {ConfigService} from "../../services/config.service";
         MatButtonModule,
         MatDialogContent,
         MatDialogActions,
-        MatTabsModule, MatIconModule, TranslateModule
+        MatTabsModule, MatIconModule, TranslatePipe
     ],
 })
 

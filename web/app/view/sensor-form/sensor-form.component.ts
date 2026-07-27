@@ -18,7 +18,7 @@ import {MatSelectModule} from '@angular/material/select';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import {MatSortModule} from '@angular/material/sort';
 import {MatTooltipModule} from '@angular/material/tooltip';
-import {TranslateModule} from '@ngx-translate/core';
+import {TranslatePipe} from '@ngx-translate/core';
 import {RuleCategory, SecRule, Sensor} from 'app/models/sensor';
 import {RuleCategoryService, SensorService} from 'app/services/sensor.service';
 import {NotificationService} from 'app/services/notification.service';
@@ -38,7 +38,7 @@ import {FormaterService} from "../../services/formater.service";
     selector: 'app-sensor-form',
     standalone: true,
     imports: [RouterModule, CommonModule,
-        ReactiveFormsModule, TranslateModule,
+        ReactiveFormsModule, TranslatePipe,
         MatMomentDateModule, MatSidenavModule, MatIconModule, MatButtonModule,
         MatListModule, MatCardModule, MatProgressBarModule, MatInputModule,
         MatTableModule, MatMenuModule, MatSortModule, MatTabsModule, MatGridListModule,

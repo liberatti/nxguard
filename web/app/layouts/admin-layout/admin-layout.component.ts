@@ -7,7 +7,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import * as moment from 'moment';
 import { Subject, takeUntil } from 'rxjs';
 import { FrontendConfig, MenuLink } from 'app/models/shared';
@@ -32,7 +32,7 @@ import { Health } from "../../models/config";
 @Component({
     selector: 'app-admin-layout',
     standalone: true,
-    imports: [RouterModule, CommonModule, TranslateModule, MatProgressBarModule,
+    imports: [RouterModule, CommonModule, TranslatePipe, MatProgressBarModule,
         MatSidenavModule, MatIconModule, MatToolbarModule, MatCardModule, MatChipsModule,
         MatButtonModule, MatListModule, MatMenuModule, MatBadgeModule
     ],
@@ -149,7 +149,7 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        this.translate.setDefaultLang('en_US');
+        this.translate.setFallbackLang('en_US');
         this.httpClient.get<any>("assets/main.menu.json").subscribe(data => {
             this.menu = data;
             this.toggleSubMenu(undefined);

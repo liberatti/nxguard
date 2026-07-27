@@ -19,7 +19,7 @@ import {MatSidenavModule} from '@angular/material/sidenav';
 import {MatSortModule} from '@angular/material/sort';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {RouterModule} from '@angular/router';
-import {TranslateModule} from '@ngx-translate/core';
+import {TranslatePipe} from '@ngx-translate/core';
 import {ConfirmDialogComponent} from 'app/components/confirm-dialog/confirm-dialog.component';
 import {Sensor} from 'app/models/sensor';
 import {SensorService} from 'app/services/sensor.service';
@@ -31,7 +31,7 @@ import {OAuthService} from "../../services/oauth.service";
     selector: 'app-sensor-list',
     standalone: true,
     imports: [RouterModule, CommonModule,
-        ReactiveFormsModule, TranslateModule,
+        ReactiveFormsModule, TranslatePipe,
         MatMomentDateModule,
         MatSidenavModule, MatIconModule, MatButtonModule,
         MatListModule, MatCardModule, MatProgressBarModule, MatInputModule,

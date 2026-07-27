@@ -20,7 +20,7 @@ import {MatSelectModule} from '@angular/material/select';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import {MatSortModule} from '@angular/material/sort';
 import {MatTooltipModule} from '@angular/material/tooltip';
-import {TranslateModule} from '@ngx-translate/core';
+import {TranslatePipe} from '@ngx-translate/core';
 import {CertificateService} from 'app/services/certificate.service';
 import {OAuthService} from "../../services/oauth.service";
 
@@ -28,7 +28,7 @@ import {OAuthService} from "../../services/oauth.service";
     selector: 'app-certificate-form',
     standalone: true,
     imports: [RouterModule, CommonModule,
-        ReactiveFormsModule, TranslateModule,
+        ReactiveFormsModule, TranslatePipe,
         MatMomentDateModule,
         MatSidenavModule, MatIconModule, MatButtonModule,
         MatListModule, MatCardModule, MatProgressBarModule, MatInputModule,

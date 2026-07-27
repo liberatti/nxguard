@@ -23,7 +23,7 @@ import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import {MatSortModule} from '@angular/material/sort';
 import {MatTabsModule} from '@angular/material/tabs';
 import {MatTooltipModule} from '@angular/material/tooltip';
-import {TranslateModule} from '@ngx-translate/core';
+import {TranslatePipe} from '@ngx-translate/core';
 import {
     ServiceBindFormDialogComponent
 } from 'app/components/service-bind-form-dialog/service-bind-form-dialog.component';
@@ -51,7 +51,7 @@ import { minArrayLength } from '../../validators/min-array-length.validator';
     selector: 'app-service-form',
     standalone: true,
     imports: [RouterModule, CommonModule, MatExpansionModule,
-        ReactiveFormsModule, TranslateModule,
+        ReactiveFormsModule, TranslatePipe,
         MatMomentDateModule, DragDropModule,
         MatSidenavModule, MatIconModule, MatButtonModule,
         MatListModule, MatCardModule, MatProgressBarModule, MatInputModule,

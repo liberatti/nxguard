@@ -19,7 +19,7 @@ import {MatSidenavModule} from '@angular/material/sidenav';
 import {MatSortModule} from '@angular/material/sort';
 import {MatTableModule} from '@angular/material/table';
 import {MatTooltipModule} from '@angular/material/tooltip';
-import {TranslateModule} from '@ngx-translate/core';
+import {TranslatePipe} from '@ngx-translate/core';
 import {MatChipsModule} from '@angular/material/chips';
 import {ScrollingModule} from "@angular/cdk/scrolling";
 import {OAuthService, UserService} from "../../services/oauth.service";
@@ -28,7 +28,7 @@ import {OAuthService, UserService} from "../../services/oauth.service";
     selector: 'app-user-form',
     standalone: true,
     imports: [RouterModule, CommonModule,
-        ReactiveFormsModule, TranslateModule,
+        ReactiveFormsModule, TranslatePipe,
         MatMomentDateModule,
         MatSidenavModule, MatIconModule, MatButtonModule,
         MatListModule, MatCardModule, MatProgressBarModule, MatInputModule,

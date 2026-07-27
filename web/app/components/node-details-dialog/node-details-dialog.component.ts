@@ -14,7 +14,6 @@ import {MatInputModule} from '@angular/material/input';
 import {MatTabsModule} from '@angular/material/tabs';
 import {CommonModule} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
-import {TranslateModule} from '@ngx-translate/core';
 import {RouterModule} from '@angular/router';
 import {NodeStatus, UpstreamStatus} from "../../models/upstream";
 import {MatExpansionModule} from "@angular/material/expansion";
@@ -32,7 +31,7 @@ import {MatExpansionModule} from "@angular/material/expansion";
         MatButtonModule,
         MatDialogContent,
         MatDialogActions,
-        MatTabsModule, MatIconModule, TranslateModule, MatExpansionModule, MatDialogTitle
+        MatTabsModule, MatIconModule, MatExpansionModule, MatDialogTitle
     ],
 })
 

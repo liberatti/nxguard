@@ -23,7 +23,7 @@ import {MatSelectModule} from '@angular/material/select';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import {MatSortModule} from '@angular/material/sort';
 import {MatTooltipModule} from '@angular/material/tooltip';
-import {TranslateModule} from '@ngx-translate/core';
+import {TranslatePipe} from '@ngx-translate/core';
 import {UpstreamTargetDialogComponent} from 'app/components/upstream-target-dialog/upstream-target-dialog.component';
 import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import {OAuthService} from "../../services/oauth.service";
@@ -33,7 +33,7 @@ import {OAuthService} from "../../services/oauth.service";
     selector: 'app-upstream-form',
     standalone: true,
     imports: [RouterModule, CommonModule,
-        ReactiveFormsModule, TranslateModule,
+        ReactiveFormsModule, TranslatePipe,
         MatMomentDateModule,
         MatSidenavModule, MatIconModule, MatButtonModule,
         MatListModule, MatCardModule, MatProgressBarModule, MatInputModule,
