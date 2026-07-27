@@ -62,8 +62,8 @@ export class DefaultPageMeta implements PageMeta {
 
 export interface MenuLink {
     label: string;
-    route: string;
-    icon: string;
-    menu:Array<MenuLink>;
-    expanded: boolean;
+    route?: string;
+    icon?: string;
+    menu?: Array<MenuLink>;
+    expanded?: boolean;
 }

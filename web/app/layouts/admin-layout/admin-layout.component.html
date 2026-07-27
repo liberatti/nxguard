@@ -55,31 +55,36 @@
                      class="sidenav" id="main-sidenav">
             
             <mat-nav-list style="padding-top: 20px;">
-                <div *ngFor="let link of menu" style="margin-bottom: 4px; padding: 0 12px;">
-                    @if (link.route) {
-                        <a mat-list-item [routerLink]="[link.route]" routerLinkActive="active-link" 
-                           style="border-radius: 8px; margin-bottom: 4px;">
-                            <mat-icon matListItemIcon style="color: var(--text-secondary-color)">{{ link.icon }}</mat-icon>
-                            <span matListItemTitle style="font-weight: 500; font-size: 0.9rem;">{{ link.label | translate }}</span>
-                        </a>
-                    } @else {
-                        <div (click)="toggleSubMenu(link)" style="cursor: pointer; display: flex; align-items: center; padding: 12px; border-radius: 8px; margin-bottom: 4px;" 
-                             [style.background]="link.expanded ? 'rgba(255,255,255,0.05)' : 'transparent'">
-                            <mat-icon style="color: var(--text-secondary-color); margin-right: 16px;">{{ link.icon }}</mat-icon>
-                            <span style="flex: 1; font-weight: 500; font-size: 0.9rem;">{{ link.label | translate }}</span>
-                            <mat-icon style="font-size: 18px; width: 18px; height: 18px;">{{ link.expanded ? 'expand_less' : 'expand_more' }}</mat-icon>
-                        </div>
-                        
-                        <div *ngIf="link.expanded" style="padding-left: 16px;">
-                            <a mat-list-item *ngFor="let subLink of link.menu" 
-                               [routerLink]="[subLink.route]" routerLinkActive="active-link"
-                               style="border-radius: 8px; margin-bottom: 2px;">
-                                <mat-icon matListItemIcon style="font-size: 20px; width: 20px; height: 20px; color: var(--text-muted)">{{ subLink.icon }}</mat-icon>
-                                <span matListItemTitle style="font-size: 0.85rem;">{{ subLink.label | translate }}</span>
+                @for (link of menu; track link.label) {
+                    <div style="margin-bottom: 4px; padding: 0 12px;">
+                        @if (link.route) {
+                            <a mat-list-item [routerLink]="[link.route]" routerLinkActive="active-link" (click)="onMenuClick()"
+                               style="border-radius: 8px; margin-bottom: 4px;">
+                                <mat-icon matListItemIcon style="color: var(--text-secondary-color)">{{ link.icon }}</mat-icon>
+                                <span matListItemTitle style="font-weight: 500; font-size: 0.9rem;">{{ link.label | translate }}</span>
                             </a>
-                        </div>
-                    }
-                </div>
+                        } @else {
+                            <div (click)="toggleSubMenu(link)" style="cursor: pointer; display: flex; align-items: center; padding: 12px; border-radius: 8px; margin-bottom: 4px;" 
+                                 [style.background]="link.expanded ? 'rgba(255,255,255,0.05)' : 'transparent'">
+                                <mat-icon style="color: var(--text-secondary-color); margin-right: 16px;">{{ link.icon }}</mat-icon>
+                                <span style="flex: 1; font-weight: 500; font-size: 0.9rem;">{{ link.label | translate }}</span>
+                                <mat-icon style="font-size: 18px; width: 18px; height: 18px;">{{ link.expanded ? 'expand_less' : 'expand_more' }}</mat-icon>
+                            </div>
+                            
+                            @if (link.expanded) {
+                                <div style="padding-left: 16px;">
+                                    @for (subLink of link.menu; track subLink.label) {
+                                        <a mat-list-item [routerLink]="[subLink.route]" routerLinkActive="active-link" (click)="onMenuClick()"
+                                           style="border-radius: 8px; margin-bottom: 2px;">
+                                            <mat-icon matListItemIcon style="font-size: 20px; width: 20px; height: 20px; color: var(--text-muted)">{{ subLink.icon }}</mat-icon>
+                                            <span matListItemTitle style="font-size: 0.85rem;">{{ subLink.label | translate }}</span>
+                                        </a>
+                                    }
+                                </div>
+                            }
+                        }
+                    </div>
+                }
                 
                 <div style="margin-top: auto; padding: 12px;">
                     <a mat-list-item (click)="showAbout()" style="border-radius: 8px; background: rgba(0,242,254,0.05);">

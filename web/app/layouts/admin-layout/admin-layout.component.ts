@@ -29,6 +29,8 @@ import { environment } from 'environments/environment';
 import { ConfigService, HealthService } from "../../services/config.service";
 import { Health } from "../../models/config";
 
+import mainMenuData from '../../../assets/main.menu.json';
+
 @Component({
     selector: 'app-admin-layout',
     standalone: true,
@@ -57,7 +59,7 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
         [Breakpoints.XLarge, 'XLarge'],
     ]);
     protected httpClient: HttpClient
-    menu: Array<MenuLink> = [];
+    menu: Array<MenuLink> = (mainMenuData as unknown) as Array<MenuLink>;
     changes: Array<string> = []
     socket: any;
     trackingEvt: boolean = false;
@@ -110,15 +112,20 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
         return this.config && this.config.sidenavOpened;
     }
 
+    onMenuClick() {
+        if (this.isMobile() && this.config) {
+            this.config.sidenavOpened = false;
+        }
+    }
+
     toggleSubMenu(link: MenuLink | undefined) {
         if (!link) {
-            const currentRoute = this.route.snapshot.url[0]?.path;
-            if (!currentRoute) return;
+            const currentRoute = this.router.url;
             for (const m of this.menu) {
                 if (m.menu && Array.isArray(m.menu)) {
                     for (const sm of m.menu) {
-                        if (sm.route?.includes(currentRoute)) {
-                            m.expanded = !m.expanded;
+                        if (sm.route && currentRoute.includes(sm.route)) {
+                            m.expanded = true;
                             break;
                         }
                     }
@@ -150,9 +157,18 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
 
     ngOnInit(): void {
         this.translate.setFallbackLang('en_US');
-        this.httpClient.get<any>("assets/main.menu.json").subscribe(data => {
-            this.menu = data;
-            this.toggleSubMenu(undefined);
+        this.menu = (mainMenuData as unknown) as Array<MenuLink>;
+        this.toggleSubMenu(undefined);
+        this.httpClient.get<any>('assets/main.menu.json').subscribe({
+            next: (data) => {
+                if (data && data.length > 0) {
+                    this.menu = data;
+                }
+                this.toggleSubMenu(undefined);
+            },
+            error: () => {
+                this.toggleSubMenu(undefined);
+            }
         });
         this.healthCheck();
     }

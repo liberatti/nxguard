@@ -25,99 +25,6 @@ import {UserFormComponent} from "./view/user-form/user-form.component";
 
 export const routes: Routes = [
     {
-        path: 'dashboard',
-        component: AdminLayoutComponent,
-        children: [
-            {path: '', component: DashboardHomeComponent},
-        ]
-    },
-    {
-        path: 'trn',
-        component: AdminLayoutComponent,
-        children: [
-            {path: '', component: TransactionListComponent}
-        ]
-    },
-    {
-        path: 'service',
-        component: AdminLayoutComponent,
-        children: [
-            {path: '', component: ServiceListComponent},
-            {path: 'add', component: ServiceFormComponent},
-            {path: 'edit/:id', component: ServiceFormComponent},
-        ]
-    },
-    {
-        path: 'feed',
-        component: AdminLayoutComponent,
-        children: [
-            {path: '', component: FeedListComponent},
-            {path: 'add', component: FeedFormComponent},
-            {path: 'edit/:id', component: FeedFormComponent},
-        ]
-    },
-    {
-        path: 'users',
-        component: AdminLayoutComponent,
-        children: [
-            {path: '', component: UserListComponent},
-            {path: 'add', component: UserFormComponent},
-            {path: 'edit/:id', component: UserFormComponent},
-        ]
-    },
-    {
-        path: 'route_filter',
-        component: AdminLayoutComponent,
-        children: [
-            {path: '', component: RouteFilterListComponent},
-            {path: 'add', component: RouteFilterFormComponent},
-            {path: 'edit/:id', component: RouteFilterFormComponent},
-        ]
-    },
-    {
-        path: 'jail',
-        component: AdminLayoutComponent,
-        children: [
-            {path: '', component: JailListComponent},
-            {path: 'add', component: JailFormComponent},
-            {path: 'edit/:id', component: JailFormComponent},
-        ]
-    },
-    {
-        path: 'ups',
-        component: AdminLayoutComponent,
-        children: [
-            {path: '', component: UpstreamListComponent},
-            {path: 'add', component: UpstreamFormComponent},
-            {path: 'edit/:id', component: UpstreamFormComponent},
-        ]
-    },
-    {
-        path: 'sensor',
-        component: AdminLayoutComponent,
-        children: [
-            {path: '', component: SensorListComponent},
-            {path: 'add', component: SensorFormComponent},
-            {path: 'edit/:id', component: SensorFormComponent},
-        ]
-    },
-    {
-        path: 'certificate',
-        component: AdminLayoutComponent,
-        children: [
-            {path: '', component: CertificateListComponent},
-            {path: 'add', component: CertificateFormComponent},
-            {path: 'edit/:id', component: CertificateFormComponent},
-        ]
-    },
-    {
-        path: 'account',
-        component: AdminLayoutComponent,
-        children: [
-            {path: '', component: AccountComponent},
-        ]
-    },
-    {
         path: 'signin',
         component: PublicLayoutComponent,
         children: [
@@ -125,10 +32,78 @@ export const routes: Routes = [
         ]
     },
     {
-        path: 'config',
+        path: '',
         component: AdminLayoutComponent,
         children: [
-            {path: '', component: ConfigFormComponent},
+            {path: '', redirectTo: 'dashboard', pathMatch: 'full'},
+            {path: 'dashboard', component: DashboardHomeComponent},
+            {path: 'trn', component: TransactionListComponent},
+            {
+                path: 'service',
+                children: [
+                    {path: '', component: ServiceListComponent},
+                    {path: 'add', component: ServiceFormComponent},
+                    {path: 'edit/:id', component: ServiceFormComponent},
+                ]
+            },
+            {
+                path: 'feed',
+                children: [
+                    {path: '', component: FeedListComponent},
+                    {path: 'add', component: FeedFormComponent},
+                    {path: 'edit/:id', component: FeedFormComponent},
+                ]
+            },
+            {
+                path: 'users',
+                children: [
+                    {path: '', component: UserListComponent},
+                    {path: 'add', component: UserFormComponent},
+                    {path: 'edit/:id', component: UserFormComponent},
+                ]
+            },
+            {
+                path: 'route_filter',
+                children: [
+                    {path: '', component: RouteFilterListComponent},
+                    {path: 'add', component: RouteFilterFormComponent},
+                    {path: 'edit/:id', component: RouteFilterFormComponent},
+                ]
+            },
+            {
+                path: 'jail',
+                children: [
+                    {path: '', component: JailListComponent},
+                    {path: 'add', component: JailFormComponent},
+                    {path: 'edit/:id', component: JailFormComponent},
+                ]
+            },
+            {
+                path: 'ups',
+                children: [
+                    {path: '', component: UpstreamListComponent},
+                    {path: 'add', component: UpstreamFormComponent},
+                    {path: 'edit/:id', component: UpstreamFormComponent},
+                ]
+            },
+            {
+                path: 'sensor',
+                children: [
+                    {path: '', component: SensorListComponent},
+                    {path: 'add', component: SensorFormComponent},
+                    {path: 'edit/:id', component: SensorFormComponent},
+                ]
+            },
+            {
+                path: 'certificate',
+                children: [
+                    {path: '', component: CertificateListComponent},
+                    {path: 'add', component: CertificateFormComponent},
+                    {path: 'edit/:id', component: CertificateFormComponent},
+                ]
+            },
+            {path: 'account', component: AccountComponent},
+            {path: 'config', component: ConfigFormComponent},
         ]
     },
     {
