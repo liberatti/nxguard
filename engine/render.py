@@ -113,7 +113,6 @@ def generate(data, output_dir=f"{BASE_PATH}", test=False):
         for sensor in data["sensors"]:
             sensor.update(
                 {
-                    "BASE_PATH": config.BASE_PATH,
                     "ipxa_url": data["config"]["ipxa"]["url"],
                     "ipxa_key": data["config"]["ipxa"]["key"],
                     "blq_geo": ",".join(sensor["security"]["geo_codes"]),

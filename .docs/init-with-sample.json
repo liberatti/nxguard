@@ -133,8 +133,8 @@
       "name": "local-dev",
       "rate_limit_per_sec": 256,
       "active": true,
-      "body_limit": 10,
-      "buffer": 256,
+      "body_limit": 4096,
+      "buffer": 1024,
       "bindings": [
         {
           "port": 80,
