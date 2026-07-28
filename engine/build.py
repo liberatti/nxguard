@@ -1,3 +1,5 @@
+"""Configuration builder module for assembling, exporting, reading, and seeding database configurations."""
+
 import json
 import os
 
@@ -17,6 +19,7 @@ from nxcore.middleware.logging_manager import logger
 
 
 def get_config():
+    """Assembles active configuration from DAOs into a single dictionary."""
     c = dict()
     with ConfigDao() as dao:
         c.update({"config": dao.get_active()})
@@ -43,19 +46,27 @@ def get_config():
 
 
 def export_config_json(data, json_file):
+    """Exports configuration dictionary as a formatted JSON file."""
     with open(os.path.join(config.DB_PATH, json_file), "w") as f:
         json.dump(data, f, indent=4)
 
 
 def read_from_json(json_file, data_dir=config.DB_PATH):
-    if os.path.exists(os.path.join(data_dir, json_file)):
-        logger.info(f"Loading {json_file} from {data_dir}")
-        with open(os.path.join(data_dir, json_file), "r") as f:
-            return json.load(f)
+    """Reads and parses a JSON file from the data directory."""
+    path = os.path.join(data_dir, json_file)
+    if os.path.exists(path):
+        try:
+            with open(path, "r") as f:
+                return json.load(f)
+        except json.JSONDecodeError as e:
+            logger.error(f"Failed to decode JSON from {path}: {e}")
+    else:
+        logger.warning(f"File not found: {path}")
     return None
 
 
 def create_db():
+    """Creates initial database schema tables and seeds default superuser."""
     with ConfigDao() as dao:
         dao.create_schema()
     with UserDao() as dao:
@@ -83,6 +94,7 @@ def create_db():
 
 
 def init_from_data(data):
+    """Populates database tables from an initial dataset dictionary."""
     with ConfigDao() as dao:
         dao.delete_all()
         data["config"].update({"cluster_id": gen_random_string(8)})
@@ -125,6 +137,7 @@ def init_from_data(data):
 
 
 def validate(data):
+    """Validates target hostname/IP resolution for upstreams in the configuration."""
     for u in data["upstreams"]:
         for t in u["targets"]:
             if not NetworkTool.is_host(t["host"]):

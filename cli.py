@@ -1,3 +1,5 @@
+"""CLI entrypoint for managing NXGuard installation, configuration apply, and SecLanguage indexing."""
+
 import sys
 
 import engine.seclang.seclang_indexer as indexer

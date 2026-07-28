@@ -1,3 +1,5 @@
+"""Global configuration variables and environment settings for NXGuard."""
+
 import json
 import os
 import secrets
@@ -14,6 +16,7 @@ except Exception:
 API_HEADERS = {"User-Agent": f"NXGuard/{APP_VERSION}"}
 
 BASE_PATH = "/opt/nxguard"
+LUA_LIBS_PATH = f"{BASE_PATH}/luajit/share/lua/5.1"
 DB_PATH = os.environ.get("BASE_PATH", "/data")
 
 ENGINE_BASE = f"{BASE_PATH}/nginx"

@@ -104,14 +104,14 @@ class RuleSetParser:
         rule = SecRule().load(
             {
                 "schema_type": "SecRule",
-                "scope": self._parse_scope(line[fi : line.index(" ", fi + 1)]),
+                "scope": self._parse_scope(line[fi: line.index(" ", fi + 1)]),
                 "tags": [],
                 "chain_starter": False,
                 "raw": line,
             }
         )
 
-        rule_data = line[line.index(" ", fi + 1) :]
+        rule_data = line[line.index(" ", fi + 1):]
         regex = re.compile('"(.*?)(?<!\\\\)"(?:\\s+"(.*)")?')
 
         matcher = regex.search(rule_data)

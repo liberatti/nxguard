@@ -1,3 +1,5 @@
+"""Main Flask application initialization and blueprint registration for NXGuard."""
+
 import traceback
 
 import nxcore.config as nxcore_config
@@ -46,11 +48,13 @@ app.register_blueprint(bp)
 
 @app.errorhandler(404)
 def not_found_error(error):
+    """Handles HTTP 404 Not Found errors."""
     return response_error_404()
 
 
 @app.errorhandler(500)
 def internal_error(error):
+    """Handles HTTP 500 Internal Server errors."""
     stack_trace = traceback.format_exc()
     logger.error(f"500 Error: {error}, Stack Trace: {stack_trace}")
     return response_error_500("Unexpected Server Error", details=stack_trace)
@@ -58,6 +62,7 @@ def internal_error(error):
 
 @app.errorhandler(Exception)
 def handle_exception(error):
+    """Handles uncaught exceptions globally."""
     stack_trace = traceback.format_exc()
     logger.error(f"Internal Server Error: {stack_trace}")
     return response_error_500("Unexpected Server Error", details=stack_trace)

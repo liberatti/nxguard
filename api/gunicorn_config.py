@@ -1,3 +1,5 @@
+"""Gunicorn configuration file managing process lifecycle hooks and background schedulers."""
+
 try:
     import gevent.monkey
 
@@ -37,6 +39,7 @@ except BlockingIOError:
 
 
 def _scheduler():
+    """Runs scheduled background jobs until stop_event is signaled."""
     while not stop_event.is_set():
         try:
             schedule.run_pending()
@@ -47,6 +50,7 @@ def _scheduler():
 
 
 def post_fork(server, worker):
+    """Gunicorn post-fork hook initializing instance roles, tasks, and background threads."""
     nxg_role = "worker"
     if is_main:
         logger.info("Lock acquired, NXGuard is the main instance")
@@ -66,12 +70,14 @@ def post_fork(server, worker):
 
 
 def on_reload(server):
+    """Gunicorn hook executed on server reload to stop background threads."""
     global scheduler_started
     stop_event.set()
     scheduler_started = False
 
 
 def on_exit(server):
+    """Gunicorn hook executed on server shutdown."""
     stop_event.set()
     logger.info("NXGuard stopped")
 

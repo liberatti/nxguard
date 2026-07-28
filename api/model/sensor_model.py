@@ -15,6 +15,7 @@ class SensorBlockedSchema(Schema):
     reputations = fields.List(fields.String(), allow_none=True)
     trusted = fields.List(fields.String(), allow_none=True)
 
+
 class SensorScoreSchema(Schema):
     class Meta:
         unknown = EXCLUDE
