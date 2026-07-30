@@ -28,15 +28,6 @@ from api.tasks import (
 
 stop_event = threading.Event()
 
-lock_handle = open(os.path.join(_config.DB_PATH, "nxguard.lock"), "a+")
-
-try:
-    fcntl.flock(lock_handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
-    logger.info("Lock acquired, NXGuard is the main instance")
-    is_main = True
-except BlockingIOError:
-    is_main = False
-
 
 def _scheduler():
     """Runs scheduled background jobs until stop_event is signaled."""
@@ -51,35 +42,36 @@ def _scheduler():
 
 def post_fork(server, worker):
     """Gunicorn post-fork hook initializing instance roles, tasks, and background threads."""
-    nxg_role = "worker"
+    is_main = os.environ.get("NXGUARD_ROLE") == "main"
+    logger.info("NXGuard instance is main: %s", is_main)
     if is_main:
-        logger.info("Lock acquired, NXGuard is the main instance")
+        c_admin.restart()
         if not os.path.exists(f"{_config.DB_PATH}/app.duckdb"):
             install()
             if os.path.exists(f"{_config.DB_PATH}/init-data.json"):
-                conf = c_builder.read_from_json("init-data.json")
-                c_builder.init_from_data(conf)
+                c_builder.init_from_data()
+        conf = c_builder.get_config()
+        val = c_admin.validate(conf)
+        if val and val.get("status") == "ok":
+            c_admin.apply(val["scn"])
+        else:
+            logger.error(f"Failed to apply config: {val['message']}")
         schedule.every(10).seconds.do(update_main_config)
-        nxg_role = "main"
     else:
+        update_node_config()
         schedule.every(60).seconds.do(update_node_config)
-    c_admin.apply(c_builder.get_config())
     schedule.every(30).seconds.do(update_node_status)
     threading.Thread(target=_scheduler, daemon=True).start()
-    logger.info(f"NXGuard started as {nxg_role}")
 
 
 def on_reload(server):
     """Gunicorn hook executed on server reload to stop background threads."""
-    global scheduler_started
     stop_event.set()
-    scheduler_started = False
 
 
 def on_exit(server):
     """Gunicorn hook executed on server shutdown."""
     stop_event.set()
-    logger.info("NXGuard stopped")
 
 
 workers = 1

@@ -33,8 +33,80 @@ class ConfigSchema(Schema):
     ca_certificate = fields.String()
     ca_private = fields.String()
     acme_directory_url = fields.String()
+    active_scn = fields.String()
     archive = fields.Nested(ConfigArchiveSchema)
     purge = fields.Nested(ConfigPurgeSchema)
+
+
+class ConfigBackupSchema(Schema):
+    class Meta:
+        unknown = EXCLUDE
+
+    _id = fields.Integer()
+    scn = fields.String()
+    created_at = fields.DateTime()
+    data = fields.String()
+
+
+class ConfigBackupDao(DuckDAO):
+    def __init__(self):
+        super().__init__(
+            db_path=config.DB_PATH,
+            table_name="config_backup",
+            schema=ConfigBackupSchema,
+        )
+
+    def create_schema(self):
+        self.ddl(
+            f"""
+            CREATE TABLE IF NOT EXISTS {self.table_name} (
+                _id INTEGER PRIMARY KEY AUTOINCREMENT,
+                scn TEXT,
+                created_at TIMESTAMP,
+                data JSON
+            );
+        """
+        )
+
+    def to_dict(self, row):
+        if row and "data" in row and isinstance(row["data"], str):
+            try:
+                for s in row["data"]["services"]:
+                    c = s.pop("certificate", None)
+                    if c:
+                        s.update({"certificate": {"name": c["name"]}})
+
+                row["data"] = json.loads(row["data"])
+            except Exception:
+                pass
+        return super().to_dict(row)
+
+    def get_latest(self) -> Optional[Dict[str, Any]]:
+        try:
+            query = f"SELECT * FROM {self.table_name} ORDER BY _id DESC LIMIT 1"
+            rs = self._query(query, fetch=True)
+            return self.to_dict(rs[0]) if rs else None
+        except Exception as e:
+            logger.error(f"Error retrieving latest backup configuration: {str(e)}")
+            return None
+
+    def get_by_scn(self, scn: str) -> Optional[Dict[str, Any]]:
+        try:
+            query = f"SELECT * FROM {self.table_name} WHERE scn = ?"
+            rs = self._query(query, (scn,), fetch=True)
+            return self.to_dict(rs[0]) if rs else None
+        except Exception as e:
+            logger.error(
+                f"Error retrieving backup configuration by SCN {scn}: {str(e)}"
+            )
+            return None
+
+    def from_dict(self, vo):
+        import datetime
+
+        if "created_at" not in vo:
+            vo.update({"created_at": datetime.datetime.now()})
+        return super().from_dict(vo)
 
 
 class ConfigDao(DuckDAO):
@@ -57,7 +129,8 @@ class ConfigDao(DuckDAO):
                 cache_json TEXT,
                 purge_json TEXT,
                 dns_resolver TEXT,
-                ipxa_json TEXT
+                ipxa_json TEXT,
+                active_scn TEXT
             );
         """
         )
@@ -97,6 +170,10 @@ class ConfigDao(DuckDAO):
         except Exception as e:
             logger.error(f"Error retrieving active configuration: {str(e)}")
             raise
+
+    def get_active_scn(self) -> Optional[str]:
+        active = self.get_active()
+        return active.get("active_scn") if active else None
 
 
 class ChangeDao(DuckDAO):

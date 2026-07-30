@@ -1,34 +1,25 @@
 """Engine administration module for testing, applying, reloading, and checking status of Nginx."""
 
+import datetime
 import os
 import subprocess
-
+import json
 import psutil
 from nxcore.common_utils import gen_random_string
 from nxcore.middleware.logging_manager import logger
 
 import engine.build as c_builder
 import engine.render as c_render
+from api.model.config_model import ConfigBackupDao, ConfigDao
 from config import BASE_PATH
 
-ACTIVE_SCN = None
-PENDING_CONFIG_UPDATE = False
 
-
-def mark_config_dirty() -> None:
-    """Flags that configuration has been modified and requires application."""
-    global PENDING_CONFIG_UPDATE
-    PENDING_CONFIG_UPDATE = True
-
-
-def apply(conf):
-    """Tests the new configuration, and if valid, cleans old files, generates new ones, and reloads Nginx."""
-    global ACTIVE_SCN
-    # logger.info(conf)
+def validate(conf):
+    """Tests the new configuration."""
     c_render.generate(conf, test=True)
     try:
         result = subprocess.Popen(
-            f"sudo {BASE_PATH}/nginx/sbin/nginx -c {BASE_PATH}/nginx/conf/test-nginx.conf -t",
+            f"sudo {BASE_PATH}/nginx/sbin/nginx -c {BASE_PATH}/nginx/conf/tests/nginx.conf -t",
             shell=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -41,16 +32,39 @@ def apply(conf):
     finally:
         c_render.clean(conf, test=True)
 
-    logger.info("Config OK")
+    with ConfigBackupDao() as backup_dao:
+        scn = gen_random_string(16)
+        backup_dao.persist(
+            {
+                "scn": scn,
+                "created_at": datetime.datetime.now(),
+                "data": conf,
+            }
+        )
+    return {"status": "ok", "scn": scn}
+
+
+def apply(scn):
+    """Tests the new configuration, and if valid, cleans old files, generates new ones, and reloads Nginx."""
+    with ConfigBackupDao() as backup_dao:
+        backup = backup_dao.get_by_scn(scn)
+        conf = json.loads(backup["data"]) if backup else None
+
+    if not conf:
+        logger.error(f"Configuration with SCN {scn} not found in ConfigBackupDao.")
+        return {"status": "error", "message": f"SCN {scn} not found"}
+
     c_render.clean(conf, test=False)
     c_render.generate(conf)
 
     restart()
     if is_running():
-        ACTIVE_SCN = gen_random_string()
-        conf.update({"scn": ACTIVE_SCN})
-        c_builder.export_config_json(conf, "config.json")
-    return {"status": "ok", "scn": ACTIVE_SCN}
+        with ConfigDao() as config_dao:
+            active_config = config_dao.get_active()
+            if active_config:
+                config_dao.update_by_id(active_config["_id"], {"active_scn": scn})
+
+    return {"status": "ok", "scn": scn}
 
 
 def is_running() -> bool:
@@ -85,22 +99,18 @@ def restart():
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
-        if not is_running():
-            logger.info("Nginx reload failed, start required")
-            result = subprocess.Popen(
-                f"sudo {BASE_PATH}/nginx/sbin/nginx",
-                shell=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-            )
-    else:
-        logger.info("Nginx is not running, start required")
-        result = subprocess.Popen(
-            f"sudo {BASE_PATH}/nginx/sbin/nginx",
-            shell=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
+        stdout, stderr = result.communicate()
+        if result.returncode == 0:
+            return
+        logger.warn("Nginx reload failed: %s", stderr.decode().strip())
 
+    logger.info("Nginx is not running, start required")
+    result = subprocess.Popen(
+        f"sudo {BASE_PATH}/nginx/sbin/nginx -c {BASE_PATH}/nginx/conf/enabled/nginx.conf",
+        shell=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
     stdout, stderr = result.communicate()
-    # subprocess.run(f"sudo chmod -R 777 {APP_BASE}/logs", shell=True)
+    if result.returncode != 0:
+        logger.error("Failed to start Nginx: %s", stderr.decode().strip())

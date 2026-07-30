@@ -1,7 +1,7 @@
 from nxcore.controllers.base_controller import response_data
 from flask import Blueprint, Response
 
-import engine.build as c_build
+from api.model.config_model import ConfigBackupDao
 from api.model.upstream_model import NodeStatusDao
 
 routes = Blueprint("config", __name__)
@@ -16,5 +16,7 @@ def health() -> Response:
 
 @routes.route("", methods=["GET"])
 def config() -> Response:
-    r = c_build.read_from_json("config.json")
+    with ConfigBackupDao() as backup_dao:
+        latest = backup_dao.get_latest()
+        r = latest["data"] if latest else None
     return response_data(r)

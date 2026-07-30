@@ -28,29 +28,32 @@ def _render_template_to_file(
 
 def clean(data, output_dir=BASE_PATH, test=False):
     """Removes generated Nginx configurations, certificates, and service files."""
+    conf_dir = f"{output_dir}/nginx/conf/tests" if test else f"{output_dir}/nginx/conf"
     logger.info(f"[{output_dir}] - Cleanup (test={test})")
     if test:
         for pattern in [
             f"{output_dir}/keystore/test-*",
-            f"{output_dir}/nginx/conf/test-*",
+            f"{conf_dir}/*",
         ]:
             for file_path in glob.glob(pattern):
                 _remove_file(file_path)
     else:
         files = [
-            f"{output_dir}/nginx/conf/mime.types",
-            f"{output_dir}/nginx/conf/uwsgi_params",
-            f"{output_dir}/nginx/conf/upstreams.conf",
-            f"{output_dir}/nginx/conf/monitor.conf",
-            f"{output_dir}/nginx/conf/fastcgi.conf",
-            f"{output_dir}/nginx/conf/nginx.conf",
+            f"{conf_dir}/mime.types",
+            f"{conf_dir}/uwsgi_params",
+            f"{conf_dir}/fastcgi_params",
+            f"{conf_dir}/scgi_params",
+            f"{conf_dir}/upstreams.conf",
+            f"{conf_dir}/monitor.conf",
+            f"{conf_dir}/fastcgi.conf",
+            f"{conf_dir}/nginx.conf",
         ]
         for f in files:
             _remove_file(f)
 
         for pattern in [
             f"{output_dir}/keystore/*",
-            f"{output_dir}/nginx/conf/service-*.conf",
+            f"{conf_dir}/service-*.conf",
         ]:
             for file_path in glob.glob(pattern):
                 if not os.path.basename(file_path).startswith("test-"):
@@ -114,7 +117,7 @@ def _generate_sensors(env: Environment, output_dir: str, data: dict) -> None:
 
 
 def _generate_services(
-    env: Environment, output_dir: str, prefix: str, test: bool, data: dict
+    env: Environment, output_dir: str, conf_dir: str, test: bool, data: dict
 ) -> None:
     """Generates Nginx configuration files for each defined service."""
     logger.info(f"[{output_dir}] - Generate Services")
@@ -127,15 +130,13 @@ def _generate_services(
             }
         )
         os.makedirs(f"{output_dir}/cache/{service['name']}", exist_ok=True)
-        logger.info(
-            f"[{output_dir}] - Generate nginx/conf/{prefix}service-{service['name']}.conf"
-        )
+        service_path = f"{conf_dir}/service-{service['name']}.conf"
+        logger.info(f"[{output_dir}] - Generate {service_path}")
         if "bindings" in service:
             for b in service["bindings"]:
                 if b["protocol"] == "HTTPS":
                     service.update({"ssl_enable": True})
 
-        service_path = f"{output_dir}/nginx/conf/{prefix}service-{service['name']}.conf"
         _render_template_to_file(env, "nginx/service.conf.j2", service_path, service)
 
 
@@ -147,53 +148,71 @@ def generate(data, output_dir=BASE_PATH, test=False):
 
     data.update({"IS_TEST": test, "BASE_PATH": config.BASE_PATH})
     env = Environment(loader=FileSystemLoader("engine/templates"))
-    prefix = "test-" if test else ""
+
+    conf_dir = (
+        f"{output_dir}/nginx/conf/tests" if test else f"{output_dir}/nginx/conf/enabled"
+    )
+    os.makedirs(conf_dir, exist_ok=True)
 
     _render_template_to_file(
-        env, "nginx/mime.types.j2", f"{output_dir}/nginx/conf/{prefix}mime.types", data
+        env,
+        "nginx/mime.types.j2",
+        f"{conf_dir}/mime.types",
+        data,
     )
     _render_template_to_file(
         env,
         "nginx/uwsgi_params.j2",
-        f"{output_dir}/nginx/conf/{prefix}uwsgi_params",
+        f"{conf_dir}/uwsgi_params",
+        data,
+    )
+    _render_template_to_file(
+        env,
+        "nginx/fastcgi_params.j2",
+        f"{conf_dir}/fastcgi_params",
+        data,
+    )
+    _render_template_to_file(
+        env,
+        "nginx/scgi_params.j2",
+        f"{conf_dir}/scgi_params",
         data,
     )
 
-    logger.info(f"[{output_dir}] - Generate nginx/conf/{prefix}monitor.conf")
+    logger.info(f"[{output_dir}] - Generate {conf_dir}/monitor.conf")
     _render_template_to_file(
         env,
         "nginx/monitor.conf.j2",
-        f"{output_dir}/nginx/conf/{prefix}monitor.conf",
+        f"{conf_dir}/monitor.conf",
         data,
     )
 
     if "upstreams" in data:
-        logger.info(f"[{output_dir}] - Generate nginx/conf/{prefix}upstreams.conf")
+        logger.info(f"[{output_dir}] - Generate {conf_dir}/upstreams.conf")
         _render_template_to_file(
             env,
             "nginx/upstreams.conf.j2",
-            f"{output_dir}/nginx/conf/{prefix}upstreams.conf",
+            f"{conf_dir}/upstreams.conf",
             data,
         )
 
     if "certificates" in data:
+        prefix = "test-" if test else ""
         _generate_certificates(env, output_dir, prefix, data["certificates"])
 
     if "sensors" in data:
         _generate_sensors(env, output_dir, data)
 
     if "services" in data:
-        _generate_services(env, output_dir, prefix, test, data)
+        _generate_services(env, output_dir, conf_dir, test, data)
 
-    logger.info(f"[{output_dir}] - Generate nginx/conf/{prefix}fastcgi.conf")
+    logger.info(f"[{output_dir}] - Generate {conf_dir}/fastcgi.conf")
     _render_template_to_file(
         env,
         "nginx/fastcgi.conf.j2",
-        f"{output_dir}/nginx/conf/{prefix}fastcgi.conf",
+        f"{conf_dir}/fastcgi.conf",
         data,
     )
 
-    logger.info(f"[{output_dir}] - Generate nginx/conf/{prefix}nginx.conf")
-    _render_template_to_file(
-        env, "nginx/nginx.conf.j2", f"{output_dir}/nginx/conf/{prefix}nginx.conf", data
-    )
+    logger.info(f"[{output_dir}] - Generate {conf_dir}/nginx.conf")
+    _render_template_to_file(env, "nginx/nginx.conf.j2", f"{conf_dir}/nginx.conf", data)

@@ -8,7 +8,7 @@ from nxcore.common_utils import gen_random_string
 
 import config
 from api.model.certificate_model import CertificateDao
-from api.model.config_model import ConfigDao
+from api.model.config_model import ConfigDao, ConfigBackupDao
 from api.model.oauth_model import UserDao
 from api.model.sensor_model import SensorDao
 from api.model.service_model import ServiceDao
@@ -69,6 +69,8 @@ def create_db():
     """Creates initial database schema tables and seeds default superuser."""
     with ConfigDao() as dao:
         dao.create_schema()
+    with ConfigBackupDao() as dao:
+        dao.create_schema()
     with UserDao() as dao:
         dao.create_schema()
         encrypted_pass = bcrypt.hashpw("admin".encode("utf8"), bcrypt.gensalt())
@@ -93,11 +95,17 @@ def create_db():
         dao.create_schema()
 
 
-def init_from_data(data):
+def init_from_data(data_file="init-data.json"):
     """Populates database tables from an initial dataset dictionary."""
+
+    logger.info(f"Iinitialize from {data_file}")
+
+    data = read_from_json(data_file)
     with ConfigDao() as dao:
         dao.delete_all()
-        data["config"].update({"cluster_id": gen_random_string(8)})
+        data["config"].update(
+            {"cluster_id": gen_random_string(8), "active_scn": gen_random_string(16)}
+        )
         dao.persist(data["config"])
         logger.info(f"Config: {data['config']['cluster_id']}")
 

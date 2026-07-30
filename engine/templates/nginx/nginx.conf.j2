@@ -14,8 +14,6 @@ http {
    local flush = require "nxguard.log_flush"
    flush.start("{{BASE_PATH}}/logs/access.json", 2)  -- flush by 2s
  }
- #lua_shared_dict geoip_cache 10m;
- #lua_shared_dict si_68e91d2946043e189ab49b96_cache 10m;
  client_body_temp_path {{BASE_PATH}}/temp/client_body;
  fastcgi_temp_path {{BASE_PATH}}/temp/fastcgi;
  proxy_temp_path {{BASE_PATH}}/temp/proxy;
@@ -25,7 +23,7 @@ http {
  access_log off;error_log /dev/null crit;
 
  proxy_intercept_errors on;
- include {%if IS_TEST%}test-{%-endif%}mime.types;
+ include mime.types;
  default_type  application/octet-stream;
  sendfile on;
  keepalive_timeout 65;
@@ -47,10 +45,10 @@ http {
  }
 
  proxy_next_upstream error timeout invalid_header http_500 http_502 http_503 http_504;
- include {%if IS_TEST%}test-{%-endif%}upstreams.conf;
- include {%if IS_TEST%}test-{%-endif%}monitor.conf;
+ include upstreams.conf;
+ include monitor.conf;
  {%- for u in services %}
- include {%if IS_TEST%}test-{%-endif%}service-{{ u.name }}.conf;
+ include service-{{ u.name }}.conf;
  {%- endfor %}
 
  limit_req_status 429;

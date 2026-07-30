@@ -12,17 +12,14 @@ import config
 import engine.admin as c_admin
 import engine.build as c_builder
 import engine.seclang.seclang_indexer as seclang_indexer
+from api.model.config_model import ConfigBackupDao, ConfigDao
 from api.model.upstream_model import NodeStatusDao
 
 
 def update_node_config() -> None:
     """Fetches configuration from the main NXGuard endpoint and updates local node if SCN changes."""
-    if not c_admin.ACTIVE_SCN and os.path.exists(
-        os.path.join(config.DB_PATH, "config.json")
-    ):
-        cnf = c_builder.read_from_json("config.json")
-        if cnf and "scn" in cnf:
-            c_admin.ACTIVE_SCN = cnf["scn"]
+    with ConfigDao() as config_dao:
+        local_scn = config_dao.get_active_scn()
 
     attempt = 0
     while attempt < config.REPLICATE_MAX_RETRIES:
@@ -34,14 +31,22 @@ def update_node_config() -> None:
             if resp.status_code in [200, 201]:
                 remote_cnf = resp.json()
                 if remote_cnf and "scn" in remote_cnf:
-                    if c_admin.ACTIVE_SCN != remote_cnf["scn"]:
+                    if local_scn != remote_cnf["scn"]:
                         logger.info(
                             f"New config SCN detected ({remote_cnf['scn']}). Applying to node..."
                         )
-                        cst = c_admin.apply(remote_cnf)
-                        if cst and cst.get("status") == "ok":
-                            c_builder.export_config_json(remote_cnf, "config.json")
-                            c_admin.ACTIVE_SCN = remote_cnf["scn"]
+                        val = c_admin.validate(remote_cnf)
+                        if val and val.get("status") == "ok":
+                            cst = c_admin.apply(remote_cnf)
+                            if cst and cst.get("status") == "ok":
+                                with ConfigBackupDao() as backup_dao:
+                                    backup_dao.persist(
+                                        {
+                                            "scn": remote_cnf["scn"],
+                                            "created_at": datetime.datetime.now(),
+                                            "data": remote_cnf,
+                                        }
+                                    )
                 break
             else:
                 logger.error(
@@ -59,9 +64,12 @@ def update_node_status() -> None:
     """Registers the node's current status, active SCN, and timestamp in the database."""
     k = f"node:{get_server_id()}"
     st = "ACTIVE" if c_admin.is_running() else "STOPPED"
+    with ConfigDao() as config_dao:
+        scn = config_dao.get_active_scn()
+
     node = {
         "status": st,
-        "scn": c_admin.ACTIVE_SCN,
+        "scn": scn,
         "last_check": datetime.datetime.now(config.TZ).isoformat(),
         "version": config.APP_VERSION,
         "net_recv": 0,
@@ -73,15 +81,20 @@ def update_node_status() -> None:
 
 
 def update_main_config():
-    """Applies configuration in background thread when pending changes exist."""
-    config_file_exists = os.path.exists(os.path.join(config.DB_PATH, "config.json"))
-    if c_admin.PENDING_CONFIG_UPDATE or not config_file_exists:
-        logger.info("Pending configuration update detected. Rebuilding config...")
+    """Applies configuration in background thread when ConfigDao SCN differs from latest ConfigBackupDao SCN."""
+    with ConfigDao() as config_dao, ConfigBackupDao() as backup_dao:
+        active_scn = config_dao.get_active_scn()
+        latest_backup = backup_dao.get_latest()
+        backup_scn = latest_backup.get("scn") if latest_backup else None
+
+    if not latest_backup or active_scn != backup_scn:
+        logger.info("Configuration change detected. Rebuilding config...")
         conf = c_builder.get_config()
-        cst = c_admin.apply(conf)
-        if cst and cst.get("status") == "ok":
-            c_admin.PENDING_CONFIG_UPDATE = False
-            logger.info(f"Main config applied successfully: {c_admin.ACTIVE_SCN}")
+        val = c_admin.validate(conf)
+        if val and val.get("status") == "ok":
+            cst = c_admin.apply(val["scn"])
+            if cst and cst.get("status") == "ok":
+                logger.info(f"Main config applied successfully: {cst.get('scn')}")
 
 
 def install():
@@ -92,10 +105,3 @@ def install():
         os.remove(f"{config.DB_PATH}/app.duckdb")
     c_builder.create_db()
     seclang_indexer.index()
-
-
-def apply():
-    """Creates, validates, and applies the initial default configuration."""
-    conf = c_builder.create()
-    conf = c_builder.validate(conf)
-    c_admin.apply(conf)

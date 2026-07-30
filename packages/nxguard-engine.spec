@@ -181,7 +181,6 @@ install /root/rpmbuild/BUILD/lualib/lib64/lua/5.1/* %{buildroot}/opt/nxguard/lua
 
 cd /root/rpmbuild/BUILD/openresty-1.29.2.3/build/nginx-1.29.2
 install -c objs/nginx %{buildroot}/opt/nxguard/nginx/sbin/nginx
-install -c conf/* %{buildroot}/opt/nxguard/nginx/conf
 install -c objs/*_module.so %{buildroot}/opt/nxguard/nginx/modules/
 
 cd /root/rpmbuild/BUILD/modsecurity-v3.0.14
