@@ -8,8 +8,9 @@ events {worker_connections 1024;}
 
 http {
  resolver {{config.dns_resolver}} valid=30s;
- uninitialized_variable_warn off;
+ uninitialized_variable_warn on;
  lua_shared_dict log_buffer 16m;
+ lua_shared_dict ipxa_cache 64m;
  init_worker_by_lua_block {
    local flush = require "nxguard.log_flush"
    flush.start("{{BASE_PATH}}/logs/access.json", 2)  -- flush by 2s

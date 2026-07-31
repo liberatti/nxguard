@@ -14,9 +14,10 @@ import time
 import traceback
 
 import schedule
-from nxcore.middleware.logging_manager import logger
+from nxcore.middleware.logging_manager import logger, LoggingManager
 
 import config as _config
+
 import engine.admin as c_admin
 import engine.build as c_builder
 from api.tasks import (
@@ -25,6 +26,8 @@ from api.tasks import (
     update_main_config,
     install,
 )
+
+LoggingManager(loglevel=_config.LOGLEVEL)
 
 stop_event = threading.Event()
 
@@ -45,7 +48,6 @@ def post_fork(server, worker):
     is_main = os.environ.get("NXGUARD_ROLE") == "main"
     logger.info("NXGuard instance is main: %s", is_main)
     if is_main:
-        c_admin.restart()
         if not os.path.exists(f"{_config.DB_PATH}/app.duckdb"):
             install()
             if os.path.exists(f"{_config.DB_PATH}/init-data.json"):

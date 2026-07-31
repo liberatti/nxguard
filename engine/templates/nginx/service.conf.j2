@@ -8,29 +8,20 @@ limit_req_zone $binary_remote_addr zone={{name}}_rate:16m rate={{rate_limit_per_
 proxy_cache_path {{BASE_PATH}}/cache/{{name}} keys_zone={{name}}_cache:10m use_temp_path=off loader_threshold=300 loader_files=200 max_size=128m;
 server {
   lua_code_cache on;
-
-  {%if config.cache and config.cache.enabled %}
-  set $cache_server_url {{ config.cache.host }};
-  set $cache_server_port {{ config.cache.port }};
-  {%endif%}
+  
   server_name {% for t in sans %}{{ t }} {% endfor %};
   if ($missing_domain_match) {return 410;}
   {%- if rate_limit %}
   limit_req zone={{name}}_rate burst=25 nodelay;
   {%- endif %}
   set $service '{{name}}';
-  set $upstream '-';
-  set $route '-';
-  set $sensor '-';
   set $real_method $request_method;
   client_max_body_size {{body_limit}}m;
-  {%- if compression %}
-  gzip on;
-  gzip_min_length 1000;
-  gzip_disable 'msie6';
-  gzip_proxied no-cache no-store expired;
-  gzip_types {% for t in compression_types %}{{ t }} {% endfor %};
+
+  {%- if compression_types %}
+  {% include 'nginx/gzip.j2' %}
   {%endif%}
+
   proxy_no_cache $cookie_nocache $arg_nocache$arg_comment;
   proxy_no_cache $http_pragma    $http_authorization;
   proxy_request_buffering on;
@@ -44,9 +35,9 @@ server {
 
   modsecurity on;
   modsecurity_transaction_id "$request_id";
-#  modsecurity_rules_file {{BASE_PATH}}/modsec/conf/config.policy;
-#  modsecurity_rules_file {{BASE_PATH}}/modsec/conf/service-proxy.policy;
-#  modsecurity_rules_file {{BASE_PATH}}/modsec/conf/crs.policy;
+  {%- if has_inspection %}
+  modsecurity_rules_file {{BASE_PATH}}/modsec/conf/service-{{name}}.{%-if IS_TEST%}test-{%-endif%}policy;
+  {%endif%}
 
   {%- if ssl_enable %}
   ssl_protocols {% for t in ssl_protocols %}{{ t }} {% endfor %};
@@ -60,11 +51,6 @@ server {
   ssl_certificate {{BASE_PATH}}/keystore/{%-if IS_TEST%}test-{%-endif%}{{certificate.name}}.crt;
   ssl_certificate_key {{BASE_PATH}}/keystore/{%-if IS_TEST%}test-{%-endif%}{{certificate.name}}.key;
   {%- endif %}
-
-  location @rate_limited {
-   add_header X-RateLimit-Triggered true;
-   return 429;
-  }
 
   location ^~ /.well-known/acme-challenge/ {
    default_type "text/plain";
@@ -95,11 +81,11 @@ server {
   location ~ {{p}}{
    set $route '{{r.name}}';
    set $sensor '{{r.sensor.name}}';
-   
-   access_by_lua_file  {{BASE_PATH}}/luajit/share/lua/5.1/nxguard/sensor-{{r.sensor.name}}.lua;
-
-#   modsecurity_rules_file {{BASE_PATH}}/modsec/conf/{%-if IS_TEST%}test-{%-endif%}route-proxy-all-req.policy;
    set $upstream '{{r.upstream.name}}';
+
+   access_by_lua_file  {{BASE_PATH}}/luajit/share/lua/5.1/nxguard/sensors/{{r.sensor.name | lower}}.lua;
+#  modsecurity_rules_file {{BASE_PATH}}/modsec/conf/{%-if IS_TEST%}test-{%-endif%}route-proxy-all-req.policy;
+   
    proxy_http_version 1.1;
    proxy_intercept_errors on;
    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -114,11 +100,16 @@ server {
 {%- endfor %}
 {%- endfor %}
 
-  error_page 404 403 500 502 503 504 /custom_error;
-  location = /custom_error {
-   internal;
+  error_page 404 403 500 502 503 504 @custom_error;
+  location @custom_error {
    content_by_lua_file {{BASE_PATH}}/luajit/share/lua/5.1/nxguard/content_by_custom_error.lua;
   }
+  
+  location @rate_limited {
+   add_header X-RateLimit-Triggered true;
+   return 429;
+  }
+
   access_log off;
   error_log /opt/nxguard/logs/error.log warn;
   log_by_lua_file {{BASE_PATH}}/luajit/share/lua/5.1/nxguard/log_by_custom.lua;

@@ -5,7 +5,7 @@ from jinja2 import Environment, FileSystemLoader
 from nxcore.middleware.logging_manager import logger
 
 import config
-from config import BASE_PATH
+from api.model.seclang_model import RuleCategoryDao
 
 
 def _remove_file(file_path: str) -> None:
@@ -26,7 +26,7 @@ def _render_template_to_file(
         f.write(template_content)
 
 
-def clean(data, output_dir=BASE_PATH, test=False):
+def clean(data, output_dir=config.BASE_PATH, test=False):
     """Removes generated Nginx configurations, certificates, and service files."""
     conf_dir = f"{output_dir}/nginx/conf/tests" if test else f"{output_dir}/nginx/conf"
     logger.info(f"[{output_dir}] - Cleanup (test={test})")
@@ -108,12 +108,44 @@ def _generate_sensors(env: Environment, output_dir: str, data: dict) -> None:
         )
         sensor.update({"name": sensor["name"].lower()})
         os.makedirs(f"{config.LUA_LIBS_PATH}/nxguard/sensors", exist_ok=True)
+
+        # TODO create test step for lua sensor
         _render_template_to_file(
             env,
             "sensor.lua",
             f"{config.LUA_LIBS_PATH}/nxguard/sensors/{sensor['name']}.lua",
             sensor,
         )
+
+        # modsec
+        s_data = {
+            "name": sensor["name"],
+            "categories": [
+                {"name": c, "rules": []} for c in sensor.get("categories", [])
+            ],
+            "inbound_anomaly_score_threshold": 1,
+            "outbound_anomaly_score_threshold": 1,
+            "paranoia_level": 1,
+            "allowed_http_versions": "",
+            "max_file_size": 12,
+        }
+        with RuleCategoryDao() as dao:
+            for c in s_data["categories"]:
+                category = dao.get_by_name(c["name"])
+                if category["file"]:
+                    with open(
+                        f"{output_dir}/modsec/coreruleset/{category['file']}",
+                        "r",
+                        encoding="utf-8",
+                    ) as r_data:
+                        c.update({"rules": r_data.read()})
+
+            _render_template_to_file(
+                env,
+                "modsec/modsec_sensor.j2",
+                f"{output_dir}/modsec/coreruleset/sensor-{sensor['name']}.policy",
+                s_data,
+            )
 
 
 def _generate_services(
@@ -137,16 +169,31 @@ def _generate_services(
                 if b["protocol"] == "HTTPS":
                     service.update({"ssl_enable": True})
 
+        if "routes" in service:
+            for r in service["routes"]:
+                if "sensor" in r:
+                    service.update({"has_inspection": True})
+                    break
+
         _render_template_to_file(env, "nginx/service.conf.j2", service_path, service)
 
+        if "has_inspection" in service:
+            prefix = "test-" if test else ""
+            _render_template_to_file(
+                env,
+                "modsec/modsec_service.j2",
+                f"{output_dir}/modsec/conf/service-{service['name']}.{prefix}policy",
+                service,
+            )
 
-def generate(data, output_dir=BASE_PATH, test=False):
+
+def generate(data, output_dir=config.BASE_PATH, test=False):
     """Generates all Nginx configuration, sensor, and certificate files from Jinja2 templates."""
     t_dir = ["client_body", "fastcgi", "proxy", "scgi", "uwsgi"]
     for t in t_dir:
         os.makedirs(f"{output_dir}/temp/{t}", exist_ok=True)
 
-    data.update({"IS_TEST": test, "BASE_PATH": config.BASE_PATH})
+    data.update({"IS_TEST": test, "config.BASE_PATH": config.BASE_PATH})
     env = Environment(loader=FileSystemLoader("engine/templates"))
 
     conf_dir = (

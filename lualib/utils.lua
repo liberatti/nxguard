@@ -48,8 +48,7 @@ end
 function _M.respond(code, _msg)
     local request_id = ngx.var.request_id
     ngx.header["X-Message"] = _msg
-    ngx.header["X-Request-Id"] = request_id
-    ngx.log(ngx.ERR, "[block] [", request_id, "]: ", _msg)
+    --ngx.log(ngx.ERR, "[block] [", request_id, "]: ", _msg)
     return ngx.exit(code)
 end
 

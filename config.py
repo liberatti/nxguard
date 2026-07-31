@@ -46,10 +46,6 @@ JWT_AUD = "nxg"
 # Cluster config
 NXGUARD_ENDPOINT = os.environ.get("NXGUARD_ENDPOINT", "http://localhost:5000/nxg")
 NXGUARD_API_KEY = os.environ.get("NXGUARD_API_KEY", secrets.token_urlsafe(32))
-
-REDIS_CACHE_PORT = int(os.environ.get("REDIS_CACHE_PORT", 6379))
-REDIS_CACHE_PASS = os.environ.get("REDIS_CACHE_PASS", None)
-
 CORS = {
     r"/*": {
         "origins": "*",

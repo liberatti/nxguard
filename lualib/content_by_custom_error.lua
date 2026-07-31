@@ -20,7 +20,6 @@ ngx.header["X-Message"] = nil
 local request_id = ngx.var.request_id
 
 ngx.status = status
-ngx.header["X-Request-Id"] = request_id
 ngx.header.content_type = "application/json"
 ngx.say(cjson.encode({
     status = status,

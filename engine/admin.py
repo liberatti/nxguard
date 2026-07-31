@@ -30,7 +30,9 @@ def validate(conf):
             logger.error(msg)
             return msg
     finally:
-        c_render.clean(conf, test=True)
+        pass
+        # TODO enable test cleanup
+        # c_render.clean(conf, test=True)
 
     with ConfigBackupDao() as backup_dao:
         scn = gen_random_string(16)

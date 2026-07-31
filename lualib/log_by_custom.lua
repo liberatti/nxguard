@@ -37,16 +37,19 @@ local log_data = {
         action = rate_limit_action
     },
     geoip = {
-        ans_number = ngx.ctx.geoip_ans_number or "-",
-        ans_description = ngx.ctx.geoip_ans_description or "-",
-        country_code = ngx.ctx.geoip_country_code or "-",
-        action = ngx.ctx.geoip_action
+        country_code = ngx.ctx.country_code or (ngx.req.get_headers() and ngx.req.get_headers()["x-nxg-country-code"]) or "--",
+        action = ngx.ctx.geoip_action or (ngx.req.get_headers() and ngx.req.get_headers()["x-nxg-geoip-action"])
     },
-    reputation = ngx.ctx.reputation,
+    reputation = {
+        score = tonumber(ngx.ctx.risk_score or (ngx.req.get_headers() and ngx.req.get_headers()["x-nxg-risk-score"])) or 0,
+        action = ngx.ctx.reputation_action or (ngx.req.get_headers() and ngx.req.get_headers()["x-nxg-reputation-action"]),
+        trusted = (string.lower(tostring(ngx.ctx.trusted ~= nil and ngx.ctx.trusted or (ngx.req.get_headers() and ngx.req.get_headers()["x-nxg-trusted"]))) == "true")
+    },
     mtls = {
         enabled = ngx.var.ssl_client_verify and true or false,
         verified = ngx.var.ssl_client_verify == "SUCCESS"
-    }
+    },
+    ipxa = ngx.ctx.ipxa or (ngx.req.get_headers() and ngx.req.get_headers()["x-nxg-ipxa"]) or "failed",
 }
 
 local json_line = cjson.encode(log_data)

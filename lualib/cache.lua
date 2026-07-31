@@ -4,10 +4,10 @@ local cjson = require("cjson")
 function _M.new(maxsize, ttl)
     local self = {}
     local CACHE_TTL = ttl or 30
-    local dict = ngx.shared.ip_cache
+    local dict = ngx.shared.ipxa_cache
 
     if not dict then
-        ngx.log(ngx.ERR, "lua_shared_dict 'ip_cache' not found in nginx.conf")
+        ngx.log(ngx.ERR, "lua_shared_dict 'ipxa_cache' not found in nginx.conf")
     end
 
     function self.get(key)

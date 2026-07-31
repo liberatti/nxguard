@@ -2,7 +2,7 @@
   "config": {
     "dns_resolver": "127.0.0.11 8.8.8.8 1.1.1.1",
     "ipxa": {
-      "url": "http://host.docker.internal:3001",
+      "url": "http://ipxa:5000",
       "key": "tZzDBUSnoy76LLSvu1Vg3e9vdFJINMT2"
     }
   },
@@ -71,11 +71,13 @@
           "lan_bypass"
         ]
       },
-      "score": {
-        "inbound": 15,
-        "outbound": 15
-      },
-      "inspect_level": 3
+      "inspection": {
+        "score": {
+          "inbound": 15,
+          "outbound": 15
+        },
+        "level": 3
+      }
     }
   ],
   "upstreams": [
