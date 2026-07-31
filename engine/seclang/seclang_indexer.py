@@ -13,6 +13,14 @@ def get_default_vars(
         return meta["variables"]
 
 
+def get_default_categories(
+    config_file=f"{config.BASE_PATH}/admin/engine/seclang/crs-config.json",
+):
+    with open(config_file, "r", encoding="utf-8") as arq:
+        meta = json.load(arq)
+        return meta["categories"]
+
+
 def index(
     config_file=f"{config.BASE_PATH}/admin/engine/seclang/crs-config.json",
     base_path=f"{config.BASE_PATH}/modsec/coreruleset",

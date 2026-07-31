@@ -73,8 +73,8 @@
       },
       "inspection": {
         "score": {
-          "inbound": 15,
-          "outbound": 15
+          "inbound": 5,
+          "outbound": 10
         },
         "level": 3
       }
@@ -135,7 +135,7 @@
       "name": "local-dev",
       "rate_limit_per_sec": 256,
       "active": true,
-      "body_limit": 4096,
+      "body_limit": 10240,
       "buffer": 1024,
       "bindings": [
         {

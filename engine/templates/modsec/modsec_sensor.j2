@@ -1,4 +1,5 @@
 # SENSOR
+SecRuleEngine On
 SecRule &TX:inbound_anomaly_score_threshold "@eq 0" "id:901100,phase:1,pass,nolog,ver:'OWASP_CRS/3.3.9',setvar:'tx.inbound_anomaly_score_threshold={{ inbound_anomaly_score_threshold }}'"
 SecRule &TX:outbound_anomaly_score_threshold "@eq 0" "id:901110,phase:1,pass,nolog,ver:'OWASP_CRS/3.3.9',setvar:'tx.outbound_anomaly_score_threshold={{ outbound_anomaly_score_threshold }}'"
 SecRule &TX:paranoia_level "@eq 0" "id:901120,phase:1,pass,nolog,ver:'OWASP_CRS/3.3.9',setvar:'tx.paranoia_level={{ paranoia_level }}'"
@@ -28,7 +29,10 @@ SecRule TX:enforce_bodyproc_urlencoded "@eq 1" "id:901350,phase:1,pass,t:none,t:
 SecRule REQBODY_PROCESSOR "!@rx (?:URLENCODED|MULTIPART|XML|JSON)" "ctl:requestBodyProcessor=URLENCODED"
 SecRule TX:executing_paranoia_level "@lt %{tx.paranoia_level}" "id:901500,phase:1,deny,status:500,t:none,log,msg:'Executing paranoia level configured is lower than the paranoia level itself. This is illegal. Blocking request. Aborting',ver:'OWASP_CRS/3.3.9'"
 
-#### Categories ============================================
+####################################################################################
+# Categories
+####################################################################################
 {%- for c in categories %}
+#### {{ c.name }} ##################################################################
 {{ c.rules }}
 {%- endfor %}

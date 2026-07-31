@@ -4,7 +4,6 @@ import time
 import traceback
 
 import requests
-import schedule
 from nxcore.common_utils import get_server_id
 from nxcore.middleware.logging_manager import logger
 

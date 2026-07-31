@@ -8,7 +8,6 @@ import psutil
 from nxcore.common_utils import gen_random_string
 from nxcore.middleware.logging_manager import logger
 
-import engine.build as c_builder
 import engine.render as c_render
 from api.model.config_model import ConfigBackupDao, ConfigDao
 from config import BASE_PATH

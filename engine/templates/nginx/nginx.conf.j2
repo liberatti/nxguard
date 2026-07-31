@@ -8,7 +8,7 @@ events {worker_connections 1024;}
 
 http {
  resolver {{config.dns_resolver}} valid=30s;
- uninitialized_variable_warn on;
+ uninitialized_variable_warn off;
  lua_shared_dict log_buffer 16m;
  lua_shared_dict ipxa_cache 64m;
  init_worker_by_lua_block {

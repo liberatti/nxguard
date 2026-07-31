@@ -1,5 +1,6 @@
 import glob
 import os
+import re
 
 from jinja2 import Environment, FileSystemLoader
 from nxcore.middleware.logging_manager import logger
@@ -23,6 +24,8 @@ def _render_template_to_file(
 ) -> None:
     """Renders a Jinja2 template with the given context and writes it to output_path."""
     template_content = env.get_template(template_name).render(context)
+    # Collapse multiple blank lines into a single blank line
+    template_content = re.sub(r"(\n\s*){2,}", "\n\n", template_content)
     with open(output_path, "w") as f:
         f.write(template_content)
 
@@ -100,7 +103,10 @@ def _generate_sensors(
     """Generates Lua sensor configuration files for LuaJIT."""
     logger.info(f"[{output_dir}] - Generate sensor")
     prefix = "test-" if test else ""
+    default_vars = get_default_vars()
+
     for sensor in data["sensors"]:
+        sensor.update(default_vars)
         sensor.update(
             {
                 "ipxa_url": data["config"]["ipxa"]["url"],
@@ -110,7 +116,7 @@ def _generate_sensors(
                 "trusted": ",".join(sensor["security"]["trusted"]),
             }
         )
-        sensor.update(get_default_vars())
+
         sensor.update(
             {
                 "name": sensor["name"].lower(),
@@ -134,23 +140,25 @@ def _generate_sensors(
         )
 
         with RuleCategoryDao() as dao:
-            categories_names = sensor.pop("categories", [])
+            ordered_cats = dao.get_all(order_by="seq")
             categories = []
 
-            for c in categories_names:
-                c_name = c["name"] if isinstance(c, dict) else str(c)
-                category = dao.get_by_name(c_name)
-                if not category and isinstance(c, dict):
-                    category = c
-                if category:
-                    if category.get("file"):
-                        file_path = (
-                            f"{output_dir}/modsec/coreruleset/{category['file']}"
-                        )
+            sensor_cats = {
+                cat if isinstance(cat, str) else (cat.get("name") or cat.get("_id"))
+                for cat in sensor.get("categories", [])
+            }
+            for c in ordered_cats["data"]:
+                if (
+                    c.get("system")
+                    or c.get("name") in sensor_cats
+                    or c.get("_id") in sensor_cats
+                ):
+                    if c.get("file"):
+                        file_path = f"{output_dir}/modsec/coreruleset/{c['file']}"
                         if os.path.exists(file_path):
                             with open(file_path, "r", encoding="utf-8") as r_data:
-                                category.update({"rules": r_data.read()})
-                    categories.append(category)
+                                c.update({"rules": r_data.read()})
+                    categories.append(c)
 
             sensor.update({"categories": categories})
             _render_template_to_file(
@@ -172,6 +180,7 @@ def _generate_services(
 ) -> None:
     """Generates Nginx configuration files for each defined service."""
     logger.info(f"[{output_dir}] - Generate Services")
+    prefix = "test-" if test else ""
     for service in data["services"]:
         service.update(
             {
@@ -197,14 +206,19 @@ def _generate_services(
                         if isinstance(sensor_raw, dict)
                         else str(sensor_raw).lower()
                     )
-                    service.update({"has_inspection": True})
+
+                    service.update(
+                        {
+                            "has_inspection": True,
+                            "service_policy_file": f"{output_dir}/modsec/conf/{prefix}service-{service['name']}.policy",
+                        }
+                    )
                     sensor = __resolve_sensor(s_name, data)
-                    sensor_prefix = "test-" if test else ""
                     r.update(
                         {
                             "sensor": sensor,
-                            "route_policy_file": f"{conf_dir}/route-{service['name']}.{r['name']}.policy",
-                            "sensor_policy_file": f"{output_dir}/modsec/coreruleset/{sensor_prefix}sensor-{s_name}.policy",
+                            "route_policy_file": f"{output_dir}/modsec/conf/{prefix}route-{service['name']}.{r['name']}.policy",
+                            "sensor_policy_file": f"{output_dir}/modsec/coreruleset/{prefix}sensor-{s_name}.policy",
                         }
                     )
                     _render_template_to_file(
@@ -217,11 +231,10 @@ def _generate_services(
         _render_template_to_file(env, "nginx/service.conf.j2", service_path, service)
 
         if "has_inspection" in service:
-            prefix = "test-" if test else ""
             _render_template_to_file(
                 env,
                 "modsec/modsec_service.j2",
-                f"{output_dir}/modsec/conf/service-{service['name']}.{prefix}policy",
+                service["service_policy_file"],
                 service,
             )
 

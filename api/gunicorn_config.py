@@ -7,7 +7,6 @@ try:
 except ImportError:
     pass
 
-import fcntl
 import os
 import threading
 import time

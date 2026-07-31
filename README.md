@@ -85,8 +85,11 @@ volumes:
 Validate your WAF rules using **GoTestWAF**:
 
 ```bash
-docker run --rm -v ${PWD}/reports:/app/reports \
-    wallarm/gotestwaf --url=https://<YOUR_ENDPOINT> --noEmailReport
+docker run --rm \
+  --shm-size=2g \
+  --add-host nxguard.local:host-gateway \
+  -v ${PWD}/reports:/app/reports \
+  wallarm/gotestwaf --url=http://nxguard.local:8080/nxg/ --blockStatusCodes=403,404 --reportFormat=html --noEmailReport
 ```
 
 ---

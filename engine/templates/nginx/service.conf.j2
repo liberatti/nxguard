@@ -36,7 +36,7 @@ server {
   modsecurity on;
   modsecurity_transaction_id "$request_id";
   {%- if has_inspection %}
-  modsecurity_rules_file {{BASE_PATH}}/modsec/conf/service-{{name}}.{%-if IS_TEST%}test-{%-endif%}policy;
+  modsecurity_rules_file {{service_policy_file}};
   {%endif%}
 
   {%- if ssl_enable %}
@@ -84,8 +84,11 @@ server {
    set $upstream '{{r.upstream.name}}';
 
    access_by_lua_file  {{BASE_PATH}}/luajit/share/lua/5.1/nxguard/sensors/{{r.sensor.name | lower}}.lua;
-   modsecurity_rules_file {{r.sensor_policy_file | lower}};
-   modsecurity_rules_file {{r.route_policy_file | lower}};
+
+  {%- if has_inspection %}
+  modsecurity_rules_file {{r.route_policy_file | lower}};
+  modsecurity_rules_file {{r.sensor_policy_file | lower}};
+  {%endif%}
 
    proxy_http_version 1.1;
    proxy_intercept_errors on;
