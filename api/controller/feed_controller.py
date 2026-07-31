@@ -9,11 +9,11 @@ from nxcore.controllers.base_controller import (
     response_error_parse,
     get_pagination,
     has_any_authority,
-    response_data_removed
+    response_data_removed,
 )
 
 from nxcore.middleware.socket_manager import emit_event
-from api.repository.config_model import ChangeDao
+from api.model.config_model import ChangeDao
 from api.services.ipxa_services import IPXAService
 
 routes = Blueprint("feed", __name__)
@@ -30,7 +30,10 @@ def after(response: Response) -> Response:
     Returns:
         Response: The modified response object
     """
-    if request.method in ["PUT", "POST", "DELETE"] and response.status_code in [200, 201]:
+    if request.method in ["PUT", "POST", "DELETE"] and response.status_code in [
+        200,
+        201,
+    ]:
         dao = ChangeDao()
         if not dao.get_by_name("feed"):
             dao.persist({"name": "feed"})
@@ -90,7 +93,11 @@ def search() -> Response:
     """
     dao = IPXAService.feeds
     result = dao.get_all(pagination=get_pagination())
-    return response_data(result, dao.pageSchema) if result["metadata"]["total_elements"] > 0 else response_error_404()
+    return (
+        response_data(result, dao.pageSchema)
+        if result["metadata"]["total_elements"] > 0
+        else response_error_404()
+    )
 
 
 @routes.route("/<feed_id>", methods=["PUT"])

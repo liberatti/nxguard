@@ -2,10 +2,10 @@ import traceback
 from datetime import datetime, timedelta
 from acme import errors as ACMEerrors
 
-from api.core.middleware.logging import logger
+from nxcore.middleware.logging_manager import logger
 
 # noinspection PyPep8Naming
-from api.common_utils import replace_tz
+from nxcore.common_utils import replace_tz
 from api.model.acme_model import ChallengeDao
 from api.model.certificate_model import CertificateDao
 from api.model.service_model import ServiceDao

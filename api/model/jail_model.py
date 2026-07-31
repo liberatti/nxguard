@@ -54,19 +54,16 @@ class JailDao(DuckDAO):
         pass
 
     def _get_api_headers(self):
-        from api.tools.feed_service import SecurityFeedService
+        from api.services.ipxa_services import IPXAService
 
-        _, key = SecurityFeedService.get_ipxa_config()
-        headers = {"Content-Type": "application/json"}
-        if key:
-            headers["x-api-key"] = key
+        _, headers = IPXAService.get_api_config()
         return headers
 
     def _get_api_url(self, path=""):
-        from api.tools.feed_service import SecurityFeedService
+        from api.services.ipxa_services import IPXAService
 
-        url, _ = SecurityFeedService.get_ipxa_config()
-        return f"{url}/api/jail{path}"
+        url, _ = IPXAService.get_api_config(f"/api/jail{path}")
+        return url
 
     def get_all(self, pagination=None, order_by=None):
         try:

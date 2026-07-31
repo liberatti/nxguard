@@ -1,6 +1,6 @@
 from flask import Blueprint, make_response, Response
 
-from api.core.controllers.base_controller import (
+from nxcore.controllers.base_controller import (
     response_error_404
 )
 
@@ -20,10 +20,10 @@ def get_config(key: str) -> Response:
     Returns:
         Response: Plain text response with challenge content or 404 error
     """
-    model = ChallengeDao()
-    result = model.get_by_key(key)
-    if result:
-        response = make_response(result["content"], 200)
-        response.mimetype = "text/plain"
-        return response
-    return response_error_404()
+    with ChallengeDao() as model:
+        result = model.get_by_key(key)
+        if result:
+            response = make_response(result["content"], 200)
+            response.mimetype = "text/plain"
+            return response
+        return response_error_404()

@@ -1,7 +1,7 @@
 from flask import Blueprint, request, Response
 from marshmallow import ValidationError
 
-from api.core.controllers.base_controller import (
+from nxcore.controllers.base_controller import (
     response_data,
     response_error_404,
     response_error_parse,
@@ -10,7 +10,7 @@ from api.core.controllers.base_controller import (
     response_data_removed
 )
 
-from api.core.middleware.socket_manager import emit_event
+from nxcore.middleware.socket_manager import emit_event
 from api.model.config_model import ChangeDao
 from api.model.service_model import RouteFilterDao
 
@@ -29,10 +29,10 @@ def after(response: Response) -> Response:
         Response: The modified response object
     """
     if request.method in ["PUT", "POST", "DELETE"] and response.status_code in [200, 201]:
-        dao = ChangeDao()
-        if not dao.get_by_name("route_filter"):
-            dao.persist({"name": "route_filter"})
-        emit_event('tracking_evt')
+        with ChangeDao() as dao:
+            if not dao.get_by_name("route_filter"):
+                dao.persist({"name": "route_filter"})
+            emit_event('tracking_evt')
     return response
 
 
@@ -45,9 +45,9 @@ def search() -> Response:
     Returns:
         Response: JSON response containing paginated route filter list or 404 error
     """
-    dao = RouteFilterDao()
-    result = dao.get_all(pagination=get_pagination())
-    return response_data(result, dao.pageSchema) if result["metadata"]["total_elements"] > 0 else response_error_404()
+    with RouteFilterDao() as dao:
+        result = dao.get_all(pagination=get_pagination())
+        return response_data(result, dao.pageSchema) if result["metadata"]["total_elements"] > 0 else response_error_404()
 
 
 @routes.route("/<route_filter_id>", methods=["GET"])
@@ -62,9 +62,9 @@ def get(route_filter_id: str) -> Response:
     Returns:
         Response: JSON response containing the route filter data or 404 error
     """
-    dao = RouteFilterDao()
-    route_filter = dao.get_by_id(route_filter_id)
-    return response_data(route_filter, dao.schema) if route_filter else response_error_404()
+    with RouteFilterDao() as dao:
+        route_filter = dao.get_by_id(route_filter_id)
+        return response_data(route_filter, dao.schema) if route_filter else response_error_404()
 
 
 @routes.route("", methods=["POST"])
@@ -76,11 +76,11 @@ def save() -> Response:
     Returns:
         Response: JSON response containing the created route filter or error message
     """
-    dao = RouteFilterDao()
     try:
-        route_filter = dao.json_load(request.json)
-        dao.persist(route_filter)
-        return response_data(route_filter, dao.schema)
+        with RouteFilterDao() as dao:
+            route_filter = dao.json_load(request.json)
+            dao.persist(route_filter)
+            return response_data(route_filter, dao.schema)
     except ValidationError as err:
         return response_error_parse(err)
 
@@ -97,11 +97,11 @@ def update(route_filter_id: str) -> Response:
     Returns:
         Response: JSON response containing the updated route filter or error message
     """
-    dao = RouteFilterDao()
     try:
-        route_filter = dao.json_load(request.json)
-        dao.update_by_id(route_filter_id, route_filter)
-        return response_data(route_filter, dao.schema)
+        with RouteFilterDao() as dao:
+            route_filter = dao.json_load(request.json)
+            dao.update_by_id(route_filter_id, route_filter)
+            return response_data(route_filter, dao.schema)
     except ValidationError as err:
         return response_error_parse(err)
 
@@ -118,6 +118,6 @@ def delete(route_filter_id: str) -> Response:
     Returns:
         Response: Success message or error response
     """
-    dao = RouteFilterDao()
-    result = dao.delete_by_id(route_filter_id)
-    return response_data_removed(route_filter_id) if result else response_error_404()
+    with RouteFilterDao() as dao:
+        result = dao.delete_by_id(route_filter_id)
+        return response_data_removed(route_filter_id) if result else response_error_404()

@@ -79,7 +79,7 @@ class FeedService:
 
     def get_all(self, pagination=None):
         try:
-            url, headers = IPXAService.get_api_config("/api/feed")
+            url, headers = IPXAService.get_api_config("/api/feed/")
             params = {}
             if pagination:
                 params["page"] = pagination.get("page", 1)
@@ -88,17 +88,27 @@ class FeedService:
             response = requests.get(url, headers=headers, params=params, timeout=5)
             if response.status_code == 200:
                 res_data = response.json()
-                feeds = res_data.get("feeds", [])
+                if isinstance(res_data, dict) and "data" in res_data and isinstance(res_data["data"], list):
+                    feeds = res_data["data"]
+                    pagination_meta = res_data.get("metadata", {})
+                else:
+                    feeds = res_data.get("feeds", []) if isinstance(res_data, dict) else []
+                    pag = res_data.get("pagination", {}) if isinstance(res_data, dict) else {}
+                    pagination_meta = {
+                        "total_elements": pag.get("total", len(feeds)),
+                        "page": pag.get("page", 1),
+                        "per_page": pag.get("per_page", 10),
+                    }
 
                 mapped_feeds = []
                 for f in feeds:
                     mapped_feeds.append(
                         {
-                            "_id": str(f.get("id", "")),
+                            "_id": str(f.get("_id") or f.get("id", "")),
                             "name": f.get("name"),
-                            "slug": f.get("name"),
+                            "slug": f.get("slug") or f.get("name"),
                             "type": f.get("type"),
-                            "source": f.get("url"),
+                            "source": f.get("source") or f.get("url"),
                             "description": f.get("description"),
                             "provider": f.get("provider", "ipxa"),
                             "version": f.get("version", "1.0"),
@@ -108,15 +118,6 @@ class FeedService:
                             "updated_on": f.get("updated_on"),
                         }
                     )
-
-                pag = res_data.get("pagination", {})
-                total = pag.get("total", len(mapped_feeds))
-
-                pagination_meta = {
-                    "total_elements": total,
-                    "page": pag.get("page", 1),
-                    "per_page": pag.get("per_page", 10),
-                }
 
                 return {"metadata": pagination_meta, "data": mapped_feeds}
             return {
@@ -135,21 +136,23 @@ class FeedService:
             url, headers = IPXAService.get_api_config(f"/api/feed/{_id}")
             response = requests.get(url, headers=headers, timeout=5)
             if response.status_code == 200:
-                f = response.json()
-                return {
-                    "_id": str(f.get("id", "")),
-                    "name": f.get("name"),
-                    "slug": f.get("name"),
-                    "type": f.get("type"),
-                    "source": f.get("url"),
-                    "description": f.get("description"),
-                    "provider": f.get("provider", "ipxa"),
-                    "version": f.get("version", "1.0"),
-                    "action": f.get("action", "deny"),
-                    "scope": f.get("scope", "system"),
-                    "update_interval": f.get("update_interval", "daily"),
-                    "updated_on": f.get("updated_on"),
-                }
+                f_data = response.json()
+                f = f_data.get("data", f_data) if isinstance(f_data, dict) else f_data
+                if isinstance(f, dict):
+                    return {
+                        "_id": str(f.get("_id") or f.get("id", "")),
+                        "name": f.get("name"),
+                        "slug": f.get("slug") or f.get("name"),
+                        "type": f.get("type"),
+                        "source": f.get("source") or f.get("url"),
+                        "description": f.get("description"),
+                        "provider": f.get("provider", "ipxa"),
+                        "version": f.get("version", "1.0"),
+                        "action": f.get("action", "deny"),
+                        "scope": f.get("scope", "system"),
+                        "update_interval": f.get("update_interval", "daily"),
+                        "updated_on": f.get("updated_on"),
+                    }
             return None
         except Exception as e:
             logger.error(f"Error fetching feed by ID from IPXA: {e}")
@@ -157,17 +160,22 @@ class FeedService:
 
     def persist(self, vo):
         try:
-            url, headers = IPXAService.get_api_config("/api/feed")
+            url, headers = IPXAService.get_api_config("/api/feed/")
             ipxa_feed = {
                 "name": vo.get("name"),
+                "slug": vo.get("slug") or vo.get("name"),
+                "provider": vo.get("provider", "ipxa"),
                 "type": vo.get("type"),
-                "url": vo.get("source"),
+                "source": vo.get("source") or vo.get("url"),
                 "description": vo.get("description"),
+                "format": vo.get("format", "list"),
+                "update_interval": vo.get("update_interval", "daily"),
             }
             response = requests.post(url, headers=headers, json=ipxa_feed, timeout=5)
             if response.status_code in [200, 201]:
                 res = response.json()
-                return str(res.get("id", ""))
+                res_dict = res.get("data", res) if isinstance(res, dict) else {}
+                return str(res_dict.get("_id") or res_dict.get("id", ""))
             return None
         except Exception as e:
             logger.error(f"Error persisting feed to IPXA: {e}")
@@ -178,9 +186,13 @@ class FeedService:
             url, headers = IPXAService.get_api_config(f"/api/feed/{_id}")
             ipxa_feed = {
                 "name": vo.get("name"),
+                "slug": vo.get("slug") or vo.get("name"),
+                "provider": vo.get("provider", "ipxa"),
                 "type": vo.get("type"),
-                "url": vo.get("source"),
+                "source": vo.get("source") or vo.get("url"),
                 "description": vo.get("description"),
+                "format": vo.get("format", "list"),
+                "update_interval": vo.get("update_interval", "daily"),
             }
             response = requests.put(url, headers=headers, json=ipxa_feed, timeout=5)
             return response.status_code in [200, 204]
@@ -225,12 +237,23 @@ class JailService:
             response = requests.get(url, headers=headers, params=params, timeout=5)
             if response.status_code == 200:
                 res_data = response.json()
-                jails = res_data.get("jails", [])
+                if isinstance(res_data, dict) and "data" in res_data and isinstance(res_data["data"], list):
+                    jails = res_data["data"]
+                    pagination_meta = res_data.get("metadata", {})
+                else:
+                    jails = res_data.get("jails", []) if isinstance(res_data, dict) else []
+                    pag = res_data.get("pagination", {}) if isinstance(res_data, dict) else {}
+                    pagination_meta = {
+                        "total_elements": pag.get("total", len(jails)),
+                        "page": pag.get("page", 1),
+                        "per_page": pag.get("per_page", 10),
+                    }
+
                 mapped_jails = []
                 for j in jails:
                     mapped_jails.append(
                         {
-                            "_id": str(j.get("id", "")),
+                            "_id": str(j.get("_id") or j.get("id", "")),
                             "name": j.get("name"),
                             "bantime": j.get("bantime"),
                             "occurrence": j.get("occurrence"),
@@ -239,15 +262,6 @@ class JailService:
                             "rules": j.get("rules", []),
                         }
                     )
-
-                pag = res_data.get("pagination", {})
-                total = pag.get("total", len(mapped_jails))
-
-                pagination_meta = {
-                    "total_elements": total,
-                    "page": pag.get("page", 1),
-                    "per_page": pag.get("per_page", 10),
-                }
 
                 return {"metadata": pagination_meta, "data": mapped_jails}
             return {
@@ -266,16 +280,18 @@ class JailService:
             url, headers = IPXAService.get_api_config(f"/api/jail/{_id}")
             response = requests.get(url, headers=headers, timeout=5)
             if response.status_code == 200:
-                j = response.json()
-                return {
-                    "_id": str(j.get("id", "")),
-                    "name": j.get("name"),
-                    "bantime": j.get("bantime"),
-                    "occurrence": j.get("occurrence"),
-                    "interval": j.get("interval"),
-                    "content": j.get("content", []),
-                    "rules": j.get("rules", []),
-                }
+                j_data = response.json()
+                j = j_data.get("data", j_data) if isinstance(j_data, dict) else j_data
+                if isinstance(j, dict):
+                    return {
+                        "_id": str(j.get("_id") or j.get("id", "")),
+                        "name": j.get("name"),
+                        "bantime": j.get("bantime"),
+                        "occurrence": j.get("occurrence"),
+                        "interval": j.get("interval"),
+                        "content": j.get("content", []),
+                        "rules": j.get("rules", []),
+                    }
             return None
         except Exception as e:
             logger.error(f"Error fetching jail by ID from IPXA: {e}")
@@ -311,7 +327,8 @@ class JailService:
             response = requests.post(url, headers=headers, json=ipxa_jail, timeout=5)
             if response.status_code in [200, 201]:
                 res = response.json()
-                return str(res.get("id", ""))
+                res_dict = res.get("data", res) if isinstance(res, dict) else {}
+                return str(res_dict.get("_id") or res_dict.get("id", ""))
             return None
         except Exception as e:
             logger.error(f"Error persisting jail to IPXA: {e}")
@@ -378,11 +395,12 @@ class IPXAService:
     def geo_info(cls, ip: str) -> dict:
         ip_info = {}
         try:
-            url, headers = cls.get_api_config(f"/api/ip/info/{ip}?wid=2")
+            url, headers = cls.get_api_config(f"/api/ip/info/{ip}")
             logger.debug(f"Fetching GeoIP info from IPXA: {url}")
             response = requests.get(url, headers=headers, timeout=5)
             if response.status_code in [200, 201]:
-                data = response.json()
+                res_data = response.json()
+                data = res_data.get("data", res_data) if isinstance(res_data, dict) else {}
                 loc = data.get("location", {})
                 org = data.get("organization", {})
                 asn_number = org.get("asn_number")
@@ -393,7 +411,7 @@ class IPXAService:
                         "ans_number": (
                             str(asn_number) if asn_number is not None else None
                         ),
-                        "organization": org.get("asn_name"),
+                        "organization": org.get("asn_name") or org.get("asn_description"),
                         "latitude": loc.get("latitude"),
                         "longitude": loc.get("longitude"),
                     }
@@ -426,7 +444,8 @@ class IPXAService:
             logger.debug(f"Checking IP block status on IPXA: {url}")
             response = requests.get(url, headers=headers, timeout=5)
             if response.status_code in [200, 201]:
-                data = response.json()
+                res_data = response.json()
+                data = res_data.get("data", res_data) if isinstance(res_data, dict) else {}
                 risk_score = data.get("risk_score", 0)
                 reasons = data.get("reasons", [])
                 blocked = (risk_score >= 5) or len(reasons) > 0

@@ -1,6 +1,6 @@
 from flask import Blueprint, request, Response
 
-from api.core.controllers.base_controller import (
+from nxcore.controllers.base_controller import (
     response_error_404,
     has_any_authority,
     response_data_list
@@ -8,7 +8,7 @@ from api.core.controllers.base_controller import (
 
 
 from api.model.seclang_model import RuleCategoryDao
-from api.tools.ruleset_tool import RuleSetParser
+from engine.seclang.seclang_parser import RuleSetParser
 
 routes = Blueprint("rulecat", __name__)
 
@@ -25,15 +25,15 @@ def get(cat_id: str) -> Response:
     Returns:
         Response: JSON response containing the rule category data or 404 error
     """
-    dao = RuleCategoryDao()
-    cat = dao.get_by_id(cat_id)
-    if not cat:
-        return response_error_404()
-    return Response(
-        RuleSetParser.dumps(cat),
-        status=201,
-        mimetype="application/json"
-    )
+    with RuleCategoryDao() as dao:
+        cat = dao.get_by_id(cat_id)
+        if not cat:
+            return response_error_404()
+        return Response(
+            RuleSetParser.dumps(cat),
+            status=201,
+            mimetype="application/json"
+        )
 
 
 @routes.route("/by_name/<cat_name>", methods=["GET"])
@@ -48,15 +48,15 @@ def get_by_name(cat_name: str) -> Response:
     Returns:
         Response: JSON response containing the rule category data or 404 error
     """
-    dao = RuleCategoryDao()
-    cat = dao.get_by_name(cat_name)
-    if not cat:
-        return response_error_404()
-    return Response(
-        RuleSetParser.dumps(cat),
-        status=201,
-        mimetype="application/json"
-    )
+    with RuleCategoryDao() as dao:
+        cat = dao.get_by_name(cat_name)
+        if not cat:
+            return response_error_404()
+        return Response(
+            RuleSetParser.dumps(cat),
+            status=201,
+            mimetype="application/json"
+        )
 
 
 @routes.route("", methods=["GET"])
@@ -72,9 +72,9 @@ def search() -> Response:
     phases_str = request.args.get("phases", type=str)
     phases = [int(phase) for phase in phases_str.split(",")] if phases_str else []
 
-    dao = RuleCategoryDao()
-    if name and phases:
-        result = dao.get_by_name_and_phases(name, phases)
-    else:
-        result = dao.get_by_phases(phases)
-    return response_data_list(result, dao.schema)
+    with RuleCategoryDao() as dao:
+        if name and phases:
+            result = dao.get_by_name_and_phases(name, phases)
+        else:
+            result = dao.get_by_phases(phases)
+        return response_data_list(result, dao.schema)

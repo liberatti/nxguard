@@ -1,7 +1,7 @@
 from flask import Blueprint, request, Response
 from marshmallow import ValidationError
 
-from api.core.controllers.base_controller import (
+from nxcore.controllers.base_controller import (
     response_data,
     response_error_404,
     response_error_parse,
@@ -11,7 +11,7 @@ from api.core.controllers.base_controller import (
     response_data_removed
 )
 
-from api.core.middleware.socket_manager import emit_event
+from nxcore.middleware.socket_manager import emit_event
 from api.model.config_model import ChangeDao
 from api.model.jail_model import JailDao
 
@@ -30,10 +30,10 @@ def after(response: Response) -> Response:
         Response: The modified response object
     """
     if request.method in ["PUT", "POST", "DELETE"] and response.status_code in [200, 201]:
-        dao = ChangeDao()
-        if not dao.get_by_name("jail"):
-            dao.persist({"name": "jail"})
-        emit_event("tracking_evt")
+        with ChangeDao() as dao:
+            if not dao.get_by_name("jail"):
+                dao.persist({"name": "jail"})
+            emit_event("tracking_evt")
     return response
 
 
@@ -49,9 +49,9 @@ def get(jail_id: str) -> Response:
     Returns:
         Response: JSON response containing the jail data or 404 error
     """
-    dao = JailDao()
-    jail = dao.get_by_id(jail_id)
-    return response_data(jail, schema=dao.schema) if jail else response_error_404()
+    with JailDao() as dao:
+        jail = dao.get_by_id(jail_id)
+        return response_data(jail, schema=dao.schema) if jail else response_error_404()
 
 
 @routes.route("", methods=["POST"])
@@ -63,12 +63,12 @@ def save() -> Response:
     Returns:
         Response: JSON response containing the created jail or error message
     """
-    dao = JailDao()
     try:
-        jail_dict = dao.json_load(request.json)
-        pk = dao.persist(jail_dict)
-        jail = dao.get_by_id(pk)
-        return response_data(jail, schema=dao.schema)
+        with JailDao() as dao:
+            jail_dict = dao.json_load(request.json)
+            pk = dao.persist(jail_dict)
+            jail = dao.get_by_id(pk)
+            return response_data(jail, schema=dao.schema)
     except ValidationError as err:
         return response_error_parse(err)
 
@@ -82,9 +82,9 @@ def search() -> Response:
     Returns:
         Response: JSON response containing paginated jail list or 404 error
     """
-    dao = JailDao()
-    result = dao.get_all(pagination=get_pagination())
-    return response_data(result, schema=dao.pageSchema) if result["metadata"]["total_elements"] > 0 else response_error_404()
+    with JailDao() as dao:
+        result = dao.get_all(pagination=get_pagination())
+        return response_data(result, schema=dao.pageSchema) if result["metadata"]["total_elements"] > 0 else response_error_404()
 
 
 @routes.route("/<jail_id>", methods=["PUT"])
@@ -99,11 +99,11 @@ def update(jail_id: str) -> Response:
     Returns:
         Response: JSON response containing the updated jail or error message
     """
-    dao = JailDao()
     try:
-        jail_dict = dao.json_load(request.json)
-        result = dao.update_by_id(jail_id, jail_dict)
-        return response_data(result, dao.schema)
+        with JailDao() as dao:
+            jail_dict = dao.json_load(request.json)
+            result = dao.update_by_id(jail_id, jail_dict)
+            return response_data(result, dao.schema)
     except ValidationError as err:
         return response_error_parse(err)
 
@@ -120,9 +120,9 @@ def delete(jail_id: str) -> Response:
     Returns:
         Response: Success message or error response
     """
-    dao = JailDao()
-    result = dao.delete_by_id(jail_id)
-    return response_data_removed(jail_id) if result else response_error_404()
+    with JailDao() as dao:
+        result = dao.delete_by_id(jail_id)
+        return response_data_removed(jail_id) if result else response_error_404()
 
 
 @routes.route("/<jail_id>/add/<addr>", methods=["PUT"])
@@ -138,12 +138,12 @@ def add_to_jail(jail_id: str, addr: str) -> Response:
     Returns:
         Response: Success message or error response
     """
-    dao = JailDao()
     try:
-        result = dao.get_by_id(jail_id)
-        result["content"].append({"ipaddr": addr})
-        dao.update_by_id(jail_id, result)
-        return response_ok("ok")
+        with JailDao() as dao:
+            result = dao.get_by_id(jail_id)
+            result["content"].append({"ipaddr": addr})
+            dao.update_by_id(jail_id, result)
+            return response_ok("ok")
     except ValidationError as err:
         return response_error_parse(err)
 
@@ -161,11 +161,11 @@ def del_to_jail(jail_id: str, addr: str) -> Response:
     Returns:
         Response: Success message or error response
     """
-    dao = JailDao()
     try:
-        result = dao.get_by_id(jail_id)
-        result["content"] = [content for content in result["content"] if addr not in content["ipaddr"]]
-        dao.update_by_id(jail_id, result)
-        return response_ok("ok")
+        with JailDao() as dao:
+            result = dao.get_by_id(jail_id)
+            result["content"] = [content for content in result["content"] if addr not in content["ipaddr"]]
+            dao.update_by_id(jail_id, result)
+            return response_ok("ok")
     except ValidationError as err:
         return response_error_parse(err)

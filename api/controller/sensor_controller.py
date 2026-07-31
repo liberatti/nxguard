@@ -1,22 +1,21 @@
 from flask import Blueprint, request, Response
 from marshmallow import ValidationError
 
-from api.core.controllers.base_controller import (
+from nxcore.controllers.base_controller import (
     response_data,
     response_error_404,
     response_error_parse,
     get_pagination,
     has_any_authority,
     response_data_removed,
-    response_error_500
+    response_error_500,
 )
 
 
-from api.core.middleware.socket_manager import emit_event
+from nxcore.middleware.socket_manager import emit_event
 from api.model.config_model import ChangeDao
 from api.model.sensor_model import SensorDao
-from api.tools.cluster_tool import ClusterTool
-from api.tools.feed_service import SecurityFeedService
+from api.services.ipxa_services import IPXAService
 
 routes = Blueprint("sensor", __name__)
 
@@ -32,11 +31,14 @@ def after(response: Response) -> Response:
     Returns:
         Response: The modified response object
     """
-    if request.method in ["PUT", "POST", "DELETE"] and response.status_code in [200, 201]:
-        dao = ChangeDao()
-        if not dao.get_by_name("sensor"):
-            dao.persist({"name": "sensor"})
-        emit_event("tracking_evt")
+    if request.method in ["PUT", "POST", "DELETE"] and response.status_code in [
+        200,
+        201,
+    ]:
+        with ChangeDao() as dao:
+            if not dao.get_by_name("sensor"):
+                dao.persist({"name": "sensor"})
+            emit_event("tracking_evt")
     return response
 
 
@@ -52,9 +54,11 @@ def get(sensor_id: str) -> Response:
     Returns:
         Response: JSON response containing the sensor data or 404 error
     """
-    dao = SensorDao()
-    sensor = dao.get_by_id(sensor_id)
-    return response_data(sensor, schema=dao.schema) if sensor else response_error_404()
+    with SensorDao() as dao:
+        sensor = dao.get_by_id(sensor_id)
+        return (
+            response_data(sensor, schema=dao.schema) if sensor else response_error_404()
+        )
 
 
 @routes.route("", methods=["POST"])
@@ -66,12 +70,12 @@ def save() -> Response:
     Returns:
         Response: JSON response containing the created sensor or error message
     """
-    dao = SensorDao()
     try:
-        sensor_dict = dao.json_load(request.json)
-        pk = dao.persist(sensor_dict)
-        sensor = dao.get_by_id(pk)
-        return response_data(sensor, dao.schema)
+        with SensorDao() as dao:
+            sensor_dict = dao.json_load(request.json)
+            pk = dao.persist(sensor_dict)
+            sensor = dao.get_by_id(pk)
+            return response_data(sensor, dao.schema)
     except ValidationError as err:
         return response_error_parse(err)
 
@@ -85,9 +89,13 @@ def search() -> Response:
     Returns:
         Response: JSON response containing paginated sensor list or 404 error
     """
-    dao = SensorDao()
-    result = dao.get_all(pagination=get_pagination())
-    return response_data(result, dao.pageSchema) if result["metadata"]["total_elements"] > 0 else response_error_404()
+    with SensorDao() as dao:
+        result = dao.get_all(pagination=get_pagination())
+        return (
+            response_data(result, dao.pageSchema)
+            if result["metadata"]["total_elements"] > 0
+            else response_error_404()
+        )
 
 
 @routes.route("/<sensor_id>", methods=["PUT"])
@@ -102,11 +110,11 @@ def update(sensor_id: str) -> Response:
     Returns:
         Response: JSON response containing the updated sensor or error message
     """
-    dao = SensorDao()
     try:
-        sensor_dict = dao.json_load(request.json)
-        result = dao.update_by_id(sensor_id, sensor_dict)
-        return response_data(result, schema=dao.schema)
+        with SensorDao() as dao:
+            sensor_dict = dao.json_load(request.json)
+            result = dao.update_by_id(sensor_id, sensor_dict)
+            return response_data(result, schema=dao.schema)
     except ValidationError as err:
         return response_error_parse(err)
 
@@ -123,9 +131,9 @@ def delete(sensor_id: str) -> Response:
     Returns:
         Response: Success message or error response
     """
-    dao = SensorDao()
-    result = dao.delete_by_id(sensor_id)
-    return response_data_removed(sensor_id) if result else response_error_404()
+    with SensorDao() as dao:
+        result = dao.delete_by_id(sensor_id)
+        return response_data_removed(sensor_id) if result else response_error_404()
 
 
 @routes.route("/<sensor_id>/check/<ipaddr>", methods=["GET"])
@@ -140,9 +148,6 @@ def geoip_info(ipaddr: str) -> Response:
     Returns:
         Response: JSON response containing GeoIP information or error response
     """
-    if not ClusterTool.CONFIG:
-        return response_error_500("System not ready")
-
-    geo = SecurityFeedService.geo_info(ipaddr)
+    geo = IPXAService.geo_info(ipaddr)
     ip_info = {"country": geo["country"]}
     return response_data(ip_info)

@@ -7,6 +7,7 @@
 
 .navbar {
     z-index: 1000;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
 }
 
 .navbar-spacer {
@@ -20,7 +21,9 @@
 
 .sidenav {
     width: 260px;
-    background-color: var(--sidebar-background) !important;
+    background-color: var(--sidebar-background, #ffffff) !important;
+    border-right: 1px solid var(--border-dim) !important;
+    box-shadow: 4px 0 12px rgba(0, 0, 0, 0.05);
 }
 
 .sidenav-content {
@@ -29,7 +32,7 @@
 }
 
 .active-link {
-    background: linear-gradient(90deg, rgba(0, 242, 254, 0.1), transparent) !important;
+    background: rgba(37, 99, 235, 0.08) !important;
     border-right: 3px solid var(--primary-color);
 }
 
@@ -43,9 +46,9 @@
 }
 
 .premium-menu {
-    background: var(--surface-color) !important;
+    background: #ffffff !important;
     backdrop-filter: blur(12px);
-    border: 1px solid var(--glass-border);
+    border: 1px solid var(--border-dim);
 }
 
 .mat-mdc-menu-item {
@@ -59,6 +62,6 @@
 /* Mobile Adjustments */
 @media (max-width: 800px) {
     .sidenav {
-        width: 100% !important;
+        width: 280px !important;
     }
 }

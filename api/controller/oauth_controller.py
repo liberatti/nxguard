@@ -28,8 +28,8 @@ def refresh_token() -> Response:
     r_token = JWTManager.get_current_instance().get_refresh_token_from_request()
     try:
         payload = JWTManager.get_current_instance().decode(r_token)
-        user_dao = UserDao()
-        user = user_dao.get_by_id(payload["sub"])
+        with UserDao() as user_dao:
+            user = user_dao.get_by_id(payload["sub"])
         if not user:
             return response_error_500(msg=f"Authorization failed for {payload['sub']}")
 

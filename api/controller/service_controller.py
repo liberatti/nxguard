@@ -1,7 +1,7 @@
 from flask import Blueprint, request, Response
 from marshmallow import ValidationError
 
-from api.core.controllers.base_controller import (
+from nxcore.controllers.base_controller import (
     response_data,
     response_error_404,
     response_error_parse,
@@ -9,13 +9,13 @@ from api.core.controllers.base_controller import (
     response_error,
     get_pagination,
     has_any_authority,
-    response_data_removed
+    response_data_removed,
 )
 
-from api.common_utils import (
+from nxcore.common_utils import (
     deep_merge,
 )
-from api.core.middleware.socket_manager import emit_event
+from nxcore.middleware.socket_manager import emit_event
 from api.model.config_model import ChangeDao
 from api.model.service_model import ServiceDao
 
@@ -33,11 +33,16 @@ def after(response: Response) -> Response:
     Returns:
         Response: The modified response object
     """
-    if request.method in ["PUT", "POST", "DELETE", "PATCH"] and response.status_code in [200, 201]:
-        dao = ChangeDao()
-        if not dao.get_by_name("service"):
-            dao.persist({"name": "service"})
-        emit_event('tracking_evt')
+    if request.method in [
+        "PUT",
+        "POST",
+        "DELETE",
+        "PATCH",
+    ] and response.status_code in [200, 201]:
+        with ChangeDao() as dao:
+            if not dao.get_by_name("service"):
+                dao.persist({"name": "service"})
+            emit_event("tracking_evt")
     return response
 
 
@@ -53,9 +58,9 @@ def get(service_id: str) -> Response:
     Returns:
         Response: JSON response containing the service data or 404 error
     """
-    dao = ServiceDao()
-    service = dao.get_by_id(service_id)
-    return response_data(service, dao.schema) if service else response_error_404()
+    with ServiceDao() as dao:
+        service = dao.get_by_id(service_id)
+        return response_data(service, dao.schema) if service else response_error_404()
 
 
 @routes.route("", methods=["POST"])
@@ -68,16 +73,16 @@ def save() -> Response:
     Returns:
         Response: JSON response containing the created service or error message
     """
-    dao = ServiceDao()
     try:
-        service_dict = dao.json_load(request.json)
-        sv_check = dao.get_by_sans(service_dict['sans'])
-        if sv_check:
-            return response_error('Domains in use', code=406)
+        with ServiceDao() as dao:
+            service_dict = dao.json_load(request.json)
+            sv_check = dao.get_by_sans(service_dict["sans"])
+            if sv_check:
+                return response_error("Domains in use", code=406)
 
-        pk = dao.persist(service_dict)
-        service = dao.get_by_id(pk)
-        return response_data(service, dao.schema)
+            pk = dao.persist(service_dict)
+            service = dao.get_by_id(pk)
+            return response_data(service, dao.schema)
     except ValidationError as err:
         return response_error_parse(err)
 
@@ -91,9 +96,13 @@ def search() -> Response:
     Returns:
         Response: JSON response containing paginated service list or 404 error
     """
-    dao = ServiceDao()
-    result = dao.get_all(pagination=get_pagination())
-    return response_data(result, dao.pageSchema) if result["metadata"]["total_elements"] > 0 else response_error_404()
+    with ServiceDao() as dao:
+        result = dao.get_all(pagination=get_pagination())
+        return (
+            response_data(result, dao.pageSchema)
+            if result["metadata"]["total_elements"] > 0
+            else response_error_404()
+        )
 
 
 @routes.route("/<service_id>", methods=["PATCH"])
@@ -108,12 +117,12 @@ def partial_update(service_id: str) -> Response:
     Returns:
         Response: Success message or error response
     """
-    dao = ServiceDao()
     try:
-        service_new = dao.json_load(request.json)
-        service_old = dao.get_by_id(service_id)
-        dao.update_by_id(service_id, deep_merge(service_old, service_new))
-        return response_ok("Partially updated")
+        with ServiceDao() as dao:
+            service_new = dao.json_load(request.json)
+            service_old = dao.get_by_id(service_id)
+            dao.update_by_id(service_id, deep_merge(service_old, service_new))
+            return response_ok("Partially updated")
     except ValidationError as err:
         return response_error_parse(err)
 
@@ -131,15 +140,15 @@ def update(service_id: str) -> Response:
     Returns:
         Response: JSON response containing the updated service or error message
     """
-    dao = ServiceDao()
     try:
-        service_dict = dao.json_load(request.json)
-        sv_check = dao.get_by_sans(service_dict['sans'])
-        if sv_check and service_id not in sv_check['_id']:
-            return response_error('Domains in use', code=406)
+        with ServiceDao() as dao:
+            service_dict = dao.json_load(request.json)
+            sv_check = dao.get_by_sans(service_dict["sans"])
+            if sv_check and service_id not in sv_check["_id"]:
+                return response_error("Domains in use", code=406)
 
-        dao.update_by_id(service_id, service_dict)
-        return response_data(dao.get_by_id(service_id), dao.schema)
+            dao.update_by_id(service_id, service_dict)
+            return response_data(dao.get_by_id(service_id), dao.schema)
     except ValidationError as err:
         return response_error_parse(err)
 
@@ -156,6 +165,6 @@ def delete(service_id: str) -> Response:
     Returns:
         Response: Success message or error response
     """
-    dao = ServiceDao()
-    result = dao.delete_by_id(service_id)
-    return response_data_removed(service_id) if result else response_error_404()
+    with ServiceDao() as dao:
+        result = dao.delete_by_id(service_id)
+        return response_data_removed(service_id) if result else response_error_404()

@@ -11,7 +11,7 @@ from nxcore.middleware.logging_manager import logger
 
 from api.model.config_model import ConfigDao
 from nxcore.common_utils import deep_merge, get_server_id
-from api.repository.transaction_model import TransactionDao
+from api.model.transaction_model import TransactionDao
 import config as env_config
 
 

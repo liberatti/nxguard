@@ -45,6 +45,10 @@
     --primary-color: var(--primary);
     --accent-color: var(--secondary);
     --background-color: var(--bg-main);
+    --sidebar-background: #ffffff;
+    --surface-color: #ffffff;
+    --surface-border: var(--border-dim);
+    --glass-border: var(--border-dim);
     --text-color: var(--text-main);
     --text-secondary-color: var(--text-dim);
     --warn-color: var(--error);

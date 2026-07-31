@@ -1,8 +1,8 @@
 import threading
 
-from api.core.middleware.logging import logger
+from nxcore.middleware.logging_manager import logger
 
-from api.common_utils import LogCache
+from nxcore.common_utils import LogCache
 from api.tools.log_tool import LogParserTool
 from config import APP_BASE
 

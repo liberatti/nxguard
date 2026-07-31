@@ -1,12 +1,12 @@
 from flask import Blueprint, Response
 
-from api.core.controllers.base_controller import (
+from nxcore.controllers.base_controller import (
     response_data,
+    response_error_404,
     has_any_authority,
-    response_error_500
+    response_error_500,
 )
-
-from api.tools.cluster_tool import ClusterTool
+from api.model.config_model import ConfigDao, ConfigBackupDao
 
 routes = Blueprint("replica", __name__)
 
@@ -15,23 +15,29 @@ routes = Blueprint("replica", __name__)
 @has_any_authority(_internal=True)
 def scn() -> Response:
     """
-    Retrieve the System Change Number (SCN) from the cluster configuration.
+    Retrieve the System Change Number (SCN) from the active configuration.
 
     Returns:
         Response: JSON response containing the SCN or error response
     """
-    if not ClusterTool.CONFIG:
-        return response_error_500("System not ready")
-    return response_data({'scn': ClusterTool.CONFIG['scn']})
+    with ConfigDao() as dao:
+        active = dao.get_active()
+        if active and "active_scn" in active:
+            return response_data({"scn": active["active_scn"]})
+    return response_error_500("System not ready")
 
 
 @routes.route("/config", methods=["GET"])
 @has_any_authority(_internal=True)
 def config() -> Response:
     """
-    Retrieve the cluster configuration.
+    Retrieve the active cluster configuration.
 
     Returns:
         Response: JSON response containing the cluster configuration
     """
-    return response_data(ClusterTool.CONFIG)
+    with ConfigBackupDao() as backup_dao:
+        latest = backup_dao.get_latest()
+        if latest and "data" in latest:
+            return response_data(latest["data"])
+    return response_error_404()

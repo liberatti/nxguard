@@ -77,7 +77,7 @@ def create_db():
         user = {
             "name": "Default Admin",
             "password": encrypted_pass.decode("utf8"),
-            "email": "admin@local",
+            "email": "admin@nxguard.local",
             "role": "superuser",
         }
         dao.persist(user)

@@ -1,6 +1,6 @@
 from flask import Blueprint, Response
 
-from api.core.controllers.base_controller import (
+from nxcore.controllers.base_controller import (
     response_data,
     response_error_404,
     has_any_authority
