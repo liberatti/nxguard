@@ -134,7 +134,7 @@ def _generate_sensors(
         # TODO create test step for lua sensor
         _render_template_to_file(
             env,
-            "sensor.lua",
+            "lua/sensor.lua",
             f"{config.LUA_LIBS_PATH}/nxguard/sensors/{sensor['name']}.lua",
             sensor,
         )
