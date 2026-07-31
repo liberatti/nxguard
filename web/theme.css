@@ -86,6 +86,22 @@ html, body {
     box-shadow: var(--shadow-premium) !important;
 }
 
+.mat-mdc-card-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+}
+
+.mat-mdc-card-header-text {
+    flex: 1 1 auto !important;
+}
+
+.mat-mdc-card-header .align-right,
+.mat-mdc-card-header mat-card-actions {
+    margin-left: auto !important;
+}
+
 /* Premium Buttons */
 .mat-mdc-button, .mat-mdc-raised-button, .mat-mdc-flat-button {
     border-radius: var(--btn-radius) !important;
@@ -128,12 +144,31 @@ html, body {
     color: #ffffff !important;
 }
 
-.bottom-actions {
+.bottom-actions, .align-right, mat-card-actions[align="end"] {
     display: flex !important;
     justify-content: flex-end !important;
     align-items: center !important;
     gap: 12px !important;
     padding: 16px 24px !important;
+}
+
+th.mat-mdc-header-cell.text-right, 
+td.mat-mdc-cell.text-right, 
+th.text-right, 
+td.text-right {
+    text-align: right !important;
+}
+
+td.mat-mdc-cell.text-right {
+    display: table-cell !important;
+    text-align: right !important;
+}
+
+td.mat-mdc-cell.text-right .table-cell-actions, 
+td.mat-mdc-cell.text-right .toggle-container {
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
 }
 
 /* Form Elements */
