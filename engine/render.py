@@ -99,7 +99,7 @@ def _generate_sensors(
 ) -> None:
     """Generates Lua sensor configuration files for LuaJIT."""
     logger.info(f"[{output_dir}] - Generate sensor")
-    prefix = "test" if test else ""
+    prefix = "test-" if test else ""
     for sensor in data["sensors"]:
         sensor.update(
             {
@@ -138,7 +138,10 @@ def _generate_sensors(
             categories = []
 
             for c in categories_names:
-                category = dao.get_by_name(c)
+                c_name = c["name"] if isinstance(c, dict) else str(c)
+                category = dao.get_by_name(c_name)
+                if not category and isinstance(c, dict):
+                    category = c
                 if category:
                     if category.get("file"):
                         file_path = (
@@ -153,14 +156,14 @@ def _generate_sensors(
             _render_template_to_file(
                 env,
                 "modsec/modsec_sensor.j2",
-                f"{output_dir}/modsec/coreruleset/{prefix}-sensor-{sensor['name']}.policy",
+                f"{output_dir}/modsec/coreruleset/{prefix}sensor-{sensor['name']}.policy",
                 sensor,
             )
 
 
 def __resolve_sensor(name, data):
     for s in data["sensors"]:
-        if s["name"] == name:
+        if s["name"].lower() == name.lower():
             return s
 
 
@@ -187,8 +190,13 @@ def _generate_services(
 
         if "routes" in service:
             for r in service["routes"]:
-                if "sensor" in r:
-                    s_name = r["sensor"].lower()
+                if "sensor" in r and r["sensor"]:
+                    sensor_raw = r["sensor"]
+                    s_name = (
+                        sensor_raw["name"].lower()
+                        if isinstance(sensor_raw, dict)
+                        else str(sensor_raw).lower()
+                    )
                     service.update({"has_inspection": True})
                     sensor = __resolve_sensor(s_name, data)
                     sensor_prefix = "test-" if test else ""
@@ -196,10 +204,9 @@ def _generate_services(
                         {
                             "sensor": sensor,
                             "route_policy_file": f"{conf_dir}/route-{service['name']}.{r['name']}.policy",
-                            "sensor_policy_file": f"{output_dir}/modsec/coreruleset/{sensor_prefix}sensor-{s['name']}.policy",
+                            "sensor_policy_file": f"{output_dir}/modsec/coreruleset/{sensor_prefix}sensor-{s_name}.policy",
                         }
                     )
-                    logger.info(r)
                     _render_template_to_file(
                         env,
                         "modsec/modsec_route.j2",
