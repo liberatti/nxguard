@@ -57,13 +57,14 @@
             </form>
         </mat-card-content>
         <mat-card-actions align="end" class="mat-mdc-card-actions bottom-actions">
-            <button id="save-route-filter-btn" type="button" mat-raised-button color="primary"
+            <button id="save-route-filter-btn" type="button" mat-flat-button color="primary"
                     *ngIf="form.enabled" (click)="onSubmit()">
                 <mat-icon>save</mat-icon>
                 {{ 'actions.save' | translate }}
             </button>
-            <button mat-mini-fab [routerLink]="['/route_filter']" id="route-filter-form-back-btn">
-                <mat-icon>keyboard_return</mat-icon>
+            <button type="button" mat-stroked-button [routerLink]="['/route_filter']" id="route-filter-form-back-btn">
+                <mat-icon>arrow_back</mat-icon>
+                Cancel
             </button>
         </mat-card-actions>
     </mat-card>

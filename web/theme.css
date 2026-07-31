@@ -106,6 +106,36 @@ html, body {
     transform: translateY(-1px);
 }
 
+/* Modern Mini FAB & Action Buttons */
+.mat-mdc-mini-fab, .mat-mdc-fab {
+    background-color: #f1f5f9 !important;
+    color: var(--text-dim) !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
+}
+
+.mat-mdc-mini-fab:hover, .mat-mdc-fab:hover {
+    background-color: #e2e8f0 !important;
+    color: var(--text-main) !important;
+}
+
+.mat-mdc-mini-fab.mat-primary, .mat-mdc-fab.mat-primary {
+    background-color: var(--primary) !important;
+    color: #ffffff !important;
+}
+
+.mat-mdc-mini-fab.mat-warn, .mat-mdc-fab.mat-warn {
+    background-color: var(--error) !important;
+    color: #ffffff !important;
+}
+
+.bottom-actions {
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding: 16px 24px !important;
+}
+
 /* Form Elements */
 .mat-mdc-text-field-wrapper {
     background-color: #f1f5f9 !important;

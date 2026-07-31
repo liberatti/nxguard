@@ -66,11 +66,6 @@
       "title": "Sensor",
       "subtitle": "List of all sensors"
     },
-    "jail": {
-      "link": "Jails",
-      "title": "Jails",
-      "subtitle": "List of all Jails"
-    },
     "route_filter": {
       "link": "Route Filters",
       "title": "Route Filters",

@@ -32,7 +32,7 @@
 
         <!-- User Profile -->
         <button mat-button [matMenuTriggerFor]="userMenu" *ngIf="oauth.userInfo()" id="user-menu-btn" style="display: flex; align-items: center; gap: 8px;">
-            <img [src]="'assets/user-placeholder.png'" style="width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--primary-color);" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=Alex'">
+            <img [src]="'https://api.dicebear.com/7.x/avataaars/svg?seed=Alex'" style="width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--primary-color);">
             <span>{{ oauth.userInfo()?.name }}</span>
             <mat-icon>arrow_drop_down</mat-icon>
         </button>

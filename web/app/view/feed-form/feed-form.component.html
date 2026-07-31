@@ -104,13 +104,14 @@
             </div>
         </mat-card-content>
         <mat-card-actions align="end" class="mat-mdc-card-actions bottom-actions">
-            <button type="button" mat-raised-button color="primary"
+            <button type="button" mat-flat-button color="primary"
                     *ngIf="form.enabled" (click)="onSubmit()">
                 <mat-icon>save</mat-icon>
                 {{ 'actions.save'|translate }}
             </button>
-            <button mat-mini-fab [routerLink]="['/feed']">
-                <mat-icon>keyboard_return</mat-icon>
+            <button type="button" mat-stroked-button [routerLink]="['/feed']">
+                <mat-icon>arrow_back</mat-icon>
+                Cancel
             </button>
         </mat-card-actions>
     </mat-card>

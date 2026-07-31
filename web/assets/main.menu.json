@@ -34,11 +34,6 @@
         "icon": "browser_updated"
       },
       {
-        "label": "view.jail.link",
-        "route": "/jail",
-        "icon": "contactless"
-      },
-      {
         "label": "view.route_filter.link",
         "route": "/route_filter",
         "icon": "route"

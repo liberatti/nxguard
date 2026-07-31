@@ -12,8 +12,6 @@ import {ServiceListComponent} from './view/service-list/service-list.component';
 import {ServiceFormComponent} from './view/service-form/service-form.component';
 import {AccountComponent} from './view/account-form/account-form.component';
 import {TransactionListComponent} from './view/transaction-list/transaction-list.component';
-import {JailListComponent} from './view/jail-list/jail-list.component';
-import {JailFormComponent} from './view/jail-form/jail-form.component';
 import {ConfigFormComponent} from './view/config-form/config-form.component';
 import {FeedListComponent} from "./view/feed-list/feed-list.component";
 import {FeedFormComponent} from "./view/feed-form/feed-form.component";
@@ -68,14 +66,6 @@ export const routes: Routes = [
                     {path: '', component: RouteFilterListComponent},
                     {path: 'add', component: RouteFilterFormComponent},
                     {path: 'edit/:id', component: RouteFilterFormComponent},
-                ]
-            },
-            {
-                path: 'jail',
-                children: [
-                    {path: '', component: JailListComponent},
-                    {path: 'add', component: JailFormComponent},
-                    {path: 'edit/:id', component: JailFormComponent},
                 ]
             },
             {

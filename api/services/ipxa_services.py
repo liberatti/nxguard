@@ -30,35 +30,17 @@ class FeedSchema(Schema):
     )
 
 
-class JailEntrySchema(Schema):
-    class Meta:
-        unknown = EXCLUDE
-
-    ipaddr = fields.String()
-    banned_on = fields.DateTime(
-        format=config.DATETIME_FMT, allow_none=True, required=False
-    )
-
-
-class JailRulesSchema(Schema):
-    class Meta:
-        unknown = EXCLUDE
-
-    field = fields.String()
-    regex = fields.String()
-
-
-class JailSchema(Schema):
-    class Meta:
-        unknown = EXCLUDE
-
-    _id = fields.String()
-    name = fields.String()
-    bantime = fields.Integer()
-    occurrence = fields.Integer()
-    interval = fields.Integer()
-    content = fields.Nested(JailEntrySchema, many=True)
-    rules = fields.Nested(JailRulesSchema, many=True)
+def _parse_dt(val):
+    if not val:
+        return None
+    if isinstance(val, datetime):
+        return val
+    if isinstance(val, str):
+        try:
+            return datetime.fromisoformat(val)
+        except Exception:
+            pass
+    return None
 
 
 class FeedService:
@@ -115,7 +97,7 @@ class FeedService:
                             "action": f.get("action", "deny"),
                             "scope": f.get("scope", "system"),
                             "update_interval": f.get("update_interval", "daily"),
-                            "updated_on": f.get("updated_on"),
+                            "updated_on": _parse_dt(f.get("updated_on")),
                         }
                     )
 
@@ -151,7 +133,7 @@ class FeedService:
                         "action": f.get("action", "deny"),
                         "scope": f.get("scope", "system"),
                         "update_interval": f.get("update_interval", "daily"),
-                        "updated_on": f.get("updated_on"),
+                        "updated_on": _parse_dt(f.get("updated_on")),
                     }
             return None
         except Exception as e:
@@ -210,160 +192,8 @@ class FeedService:
             return False
 
 
-class JailService:
-    def __init__(self):
-        self.schema = JailSchema()
-        page_class = type(
-            "pagination",
-            (Schema,),
-            {
-                "metadata": fields.Nested(PageMetaSchema, many=False),
-                "data": fields.Nested(JailSchema, many=True),
-            },
-        )
-        self.pageSchema = page_class()
-
-    def json_load(self, json_data):
-        return self.schema.load(json_data)
-
-    def get_all(self, pagination=None):
-        try:
-            url, headers = IPXAService.get_api_config("/api/jail")
-            params = {}
-            if pagination:
-                params["page"] = pagination.get("page", 1)
-                params["per_page"] = pagination.get("per_page", 10)
-
-            response = requests.get(url, headers=headers, params=params, timeout=5)
-            if response.status_code == 200:
-                res_data = response.json()
-                if isinstance(res_data, dict) and "data" in res_data and isinstance(res_data["data"], list):
-                    jails = res_data["data"]
-                    pagination_meta = res_data.get("metadata", {})
-                else:
-                    jails = res_data.get("jails", []) if isinstance(res_data, dict) else []
-                    pag = res_data.get("pagination", {}) if isinstance(res_data, dict) else {}
-                    pagination_meta = {
-                        "total_elements": pag.get("total", len(jails)),
-                        "page": pag.get("page", 1),
-                        "per_page": pag.get("per_page", 10),
-                    }
-
-                mapped_jails = []
-                for j in jails:
-                    mapped_jails.append(
-                        {
-                            "_id": str(j.get("_id") or j.get("id", "")),
-                            "name": j.get("name"),
-                            "bantime": j.get("bantime"),
-                            "occurrence": j.get("occurrence"),
-                            "interval": j.get("interval"),
-                            "content": j.get("content", []),
-                            "rules": j.get("rules", []),
-                        }
-                    )
-
-                return {"metadata": pagination_meta, "data": mapped_jails}
-            return {
-                "metadata": {"total_elements": 0, "page": 1, "per_page": 10},
-                "data": [],
-            }
-        except Exception as e:
-            logger.error(f"Error fetching jails from IPXA: {e}")
-            return {
-                "metadata": {"total_elements": 0, "page": 1, "per_page": 10},
-                "data": [],
-            }
-
-    def get_by_id(self, _id):
-        try:
-            url, headers = IPXAService.get_api_config(f"/api/jail/{_id}")
-            response = requests.get(url, headers=headers, timeout=5)
-            if response.status_code == 200:
-                j_data = response.json()
-                j = j_data.get("data", j_data) if isinstance(j_data, dict) else j_data
-                if isinstance(j, dict):
-                    return {
-                        "_id": str(j.get("_id") or j.get("id", "")),
-                        "name": j.get("name"),
-                        "bantime": j.get("bantime"),
-                        "occurrence": j.get("occurrence"),
-                        "interval": j.get("interval"),
-                        "content": j.get("content", []),
-                        "rules": j.get("rules", []),
-                    }
-            return None
-        except Exception as e:
-            logger.error(f"Error fetching jail by ID from IPXA: {e}")
-            return None
-
-    def persist(self, vo: Dict[str, Any]) -> str:
-        try:
-            from nxcore.common_utils import replace_tz
-
-            default_date = replace_tz(datetime.now()).replace(microsecond=0)
-            if "content" in vo:
-                for c in vo["content"]:
-                    if "banned_on" not in c:
-                        c.update(
-                            {
-                                "banned_on": (
-                                    default_date.isoformat()
-                                    if hasattr(default_date, "isoformat")
-                                    else str(default_date)
-                                )
-                            }
-                        )
-
-            url, headers = IPXAService.get_api_config("/api/jail")
-            ipxa_jail = {
-                "name": vo.get("name"),
-                "bantime": vo.get("bantime"),
-                "occurrence": vo.get("occurrence"),
-                "interval": vo.get("interval"),
-                "content": vo.get("content", []),
-                "rules": vo.get("rules", []),
-            }
-            response = requests.post(url, headers=headers, json=ipxa_jail, timeout=5)
-            if response.status_code in [200, 201]:
-                res = response.json()
-                res_dict = res.get("data", res) if isinstance(res, dict) else {}
-                return str(res_dict.get("_id") or res_dict.get("id", ""))
-            return None
-        except Exception as e:
-            logger.error(f"Error persisting jail to IPXA: {e}")
-            return None
-
-    def update_by_id(self, _id, vo):
-        try:
-            url, headers = IPXAService.get_api_config(f"/api/jail/{_id}")
-            ipxa_jail = {
-                "name": vo.get("name"),
-                "bantime": vo.get("bantime"),
-                "occurrence": vo.get("occurrence"),
-                "interval": vo.get("interval"),
-                "content": vo.get("content", []),
-                "rules": vo.get("rules", []),
-            }
-            response = requests.put(url, headers=headers, json=ipxa_jail, timeout=5)
-            return response.status_code in [200, 204]
-        except Exception as e:
-            logger.error(f"Error updating jail on IPXA: {e}")
-            return False
-
-    def delete_by_id(self, _id):
-        try:
-            url, headers = IPXAService.get_api_config(f"/api/jail/{_id}")
-            response = requests.delete(url, headers=headers, timeout=5)
-            return response.status_code in [200, 204]
-        except Exception as e:
-            logger.error(f"Error deleting jail from IPXA: {e}")
-            return False
-
-
 class IPXAService:
     feeds = FeedService()
-    jails = JailService()
 
     @classmethod
     def get_api_config(cls, path=""):

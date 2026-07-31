@@ -5,7 +5,6 @@ from api.controller.certificate_controller import routes as certificate_routes
 from api.controller.challenge_controller import routes as challenge_routes
 from api.controller.config_controller import routes as config_routes
 from api.controller.feed_controller import routes as feed_routes
-from api.controller.jail_controller import routes as jail_routes
 from api.controller.oauth_controller import routes as oauth_routes
 from api.controller.replica_controller import routes as replica_routes
 from api.controller.route_filter_controller import routes as route_filter_routes
@@ -22,7 +21,6 @@ routes = [
     (challenge_routes, f"{config.APP_CONTEXT}"),
     (config_routes, f"{config.APP_CONTEXT}/api/config"),
     (feed_routes, f"{config.APP_CONTEXT}/api/feed"),
-    (jail_routes, f"{config.APP_CONTEXT}/api/jail"),
     (oauth_routes, f"{config.APP_CONTEXT}/api/oauth"),
     (replica_routes, f"{config.APP_CONTEXT}/api/replica"),
     (route_filter_routes, f"{config.APP_CONTEXT}/api/route_filter"),

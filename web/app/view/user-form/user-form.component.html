@@ -52,13 +52,14 @@
             </div>
         </mat-card-content>
         <mat-card-actions align="end" class="mat-mdc-card-actions bottom-actions">
-            <button type="button" mat-raised-button color="primary"
+            <button type="button" mat-flat-button color="primary"
                     *ngIf="form.enabled" id="save-user-btn" (click)="onSubmit()">
                 <mat-icon>save</mat-icon>
                 {{ 'actions.save'|translate }}
             </button>
-            <button mat-mini-fab [routerLink]="['/users']" id="back-user-btn">
-                <mat-icon>keyboard_return</mat-icon>
+            <button type="button" mat-stroked-button [routerLink]="['/users']" id="back-user-btn">
+                <mat-icon>arrow_back</mat-icon>
+                Cancel
             </button>
         </mat-card-actions>
     </mat-card>
