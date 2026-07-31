@@ -12,11 +12,7 @@ class RuleDao(DuckDAO):
     """
 
     def __init__(self):
-        super().__init__(
-            db_path=config.DB_PATH,
-            table_name="rules",
-            schema=SecRule
-        )
+        super().__init__(db_path=config.DB_PATH, table_name="rules", schema=SecRule)
 
     def _query(self, sql, params=(), fetch=False):
         if not self.is_connected():
@@ -31,7 +27,8 @@ class RuleDao(DuckDAO):
             pass
 
     def create_schema(self):
-        self.ddl(f"""
+        self.ddl(
+            f"""
             CREATE TABLE IF NOT EXISTS {self.table_name} (
                 _id TEXT PRIMARY KEY,
                 code INTEGER,
@@ -46,7 +43,8 @@ class RuleDao(DuckDAO):
                 seq INTEGER,
                 tags_json TEXT
             );
-        """)
+        """
+        )
 
     def from_dict(self, vo):
         vo = vo.copy()
@@ -85,9 +83,7 @@ class RuleCategoryDao(DuckDAO):
 
     def __init__(self):
         super().__init__(
-            db_path=config.DB_PATH,
-            table_name="categories",
-            schema=RuleCategorySchema
+            db_path=config.DB_PATH, table_name="categories", schema=RuleCategorySchema
         )
 
     def _query(self, sql, params=(), fetch=False):
@@ -103,7 +99,8 @@ class RuleCategoryDao(DuckDAO):
             pass
 
     def create_schema(self):
-        self.ddl(f"""
+        self.ddl(
+            f"""
             CREATE TABLE IF NOT EXISTS {self.table_name} (
                 _id TEXT PRIMARY KEY,
                 name TEXT,
@@ -114,7 +111,8 @@ class RuleCategoryDao(DuckDAO):
                 seq INTEGER,
                 system BOOLEAN DEFAULT FALSE
             );
-        """)
+        """
+        )
 
     def from_dict(self, vo):
         vo = vo.copy()
@@ -140,12 +138,16 @@ class RuleCategoryDao(DuckDAO):
         rs = self._query(sql, (name,), fetch=True)
         return self.to_dict(rs[0]) if rs else None
 
-    def get_by_name_and_phases(self, name: str, phases: List[int]) -> List[Dict[str, Any]]:
+    def get_by_name_and_phases(
+        self, name: str, phases: List[int]
+    ) -> List[Dict[str, Any]]:
         if not phases:
-            return []
-        placeholders = ", ".join(["?"] * len(phases))
-        sql = f"SELECT * FROM {self.table_name} WHERE name LIKE ? AND phase IN ({placeholders})"
-        params = [f"%{name}%"] + phases
+            sql = f"SELECT * FROM {self.table_name} WHERE name LIKE ?"
+            params = [f"%{name}%"]
+        else:
+            placeholders = ", ".join(["?"] * len(phases))
+            sql = f"SELECT * FROM {self.table_name} WHERE name LIKE ? AND phase IN ({placeholders})"
+            params = [f"%{name}%"] + phases
         rs = self._query(sql, params, fetch=True)
         return [self.to_dict(row) for row in rs]
 

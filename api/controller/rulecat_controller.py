@@ -3,12 +3,12 @@ from flask import Blueprint, request, Response
 from nxcore.controllers.base_controller import (
     response_error_404,
     has_any_authority,
-    response_data_list
+    response_data,
+    response_data_list,
 )
 
 
 from api.model.seclang_model import RuleCategoryDao
-from engine.seclang.seclang_parser import RuleSetParser
 
 routes = Blueprint("rulecat", __name__)
 
@@ -29,11 +29,7 @@ def get(cat_id: str) -> Response:
         cat = dao.get_by_id(cat_id)
         if not cat:
             return response_error_404()
-        return Response(
-            RuleSetParser.dumps(cat),
-            status=201,
-            mimetype="application/json"
-        )
+        return response_data(cat, dao.schema)
 
 
 @routes.route("/by_name/<cat_name>", methods=["GET"])
@@ -52,11 +48,7 @@ def get_by_name(cat_name: str) -> Response:
         cat = dao.get_by_name(cat_name)
         if not cat:
             return response_error_404()
-        return Response(
-            RuleSetParser.dumps(cat),
-            status=201,
-            mimetype="application/json"
-        )
+        return response_data(cat, dao.schema)
 
 
 @routes.route("", methods=["GET"])
@@ -76,5 +68,5 @@ def search() -> Response:
         if name and phases:
             result = dao.get_by_name_and_phases(name, phases)
         else:
-            result = dao.get_by_phases(phases)
-        return response_data_list(result, dao.schema)
+            result = dao.get_all()
+        return response_data(result, dao.schema)

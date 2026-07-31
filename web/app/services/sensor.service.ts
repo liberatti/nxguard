@@ -28,9 +28,12 @@ export class RuleCategoryService extends APIService<RuleCategory, number> {
         super(injector, 'rulecat')
     }
 
-    getByPhases(phases: Array<number>): Observable<Array<RuleCategory>> {
+    getByPhases(phases?: Array<number>): Observable<Array<RuleCategory>> {
         let options = {
-            params: new HttpParams().append("phases", phases.join(','))
+            params: new HttpParams()
+        };
+        if (phases && phases.length > 0) {
+            options.params = options.params.append("phases", phases.join(','));
         }
         return this.httpClient.get<Array<RuleCategory>>(this.END_POINT, options);
     }

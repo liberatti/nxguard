@@ -1,36 +1,37 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { CommonModule } from '@angular/common';
-import { MatMomentDateModule } from '@angular/material-moment-adapter';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatGridListModule } from '@angular/material/grid-list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
 import { MatMenuModule } from '@angular/material/menu';
+
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSortModule } from '@angular/material/sort';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { RuleCategory, SecRule, Sensor } from 'app/models/sensor';
-import { RuleCategoryService, SensorService } from 'app/services/sensor.service';
+import { Feed } from 'app/models/feed';
 import { NotificationService } from 'app/services/notification.service';
+import { OAuthService } from 'app/services/oauth.service';
+import { FeedService } from 'app/services/feed.service';
+import { RuleCategoryService, SensorService } from 'app/services/sensor.service';
 import { DefaultPageMeta } from 'app/models/shared';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatTabsModule } from '@angular/material/tabs';
-import { MatGridListModule } from '@angular/material/grid-list';
-import { OAuthService } from "../../services/oauth.service";
-import { Feed } from "../../models/feed";
-import { FeedService } from "../../services/feed.service";
-import { FormaterService } from "../../services/formater.service";
+import { CommonModule } from '@angular/common';
+import { FormaterService } from "app/services/formater.service";
+import { MatMomentDateModule } from "@angular/material-moment-adapter";
 
 @Component({
     selector: 'app-sensor-form',
@@ -44,7 +45,6 @@ import { FormaterService } from "../../services/formater.service";
         MatFormFieldModule, MatChipsModule],
     templateUrl: './sensor-form.component.html'
 })
-
 export class SensorFormComponent implements OnInit {
     isAddMode: boolean;
     submitted = false;
@@ -61,6 +61,7 @@ export class SensorFormComponent implements OnInit {
     ruleDC: string[] = ['code', 'severity', 'msg', 'actionSummary', 'action'];
     ruleDS: MatTableDataSource<SecRule>;
     ruleCH: number[] = [];
+
     form = new FormGroup({
         _id: new FormControl<string>(''),
         name: new FormControl<string>('', {
@@ -72,12 +73,18 @@ export class SensorFormComponent implements OnInit {
         description: new FormControl<string>(''),
         categories: new FormControl<Array<string>>([]),
         exclusions: new FormControl<Array<number>>([]),
-        block: new FormControl<Array<Feed>>([]),
-        permit: new FormControl<Array<Feed>>([]),
-        geo_block_list: new FormControl<string[]>([]),
-        inspect_level: new FormControl<number>(0),
-        inbound_score: new FormControl<number>(0),
-        outbound_score: new FormControl<number>(0),
+        security: new FormGroup({
+            geo_codes: new FormControl<string[]>([]),
+            reputation: new FormControl<string[]>([]),
+            trusted: new FormControl<string[]>([])
+        }),
+        inspection: new FormGroup({
+            level: new FormControl<number>(1),
+            score: new FormGroup({
+                inbound: new FormControl<number>(5),
+                outbound: new FormControl<number>(4)
+            })
+        })
     });
 
     constructor(
@@ -96,39 +103,34 @@ export class SensorFormComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        // Extract id from route params
         const { id } = this.route.snapshot.params;
         this.isAddMode = !id;
 
-        // Disable form if user is not a superuser
         if (!this.oauth.isRole('superuser')) {
             this.form.disable();
-            // No need to fetch data if form is disabled and not in add mode
             if (!this.isAddMode) return;
         }
 
-        // If editing, fetch sensor and patch form values
         if (!this.isAddMode) {
-            this.sensorService.getById(id).subscribe(data => {
-                this.form.patchValue({
-                    _id: data._id,
-                    name: data.name,
-                    description: data.description,
-                    categories: data.categories || [],
-                    exclusions: data.exclusions || [],
-                    block: data.block || [],
-                    permit: data.permit || [],
-                    geo_block_list: data.geo_block_list || [],
-                    inspect_level: data.inspect_level || 0,
-                    inbound_score: data.inbound_score || 0,
-                    outbound_score: data.outbound_score || 0
-                });
+            this.sensorService.getById(id).subscribe((data: Sensor) => {
+                this.form.patchValue(data);
             });
         }
 
-        // Load additional data
         this.getCategories(null);
         this.getFeeds(null);
+    }
+
+    getGeoCodes(): string[] {
+        return (this.form.get('security.geo_codes')?.value as string[]) || [];
+    }
+
+    getReputation(): string[] {
+        return (this.form.get('security.reputation')?.value as string[]) || [];
+    }
+
+    getTrusted(): string[] {
+        return (this.form.get('security.trusted')?.value as string[]) || [];
     }
 
     onSave() {
@@ -137,26 +139,16 @@ export class SensorFormComponent implements OnInit {
             return;
         }
 
-        const formData = this.form.value as Sensor;
+        const payload = this.form.value as Sensor;
 
-        if (formData.block) {
-            for (let i = 0; i < formData.block.length; i++) {
-                formData.block[i] = { _id: formData.block[i]._id } as Feed;
-            }
-        }
-        if (formData.permit) {
-            for (let i = 0; i < formData.permit.length; i++) {
-                formData.permit[i] = { _id: formData.permit[i]._id } as Feed;
-            }
-        }
         if (this.isAddMode) {
-            Reflect.deleteProperty(formData, '_id');
-            this.sensorService.save(formData).subscribe(() => {
+            delete payload._id;
+            this.sensorService.save(payload).subscribe(() => {
                 this.notificationService.openSnackBar('Sensor saved');
                 this.router.navigate(['/sensor']);
             });
         } else {
-            this.sensorService.update(formData._id, formData).subscribe(() => {
+            this.sensorService.update(String(payload._id), payload).subscribe(() => {
                 this.notificationService.openSnackBar('Sensor updated');
                 this.router.navigate(['/sensor']);
             });
@@ -164,12 +156,7 @@ export class SensorFormComponent implements OnInit {
     }
 
     isRuleSelected(code: number): boolean {
-        for (let i = 0; i < this.ruleCH.length; i++) {
-            if (this.ruleCH[i] === code) {
-                return true;
-            }
-        }
-        return false;
+        return this.ruleCH.includes(code);
     }
 
     selectRule(checked: boolean, code: number) {
@@ -177,7 +164,7 @@ export class SensorFormComponent implements OnInit {
             this.ruleCH.push(code);
         } else {
             let idx = this.ruleCH.indexOf(code);
-            this.ruleCH.splice(idx, 1);
+            if (idx >= 0) this.ruleCH.splice(idx, 1);
         }
     }
 
@@ -197,7 +184,7 @@ export class SensorFormComponent implements OnInit {
         if (event === null) {
             this.feedService.get(new DefaultPageMeta()).subscribe((data: any) => {
                 const list = Array.isArray(data) ? data : (data?.data || []);
-                const allowedTypes = ['reputation', 'network', 'network_static', 'ip', 'rbl', 'cidr'];
+                const allowedTypes = ['reputation', 'by_pass', 'network', 'network_static', 'ip', 'rbl', 'cidr'];
                 this._rbl_feeds = list.filter((item: any) =>
                     !item['type'] || allowedTypes.includes(item['type'])
                 );
@@ -206,86 +193,96 @@ export class SensorFormComponent implements OnInit {
     }
 
     onAddBlock(event: any): void {
-        let data = event.value as Feed;
-        let list = this.form.value.block || [];
-        list.push(data);
-        this.form.patchValue({ block: list });
+        let val = event.value;
+        if (typeof val === 'object' && val) val = val.name || val._id;
+        let list = [...this.getReputation()];
+        if (val && !list.includes(val)) {
+            list.push(val);
+            this.form.get('security.reputation')?.setValue(list);
+        }
     }
 
     onAddPermit(event: any): void {
-        let data = event.value as Feed;
-        let list = this.form.value.permit || [];
-        list.push(data);
-        this.form.patchValue({ permit: list });
+        let val = event.value;
+        if (typeof val === 'object' && val) val = val.name || val._id;
+        let list = [...this.getTrusted()];
+        if (val && !list.includes(val)) {
+            list.push(val);
+            this.form.get('security.trusted')?.setValue(list);
+        }
     }
 
-    onRemovePermit(keyword: any): void {
-        let list = this.form.value.permit;
-        if (list != null) {
-            let index = list.indexOf(keyword);
-            if (index >= 0) {
-                list.splice(index, 1);
-            }
+    onRemovePermit(keyword: string): void {
+        let list = [...this.getTrusted()];
+        let index = list.indexOf(keyword);
+        if (index >= 0) {
+            list.splice(index, 1);
+            this.form.get('security.trusted')?.setValue(list);
         }
         this.form.markAsTouched();
     }
 
-    onRemoveBlock(keyword: any): void {
-        let list = this.form.value.block;
-        if (list != null) {
-            let index = list.indexOf(keyword);
-            if (index >= 0) {
-                list.splice(index, 1);
-            }
+    onRemoveBlock(keyword: string): void {
+        let list = [...this.getReputation()];
+        let index = list.indexOf(keyword);
+        if (index >= 0) {
+            list.splice(index, 1);
+            this.form.get('security.reputation')?.setValue(list);
         }
     }
 
     onAddGeo(event: any): void {
         let data = event.value as string;
-        let list = this.form.value.geo_block_list || [];
-        list.push(data);
-        this.form.patchValue({ geo_block_list: list });
+        let list = [...this.getGeoCodes()];
+        if (data && !list.includes(data)) {
+            list.push(data);
+            this.form.get('security.geo_codes')?.setValue(list);
+        }
     }
 
-    onRemoveGeo(keyword: any): void {
-        if (this.form.value.geo_block_list != null) {
-            let index = this.form.value.geo_block_list.indexOf(keyword);
-            if (index >= 0) {
-                this.form.value.geo_block_list.splice(index, 1);
-            }
+    onRemoveGeo(keyword: string): void {
+        let list = [...this.getGeoCodes()];
+        let index = list.indexOf(keyword);
+        if (index >= 0) {
+            list.splice(index, 1);
+            this.form.get('security.geo_codes')?.setValue(list);
         }
     }
 
     getCategories(event: any) {
-        let phases = [3, 5];
         if (event === null) {
-            this.ruleCatService.getByPhases(phases).subscribe((data: any) => {
+            this.ruleCatService.getByPhases().subscribe((data: any) => {
                 this._categories = Array.isArray(data) ? data : (data?.data || []);
             });
         } else {
-            this.ruleCatService.getByNameAndPhases(event.target.value, phases).subscribe((data: any) => {
-                this._categories = Array.isArray(data) ? data : (data?.data || []);
-            });
+            const name = event?.target?.value || '';
+            if (name) {
+                this.ruleCatService.getByNameAndPhases(name, []).subscribe((data: any) => {
+                    this._categories = Array.isArray(data) ? data : (data?.data || []);
+                });
+            } else {
+                this.ruleCatService.getByPhases().subscribe((data: any) => {
+                    this._categories = Array.isArray(data) ? data : (data?.data || []);
+                });
+            }
         }
     }
 
     onAddCategory(event: any): void {
         let data = event.value as RuleCategory;
-        if (this.form.value.categories != null) {
-            this.form.value.categories.push(data.name);
+        let cats = this.form.value.categories || [];
+        if (data && data.name && !cats.includes(data.name)) {
+            cats.push(data.name);
+            this.form.patchValue({ categories: cats });
         }
     }
 
     onSelectCategory(cat_name: string): void {
-        this.ruleCatService.getBySingleName(cat_name).subscribe(data => {
-            let rules = [];
-            for (let i = 0; i < data.rules.length; i++) {
-                const rule = data.rules[i];
-                if (rule.action === "block") {
-                    rules.push(rule);
-                }
-            }
-            this.ruleDS.data = rules;
+        this.ruleCatService.getBySingleName(cat_name).subscribe((data: any) => {
+            if (!data) return;
+            const categoryData = data.data || data;
+            const ruleList = Array.isArray(categoryData) ? categoryData : (categoryData.rules || []);
+            this.ruleDS.data = ruleList;
             this.ruleCH = [];
         });
     }
@@ -300,14 +297,15 @@ export class SensorFormComponent implements OnInit {
     }
 
     isRuleActive(code: number) {
-        let exclusions = this.form.value.exclusions as Array<number>;
+        let exclusions = (this.form.value.exclusions as Array<number>) || [];
         return !exclusions.includes(code);
     }
 
     onRuleCheck(checked: boolean, code: number) {
-        let exclusions = this.form.value.exclusions as Array<number>;
+        let exclusions = (this.form.value.exclusions as Array<number>) || [];
         if (checked) {
-            exclusions.splice(exclusions.indexOf(code), 1);
+            let idx = exclusions.indexOf(code);
+            if (idx >= 0) exclusions.splice(idx, 1);
         } else {
             if (!exclusions.includes(code)) {
                 exclusions.push(code);
@@ -325,28 +323,20 @@ export class SensorFormComponent implements OnInit {
 
     filterActiveGeo(geo: string[]): string[] {
         if (!geo) return [];
-        const sensor = this.form.value as Sensor;
-        if (sensor && sensor.geo_block_list && Array.isArray(sensor.geo_block_list))
-            return geo.filter(code => !sensor.geo_block_list.includes(code));
-        return geo;
+        const geoCodes = this.getGeoCodes();
+        return geo.filter(code => !geoCodes.includes(code));
     }
 
     filterActiveFeed(feeds: Array<Feed>): Array<Feed> {
         if (!feeds) return [];
-        let arrUsed: Feed[] = [];
-        const sensor = this.form.value as Sensor;
-        if (sensor && sensor.block && Array.isArray(sensor.block)) {
-            arrUsed.push(...sensor.block);
-        }
-        if (sensor && sensor.permit && Array.isArray(sensor.permit)) {
-            arrUsed.push(...sensor.permit);
-        }
+        const used = [...this.getReputation(), ...this.getTrusted()];
         return feeds.filter(a =>
-            a && !arrUsed.some(b => b && b['_id'] === a['_id'])
+            a && !used.includes(a.name) && !used.includes(a._id)
         );
     }
 
     compareFn(object1: any, object2: any) {
-        return object1._id === object2._id;
+        if (!object1 || !object2) return object1 === object2;
+        return (object1._id || object1) === (object2._id || object2);
     }
 }

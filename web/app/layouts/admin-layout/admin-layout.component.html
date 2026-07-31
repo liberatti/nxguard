@@ -1,51 +1,55 @@
 <div class="navbar-container" [class.example-is-mobile]="isMobile()">
     <!-- Top navbar -->
-    <mat-toolbar class="navbar" color="primary">
-        <button mat-icon-button (click)="onSidenavToggle()" id="toggle-sidenav-btn">
+    <mat-toolbar class="navbar">
+        <button mat-icon-button (click)="onSidenavToggle()" id="toggle-sidenav-btn" class="menu-btn">
             <mat-icon>menu</mat-icon>
         </button>
         
-        <div class="navbar-brand" [routerLink]="['/']" style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-            <mat-icon style="color: var(--primary-color); font-size: 32px; width: 32px; height: 32px;">shield</mat-icon>
-            <span class="gradient-text" style="font-size: 1.5rem; letter-spacing: 1px;">NXGUARD</span>
+        <div class="navbar-brand" [routerLink]="['/']">
+            <mat-icon class="brand-icon">shield</mat-icon>
+            <span class="gradient-text brand-title">NXGUARD</span>
         </div>
 
         <span class="navbar-spacer"></span>
 
-        <!-- Notifications -->
-        @if (trackingEvt) {
-            <button mat-icon-button [matMenuTriggerFor]="notificationMenu" (click)="healthCheck()" id="notification-btn">
-                <mat-icon matBadge matBadgeColor="warn" [matBadge]="changes.length || null">notifications</mat-icon>
-            </button>
-            <mat-menu #notificationMenu="matMenu" class="premium-menu">
-                <div style="padding: 16px; min-width: 250px;">
-                    <div style="font-weight: 600; margin-bottom: 12px; color: var(--text-color);">System Notifications</div>
-                    @for (p of changes; track p) {
-                        <div style="padding: 8px 0; border-bottom: 1px solid var(--surface-border); font-size: 0.85rem;">
-                            {{ 'view.' + p + '.link' |translate }} changed
-                        </div>
-                    }
-                    <button mat-flat-button color="primary" style="width: 100%; margin-top: 12px;" (click)="onApply()">Apply Changes</button>
-                </div>
-            </mat-menu>
-        }
+        <div class="navbar-actions">
+            <!-- Notifications -->
+            @if (trackingEvt) {
+                <button mat-icon-button [matMenuTriggerFor]="notificationMenu" (click)="healthCheck()" id="notification-btn" class="nav-icon-btn">
+                    <mat-icon matBadge matBadgeColor="warn" [matBadge]="changes.length || null">notifications</mat-icon>
+                </button>
+                <mat-menu #notificationMenu="matMenu" class="premium-menu">
+                    <div style="padding: 16px; min-width: 250px;">
+                        <div style="font-weight: 600; margin-bottom: 12px; color: var(--text-color);">System Notifications</div>
+                        @for (p of changes; track p) {
+                            <div style="padding: 8px 0; border-bottom: 1px solid var(--surface-border); font-size: 0.85rem;">
+                                {{ 'view.' + p + '.link' |translate }} changed
+                            </div>
+                        }
+                        <button mat-flat-button color="primary" style="width: 100%; margin-top: 12px;" (click)="onApply()">Apply Changes</button>
+                    </div>
+                </mat-menu>
+            }
 
-        <!-- User Profile -->
-        <button mat-button [matMenuTriggerFor]="userMenu" *ngIf="oauth.userInfo()" id="user-menu-btn" style="display: flex; align-items: center; gap: 8px;">
-            <img [src]="'https://api.dicebear.com/7.x/avataaars/svg?seed=Alex'" style="width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--primary-color);">
-            <span>{{ oauth.userInfo()?.name }}</span>
-            <mat-icon>arrow_drop_down</mat-icon>
-        </button>
-        <mat-menu #userMenu="matMenu" class="premium-menu">
-            <a mat-menu-item [routerLink]="['/account']">
-                <mat-icon>person</mat-icon>
-                <span>Account</span>
-            </a>
-            <a mat-menu-item (click)="signOut()">
-                <mat-icon>exit_to_app</mat-icon>
-                <span>Log out</span>
-            </a>
-        </mat-menu>
+            <!-- User Profile -->
+            <button mat-button [matMenuTriggerFor]="userMenu" *ngIf="oauth.userInfo()" id="user-menu-btn" class="user-btn">
+                <div class="user-btn-content">
+                    <img [src]="'https://api.dicebear.com/7.x/avataaars/svg?seed=Alex'" class="user-avatar">
+                    <span class="user-name">{{ oauth.userInfo()?.name }}</span>
+                    <mat-icon class="dropdown-icon">arrow_drop_down</mat-icon>
+                </div>
+            </button>
+            <mat-menu #userMenu="matMenu" class="premium-menu" xPosition="before">
+                <a mat-menu-item [routerLink]="['/account']">
+                    <mat-icon>person</mat-icon>
+                    <span>Account</span>
+                </a>
+                <a mat-menu-item (click)="signOut()">
+                    <mat-icon>exit_to_app</mat-icon>
+                    <span>Log out</span>
+                </a>
+            </mat-menu>
+        </div>
     </mat-toolbar>
 
     <mat-sidenav-container class="navbar-sidenav-container">
@@ -54,7 +58,7 @@
                      [mode]="isMobile() ? 'over' : 'side'"
                      class="sidenav" id="main-sidenav">
             
-            <mat-nav-list style="padding-top: 20px;">
+            <mat-nav-list style="padding-top: 16px;">
                 @for (link of menu; track link.label) {
                     <div style="margin-bottom: 4px; padding: 0 12px;">
                         @if (link.route) {
@@ -64,7 +68,7 @@
                                 <span matListItemTitle style="font-weight: 500; font-size: 0.9rem;">{{ link.label | translate }}</span>
                             </a>
                         } @else {
-                            <div (click)="toggleSubMenu(link)" style="cursor: pointer; display: flex; align-items: center; padding: 12px; border-radius: 8px; margin-bottom: 4px;" 
+                            <div (click)="toggleSubMenu(link)" style="cursor: pointer; display: flex; align-items: center; padding: 10px 12px; border-radius: 8px; margin-bottom: 4px;" 
                                  [style.background]="link.expanded ? 'rgba(37, 99, 235, 0.05)' : 'transparent'">
                                 <mat-icon style="color: var(--text-secondary-color); margin-right: 16px;">{{ link.icon }}</mat-icon>
                                 <span style="flex: 1; font-weight: 500; font-size: 0.9rem; color: var(--text-color);">{{ link.label | translate }}</span>
@@ -97,7 +101,9 @@
 
         <!-- Main content -->
         <mat-sidenav-content class="sidenav-content">
-            <router-outlet></router-outlet>
+            <div class="content-wrapper">
+                <router-outlet></router-outlet>
+            </div>
             
             <footer style="padding: 20px; text-align: center; color: var(--text-muted); border-top: 1px solid var(--surface-border); font-size: 0.8rem;">
                 <div [innerHTML]="'content.copy' |translate"></div>

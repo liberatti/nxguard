@@ -1,4 +1,4 @@
-import {Feed} from "./feed";
+import { Feed } from "./feed";
 
 export interface RuleCategory {
     _id: string;
@@ -14,6 +14,8 @@ export interface SecRule {
     action: string;
     active: boolean;
     phase: string;
+    severity?: string;
+    tags?: string[];
     logging: string;
     auditLog: string;
     comment: string;
@@ -21,18 +23,30 @@ export interface SecRule {
     scope: string;
 }
 
+export interface SensorSecurity {
+    geo_codes?: string[];
+    reputation?: string[];
+    trusted?: string[];
+}
+
+export interface SensorScore {
+    inbound?: number;
+    outbound?: number;
+}
+
+export interface SensorInspection {
+    score?: SensorScore;
+    level?: number;
+}
+
 export interface Sensor {
-    _id: string;
+    _id?: any;
     name: string;
-    description: string;
-    block: Array<Feed>;
-    permit: Array<Feed>;
-    geo_block_list: string[];
-    categories: Array<string>;
-    exclusions: Array<number>;
-    inspect_level: number;
-    inbound_score: number;
-    outbound_score: number;
+    description?: string;
+    categories?: string[];
+    exclusions?: number[];
+    security?: SensorSecurity;
+    inspection?: SensorInspection;
 }
 
 export interface SecRuleCustom {
