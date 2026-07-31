@@ -5,7 +5,7 @@ SecRule &TX:paranoia_level "@eq 0" "id:901120,phase:1,pass,nolog,ver:'OWASP_CRS/
 SecRule &TX:allowed_http_versions "@eq 0" "id:901163,phase:1,pass,nolog,ver:'OWASP_CRS/3.3.9',setvar:'tx.allowed_http_versions={{ allowed_http_versions }}'"
 SecAction "id:900340,phase:1,pass,nolog,noauditlog,t:none,setvar:tx.max_file_size={{ max_file_size }}"
 
-# REQUEST-901-INITIALIZATION
+# REQUEST-901-INITIALIZATION    
 SecRule &TX:executing_paranoia_level "@eq 0" "id:901125,phase:1,pass,nolog,ver:'OWASP_CRS/3.3.9',setvar:'tx.executing_paranoia_level=%{TX.PARANOIA_LEVEL}'"
 SecRule &TX:sampling_percentage "@eq 0" "id:901130,phase:1,pass,nolog,ver:'OWASP_CRS/3.3.9',setvar:'tx.sampling_percentage=100'"
 SecRule &TX:critical_anomaly_score "@eq 0" "id:901140,phase:1,pass,nolog,ver:'OWASP_CRS/3.3.9',setvar:'tx.critical_anomaly_score=5'"

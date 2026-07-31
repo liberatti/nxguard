@@ -94,9 +94,12 @@ def _generate_certificates(
         )
 
 
-def _generate_sensors(env: Environment, output_dir: str, data: dict) -> None:
+def _generate_sensors(
+    env: Environment, output_dir: str, data: dict, test: bool
+) -> None:
     """Generates Lua sensor configuration files for LuaJIT."""
     logger.info(f"[{output_dir}] - Generate sensor")
+    prefix = "test" if test else ""
     for sensor in data["sensors"]:
         sensor.update(
             {
@@ -107,7 +110,19 @@ def _generate_sensors(env: Environment, output_dir: str, data: dict) -> None:
                 "trusted": ",".join(sensor["security"]["trusted"]),
             }
         )
-        sensor.update({"name": sensor["name"].lower()})
+        sensor.update(get_default_vars())
+        sensor.update(
+            {
+                "name": sensor["name"].lower(),
+                "inbound_anomaly_score_threshold": sensor["inspection"]["score"][
+                    "inbound"
+                ],
+                "outbound_anomaly_score_threshold": sensor["inspection"]["score"][
+                    "outbound"
+                ],
+                "paranoia_level": sensor["inspection"]["level"],
+            }
+        )
         os.makedirs(f"{config.LUA_LIBS_PATH}/nxguard/sensors", exist_ok=True)
 
         # TODO create test step for lua sensor
@@ -118,43 +133,35 @@ def _generate_sensors(env: Environment, output_dir: str, data: dict) -> None:
             sensor,
         )
 
-        # modsec
-        s_data = get_default_vars()
-        s_data.update(
-            {
-                "name": sensor["name"],
-                "categories": [
-                    {"name": c, "rules": []} for c in sensor.get("categories", [])
-                ],
-                "inbound_anomaly_score_threshold": sensor["inspection"]["score"][
-                    "inbound"
-                ],
-                "outbound_anomaly_score_threshold": sensor["inspection"]["score"][
-                    "outbound"
-                ],
-                "paranoia_level": sensor["inspection"]["level"],
-            }
-        )
-
         with RuleCategoryDao() as dao:
-            for c in s_data["categories"]:
-                category = dao.get_by_name(c["name"])
-                if category and category.get("file"):
-                    file_path = f"{output_dir}/modsec/coreruleset/{category['file']}"
-                    if not os.path.exists(file_path):
-                        file_path = (
-                            f"{config.BASE_PATH}/modsec/coreruleset/{category['file']}"
-                        )
-                    if os.path.exists(file_path):
-                        with open(file_path, "r", encoding="utf-8") as r_data:
-                            c.update({"rules": r_data.read()})
+            categories_names = sensor.pop("categories", [])
+            categories = []
 
+            for c in categories_names:
+                category = dao.get_by_name(c)
+                if category:
+                    if category.get("file"):
+                        file_path = (
+                            f"{output_dir}/modsec/coreruleset/{category['file']}"
+                        )
+                        if os.path.exists(file_path):
+                            with open(file_path, "r", encoding="utf-8") as r_data:
+                                category.update({"rules": r_data.read()})
+                    categories.append(category)
+
+            sensor.update({"categories": categories})
             _render_template_to_file(
                 env,
                 "modsec/modsec_sensor.j2",
-                f"{output_dir}/modsec/coreruleset/sensor-{sensor['name']}.policy",
-                s_data,
+                f"{output_dir}/modsec/coreruleset/{prefix}-sensor-{sensor['name']}.policy",
+                sensor,
             )
+
+
+def __resolve_sensor(name, data):
+    for s in data["sensors"]:
+        if s["name"] == name:
+            return s
 
 
 def _generate_services(
@@ -181,8 +188,24 @@ def _generate_services(
         if "routes" in service:
             for r in service["routes"]:
                 if "sensor" in r:
+                    s_name = r["sensor"].lower()
                     service.update({"has_inspection": True})
-                    break
+                    sensor = __resolve_sensor(s_name, data)
+                    sensor_prefix = "test-" if test else ""
+                    r.update(
+                        {
+                            "sensor": sensor,
+                            "route_policy_file": f"{conf_dir}/route-{service['name']}.{r['name']}.policy",
+                            "sensor_policy_file": f"{output_dir}/modsec/coreruleset/{sensor_prefix}sensor-{s['name']}.policy",
+                        }
+                    )
+                    logger.info(r)
+                    _render_template_to_file(
+                        env,
+                        "modsec/modsec_route.j2",
+                        r["route_policy_file"],
+                        r,
+                    )
 
         _render_template_to_file(env, "nginx/service.conf.j2", service_path, service)
 
@@ -257,7 +280,7 @@ def generate(data, output_dir=config.BASE_PATH, test=False):
         _generate_certificates(env, output_dir, prefix, data["certificates"])
 
     if "sensors" in data:
-        _generate_sensors(env, output_dir, data)
+        _generate_sensors(env, output_dir, data, test)
 
     if "services" in data:
         _generate_services(env, output_dir, conf_dir, test, data)

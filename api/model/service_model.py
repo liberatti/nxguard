@@ -8,6 +8,7 @@ from marshmallow import EXCLUDE, Schema, fields
 import config
 from api.model.certificate_model import CertificateDao, CertificateSchema
 from api.model.upstream_model import UpstreamSchema
+from api.model.sensor_model import SensorSchema
 
 
 class HeaderSchema(Schema):

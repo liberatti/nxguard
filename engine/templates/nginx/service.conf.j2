@@ -84,8 +84,9 @@ server {
    set $upstream '{{r.upstream.name}}';
 
    access_by_lua_file  {{BASE_PATH}}/luajit/share/lua/5.1/nxguard/sensors/{{r.sensor.name | lower}}.lua;
-   modsecurity_rules_file {{BASE_PATH}}/modsec/coreruleset/sensor-{{r.sensor.name |lower}}.policy;
-   
+   modsecurity_rules_file {{r.sensor_policy_file | lower}};
+   modsecurity_rules_file {{r.route_policy_file | lower}};
+
    proxy_http_version 1.1;
    proxy_intercept_errors on;
    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
