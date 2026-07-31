@@ -84,7 +84,7 @@ server {
    set $upstream '{{r.upstream.name}}';
 
    access_by_lua_file  {{BASE_PATH}}/luajit/share/lua/5.1/nxguard/sensors/{{r.sensor.name | lower}}.lua;
-#  modsecurity_rules_file {{BASE_PATH}}/modsec/conf/{%-if IS_TEST%}test-{%-endif%}route-proxy-all-req.policy;
+   modsecurity_rules_file {{BASE_PATH}}/modsec/coreruleset/sensor-{{r.sensor.name |lower}}.policy;
    
    proxy_http_version 1.1;
    proxy_intercept_errors on;

@@ -62,7 +62,7 @@ class RouteSchema(Schema):
     methods = fields.List(fields.String())
     upstream = fields.Nested(UpstreamSchema)
     redirect = fields.Nested(RedirectSchema)
-    # sensor = fields.Nested(SensorSchema)
+    sensor = fields.Nested(SensorSchema)
     monitor_only = fields.Boolean()
     cache_methods = fields.List(fields.String())
     filters = fields.Nested(RouteFilterSchema, many=True)

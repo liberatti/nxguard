@@ -4,6 +4,7 @@ import os
 from jinja2 import Environment, FileSystemLoader
 from nxcore.middleware.logging_manager import logger
 
+from engine.seclang.seclang_indexer import get_default_vars
 import config
 from api.model.seclang_model import RuleCategoryDao
 
@@ -118,27 +119,35 @@ def _generate_sensors(env: Environment, output_dir: str, data: dict) -> None:
         )
 
         # modsec
-        s_data = {
-            "name": sensor["name"],
-            "categories": [
-                {"name": c, "rules": []} for c in sensor.get("categories", [])
-            ],
-            "inbound_anomaly_score_threshold": 1,
-            "outbound_anomaly_score_threshold": 1,
-            "paranoia_level": 1,
-            "allowed_http_versions": "",
-            "max_file_size": 12,
-        }
+        s_data = get_default_vars()
+        s_data.update(
+            {
+                "name": sensor["name"],
+                "categories": [
+                    {"name": c, "rules": []} for c in sensor.get("categories", [])
+                ],
+                "inbound_anomaly_score_threshold": sensor["inspection"]["score"][
+                    "inbound"
+                ],
+                "outbound_anomaly_score_threshold": sensor["inspection"]["score"][
+                    "outbound"
+                ],
+                "paranoia_level": sensor["inspection"]["level"],
+            }
+        )
+
         with RuleCategoryDao() as dao:
             for c in s_data["categories"]:
                 category = dao.get_by_name(c["name"])
-                if category["file"]:
-                    with open(
-                        f"{output_dir}/modsec/coreruleset/{category['file']}",
-                        "r",
-                        encoding="utf-8",
-                    ) as r_data:
-                        c.update({"rules": r_data.read()})
+                if category and category.get("file"):
+                    file_path = f"{output_dir}/modsec/coreruleset/{category['file']}"
+                    if not os.path.exists(file_path):
+                        file_path = (
+                            f"{config.BASE_PATH}/modsec/coreruleset/{category['file']}"
+                        )
+                    if os.path.exists(file_path):
+                        with open(file_path, "r", encoding="utf-8") as r_data:
+                            c.update({"rules": r_data.read()})
 
             _render_template_to_file(
                 env,

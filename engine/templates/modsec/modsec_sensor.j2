@@ -28,8 +28,7 @@ SecRule TX:enforce_bodyproc_urlencoded "@eq 1" "id:901350,phase:1,pass,t:none,t:
 SecRule REQBODY_PROCESSOR "!@rx (?:URLENCODED|MULTIPART|XML|JSON)" "ctl:requestBodyProcessor=URLENCODED"
 SecRule TX:executing_paranoia_level "@lt %{tx.paranoia_level}" "id:901500,phase:1,deny,status:500,t:none,log,msg:'Executing paranoia level configured is lower than the paranoia level itself. This is illegal. Blocking request. Aborting',ver:'OWASP_CRS/3.3.9'"
 
+#### Categories ============================================
 {%- for c in categories %}
-# Category: {{ c.name }} ============================================
-# 
 {{ c.rules }}
 {%- endfor %}

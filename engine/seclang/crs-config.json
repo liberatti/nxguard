@@ -1,50 +1,17 @@
 {
-  "variables": [
-    {
-      "name": "sensor.paranoia_level",
-      "default_value": 3
-    },
-    {
-      "name": "sensor.inbound_anomaly_score_threshold",
-      "default_value": 15
-    },
-    {
-      "name": "sensor.outbound_anomaly_score_threshold",
-      "default_value": 15
-    },
-    {
-      "name": "sensor.allowed_http_versions",
-      "default_value": "HTTP/1.0 HTTP/1.1 HTTP/2 HTTP/2.0"
-    },
-    {
-      "name": "sensor.max_file_size",
-      "default_value": 1048576
-    },
-    {
-      "name": "sensor.route.allowed_methods",
-      "default_value": "GET HEAD POST OPTIONS PUT PATCH DELETE"
-    },
-    {
-      "name": "sensor.route.allowed_content_type",
-      "default_value": "|application/x-www-form-urlencoded| |multipart/form-data| |text/xml| |application/xml| |application/soap+xml| |application/json|"
-    },
-    {
-      "name": "sensor.route.restricted_extensions",
-      "default_value": ".asa/ .asax/ .ascx/ .axd/ .backup/ .bak/ .bat/ .cdx/ .cer/ .cfg/ .cmd/ .com/ .config/ .conf/ .cs/ .csproj/ .csr/ .dat/ .db/ .dbf/ .dll/ .dos/ .htr/ .htw/ .ida/ .idc/ .idq/ .inc/ .ini/ .key/ .licx/ .lnk/ .log/ .mdb/ .old/ .pass/ .pdb/ .pol/ .printer/ .pwd/ .rdb/ .resources/ .resx/ .sql/ .swp/ .sys/ .vb/ .vbs/ .vbproj/ .vsdisco/ .webinfo/ .xsd/ .xsx/"
-    },
-    {
-      "name": "sensor.route.max_num_args",
-      "default_value": 255
-    },
-    {
-      "name": "sensor.route.arg_name_length",
-      "default_value": 100
-    },
-    {
-      "name": "sensor.route.arg_length",
-      "default_value": 400
-    }
-  ],
+  "variables": {
+    "paranoia_level": 3,
+    "inbound_anomaly_score_threshold": 15,
+    "outbound_anomaly_score_threshold": 15,
+    "allowed_http_versions": "HTTP/1.0 HTTP/1.1 HTTP/2 HTTP/2.0",
+    "max_file_size": 1048576,
+    "allowed_methods": "GET HEAD POST OPTIONS PUT PATCH DELETE",
+    "allowed_content_type": "|application/x-www-form-urlencoded| |multipart/form-data| |text/xml| |application/xml| |application/soap+xml| |application/json|",
+    "restricted_extensions": ".asa/ .asax/ .ascx/ .axd/ .backup/ .bak/ .bat/ .cdx/ .cer/ .cfg/ .cmd/ .com/ .config/ .conf/ .cs/ .csproj/ .csr/ .dat/ .db/ .dbf/ .dll/ .dos/ .htr/ .htw/ .ida/ .idc/ .idq/ .inc/ .ini/ .key/ .licx/ .lnk/ .log/ .mdb/ .old/ .pass/ .pdb/ .pol/ .printer/ .pwd/ .rdb/ .resources/ .resx/ .sql/ .swp/ .sys/ .vb/ .vbs/ .vbproj/ .vsdisco/ .webinfo/ .xsd/ .xsx/",
+    "max_num_args": 255,
+    "arg_name_length": 100,
+    "arg_length": 400
+  },
   "categories": [
     {
       "_id": "903.9001",
