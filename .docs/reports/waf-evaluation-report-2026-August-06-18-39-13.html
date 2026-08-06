@@ -365,7 +365,7 @@
                     <span class="grade__info-grade">C</span>
                     <span class="grade__info-pont">-</span>
                     
-                    <span class="grade__info-ratio">71.2 / 100</span>
+                    <span class="grade__info-ratio">70.3 / 100</span>
                 </div>
             </div>
             <div class="desc">
@@ -395,7 +395,7 @@
                         
                         <span class="row__name">Used arguments</span>
                         :
-                        <span class="row__args mono">--url=http://nxguard.local:8080/nxg/ --blockStatusCodes=403,404 --reportFormat=html --noEmailReport</span>
+                        <span class="row__args mono">--url=http://nxguard.local:8080/nxg/ --blockStatusCodes=403,404,400 --reportFormat=html --noEmailReport</span>
                         <br>
                         
                     </div>
@@ -428,8 +428,8 @@
             <div class="grid__row">
                 <div class="row__item">Application Security</div>
                 <div class="row__item row__item--b">
-                    <div class="row__item-grade row__item-grade--b">B</div>
-                    <div class="row__item-value">84.7%</div>
+                    <div class="row__item-grade row__item-grade--b">B-</div>
+                    <div class="row__item-value">81.1%</div>
                 </div>
                 <div class="row__item row__item--f">
                     <div class="row__item-grade row__item-grade--f">F</div>
@@ -437,7 +437,7 @@
                 </div>
                 <div class="row__item row__item--f">
                     <div class="row__item-grade row__item-grade--f">F</div>
-                    <div class="row__item-value">42.3%</div>
+                    <div class="row__item-value">40.6%</div>
                 </div>
             </div>
         </div>
@@ -462,7 +462,7 @@
             <script type="text/javascript">
     "use strict";
     let goecharts_app_chart = echarts.init(document.getElementById('app_chart'), "white", {renderer: "svg"});
-    let option_app_chart = {"color":["#5470c6","#91cc75","#fac858","#ee6666","#73c0de","#3ba272","#fc8452","#9a60b4","#ea7ccc"],"dataset":{"source":null},"legend":{"show":false,"type":"","data":[""]},"radar":{"indicator":[{"name":"rce (76.5%)","max":100,"color":"#333333"},{"name":"sql injection (73.2%)","max":100,"color":"#333333"},{"name":"crlf injection (100.0%)","max":100,"color":"#333333"},{"name":"mail injection (80.0%)","max":100,"color":"#333333"},{"name":"32kb xss (100.0%)","max":100,"color":"#333333"},{"name":"ss injection (80.0%)","max":100,"color":"#333333"},{"name":"16kb sql injection (100.0%)","max":100,"color":"#333333"},{"name":"64kb rce (100.0%)","max":100,"color":"#333333"},{"name":"64kb sql injection (100.0%)","max":100,"color":"#333333"},{"name":"path traversal (81.8%)","max":100,"color":"#333333"},{"name":"16kb xss (100.0%)","max":100,"color":"#333333"},{"name":"8kb xss (100.0%)","max":100,"color":"#333333"},{"name":"useragent (66.7%)","max":100,"color":"#333333"},{"name":"shell (100.0%)","max":100,"color":"#333333"},{"name":"128kb xss (100.0%)","max":100,"color":"#333333"},{"name":"128kb rce (100.0%)","max":100,"color":"#333333"},{"name":"rawrequest test (100.0%)","max":100,"color":"#333333"},{"name":"sst injection (80.0%)","max":100,"color":"#333333"},{"name":"16kb rce (100.0%)","max":100,"color":"#333333"},{"name":"ldap injection (100.0%)","max":100,"color":"#333333"},{"name":"128kb sql injection (100.0%)","max":100,"color":"#333333"},{"name":"8kb rce (100.0%)","max":100,"color":"#333333"},{"name":"8kb sql injection (100.0%)","max":100,"color":"#333333"},{"name":"nosql injection (79.3%)","max":100,"color":"#333333"},{"name":"64kb xss (100.0%)","max":100,"color":"#333333"},{"name":"community-lfi-multipart (100.0%)","max":100,"color":"#333333"},{"name":"lfi (100.0%)","max":100,"color":"#333333"},{"name":"xss (85.8%)","max":100,"color":"#333333"},{"name":"xxe (100.0%)","max":100,"color":"#333333"},{"name":"32kb rce (100.0%)","max":100,"color":"#333333"},{"name":"32kb sql injection (100.0%)","max":100,"color":"#333333"}],"splitArea":{"show":true},"splitLine":{"show":true}},"series":[{"type":"radar","smooth":false,"connectNulls":false,"showSymbol":false,"waveAnimation":false,"renderLabelForZeroData":false,"selectedMode":false,"animation":false,"data":[{"value":[76.47,73.17,100,80,100,80,100,100,100,81.82,100,100,66.67,100,100,100,100,80,100,100,100,100,100,79.31,100,100,100,85.78,100,100,100]}]}],"title":{"text":"Application Security","textStyle":{"color":"#000000"},"right":"center"},"tooltip":{"show":false}}
+    let option_app_chart = {"color":["#5470c6","#91cc75","#fac858","#ee6666","#73c0de","#3ba272","#fc8452","#9a60b4","#ea7ccc"],"dataset":{"source":null},"legend":{"show":false,"type":"","data":[""]},"radar":{"indicator":[{"name":"sst injection (70.0%)","max":100,"color":"#333333"},{"name":"16kb rce (100.0%)","max":100,"color":"#333333"},{"name":"16kb xss (100.0%)","max":100,"color":"#333333"},{"name":"crlf injection (100.0%)","max":100,"color":"#333333"},{"name":"path traversal (77.8%)","max":100,"color":"#333333"},{"name":"128kb xss (100.0%)","max":100,"color":"#333333"},{"name":"32kb rce (100.0%)","max":100,"color":"#333333"},{"name":"community-lfi-multipart (100.0%)","max":100,"color":"#333333"},{"name":"lfi (100.0%)","max":100,"color":"#333333"},{"name":"ss injection (75.0%)","max":100,"color":"#333333"},{"name":"16kb sql injection (100.0%)","max":100,"color":"#333333"},{"name":"64kb sql injection (100.0%)","max":100,"color":"#333333"},{"name":"ldap injection (100.0%)","max":100,"color":"#333333"},{"name":"128kb sql injection (100.0%)","max":100,"color":"#333333"},{"name":"64kb xss (100.0%)","max":100,"color":"#333333"},{"name":"8kb xss (100.0%)","max":100,"color":"#333333"},{"name":"rawrequest test (100.0%)","max":100,"color":"#333333"},{"name":"xss (83.1%)","max":100,"color":"#333333"},{"name":"shell (100.0%)","max":100,"color":"#333333"},{"name":"32kb xss (100.0%)","max":100,"color":"#333333"},{"name":"8kb sql injection (100.0%)","max":100,"color":"#333333"},{"name":"mail injection (50.0%)","max":100,"color":"#333333"},{"name":"xxe (100.0%)","max":100,"color":"#333333"},{"name":"128kb rce (100.0%)","max":100,"color":"#333333"},{"name":"32kb sql injection (100.0%)","max":100,"color":"#333333"},{"name":"nosql injection (76.0%)","max":100,"color":"#333333"},{"name":"64kb rce (100.0%)","max":100,"color":"#333333"},{"name":"8kb rce (100.0%)","max":100,"color":"#333333"},{"name":"rce (77.8%)","max":100,"color":"#333333"},{"name":"sql injection (67.6%)","max":100,"color":"#333333"},{"name":"useragent (66.7%)","max":100,"color":"#333333"}],"splitArea":{"show":true},"splitLine":{"show":true}},"series":[{"type":"radar","smooth":false,"connectNulls":false,"showSymbol":false,"waveAnimation":false,"renderLabelForZeroData":false,"selectedMode":false,"animation":false,"data":[{"value":[70,100,100,100,77.78,100,100,100,100,75,100,100,100,100,100,100,100,83.06,100,100,100,50,100,100,100,76,100,100,77.78,67.57,66.67]}]}],"title":{"text":"Application Security","textStyle":{"color":"#000000"},"right":"center"},"tooltip":{"show":false}}
 ;
 	let action_app_chart = {"areas":{},"type":""}
 ;
@@ -573,11 +573,11 @@
                     </div>
                     <div class="row__item row__item--f">
                         <div class="row__item-grade row__item-grade--f">F</div>
-                        <div class="row__item-value">42.3%</div>
+                        <div class="row__item-value">40.6%</div>
                     </div>
                     <div class="row__item row__item--c">
                         <div class="row__item-grade row__item-grade--c">C-</div>
-                        <div class="row__item-value">71.2%</div>
+                        <div class="row__item-value">70.3%</div>
                     </div>
                 </div>
             </div>
@@ -586,10 +586,10 @@
             <h2 class="detail__title">Details</h2>
             <h3 class="detail__sub-title">Summary</h3>
             <p>Total requests sent: 816</p>
-            <p>Number of blocked requests: 443</p>
-            <p>Number of passed requests: 65</p>
+            <p>Number of blocked requests: 332</p>
+            <p>Number of passed requests: 67</p>
             
-            <p>Number of unresolved requests: 308</p>
+            <p>Number of unresolved requests: 417</p>
             
             <p>Number of failed requests: 0</p>
             
@@ -886,10 +886,10 @@
                     <div class="summary__grid--row-item">community</div>
                     <div class="summary__grid--row-item">community-xss</div>
                     <div class="summary__grid--row-item">100.00%</div>
-                    <div class="summary__grid--row-item">75</div>
+                    <div class="summary__grid--row-item">74</div>
                     <div class="summary__grid--row-item">0</div>
                     
-                    <div class="summary__grid--row-item">29</div>
+                    <div class="summary__grid--row-item">30</div>
                     
                     <div class="summary__grid--row-item">104</div>
                     <div class="summary__grid--row-item">0</div>
@@ -898,11 +898,11 @@
                 <div class="summary__grid--row">
                     <div class="summary__grid--row-item">community</div>
                     <div class="summary__grid--row-item">community-xxe</div>
-                    <div class="summary__grid--row-item">100.00%</div>
-                    <div class="summary__grid--row-item">1</div>
+                    <div class="summary__grid--row-item">0.00%</div>
+                    <div class="summary__grid--row-item">0</div>
                     <div class="summary__grid--row-item">0</div>
                     
-                    <div class="summary__grid--row-item">1</div>
+                    <div class="summary__grid--row-item">2</div>
                     
                     <div class="summary__grid--row-item">2</div>
                     <div class="summary__grid--row-item">0</div>
@@ -911,11 +911,11 @@
                     
                 <div class="summary__grid--row-sum">
                     <div class="summary__grid--row-item">Summary for community</div>
-                    <div class="summary__grid--row-item">98.55%</div>
-                    <div class="summary__grid--row-item">120</div>
+                    <div class="summary__grid--row-item">98.49%</div>
+                    <div class="summary__grid--row-item">118</div>
                     <div class="summary__grid--row-item">3</div>
                     
-                    <div class="summary__grid--row-item">36</div>
+                    <div class="summary__grid--row-item">38</div>
                     
                     <div class="summary__grid--row-item">159</div>
                     <div class="summary__grid--row-item">0</div>
@@ -940,10 +940,10 @@
                     <div class="summary__grid--row-item">owasp</div>
                     <div class="summary__grid--row-item">ldap-injection</div>
                     <div class="summary__grid--row-item">100.00%</div>
-                    <div class="summary__grid--row-item">10</div>
+                    <div class="summary__grid--row-item">3</div>
                     <div class="summary__grid--row-item">0</div>
                     
-                    <div class="summary__grid--row-item">14</div>
+                    <div class="summary__grid--row-item">21</div>
                     
                     <div class="summary__grid--row-item">24</div>
                     <div class="summary__grid--row-item">0</div>
@@ -952,11 +952,11 @@
                 <div class="summary__grid--row">
                     <div class="summary__grid--row-item">owasp</div>
                     <div class="summary__grid--row-item">mail-injection</div>
-                    <div class="summary__grid--row-item">80.00%</div>
-                    <div class="summary__grid--row-item">12</div>
+                    <div class="summary__grid--row-item">50.00%</div>
+                    <div class="summary__grid--row-item">3</div>
                     <div class="summary__grid--row-item">3</div>
                     
-                    <div class="summary__grid--row-item">9</div>
+                    <div class="summary__grid--row-item">18</div>
                     
                     <div class="summary__grid--row-item">24</div>
                     <div class="summary__grid--row-item">0</div>
@@ -965,11 +965,11 @@
                 <div class="summary__grid--row">
                     <div class="summary__grid--row-item">owasp</div>
                     <div class="summary__grid--row-item">nosql-injection</div>
-                    <div class="summary__grid--row-item">79.31%</div>
-                    <div class="summary__grid--row-item">23</div>
+                    <div class="summary__grid--row-item">76.00%</div>
+                    <div class="summary__grid--row-item">19</div>
                     <div class="summary__grid--row-item">6</div>
                     
-                    <div class="summary__grid--row-item">21</div>
+                    <div class="summary__grid--row-item">25</div>
                     
                     <div class="summary__grid--row-item">50</div>
                     <div class="summary__grid--row-item">0</div>
@@ -978,11 +978,11 @@
                 <div class="summary__grid--row">
                     <div class="summary__grid--row-item">owasp</div>
                     <div class="summary__grid--row-item">path-traversal</div>
-                    <div class="summary__grid--row-item">81.82%</div>
-                    <div class="summary__grid--row-item">9</div>
+                    <div class="summary__grid--row-item">77.78%</div>
+                    <div class="summary__grid--row-item">7</div>
                     <div class="summary__grid--row-item">2</div>
                     
-                    <div class="summary__grid--row-item">9</div>
+                    <div class="summary__grid--row-item">11</div>
                     
                     <div class="summary__grid--row-item">20</div>
                     <div class="summary__grid--row-item">0</div>
@@ -1017,11 +1017,11 @@
                 <div class="summary__grid--row">
                     <div class="summary__grid--row-item">owasp</div>
                     <div class="summary__grid--row-item">rce-urlpath</div>
-                    <div class="summary__grid--row-item">50.00%</div>
-                    <div class="summary__grid--row-item">1</div>
+                    <div class="summary__grid--row-item">66.67%</div>
+                    <div class="summary__grid--row-item">2</div>
                     <div class="summary__grid--row-item">1</div>
                     
-                    <div class="summary__grid--row-item">1</div>
+                    <div class="summary__grid--row-item">0</div>
                     
                     <div class="summary__grid--row-item">3</div>
                     <div class="summary__grid--row-item">0</div>
@@ -1031,10 +1031,10 @@
                     <div class="summary__grid--row-item">owasp</div>
                     <div class="summary__grid--row-item">shell-injection</div>
                     <div class="summary__grid--row-item">100.00%</div>
-                    <div class="summary__grid--row-item">13</div>
+                    <div class="summary__grid--row-item">7</div>
                     <div class="summary__grid--row-item">0</div>
                     
-                    <div class="summary__grid--row-item">19</div>
+                    <div class="summary__grid--row-item">25</div>
                     
                     <div class="summary__grid--row-item">32</div>
                     <div class="summary__grid--row-item">0</div>
@@ -1043,11 +1043,11 @@
                 <div class="summary__grid--row">
                     <div class="summary__grid--row-item">owasp</div>
                     <div class="summary__grid--row-item">sql-injection</div>
-                    <div class="summary__grid--row-item">65.63%</div>
-                    <div class="summary__grid--row-item">21</div>
-                    <div class="summary__grid--row-item">11</div>
-                    
+                    <div class="summary__grid--row-item">57.14%</div>
                     <div class="summary__grid--row-item">16</div>
+                    <div class="summary__grid--row-item">12</div>
+                    
+                    <div class="summary__grid--row-item">20</div>
                     
                     <div class="summary__grid--row-item">48</div>
                     <div class="summary__grid--row-item">0</div>
@@ -1056,11 +1056,11 @@
                 <div class="summary__grid--row">
                     <div class="summary__grid--row-item">owasp</div>
                     <div class="summary__grid--row-item">ss-include</div>
-                    <div class="summary__grid--row-item">80.00%</div>
-                    <div class="summary__grid--row-item">12</div>
+                    <div class="summary__grid--row-item">75.00%</div>
+                    <div class="summary__grid--row-item">9</div>
                     <div class="summary__grid--row-item">3</div>
                     
-                    <div class="summary__grid--row-item">9</div>
+                    <div class="summary__grid--row-item">12</div>
                     
                     <div class="summary__grid--row-item">24</div>
                     <div class="summary__grid--row-item">0</div>
@@ -1069,11 +1069,11 @@
                 <div class="summary__grid--row">
                     <div class="summary__grid--row-item">owasp</div>
                     <div class="summary__grid--row-item">sst-injection</div>
-                    <div class="summary__grid--row-item">80.00%</div>
-                    <div class="summary__grid--row-item">12</div>
+                    <div class="summary__grid--row-item">70.00%</div>
+                    <div class="summary__grid--row-item">7</div>
                     <div class="summary__grid--row-item">3</div>
                     
-                    <div class="summary__grid--row-item">9</div>
+                    <div class="summary__grid--row-item">14</div>
                     
                     <div class="summary__grid--row-item">24</div>
                     <div class="summary__grid--row-item">0</div>
@@ -1083,10 +1083,10 @@
                     <div class="summary__grid--row-item">owasp</div>
                     <div class="summary__grid--row-item">xml-injection</div>
                     <div class="summary__grid--row-item">100.00%</div>
-                    <div class="summary__grid--row-item">4</div>
+                    <div class="summary__grid--row-item">3</div>
                     <div class="summary__grid--row-item">0</div>
                     
-                    <div class="summary__grid--row-item">3</div>
+                    <div class="summary__grid--row-item">4</div>
                     
                     <div class="summary__grid--row-item">7</div>
                     <div class="summary__grid--row-item">0</div>
@@ -1095,11 +1095,11 @@
                 <div class="summary__grid--row">
                     <div class="summary__grid--row-item">owasp</div>
                     <div class="summary__grid--row-item">xss-scripting</div>
-                    <div class="summary__grid--row-item">77.94%</div>
-                    <div class="summary__grid--row-item">106</div>
-                    <div class="summary__grid--row-item">30</div>
+                    <div class="summary__grid--row-item">71.56%</div>
+                    <div class="summary__grid--row-item">78</div>
+                    <div class="summary__grid--row-item">31</div>
                     
-                    <div class="summary__grid--row-item">88</div>
+                    <div class="summary__grid--row-item">115</div>
                     
                     <div class="summary__grid--row-item">224</div>
                     <div class="summary__grid--row-item">0</div>
@@ -1108,11 +1108,11 @@
                     
                 <div class="summary__grid--row-sum">
                     <div class="summary__grid--row-item">Summary for owasp</div>
-                    <div class="summary__grid--row-item">81.76%</div>
-                    <div class="summary__grid--row-item">239</div>
-                    <div class="summary__grid--row-item">62</div>
+                    <div class="summary__grid--row-item">78.15%</div>
+                    <div class="summary__grid--row-item">170</div>
+                    <div class="summary__grid--row-item">64</div>
                     
-                    <div class="summary__grid--row-item">201</div>
+                    <div class="summary__grid--row-item">268</div>
                     
                     <div class="summary__grid--row-item">502</div>
                     <div class="summary__grid--row-item">0</div>
@@ -1189,10 +1189,10 @@
                     <div class="summary__grid--row-item">owasp-api</div>
                     <div class="summary__grid--row-item">soap</div>
                     <div class="summary__grid--row-item">100.00%</div>
-                    <div class="summary__grid--row-item">5</div>
+                    <div class="summary__grid--row-item">4</div>
                     <div class="summary__grid--row-item">0</div>
                     
-                    <div class="summary__grid--row-item">0</div>
+                    <div class="summary__grid--row-item">1</div>
                     
                     <div class="summary__grid--row-item">5</div>
                     <div class="summary__grid--row-item">0</div>
@@ -1202,10 +1202,10 @@
                 <div class="summary__grid--row-sum">
                     <div class="summary__grid--row-item">Summary for owasp-api</div>
                     <div class="summary__grid--row-item">100.00%</div>
-                    <div class="summary__grid--row-item">13</div>
+                    <div class="summary__grid--row-item">12</div>
                     <div class="summary__grid--row-item">0</div>
                     
-                    <div class="summary__grid--row-item">1</div>
+                    <div class="summary__grid--row-item">2</div>
                     
                     <div class="summary__grid--row-item">14</div>
                     <div class="summary__grid--row-item">0</div>
@@ -1215,11 +1215,11 @@
                 
                 <div class="summary__grid--row-sum">
                     <div class="summary__grid--row-item">Summary for true-positive tests</div>
-                    <div class="summary__grid--row-item">85.13%</div>
-                    <div class="summary__grid--row-item">372</div>
-                    <div class="summary__grid--row-item">65</div>
+                    <div class="summary__grid--row-item">81.74%</div>
+                    <div class="summary__grid--row-item">300</div>
+                    <div class="summary__grid--row-item">67</div>
                     
-                    <div class="summary__grid--row-item">238</div>
+                    <div class="summary__grid--row-item">308</div>
                     
                     <div class="summary__grid--row-item">675</div>
                     <div class="summary__grid--row-item">0</div>
@@ -1248,10 +1248,10 @@
                     <div class="summary__grid--row-item">false-pos</div>
                     <div class="summary__grid--row-item">texts</div>
                     <div class="summary__grid--row-item">0.00%</div>
-                    <div class="summary__grid--row-item">71</div>
+                    <div class="summary__grid--row-item">32</div>
                     <div class="summary__grid--row-item">0</div>
                     
-                    <div class="summary__grid--row-item">70</div>
+                    <div class="summary__grid--row-item">109</div>
                     
                     <div class="summary__grid--row-item">141</div>
                     <div class="summary__grid--row-item">0</div>
@@ -1265,19 +1265,19 @@
             
             <h3 class="detail__sub-title">True Negative Tests</h3>
             <p>0 true-negative requests identified as bypassed (test passed, good behavior)</p>
-            <p>71 true-negative requests identified as blocked (test failed, bad behavior)</p>
+            <p>32 true-negative requests identified as blocked (test failed, bad behavior)</p>
             
             
-            <p>70 true positive requests identified as unresolved</p>
+            <p>109 true positive requests identified as unresolved</p>
             
             
             
             <h3 class="detail__sub-title">Bypasses in Details</h3>
-            <p>65 malicious requests have bypassed the security solution</p>
+            <p>67 malicious requests have bypassed the security solution</p>
             
             
             <h3 class="detail__sub-title">Unresolved requests in Details</h3>
-            <p>238 requests identified as blocked and passed or as not-blocked and not-passed</p>
+            <p>308 requests identified as blocked and passed or as not-blocked and not-passed</p>
             
             
             

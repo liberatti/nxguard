@@ -17,8 +17,8 @@ SecAuditLogFormat JSON
 SecAuditLogType Serial
 SecDebugLogLevel 0
 
-SecDefaultAction "phase:1,log,auditlog,pass"
-SecDefaultAction "phase:2,log,auditlog,pass"
+SecDefaultAction "phase:1,log,auditlog,pass,t:urlDecodeUni,t:htmlEntityDecode"
+SecDefaultAction "phase:2,log,auditlog,pass,t:urlDecodeUni,t:htmlEntityDecode"
 SecComponentSignature "OWASP_CRS/4.25.1"
 SecAction "id:900010,phase:1,pass,nolog,noauditlog,t:none,setvar:tx.enforce_bodyproc_urlencoded=1"
 SecAction "id:900320,phase:1,pass,nolog,noauditlog,t:none,setvar:tx.crs_setup_version=400"
