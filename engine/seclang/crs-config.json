@@ -14,52 +14,12 @@
   },
   "categories": [
     {
-      "_id": "903.9001",
+      "_id": "900",
       "phase": 1,
       "scope": "request",
-      "name": "903.9001-DRUPAL-EXCLUSION-RULES",
-      "file": "REQUEST-903.9001-DRUPAL-EXCLUSION-RULES.conf",
+      "name": "900-EXCLUSION-RULES-BEFORE-CRS",
+      "file": "REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf.example",
       "seq": 1
-    },
-    {
-      "_id": "903.9002",
-      "phase": 1,
-      "scope": "request",
-      "name": "903.9002-WORDPRESS-EXCLUSION-RULES",
-      "file": "REQUEST-903.9002-WORDPRESS-EXCLUSION-RULES.conf",
-      "seq": 2
-    },
-    {
-      "_id": "903.9003",
-      "phase": 1,
-      "scope": "request",
-      "name": "903.9003-NEXTCLOUD-EXCLUSION-RULES",
-      "file": "REQUEST-903.9003-NEXTCLOUD-EXCLUSION-RULES.conf",
-      "seq": 3
-    },
-    {
-      "_id": "903.9004",
-      "phase": 1,
-      "scope": "request",
-      "name": "903.9004-DOKUWIKI-EXCLUSION-RULES",
-      "file": "REQUEST-903.9004-DOKUWIKI-EXCLUSION-RULES.conf",
-      "seq": 4
-    },
-    {
-      "_id": "903.9005",
-      "phase": 1,
-      "scope": "request",
-      "name": "903.9005-CPANEL-EXCLUSION-RULES",
-      "file": "REQUEST-903.9005-CPANEL-EXCLUSION-RULES.conf",
-      "seq": 5
-    },
-    {
-      "_id": "903.9006",
-      "phase": 1,
-      "scope": "request",
-      "name": "903.9006-XENFORO-EXCLUSION-RULES",
-      "file": "REQUEST-903.9006-XENFORO-EXCLUSION-RULES.conf",
-      "seq": 6
     },
     {
       "_id": "905",
@@ -67,15 +27,15 @@
       "scope": "request",
       "name": "905-COMMON-EXCEPTIONS",
       "file": "REQUEST-905-COMMON-EXCEPTIONS.conf",
-      "seq": 7
+      "seq": 3
     },
     {
       "_id": "911",
-      "phase": 2,
+      "phase": 1,
       "scope": "request",
       "name": "911-METHOD-ENFORCEMENT",
       "file": "REQUEST-911-METHOD-ENFORCEMENT.conf",
-      "seq": 8
+      "seq": 4
     },
     {
       "_id": "913",
@@ -83,7 +43,7 @@
       "scope": "request",
       "name": "913-SCANNER-DETECTION",
       "file": "REQUEST-913-SCANNER-DETECTION.conf",
-      "seq": 9
+      "seq": 5
     },
     {
       "_id": "920",
@@ -91,7 +51,7 @@
       "scope": "request",
       "name": "920-PROTOCOL-ENFORCEMENT",
       "file": "REQUEST-920-PROTOCOL-ENFORCEMENT.conf",
-      "seq": 10
+      "seq": 6
     },
     {
       "_id": "921",
@@ -99,7 +59,7 @@
       "scope": "request",
       "name": "921-PROTOCOL-ATTACK",
       "file": "REQUEST-921-PROTOCOL-ATTACK.conf",
-      "seq": 11
+      "seq": 7
     },
     {
       "_id": "922",
@@ -107,7 +67,7 @@
       "scope": "request",
       "name": "922-MULTIPART-ATTACK",
       "file": "REQUEST-922-MULTIPART-ATTACK.conf",
-      "seq": 12
+      "seq": 8
     },
     {
       "_id": "930",
@@ -115,7 +75,7 @@
       "scope": "request",
       "name": "930-APPLICATION-ATTACK-LFI",
       "file": "REQUEST-930-APPLICATION-ATTACK-LFI.conf",
-      "seq": 13
+      "seq": 9
     },
     {
       "_id": "931",
@@ -123,7 +83,7 @@
       "scope": "request",
       "name": "931-APPLICATION-ATTACK-RFI",
       "file": "REQUEST-931-APPLICATION-ATTACK-RFI.conf",
-      "seq": 14
+      "seq": 10
     },
     {
       "_id": "932",
@@ -131,7 +91,7 @@
       "scope": "request",
       "name": "932-APPLICATION-ATTACK-RCE",
       "file": "REQUEST-932-APPLICATION-ATTACK-RCE.conf",
-      "seq": 15
+      "seq": 11
     },
     {
       "_id": "933",
@@ -139,15 +99,39 @@
       "scope": "request",
       "name": "933-APPLICATION-ATTACK-PHP",
       "file": "REQUEST-933-APPLICATION-ATTACK-PHP.conf",
-      "seq": 16
+      "seq": 12
     },
     {
       "_id": "934",
       "phase": 2,
       "scope": "request",
-      "name": "934-APPLICATION-ATTACK-NODEJS",
-      "file": "REQUEST-934-APPLICATION-ATTACK-NODEJS.conf",
-      "seq": 17
+      "name": "934-APPLICATION-ATTACK-GENERIC",
+      "file": "REQUEST-934-APPLICATION-ATTACK-GENERIC.conf",
+      "seq": 13
+    },
+    {
+      "_id": "941",
+      "phase": 2,
+      "scope": "request",
+      "name": "941-APPLICATION-ATTACK-XSS",
+      "file": "REQUEST-941-APPLICATION-ATTACK-XSS.conf",
+      "seq": 14
+    },
+    {
+      "_id": "942",
+      "phase": 2,
+      "scope": "request",
+      "name": "942-APPLICATION-ATTACK-SQLI",
+      "file": "REQUEST-942-APPLICATION-ATTACK-SQLI.conf",
+      "seq": 15
+    },
+    {
+      "_id": "943",
+      "phase": 2,
+      "scope": "request",
+      "name": "943-APPLICATION-ATTACK-SESSION-FIXATION",
+      "file": "REQUEST-943-APPLICATION-ATTACK-SESSION-FIXATION.conf",
+      "seq": 16
     },
     {
       "_id": "944",
@@ -155,7 +139,7 @@
       "scope": "request",
       "name": "944-APPLICATION-ATTACK-JAVA",
       "file": "REQUEST-944-APPLICATION-ATTACK-JAVA.conf",
-      "seq": 21
+      "seq": 17
     },
     {
       "_id": "949",
@@ -163,8 +147,16 @@
       "scope": "request",
       "name": "949-BLOCKING-EVALUATION",
       "file": "REQUEST-949-BLOCKING-EVALUATION.conf",
-      "seq": 22,
+      "seq": 18,
       "system": true
+    },
+    {
+      "_id": "999",
+      "phase": 3,
+      "scope": "request",
+      "name": "999-COMMON-EXCEPTIONS-AFTER",
+      "file": "REQUEST-999-COMMON-EXCEPTIONS-AFTER.conf",
+      "seq": 19
     },
     {
       "_id": "950",
@@ -172,7 +164,7 @@
       "scope": "response",
       "name": "950-DATA-LEAKAGES",
       "file": "RESPONSE-950-DATA-LEAKAGES.conf",
-      "seq": 23
+      "seq": 20
     },
     {
       "_id": "951",
@@ -180,7 +172,7 @@
       "scope": "response",
       "name": "951-DATA-LEAKAGES-SQL",
       "file": "RESPONSE-951-DATA-LEAKAGES-SQL.conf",
-      "seq": 24
+      "seq": 21
     },
     {
       "_id": "952",
@@ -188,7 +180,7 @@
       "scope": "response",
       "name": "952-DATA-LEAKAGES-JAVA",
       "file": "RESPONSE-952-DATA-LEAKAGES-JAVA.conf",
-      "seq": 25
+      "seq": 22
     },
     {
       "_id": "953",
@@ -196,7 +188,7 @@
       "scope": "response",
       "name": "953-DATA-LEAKAGES-PHP",
       "file": "RESPONSE-953-DATA-LEAKAGES-PHP.conf",
-      "seq": 26
+      "seq": 23
     },
     {
       "_id": "954",
@@ -204,7 +196,23 @@
       "scope": "response",
       "name": "954-DATA-LEAKAGES-IIS",
       "file": "RESPONSE-954-DATA-LEAKAGES-IIS.conf",
-      "seq": 27
+      "seq": 24
+    },
+    {
+      "_id": "955",
+      "phase": 4,
+      "scope": "response",
+      "name": "955-WEB-SHELLS",
+      "file": "RESPONSE-955-WEB-SHELLS.conf",
+      "seq": 25
+    },
+    {
+      "_id": "956",
+      "phase": 4,
+      "scope": "response",
+      "name": "956-DATA-LEAKAGES-RUBY",
+      "file": "RESPONSE-956-DATA-LEAKAGES-RUBY.conf",
+      "seq": 26
     },
     {
       "_id": "959",
@@ -212,7 +220,7 @@
       "scope": "response",
       "name": "959-BLOCKING-EVALUATION",
       "file": "RESPONSE-959-BLOCKING-EVALUATION.conf",
-      "seq": 28,
+      "seq": 27,
       "system": true
     },
     {
@@ -221,7 +229,7 @@
       "scope": "response",
       "name": "980-CORRELATION",
       "file": "RESPONSE-980-CORRELATION.conf",
-      "seq": 29,
+      "seq": 28,
       "system": true
     }
   ]

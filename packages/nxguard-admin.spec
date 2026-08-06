@@ -31,6 +31,9 @@ cp -r %{_builddir}/luajit/* %{buildroot}/opt/nxguard/luajit/share/lua/5.1/nxguar
 %attr(0755, nxguard, nxguard) /opt/nxguard/luajit/share/lua/5.1/nxguard
 
 %changelog
-* Wed Feb 11 2026 Gustavo Liberatti
+* Thu Aug 06 2026 Gustavo Liberatti <gustavo@liberatti.com.br> - 1.0.7-1
+- Update build dependencies and packaging configuration
+
+* Wed Feb 11 2026 Gustavo Liberatti <gustavo@liberatti.com.br> - 1.0.7-1
 - Fix python dependencies installation and packaging
 - Split Core Rule Set into its own package

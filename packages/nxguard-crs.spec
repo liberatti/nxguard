@@ -1,5 +1,5 @@
 Name:		nxguard-crs
-Version:	3.3.9
+Version:	4.25.1
 Release:	1%{?dist}
 Summary:	OWASP Core Rule Set for nxguard
 BuildArch:	noarch
@@ -20,12 +20,15 @@ cd /root/rpmbuild/BUILD
 
 %install
 install -d %{buildroot}/opt/nxguard/modsec/coreruleset
-cp -r /root/rpmbuild/BUILD/coreruleset-3.3.9/rules/* %{buildroot}/opt/nxguard/modsec/coreruleset/
+cp -r /root/rpmbuild/BUILD/coreruleset-4.25.1/rules/* %{buildroot}/opt/nxguard/modsec/coreruleset/
 #rm -f %{buildroot}/opt/nxguard/modsec/coreruleset/REQUEST-901-INITIALIZATION.conf
 
 %files
 %attr(0744, nxguard, nxguard) /opt/nxguard/modsec/coreruleset
 
 %changelog
-* Wed Feb 11 2026 Gustavo Liberatti
+* Thu Aug 06 2026 Gustavo Liberatti <gustavo@liberatti.com.br> - 4.25.1-1
+- Update OWASP Core Rule Set to version 4.25.1
+
+* Wed Feb 11 2026 Gustavo Liberatti <gustavo@liberatti.com.br> - 4.25.1-1
 - Split Core Rule Set into its own package

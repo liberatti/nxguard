@@ -34,5 +34,8 @@ make install DESTDIR=%{buildroot}
 /sbin/ldconfig
 
 %changelog
-* Sat Aug 19 2023 Gustavo Liberatti
-- Create
+* Thu Aug 06 2026 Gustavo Liberatti <gustavo@liberatti.com.br> - 2.14.1-1
+- Standardize RPM spec metadata and build configuration
+
+* Sat Aug 19 2023 Gustavo Liberatti <gustavo@liberatti.com.br> - 2.14.1-1
+- Initial ssdeep RPM spec creation

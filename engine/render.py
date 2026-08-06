@@ -148,11 +148,7 @@ def _generate_sensors(
                 for cat in sensor.get("categories", [])
             }
             for c in ordered_cats["data"]:
-                if (
-                    c.get("system")
-                    or c.get("name") in sensor_cats
-                    or c.get("_id") in sensor_cats
-                ):
+                if bool(c.get("system")) or c.get("name") in sensor_cats:
                     if c.get("file"):
                         file_path = f"{output_dir}/modsec/coreruleset/{c['file']}"
                         if os.path.exists(file_path):

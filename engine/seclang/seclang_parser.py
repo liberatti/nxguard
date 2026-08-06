@@ -22,18 +22,7 @@ class RuleSetParser:
         self.charset = "utf-8"
 
     def _is_com_break(self, cmd):
-        b = cmd.startswith(
-            (
-                "SecRule",
-                "SecMarker",
-                "SecAction",
-                "SecDefaultAction",
-                "SecComponentSignature",
-                "SecResponseBodyAccess",
-                "#",
-            )
-        )
-        return b
+        return cmd.startswith(("Sec", "#"))
 
     def _parse_comment(self):
         com = ""
@@ -104,14 +93,14 @@ class RuleSetParser:
         rule = SecRule().load(
             {
                 "schema_type": "SecRule",
-                "scope": self._parse_scope(line[fi: line.index(" ", fi + 1)]),
+                "scope": self._parse_scope(line[fi : line.index(" ", fi + 1)]),
                 "tags": [],
                 "chain_starter": False,
                 "raw": line,
             }
         )
 
-        rule_data = line[line.index(" ", fi + 1):]
+        rule_data = line[line.index(" ", fi + 1) :]
         regex = re.compile('"(.*?)(?<!\\\\)"(?:\\s+"(.*)")?')
 
         matcher = regex.search(rule_data)
@@ -251,6 +240,15 @@ class RuleSetParser:
                         r["comment"] = comment
                         ruleset.append(r)
                     chain_starter = r["chain_starter"]
+                elif key.startswith(("SecRuleUpdate", "SecRuleRemove")):
+                    a = self._parse_action(line)
+                    tokens = line.split(" ")
+                    if len(tokens) > 1 and tokens[1].isdigit():
+                        a["code"] = int(tokens[1])
+                    ruleset.append(a)
+                elif key.startswith("Sec"):
+                    a = self._parse_action(line)
+                    ruleset.append(a)
                 else:
                     logger.error(f"parseFile Unknown key [{key}] from {line}")
         logger.info(f"{ruleset_name}: {len(ruleset)} rules")
