@@ -77,7 +77,7 @@
           "inbound": 5,
           "outbound": 10
         },
-        "level": 2
+        "level": 3
       }
     }
   ],
@@ -201,6 +201,7 @@
           "monitor_only": false,
           "name": "graphql-route",
           "paths": [
+            "^/(nxg/graphql.*)",
             "^/(graphql.*)"
           ],
           "sensor": {
