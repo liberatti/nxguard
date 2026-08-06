@@ -7,6 +7,7 @@ worker_processes auto;
 events {worker_connections 1024;}
 
 http {
+ merge_slashes on;
  resolver {{config.dns_resolver}} valid=30s;
  uninitialized_variable_warn off;
  lua_shared_dict log_buffer 16m;

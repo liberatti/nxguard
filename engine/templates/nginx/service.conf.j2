@@ -10,7 +10,19 @@ server {
   lua_code_cache on;
   
   server_name {% for t in sans %}{{ t }} {% endfor %};
+  
   if ($missing_domain_match) {return 410;}
+  
+  # directory traversal protection
+  if ($request_uri ~* "(\.\./|\.\.\\|%2e%2e%2f|%2e%2e/|\.\.%2f|%00)") {return 400;}
+  
+  # deny access to hidden files
+  location ~ /\. {
+    deny all;
+    access_log off;
+    log_not_found off;
+  }
+
   {%- if rate_limit %}
   limit_req zone={{name}}_rate burst=25 nodelay;
   {%- endif %}
