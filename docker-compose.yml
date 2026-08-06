@@ -19,7 +19,7 @@ services:
           memory: 256M
       replicas: 1
 
-  app:
+  api:
     build:
       context: .
     image: liberatti/nxguard:latest
@@ -41,4 +41,13 @@ services:
       - "./lualib:/opt/nxguard/luajit/share/lua/5.1/nxguard"
       - "./data:/data"
     extra_hosts:
-      - "host.docker.internal:host-gateway" 
+      - "host.docker.internal:host-gateway"
+
+  web:
+    image: node:lts
+    working_dir: /app
+    command: npm run container
+    ports:
+      - "4200:4200"
+    volumes:
+      - "./web:/app" 
