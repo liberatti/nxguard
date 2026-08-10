@@ -25,8 +25,8 @@ def _render_template_to_file(
 ) -> None:
     """Renders a Jinja2 template with the given context and writes it to output_path."""
     template_content = env.get_template(template_name).render(context)
-    # Collapse multiple blank lines into a single blank line
-    template_content = re.sub(r"(\n\s*){2,}", "\n\n", template_content)
+    # Collapse multiple consecutive blank lines into a single blank line while preserving indentation
+    template_content = re.sub(r"\n[ \t]*\n([ \t]*\n)+", "\n\n", template_content)
     with open(output_path, "w") as f:
         f.write(template_content)
 
@@ -194,10 +194,65 @@ def _generate_sensors(
             )
 
 
-def __resolve_sensor(name, data):
-    for s in data["sensors"]:
-        if s["name"].lower() == name.lower():
-            return s
+def __resolve_sensor(sensor_ref, data):
+    sensors = data.get("sensors", [])
+    if isinstance(sensor_ref, dict):
+        if "name" in sensor_ref and sensor_ref["name"]:
+            target_name = str(sensor_ref["name"]).lower()
+            for s in sensors:
+                if s.get("name", "").lower() == target_name:
+                    return s
+        if "_id" in sensor_ref and sensor_ref["_id"] is not None:
+            target_id = str(sensor_ref["_id"])
+            for s in sensors:
+                if str(s.get("_id")) == target_id:
+                    return s
+        if sensor_ref.get("name"):
+            return sensor_ref
+
+    elif sensor_ref is not None and sensor_ref != "":
+        target = str(sensor_ref).lower()
+        for s in sensors:
+            if s.get("name", "").lower() == target or str(s.get("_id")) == target:
+                return s
+
+    if sensors:
+        return sensors[0]
+
+    return None
+
+
+def __resolve_upstream(upstream_ref, data):
+    upstreams = data.get("upstreams", [])
+    if isinstance(upstream_ref, dict):
+        if "name" in upstream_ref and upstream_ref["name"]:
+            target_name = str(upstream_ref["name"])
+            for u in upstreams:
+                if u.get("name") == target_name:
+                    return u
+            return upstream_ref
+        if "_id" in upstream_ref and upstream_ref["_id"] is not None:
+            target_id = str(upstream_ref["_id"])
+            for u in upstreams:
+                if str(u.get("_id")) == target_id:
+                    return u
+        if upstreams:
+            return upstreams[0]
+        return upstream_ref
+
+    if upstream_ref is not None and upstream_ref != "":
+        target = str(upstream_ref)
+        for u in upstreams:
+            if u.get("name") == target or str(u.get("_id")) == target:
+                return u
+        if upstreams:
+            return upstreams[0]
+        return {"name": target}
+
+    if upstreams:
+        return upstreams[0]
+
+    return {"name": ""}
 
 
 def _generate_services(
@@ -224,13 +279,11 @@ def _generate_services(
 
         if "routes" in service:
             for r in service["routes"]:
-                if "sensor" in r and r["sensor"]:
-                    sensor_raw = r["sensor"]
-                    s_name = (
-                        sensor_raw["name"].lower()
-                        if isinstance(sensor_raw, dict)
-                        else str(sensor_raw).lower()
-                    )
+                r["upstream"] = __resolve_upstream(r.get("upstream"), data)
+                sensor = __resolve_sensor(r.get("sensor"), data)
+
+                if sensor and sensor.get("name"):
+                    s_name = sensor["name"].lower()
 
                     service.update(
                         {
@@ -238,17 +291,27 @@ def _generate_services(
                             "service_policy_file": f"{output_dir}/modsec/conf/{prefix}service-{service['name']}.policy",
                         }
                     )
-                    sensor = __resolve_sensor(s_name, data)
                     if "allowed_methods" not in r or r["allowed_methods"] is None:
-                        r["allowed_methods"] = ["GET", "HEAD", "POST", "OPTIONS", "PUT", "PATCH", "DELETE"]
-                    if "allowed_content_type" not in r or r["allowed_content_type"] is None:
+                        r["allowed_methods"] = [
+                            "GET",
+                            "HEAD",
+                            "POST",
+                            "OPTIONS",
+                            "PUT",
+                            "PATCH",
+                            "DELETE",
+                        ]
+                    if (
+                        "allowed_content_type" not in r
+                        or r["allowed_content_type"] is None
+                    ):
                         r["allowed_content_type"] = [
                             "application/x-www-form-urlencoded",
                             "multipart/form-data",
                             "text/xml",
                             "application/xml",
                             "application/soap+xml",
-                            "application/json"
+                            "application/json",
                         ]
                     r.update(
                         {
@@ -263,6 +326,8 @@ def _generate_services(
                         r["route_policy_file"],
                         r,
                     )
+                elif sensor:
+                    r["sensor"] = sensor
 
         _render_template_to_file(env, "nginx/service.conf.j2", service_path, service)
 

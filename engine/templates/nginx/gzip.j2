@@ -2,4 +2,4 @@
   gzip_min_length 1000;
   gzip_disable 'msie6';
   gzip_proxied no-cache no-store expired;
-  gzip_types {% for t in compression_types %}{{ t }} {% endfor %};
+  gzip_types {% for t in compression_types %}{{ t }}{% if not loop.last %} {% endif %}{% endfor %};

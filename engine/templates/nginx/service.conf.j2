@@ -1,21 +1,22 @@
 #####################################################################
 # service: {{name}}
 #####################################################################
-{%- if rate_limit_per_sec and rate_limit_per_sec > 0 %}
+{% if rate_limit_per_sec and rate_limit_per_sec > 0 %}
 limit_req_zone $binary_remote_addr zone={{name}}_rate:16m rate={{rate_limit_per_sec}}r/s;
-{%- endif %}
+{% endif %}
 
 proxy_cache_path {{BASE_PATH}}/cache/{{name}} keys_zone={{name}}_cache:10m use_temp_path=off loader_threshold=300 loader_files=200 max_size=128m;
+
 server {
   lua_code_cache on;
-  
-  server_name {% for t in sans %}{{ t }} {% endfor %};
-  
+
+  server_name {% for t in sans %}{{ t }}{% if not loop.last %} {% endif %}{% endfor %};
+
   # Enforce Host header and service name
-  if ($missing_domain_match) {return 410;}
-  
+  if ($missing_domain_match) { return 410; }
+
   # directory traversal protection
-  if ($request_uri ~* "(\.\./|\.\.\\|%2e%2e%2f|%2e%2e/|\.\.%2f|%00)") {return 403;}
+  if ($request_uri ~* "(\.\./|\.\.\\|%2e%2e%2f|%2e%2e/|\.\.%2f|%00)") { return 403; }
 
   # deny access to hidden files
   location ~ /\. {
@@ -24,16 +25,17 @@ server {
     log_not_found off;
   }
 
-  {%- if rate_limit_per_sec and rate_limit_per_sec > 0 %}
+  {% if rate_limit_per_sec and rate_limit_per_sec > 0 %}
   limit_req zone={{name}}_rate burst=25 nodelay;
-  {%- endif %}
+  {% endif %}
+
   set $service '{{name}}';
   set $real_method $request_method;
   client_max_body_size {{body_limit}}m;
 
-  {%- if compression_types and compression_types|length > 0 %}
-  {% include 'nginx/gzip.j2' %}
-  {%endif%}
+  {% if compression_types and compression_types|length > 0 %}
+{% include 'nginx/gzip.j2' %}
+  {% endif %}
 
   proxy_no_cache $cookie_nocache $arg_nocache$arg_comment;
   proxy_no_cache $http_pragma    $http_authorization;
@@ -44,18 +46,18 @@ server {
   proxy_set_header Proxy "";
 
   add_header X-Request-Id $request_id always;
-  {%- for header in headers %}
+  {% for header in headers %}
   add_header {{ header.name }} '{{ header.content }}' always;
   {%- endfor %}
 
   modsecurity on;
   modsecurity_transaction_id "$request_id";
-  {%- if has_inspection %}
+  {% if has_inspection %}
   modsecurity_rules_file {{service_policy_file}};
-  {%endif%}
+  {% endif %}
 
-  {%- if ssl_enable %}
-  ssl_protocols {% for t in ssl_protocols %}{{ t }} {% endfor %};
+  {% if ssl_enable %}
+  ssl_protocols {% for t in ssl_protocols %}{{ t }}{% if not loop.last %} {% endif %}{% endfor %};
   ssl_prefer_server_ciphers on;
   ssl_session_cache shared:SSL:10m;
   ssl_session_timeout 10m;
@@ -63,70 +65,69 @@ server {
   ssl_ecdh_curve secp384r1;
   ssl_stapling off;
   ssl_stapling_verify off;
-  ssl_certificate {{BASE_PATH}}/keystore/{%-if IS_TEST%}test-{%-endif%}{{certificate.name}}.crt;
-  ssl_certificate_key {{BASE_PATH}}/keystore/{%-if IS_TEST%}test-{%-endif%}{{certificate.name}}.key;
-  {%- endif %}
+  ssl_certificate {{BASE_PATH}}/keystore/{% if IS_TEST %}test-{% endif %}{{certificate.name}}.crt;
+  ssl_certificate_key {{BASE_PATH}}/keystore/{% if IS_TEST %}test-{% endif %}{{certificate.name}}.key;
+  {% endif %}
 
   location ^~ /.well-known/acme-challenge/ {
-   default_type "text/plain";
-   proxy_redirect off;
-   proxy_pass http://acme;
-   proxy_read_timeout 120s;
-   proxy_connect_timeout 120s;
-#   modsecurity_rules '
-#    SecRuleRemoveById 920272
-#   ';
+    default_type "text/plain";
+    proxy_redirect off;
+    proxy_pass http://acme;
+    proxy_read_timeout 120s;
+    proxy_connect_timeout 120s;
   }
+
   proxy_ssl_server_name on;
   proxy_ssl_verify off;
 
-  {%- for b in bindings %}
-  {%- if b.protocol == 'HTTP' %}
+  {% for b in bindings %}
+  {% if b.protocol == 'HTTP' %}
   listen {{b.port}};
-  {%- endif %}
-  {%- if b.protocol == 'HTTPS' %}
+  {% endif %}
+  {% if b.protocol == 'HTTPS' %}
   listen {{b.port}} ssl;
-  {%- if b.ssl_upgrade %}
-  if ($ssl_upgrade) {return 301 https://$server_name:{{b.port}}$request_uri;}
-  {%- endif %}
-  {%- endif %}
-  {%- endfor %}
-{%- for r in routes %}
-{%- for p in r.paths %}
-  location ~ {{p}}{
-   set $route '{{r.name}}';
-   set $sensor '{{r.sensor.name}}';
-   set $upstream '{{r.upstream.name}}';
+  {% if b.ssl_upgrade %}
+  if ($ssl_upgrade) { return 301 https://$server_name:{{b.port}}$request_uri; }
+  {% endif %}
+  {% endif %}
+  {% endfor %}
 
-   access_by_lua_file  {{BASE_PATH}}/luajit/share/lua/5.1/nxguard/sensors/{{r.sensor.name | lower}}.lua;
+  {% for r in routes %}
+  {% for p in r.paths %}
+  location ~ {{p}} {
+    set $route '{{r.name}}';
+    set $sensor '{{r.sensor.name if r.sensor and r.sensor.name else "Default"}}';
+    set $upstream '{{r.upstream.name if r.upstream and r.upstream.name else "default"}}';
 
-  {%- if has_inspection %}
-  modsecurity_rules_file {{r.route_policy_file | lower}};
-  modsecurity_rules_file {{r.sensor_policy_file | lower}};
-  {%endif%}
+    access_by_lua_file {{BASE_PATH}}/luajit/share/lua/5.1/nxguard/sensors/{{r.sensor.name | lower if r.sensor and r.sensor.name else "default"}}.lua;
 
-   proxy_http_version 1.1;
-   proxy_intercept_errors on;
-   proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-   proxy_read_timeout {{timeout}}s;
-   proxy_set_header Host $host;
-   proxy_set_header X-Real-IP $remote_addr;
-   proxy_set_header Upgrade $http_upgrade;
-   proxy_set_header Connection $connection_upgrade;
-   proxy_redirect off;
-   proxy_pass http://{{r.upstream.name}}/$1$is_args$args;
+    {% if has_inspection and r.route_policy_file %}
+    modsecurity_rules_file {{r.route_policy_file | lower}};
+    modsecurity_rules_file {{r.sensor_policy_file | lower}};
+    {% endif %}
+
+    proxy_http_version 1.1;
+    proxy_intercept_errors on;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_read_timeout {{timeout}}s;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection $connection_upgrade;
+    proxy_redirect off;
+    proxy_pass http://{{r.upstream.name if r.upstream and r.upstream.name else "default"}}/$1$is_args$args;
   }
-{%- endfor %}
-{%- endfor %}
+  {% endfor %}
+  {% endfor %}
 
   error_page 404 403 500 502 503 504 @custom_error;
   location @custom_error {
-   content_by_lua_file {{BASE_PATH}}/luajit/share/lua/5.1/nxguard/content_by_custom_error.lua;
+    content_by_lua_file {{BASE_PATH}}/luajit/share/lua/5.1/nxguard/content_by_custom_error.lua;
   }
-  
+
   location @rate_limited {
-   add_header X-RateLimit-Triggered true;
-   return 429;
+    add_header X-RateLimit-Triggered true;
+    return 429;
   }
 
   access_log off;
