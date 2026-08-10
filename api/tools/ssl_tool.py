@@ -32,7 +32,9 @@ class SSLTool:
     """
 
     @classmethod
-    def private_from_pem(cls, pem: str, password: Optional[str] = None) -> rsa.RSAPrivateKey:
+    def private_from_pem(
+        cls, pem: str, password: Optional[str] = None
+    ) -> rsa.RSAPrivateKey:
         """Load a private key from PEM format.
 
         Args:
@@ -112,7 +114,9 @@ class SSLTool:
         return crypto_util.make_csr(pk_bytes, domain_names)
 
     @classmethod
-    def gen_ca(cls, crt_cn: str, crt_org: Optional[str] = "nxguard-CA") -> Dict[str, Union[x509.Certificate, rsa.RSAPrivateKey]]:
+    def gen_ca(
+        cls, crt_cn: str, crt_org: Optional[str] = "nxguard-CA"
+    ) -> Dict[str, Union[x509.Certificate, rsa.RSAPrivateKey]]:
         """Generate a self-signed certificate authority (CA).
 
         Args:
@@ -154,11 +158,35 @@ class SSLTool:
         }
 
     @classmethod
+    def get_or_create_ca(
+        cls, c: Dict
+    ) -> Dict[str, Union[x509.Certificate, rsa.RSAPrivateKey]]:
+        """Get CA from config or create a new CA if missing.
+
+        Args:
+            c: Active configuration dictionary
+
+        Returns:
+            Dictionary containing the CA certificate and private key
+        """
+        if not c.get("ca_certificate") or not c.get("ca_private"):
+            ca_dict = cls.gen_ca("nxguard-CA")
+            c["ca_certificate"] = cls.crt_to_pem(ca_dict["certificate"])
+            c["ca_private"] = cls.private_to_pem(ca_dict["private_key"])
+            with ConfigDao() as dao:
+                dao.update_by_id(c["_id"], c)
+            return ca_dict
+        return {
+            "certificate": cls.crt_from_pem(c["ca_certificate"]),
+            "private_key": cls.private_from_pem(c["ca_private"]),
+        }
+
+    @classmethod
     def create_certificate(
         cls,
         domain: str,
         sans: Optional[List[str]] = None,
-        ca: Optional[Dict[str, Union[x509.Certificate, rsa.RSAPrivateKey]]] = None
+        ca: Optional[Dict[str, Union[x509.Certificate, rsa.RSAPrivateKey]]] = None,
     ) -> Dict:
         """Create a new SSL/TLS certificate.
 
@@ -170,12 +198,12 @@ class SSLTool:
         Returns:
             Dictionary containing the certificate, chain, private key and metadata
         """
-        c = ConfigDao().get_active()
+        with ConfigDao() as dao:
+            c = dao.get_active()
+        if not c:
+            raise ValueError("No active configuration found")
         if not ca:
-            ca = {
-                "certificate": SSLTool.crt_from_pem(c['ca_certificate']),
-                "private_key": SSLTool.private_from_pem(c['ca_private']),
-            }
+            ca = cls.get_or_create_ca(c)
 
         curr_date = datetime.now().astimezone(TZ)
         server_key = cls.generate_private_key()
@@ -243,7 +271,9 @@ class SSLTool:
             subjects.append(c.value)
 
         try:
-            san_extension = crt.extensions.get_extension_for_class(x509.SubjectAlternativeName)
+            san_extension = crt.extensions.get_extension_for_class(
+                x509.SubjectAlternativeName
+            )
             for c in san_extension.value:
                 subjects.append(c.value)
         except x509.extensions.ExtensionNotFound:
@@ -278,8 +308,11 @@ class SSLLetsEncryptTool:
         Returns:
             Dictionary containing account key and registration
         """
-        config_model = ConfigDao()
-        config = config_model.get_active()
+        with ConfigDao() as dao:
+            config = dao.get_active()
+        if not config:
+            raise ValueError("No active configuration found")
+
         reg_file = f"{APP_BASE}/keystore/account_reg.json"
         key_file = f"{APP_BASE}/keystore/account_key.json"
         try:
@@ -312,7 +345,7 @@ class SSLLetsEncryptTool:
         cls,
         domain: str,
         sans: Optional[List[str]] = None,
-        email: str = "fake@tooka.com.br"
+        email: str = "fake@tooka.com.br",
     ) -> Optional[Dict]:
         """Create a new Let's Encrypt certificate.
 
@@ -333,8 +366,10 @@ class SSLLetsEncryptTool:
         crt_key = SSLTool.generate_private_key()
         csr = SSLTool.gen_csr(domain_list, crt_key)
 
-        config_model = ConfigDao()
-        config = config_model.get_active()
+        with ConfigDao() as dao:
+            config = dao.get_active()
+        if not config:
+            raise ValueError("No active configuration found")
 
         account = cls.account(email)
 
@@ -377,7 +412,9 @@ class SSLLetsEncryptTool:
         return None
 
     @classmethod
-    def challenge_body(cls, new_order: messages.OrderResource) -> List[challenges.HTTP01]:
+    def challenge_body(
+        cls, new_order: messages.OrderResource
+    ) -> List[challenges.HTTP01]:
         """Extract HTTP-01 challenges from a new order.
 
         Args:

@@ -7,7 +7,7 @@ SecRule &TX:outbound_anomaly_score_threshold "@eq 0" "id:901110,phase:1,pass,nol
 SecRule &TX:blocking_paranoia_level "@eq 0" "id:901120,phase:1,pass,nolog,ver:'OWASP_CRS/4.25.1',setvar:'tx.blocking_paranoia_level={{ paranoia_level }}'"
 SecRule &TX:detection_paranoia_level "@eq 0" "id:901125,phase:1,pass,nolog,ver:'OWASP_CRS/4.25.1',setvar:'tx.detection_paranoia_level={{ paranoia_level }}'"
 SecRule &TX:executing_paranoia_level "@eq 0" "id:901126,phase:1,pass,nolog,ver:'OWASP_CRS/4.25.1',setvar:'tx.executing_paranoia_level={{ paranoia_level }}'"
-SecRule &TX:allowed_http_versions "@eq 0" "id:901163,phase:1,pass,nolog,ver:'OWASP_CRS/4.25.1',setvar:'tx.allowed_http_versions={{ inspection.variables.allowed_http_versions }}'"
+SecRule &TX:allowed_http_versions "@eq 0" "id:901163,phase:1,pass,nolog,ver:'OWASP_CRS/4.25.1',setvar:'tx.allowed_http_versions={{ inspection.variables.allowed_http_versions if inspection.variables.allowed_http_versions is string else inspection.variables.allowed_http_versions|join(' ') }}'"
 SecAction "id:900340,phase:1,pass,nolog,noauditlog,t:none,setvar:tx.max_file_size={{ inspection.variables.max_file_size }}"
 
 # REQUEST-901-INITIALIZATION    

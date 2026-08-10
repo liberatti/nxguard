@@ -36,6 +36,23 @@
     "gateway": "Gateway",
     "transactions": "Transações"
   },
+  "SENSOR": {
+    "CONFIG": "Configuração",
+    "IP_REPUTATION": "Reputação de IP",
+    "SECURITY_INSPECTION": "Inspeção de Segurança",
+    "INSPECT_LEVEL": "Nível de Inspeção",
+    "INBOUND_SCORE": "Score Entrante",
+    "OUTBOUND_SCORE": "Score Saindo",
+    "VARIABLES_TITLE": "Variáveis de Inspeção",
+    "ALLOWED_HTTP_VERSIONS": "Versões HTTP Permitidas",
+    "MAX_FILE_SIZE": "Tamanho Máx. de Arquivo (bytes)",
+    "ALLOWED_METHODS": "Métodos HTTP Permitidos",
+    "ALLOWED_CONTENT_TYPE": "Content Types Permitidos",
+    "RESTRICTED_EXTENSIONS": "Extensões Restritas",
+    "MAX_NUM_ARGS": "Qtd. Máxima de Argumentos",
+    "ARG_NAME_LENGTH": "Tamanho do Nome do Argumento",
+    "ARG_LENGTH": "Tamanho do Argumento"
+  },
   "format": {
     "parse": {
       "dateInput": "YYYY-MM-DDTHH:mm:ss.SSSZ"

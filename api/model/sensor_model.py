@@ -24,12 +24,27 @@ class SensorScoreSchema(Schema):
     outbound = fields.Integer(allow_none=True)
 
 
+class SensorVariablesSchema(Schema):
+    class Meta:
+        unknown = EXCLUDE
+
+    allowed_http_versions = fields.Raw(allow_none=True)
+    max_file_size = fields.Integer(allow_none=True)
+    allowed_methods = fields.Raw(allow_none=True)
+    allowed_content_type = fields.Raw(allow_none=True)
+    restricted_extensions = fields.Raw(allow_none=True)
+    max_num_args = fields.Integer(allow_none=True)
+    arg_name_length = fields.Integer(allow_none=True)
+    arg_length = fields.Integer(allow_none=True)
+
+
 class SensorInspectionSchema(Schema):
     class Meta:
         unknown = EXCLUDE
 
     score = fields.Nested(SensorScoreSchema, allow_none=True)
     level = fields.Integer(allow_none=True)
+    variables = fields.Nested(SensorVariablesSchema, allow_none=True)
 
 
 class SensorSchema(Schema):

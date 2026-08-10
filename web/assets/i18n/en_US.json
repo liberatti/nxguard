@@ -86,6 +86,23 @@
     }
   },
   "aboutMessage": "Thanks",
+  "SENSOR": {
+    "CONFIG": "Config",
+    "IP_REPUTATION": "IP Reputation",
+    "SECURITY_INSPECTION": "Security Inspection",
+    "INSPECT_LEVEL": "Inspect Level",
+    "INBOUND_SCORE": "Inbound Score",
+    "OUTBOUND_SCORE": "Outbound Score",
+    "VARIABLES_TITLE": "Inspection Variables",
+    "ALLOWED_HTTP_VERSIONS": "Allowed HTTP Versions",
+    "MAX_FILE_SIZE": "Max File Size (bytes)",
+    "ALLOWED_METHODS": "Allowed HTTP Methods",
+    "ALLOWED_CONTENT_TYPE": "Allowed Content Types",
+    "RESTRICTED_EXTENSIONS": "Restricted Extensions",
+    "MAX_NUM_ARGS": "Max Number of Arguments",
+    "ARG_NAME_LENGTH": "Argument Name Length",
+    "ARG_LENGTH": "Argument Length"
+  },
   "format": {
     "display": {
       "datetime": "DD/MM/YYYY HH:mm:ss",

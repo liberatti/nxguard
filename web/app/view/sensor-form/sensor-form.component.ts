@@ -33,6 +33,8 @@ import { CommonModule } from '@angular/common';
 import { FormaterService } from "app/services/formater.service";
 import { MatMomentDateModule } from "@angular/material-moment-adapter";
 
+import { MatExpansionModule } from '@angular/material/expansion';
+
 @Component({
     selector: 'app-sensor-form',
     standalone: true,
@@ -42,7 +44,7 @@ import { MatMomentDateModule } from "@angular/material-moment-adapter";
         MatListModule, MatCardModule, MatProgressBarModule, MatInputModule,
         MatTableModule, MatMenuModule, MatSortModule, MatTabsModule, MatGridListModule,
         MatTooltipModule, MatSelectModule, MatPaginatorModule, MatSlideToggleModule, MatCheckboxModule,
-        MatFormFieldModule, MatChipsModule],
+        MatFormFieldModule, MatChipsModule, MatExpansionModule],
     templateUrl: './sensor-form.component.html'
 })
 export class SensorFormComponent implements OnInit {
@@ -57,6 +59,28 @@ export class SensorFormComponent implements OnInit {
         "JP", "CN", "MX", "RU", "ZA", "KR", "NG", "AR", "SE", "NO",
         "DK", "FI", "PL", "CH", "NL", "BE", "SG", "AE", "MY", "TH",
         "PH", "NG", "KR", "None", "Unknown"
+    ];
+    _allowed_http_versions: string[] = [
+        'HTTP/1.0', 'HTTP/1.1', 'HTTP/2', 'HTTP/2.0'
+    ];
+    _allowed_methods: string[] = [
+        'GET', 'HEAD', 'POST', 'OPTIONS', 'PUT', 'PATCH', 'DELETE'
+    ];
+    _allowed_content_type: string[] = [
+        '|application/x-www-form-urlencoded|',
+        '|multipart/form-data|',
+        '|text/xml|',
+        '|application/xml|',
+        '|application/soap+xml|',
+        '|application/json|'
+    ];
+    _restricted_extensions: string[] = [
+        '.asa/', '.asax/', '.ascx/', '.axd/', '.backup/', '.bak/', '.bat/', '.cdx/', '.cer/',
+        '.cfg/', '.cmd/', '.com/', '.config/', '.conf/', '.cs/', '.csproj/', '.csr/', '.dat/',
+        '.db/', '.dbf/', '.dll/', '.dos/', '.htr/', '.htw/', '.ida/', '.idc/', '.idq/',
+        '.inc/', '.ini/', '.key/', '.licx/', '.lnk/', '.log/', '.mdb/', '.old/', '.pass/',
+        '.pdb/', '.pol/', '.printer/', '.pwd/', '.rdb/', '.resources/', '.resx/', '.sql/',
+        '.swp/', '.sys/', '.vb/', '.vbs/', '.vbproj/', '.vsdisco/', '.webinfo/', '.xsd/', '.xsx/'
     ];
     ruleDC: string[] = ['code', 'severity', 'msg', 'actionSummary', 'action'];
     ruleDS: MatTableDataSource<SecRule>;
@@ -83,6 +107,34 @@ export class SensorFormComponent implements OnInit {
             score: new FormGroup({
                 inbound: new FormControl<number>(5),
                 outbound: new FormControl<number>(4)
+            }),
+            variables: new FormGroup({
+                allowed_http_versions: new FormControl<string[] | string>([
+                    'HTTP/1.0', 'HTTP/1.1', 'HTTP/2', 'HTTP/2.0'
+                ]),
+                max_file_size: new FormControl<number>(26214400),
+                allowed_methods: new FormControl<string[] | string>([
+                    'GET', 'HEAD', 'POST', 'OPTIONS', 'PUT', 'PATCH', 'DELETE'
+                ]),
+                allowed_content_type: new FormControl<string[] | string>([
+                    '|application/x-www-form-urlencoded|',
+                    '|multipart/form-data|',
+                    '|text/xml|',
+                    '|application/xml|',
+                    '|application/soap+xml|',
+                    '|application/json|'
+                ]),
+                restricted_extensions: new FormControl<string[] | string>([
+                    '.asa/', '.asax/', '.ascx/', '.axd/', '.backup/', '.bak/', '.bat/', '.cdx/', '.cer/',
+                    '.cfg/', '.cmd/', '.com/', '.config/', '.conf/', '.cs/', '.csproj/', '.csr/', '.dat/',
+                    '.db/', '.dbf/', '.dll/', '.dos/', '.htr/', '.htw/', '.ida/', '.idc/', '.idq/',
+                    '.inc/', '.ini/', '.key/', '.licx/', '.lnk/', '.log/', '.mdb/', '.old/', '.pass/',
+                    '.pdb/', '.pol/', '.printer/', '.pwd/', '.rdb/', '.resources/', '.resx/', '.sql/',
+                    '.swp/', '.sys/', '.vb/', '.vbs/', '.vbproj/', '.vsdisco/', '.webinfo/', '.xsd/', '.xsx/'
+                ]),
+                max_num_args: new FormControl<number>(255),
+                arg_name_length: new FormControl<number>(100),
+                arg_length: new FormControl<number>(2000)
             })
         })
     });
@@ -246,6 +298,46 @@ export class SensorFormComponent implements OnInit {
         if (index >= 0) {
             list.splice(index, 1);
             this.form.get('security.geo_codes')?.setValue(list);
+        }
+    }
+
+    getVariableList(field: string): string[] {
+        const varsGroup = this.form.get('inspection.variables') as FormGroup;
+        const val: any = varsGroup?.get(field)?.value;
+        if (!val) return [];
+        if (Array.isArray(val)) return val as string[];
+        if (typeof val === 'string') {
+            const str: string = val;
+            return str.trim().split(/\s+/).filter((x: string) => x.length > 0);
+        }
+        return [];
+    }
+
+    filterActiveVariable(options: string[], field: string): string[] {
+        if (!options) return [];
+        const current = this.getVariableList(field);
+        return options.filter(item => !current.includes(item));
+    }
+
+    onAddVariableItem(field: string, event: any): void {
+        const val = event.value as string;
+        const list = [...this.getVariableList(field)];
+        if (val && !list.includes(val)) {
+            list.push(val);
+            const varsGroup = this.form.get('inspection.variables') as FormGroup;
+            varsGroup?.get(field)?.setValue(list);
+            this.form.markAsTouched();
+        }
+    }
+
+    onRemoveVariableItem(field: string, item: string): void {
+        const list = [...this.getVariableList(field)];
+        const index = list.indexOf(item);
+        if (index >= 0) {
+            list.splice(index, 1);
+            const varsGroup = this.form.get('inspection.variables') as FormGroup;
+            varsGroup?.get(field)?.setValue(list);
+            this.form.markAsTouched();
         }
     }
 

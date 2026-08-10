@@ -18,22 +18,20 @@ class AcmeTool:
 
     @classmethod
     def clean_expired_challenges(cls):
-        dao = ChallengeDao()
-        dao.delete_issued_before(
-            datetime.now() + timedelta(days=cls.__CERTIFICATE_RENEW)
-        )
+        with ChallengeDao() as dao:
+            dao.delete_issued_before(
+                datetime.now() + timedelta(days=cls.__CERTIFICATE_RENEW)
+            )
 
     @classmethod
     def renew_self(cls, certificate):
-        dao = ServiceDao()
-        ca = None
-        c = ConfigDao().get_active()
-        ca = {
-                "certificate": SSLTool.crt_from_pem(c['ca_certificate']),
-                "private_key": SSLTool.private_from_pem(c['ca_private']),
-            }
-
-        services = dao.getall_by_certificate_id(certificate["_id"])
+        with ConfigDao() as dao_c:
+            c = dao_c.get_active()
+        if not c:
+            raise ValueError("No active configuration found")
+        ca = SSLTool.get_or_create_ca(c)
+        with ServiceDao() as dao_s:
+            services = dao_s.getall_by_certificate_id(certificate["_id"])
 
         cn = None
         sans = []
@@ -60,13 +58,14 @@ class AcmeTool:
             "force_renew": "MANAGED" == certificate["provider"],
         }
         crt.update(SSLTool.extract_info_from_crt(self_crt["certificate"]))
-        CertificateDao().update_by_id(certificate["_id"], crt)
+        with CertificateDao() as dao_crt:
+            dao_crt.update_by_id(certificate["_id"], crt)
 
     @classmethod
     def renew_lets(cls, certificate):
-        dao = ServiceDao()
         try:
-            services = dao.getall_by_certificate_id(certificate["_id"])
+            with ServiceDao() as dao_s:
+                services = dao_s.getall_by_certificate_id(certificate["_id"])
             cn = None
             sans = []
             for s in services:
@@ -89,13 +88,18 @@ class AcmeTool:
                         {
                             "chain": chain,
                             "certificate": SSLTool.crt_to_pem(result["certificate"]),
-                            "private_key": SSLTool.private_to_pem(result["private_key"]),
+                            "private_key": SSLTool.private_to_pem(
+                                result["private_key"]
+                            ),
                             "status": "VALID",
                             "force_renew": False,
                         }
                     )
-                    certificate.update(SSLTool.extract_info_from_crt(result["certificate"]))
-                    CertificateDao().update_by_id(certificate["_id"], certificate)
+                    certificate.update(
+                        SSLTool.extract_info_from_crt(result["certificate"])
+                    )
+                    with CertificateDao() as dao_crt:
+                        dao_crt.update_by_id(certificate["_id"], certificate)
         except ACMEerrors.ValidationError as e:
             for rs in e.failed_authzrs:
                 for challenge in rs.body.challenges:
@@ -104,8 +108,8 @@ class AcmeTool:
     @classmethod
     def auto_renew(cls):
         cls.clean_expired_challenges()
-        dao_service = ServiceDao()
-        services = dao_service.get_all()
+        with ServiceDao() as dao_s:
+            services = dao_s.get_all()
         crt_count = 0
         if "data" in services:
             for service in services["data"]:

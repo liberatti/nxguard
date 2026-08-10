@@ -8,7 +8,7 @@ from nxcore.common_utils import gen_random_string
 
 import config
 from api.model.certificate_model import CertificateDao
-from api.model.config_model import ConfigDao, ConfigBackupDao
+from api.model.config_model import ConfigDao, ConfigBackupDao, ChangeDao
 from api.model.oauth_model import UserDao
 from api.model.sensor_model import SensorDao
 from api.model.service_model import ServiceDao
@@ -16,6 +16,7 @@ from api.model.upstream_model import UpstreamDao, NodeStatusDao
 from api.model.transaction_model import TransactionDao
 from api.tools.network_tool import NetworkTool
 from nxcore.middleware.logging_manager import logger
+from api.model.acme_model import ChallengeDao
 
 
 def get_config():
@@ -92,6 +93,10 @@ def create_db():
     with TransactionDao() as dao:
         dao.create_schema()
     with NodeStatusDao() as dao:
+        dao.create_schema()
+    with ChangeDao() as dao:
+        dao.create_schema()
+    with ChallengeDao() as dao:
         dao.create_schema()
 
 
