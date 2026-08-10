@@ -1,6 +1,6 @@
 <ng-container>
     <mat-card>
-        <mat-card-header>
+        <mat-card-header class="mb-2">
             <mat-card-title>{{ 'view.sensor.title'|translate }}</mat-card-title>
             <mat-card-subtitle>{{ (isAddMode ? 'actions.create' : 'actions.edit')| translate }}</mat-card-subtitle>
         </mat-card-header>
@@ -8,20 +8,17 @@
             <form [formGroup]="form">
                 <mat-tab-group [(selectedIndex)]="selectedTabIndex">
                     <mat-tab [label]="'SENSOR.CONFIG' | translate" id="config-tab">
-                        <div class="mat-row">
-                            <div class="mat-col-12">
+                        <div class="mat-row mt-2">
+                            <div class="mat-col-6">
                                 <mat-form-field class="full-width" appearance="outline">
                                     <mat-label>Name</mat-label>
                                     <input matInput formControlName="name" id="sensor-name-input">
                                 </mat-form-field>
                             </div>
-                        </div>
-                        <div class="mat-row">
-                            <div class="mat-col-12">
+                            <div class="mat-col-6">
                                 <mat-form-field class="full-width" appearance="outline">
                                     <mat-label>Description</mat-label>
-                                    <textarea matInput formControlName="description"
-                                        id="sensor-description-input"></textarea>
+                                    <input matInput formControlName="description" id="sensor-description-input">
                                 </mat-form-field>
                             </div>
                         </div>
@@ -50,9 +47,9 @@
                         </div>
                     </mat-tab>
                     <mat-tab [label]="'SENSOR.IP_REPUTATION' | translate" id="ip-reputation-tab">
-                        <div class="mat-row" formGroupName="security">
+                        <div class="mat-row mt-2" formGroupName="security">
                             <div class="mat-col-6">
-                                <mat-form-field class="full-width">
+                                <mat-form-field class="full-width" appearance="outline">
                                     <mat-label>RBL Blocking Feed</mat-label>
                                     <mat-select (selectionChange)="onAddBlock($event)" id="rbl-block-select">
                                         <mat-option *ngFor="let c of filterActiveFeed(_rbl_feeds); let i = index"
@@ -72,7 +69,7 @@
                                 </mat-chip-listbox>
                             </div>
                             <div class="mat-col-6">
-                                <mat-form-field class="full-width">
+                                <mat-form-field class="full-width" appearance="outline">
                                     <mat-label>RBL ByPass</mat-label>
                                     <mat-select (selectionChange)="onAddPermit($event)" id="rbl-permit-select">
                                         <mat-option *ngFor="let c of filterActiveFeed(_rbl_feeds); let i = index"
@@ -94,7 +91,7 @@
                         </div>
                     </mat-tab>
                     <mat-tab [label]="'SENSOR.SECURITY_INSPECTION' | translate" id="security-inspection-tab">
-                        <div class="mat-row mt-2" formGroupName="inspection">
+                        <div class="mat-row mt-2 mb-2" formGroupName="inspection">
                             <div class="mat-col-4">
                                 <mat-form-field class="full-width" appearance="outline">
                                     <mat-label>{{ 'SENSOR.INSPECT_LEVEL' | translate }}</mat-label>
@@ -128,18 +125,24 @@
                                         </mat-panel-title>
                                     </mat-expansion-panel-header>
                                     <div class="mat-row">
-                                        <div class="mat-col-12">
+                                        <div class="mat-col-6">
                                             <mat-form-field class="full-width" appearance="outline">
                                                 <mat-label>{{ 'SENSOR.ALLOWED_HTTP_VERSIONS' | translate }}</mat-label>
-                                                <mat-select (selectionChange)="onAddVariableItem('allowed_http_versions', $event)" id="allowed-http-versions-select">
-                                                    <mat-option *ngFor="let v of filterActiveVariable(_allowed_http_versions, 'allowed_http_versions'); let i = index"
+                                                <mat-select
+                                                    (selectionChange)="onAddVariableItem('allowed_http_versions', $event)"
+                                                    id="allowed-http-versions-select">
+                                                    <mat-option
+                                                        *ngFor="let v of filterActiveVariable(_allowed_http_versions, 'allowed_http_versions'); let i = index"
                                                         [value]="v" id="allowed-http-versions-option-{{i}}">
                                                         {{ v }}
                                                     </mat-option>
                                                 </mat-select>
                                             </mat-form-field>
-                                            <mat-chip-listbox class="full-width mb-2" [multiple]="false" [selectable]="true">
-                                                <mat-chip-option class="small-chip" *ngFor="let p of getVariableList('allowed_http_versions')" (removed)="onRemoveVariableItem('allowed_http_versions', p)">
+                                            <mat-chip-listbox class="full-width mb-2" [multiple]="false"
+                                                [selectable]="true">
+                                                <mat-chip-option class="small-chip"
+                                                    *ngFor="let p of getVariableList('allowed_http_versions')"
+                                                    (removed)="onRemoveVariableItem('allowed_http_versions', p)">
                                                     {{ p }}
                                                     <button matChipRemove>
                                                         <mat-icon>cancel</mat-icon>
@@ -147,20 +150,24 @@
                                                 </mat-chip-option>
                                             </mat-chip-listbox>
                                         </div>
-                                    </div>
-                                    <div class="mat-row">
-                                        <div class="mat-col-12">
+                                        <div class="mat-col-6">
                                             <mat-form-field class="full-width" appearance="outline">
                                                 <mat-label>{{ 'SENSOR.RESTRICTED_EXTENSIONS' | translate }}</mat-label>
-                                                <mat-select (selectionChange)="onAddVariableItem('restricted_extensions', $event)" id="restricted-extensions-select">
-                                                    <mat-option *ngFor="let v of filterActiveVariable(_restricted_extensions, 'restricted_extensions'); let i = index"
+                                                <mat-select
+                                                    (selectionChange)="onAddVariableItem('restricted_extensions', $event)"
+                                                    id="restricted-extensions-select">
+                                                    <mat-option
+                                                        *ngFor="let v of filterActiveVariable(_restricted_extensions, 'restricted_extensions'); let i = index"
                                                         [value]="v" id="restricted-extensions-option-{{i}}">
                                                         {{ v }}
                                                     </mat-option>
                                                 </mat-select>
                                             </mat-form-field>
-                                            <mat-chip-listbox class="full-width mb-2" [multiple]="false" [selectable]="true">
-                                                <mat-chip-option class="small-chip" *ngFor="let p of getVariableList('restricted_extensions')" (removed)="onRemoveVariableItem('restricted_extensions', p)">
+                                            <mat-chip-listbox class="full-width mb-2" [multiple]="false"
+                                                [selectable]="true">
+                                                <mat-chip-option class="small-chip"
+                                                    *ngFor="let p of getVariableList('restricted_extensions')"
+                                                    (removed)="onRemoveVariableItem('restricted_extensions', p)">
                                                     {{ p }}
                                                     <button matChipRemove>
                                                         <mat-icon>cancel</mat-icon>
@@ -202,7 +209,7 @@
                                 </mat-expansion-panel>
                             </mat-accordion>
                         </div>
-                        <mat-form-field class="full-width">
+                        <mat-form-field class="full-width" appearance="outline">
                             <mat-label>Category</mat-label>
                             <mat-select (selectionChange)="onAddCategory($event)" id="category-select">
                                 <mat-option *ngFor="let c of filterActiveCategory(_categories,form.value.categories)"

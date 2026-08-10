@@ -32,9 +32,8 @@
   "sensors": [
     {
       "name": "Default",
-      "description": "",
+      "description": "Default sensor for web application",
       "categories": [
-        "900-EXCLUSION-RULES-BEFORE-CRS",
         "905-COMMON-EXCEPTIONS",
         "911-METHOD-ENFORCEMENT",
         "913-SCANNER-DETECTION",

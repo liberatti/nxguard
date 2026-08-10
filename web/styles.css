@@ -20,6 +20,24 @@
     flex-direction: column;
 }
 
+div.mat-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: flex-start;
+    width: 100%;
+    margin-bottom: 12px;
+}
+
+.mat-col-12 { flex: 0 0 100%; width: 100%; box-sizing: border-box; }
+.mat-col-9  { flex: 1 1 calc(75% - 12px); min-width: 300px; box-sizing: border-box; }
+.mat-col-8  { flex: 1 1 calc(66.666% - 11px); min-width: 280px; box-sizing: border-box; }
+.mat-col-7  { flex: 1 1 calc(58.333% - 9px); min-width: 260px; box-sizing: border-box; }
+.mat-col-6  { flex: 1 1 calc(50% - 8px); min-width: 260px; box-sizing: border-box; }
+.mat-col-5  { flex: 1 1 calc(41.666% - 7px); min-width: 220px; box-sizing: border-box; }
+.mat-col-4  { flex: 1 1 calc(33.333% - 11px); min-width: 200px; box-sizing: border-box; }
+.mat-col-3  { flex: 1 1 calc(25% - 12px); min-width: 160px; box-sizing: border-box; }
+
 /* -------------------------------------------------------------------------- */
 /* 2. Modern Light Background                                                 */
 /* -------------------------------------------------------------------------- */
