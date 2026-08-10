@@ -280,12 +280,12 @@
             "DELETE"
           ],
           "allowed_content_type": [
-            "|application/x-www-form-urlencoded|",
-            "|multipart/form-data|",
-            "|text/xml|",
-            "|application/xml|",
-            "|application/soap+xml|",
-            "|application/json|"
+            "application/x-www-form-urlencoded",
+            "multipart/form-data",
+            "text/xml",
+            "application/xml",
+            "application/soap+xml",
+            "application/json"
           ],
           "monitor_only": false,
           "name": "graphql-route",
@@ -314,15 +314,15 @@
             "DELETE"
           ],
           "allowed_content_type": [
-            "|application/x-www-form-urlencoded|",
-            "|multipart/form-data|",
-            "|text/xml|",
-            "|application/xml|",
-            "|application/soap+xml|",
-            "|application/json|"
+            "application/x-www-form-urlencoded",
+            "multipart/form-data",
+            "text/xml",
+            "application/xml",
+            "application/soap+xml",
+            "application/json"
           ],
           "monitor_only": false,
-          "name": "all-req",
+          "name": "api-req",
           "paths": [
             "^/(nxg/api.*)"
           ],
@@ -342,15 +342,15 @@
             "HEAD"
           ],
           "allowed_content_type": [
-            "|application/x-www-form-urlencoded|",
-            "|multipart/form-data|",
-            "|text/xml|",
-            "|application/xml|",
-            "|application/soap+xml|",
-            "|application/json|"
+            "application/x-www-form-urlencoded",
+            "multipart/form-data",
+            "text/xml",
+            "application/xml",
+            "application/soap+xml",
+            "application/json"
           ],
           "monitor_only": false,
-          "name": "all-req",
+          "name": "front-req",
           "paths": [
             "^/(nxg/.*)"
           ],

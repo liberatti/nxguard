@@ -52,12 +52,12 @@ export class ServiceRouteFormDialogComponent implements OnInit {
         'GET', 'HEAD', 'POST', 'OPTIONS', 'PUT', 'PATCH', 'DELETE'
     ];
     _allowed_content_type: string[] = [
-        '|application/x-www-form-urlencoded|',
-        '|multipart/form-data|',
-        '|text/xml|',
-        '|application/xml|',
-        '|application/soap+xml|',
-        '|application/json|'
+        'application/x-www-form-urlencoded',
+        'multipart/form-data',
+        'text/xml',
+        'application/xml',
+        'application/soap+xml',
+        'application/json'
     ];
     separatorKeysCodes = [COMMA, ENTER];
     _upstreams: Upstream[] = [];
@@ -99,12 +99,12 @@ export class ServiceRouteFormDialogComponent implements OnInit {
         methods: new FormControl<Array<string>>(['GET', 'POST','PUT', 'PATCH', 'DELETE']),
         allowed_methods: new FormControl<Array<string> | string>(['GET', 'HEAD', 'POST', 'OPTIONS', 'PUT', 'PATCH', 'DELETE']),
         allowed_content_type: new FormControl<Array<string> | string>([
-            '|application/x-www-form-urlencoded|',
-            '|multipart/form-data|',
-            '|text/xml|',
-            '|application/xml|',
-            '|application/soap+xml|',
-            '|application/json|'
+            'application/x-www-form-urlencoded',
+            'multipart/form-data',
+            'text/xml',
+            'application/xml',
+            'application/soap+xml',
+            'application/json'
         ]),
         monitor_only: new FormControl<boolean>(false),
         sensor: new FormControl<Sensor>(<Sensor>{}),
@@ -155,12 +155,12 @@ export class ServiceRouteFormDialogComponent implements OnInit {
                 this.form.get('allowed_content_type')?.setValue(this.routeData.allowed_content_type);
             } else {
                 this.form.get('allowed_content_type')?.setValue([
-                    '|application/x-www-form-urlencoded|',
-                    '|multipart/form-data|',
-                    '|text/xml|',
-                    '|application/xml|',
-                    '|application/soap+xml|',
-                    '|application/json|'
+                    'application/x-www-form-urlencoded',
+                    'multipart/form-data',
+                    'text/xml',
+                    'application/xml',
+                    'application/soap+xml',
+                    'application/json'
                 ]);
             }
             this.form.get('monitor_only')?.setValue(this.routeData.monitor_only);

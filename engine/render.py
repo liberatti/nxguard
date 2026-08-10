@@ -243,12 +243,12 @@ def _generate_services(
                         r["allowed_methods"] = ["GET", "HEAD", "POST", "OPTIONS", "PUT", "PATCH", "DELETE"]
                     if "allowed_content_type" not in r or r["allowed_content_type"] is None:
                         r["allowed_content_type"] = [
-                            "|application/x-www-form-urlencoded|",
-                            "|multipart/form-data|",
-                            "|text/xml|",
-                            "|application/xml|",
-                            "|application/soap+xml|",
-                            "|application/json|"
+                            "application/x-www-form-urlencoded",
+                            "multipart/form-data",
+                            "text/xml",
+                            "application/xml",
+                            "application/soap+xml",
+                            "application/json"
                         ]
                     r.update(
                         {

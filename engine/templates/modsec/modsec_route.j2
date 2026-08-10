@@ -10,4 +10,5 @@ SecAction "id:900310,phase:1,pass,nolog,noauditlog,t:none,setvar:tx.arg_name_len
 SecAction "id:900320,phase:1,pass,nolog,noauditlog,t:none,setvar:tx.arg_length={{ sensor.inspection.variables.arg_length }}"
 SecAction "id:900330,phase:1,pass,nolog,noauditlog,t:none,setvar:'tx.allowed_methods={{ allowed_methods if allowed_methods is string else allowed_methods|join(' ') }}'"
 SecAction "id:900350,phase:1,pass,nolog,noauditlog,t:none,setvar:'tx.restricted_extensions={{ sensor.inspection.variables.restricted_extensions if sensor.inspection.variables.restricted_extensions is string else sensor.inspection.variables.restricted_extensions|join(' ') }}'"
-SecAction "id:900360,phase:1,pass,nolog,noauditlog,t:none,setvar:'tx.allowed_request_content_type={{ allowed_content_type if allowed_content_type is string else allowed_content_type|join(' ') }}'"
+{%- if allowed_content_type is string %}{% set act_list = allowed_content_type.split(' ') %}{%- else %}{% set act_list = allowed_content_type %}{%- endif %}
+SecAction "id:900360,phase:1,pass,nolog,noauditlog,t:none,setvar:'tx.allowed_request_content_type={% for act in act_list %}|{{ act.strip('|') }}|{% if not loop.last %} {% endif %}{% endfor %}'"
