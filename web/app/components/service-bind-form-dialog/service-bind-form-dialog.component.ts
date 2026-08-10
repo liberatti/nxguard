@@ -52,10 +52,11 @@ export class ServiceBindFormDialogComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.form.get('port')?.setValue(this.bindData.port);
-        this.form.get('protocol')?.setValue(this.bindData.protocol);
-        this.form.get('ssl_upgrade')?.setValue(this.bindData.ssl_upgrade);
-
+        if (this.bindData) {
+            this.form.get('port')?.setValue(this.bindData.port);
+            this.form.get('protocol')?.setValue(this.bindData.protocol);
+            this.form.get('ssl_upgrade')?.setValue(this.bindData.ssl_upgrade ?? false);
+        }
     }
 
     onCancel() {

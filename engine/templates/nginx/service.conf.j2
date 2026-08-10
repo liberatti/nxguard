@@ -1,7 +1,7 @@
 #####################################################################
 # service: {{name}}
 #####################################################################
-{%- if rate_limit %}
+{%- if rate_limit_per_sec and rate_limit_per_sec > 0 %}
 limit_req_zone $binary_remote_addr zone={{name}}_rate:16m rate={{rate_limit_per_sec}}r/s;
 {%- endif %}
 
@@ -24,14 +24,14 @@ server {
     log_not_found off;
   }
 
-  {%- if rate_limit %}
+  {%- if rate_limit_per_sec and rate_limit_per_sec > 0 %}
   limit_req zone={{name}}_rate burst=25 nodelay;
   {%- endif %}
   set $service '{{name}}';
   set $real_method $request_method;
   client_max_body_size {{body_limit}}m;
 
-  {%- if compression_types %}
+  {%- if compression_types and compression_types|length > 0 %}
   {% include 'nginx/gzip.j2' %}
   {%endif%}
 

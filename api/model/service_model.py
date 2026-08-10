@@ -25,7 +25,7 @@ class BindSchema(Schema):
 
     port = fields.Integer()
     protocol = fields.String()
-    ssl_upgrade = fields.Boolean()
+    ssl_upgrade = fields.Boolean(load_default=False, dump_default=False)
 
 
 class RedirectSchema(Schema):
@@ -83,9 +83,7 @@ class ServiceSchema(Schema):
     bindings = fields.Nested(BindSchema, many=True)
     headers = fields.Nested(HeaderSchema, many=True)
     routes = fields.Nested(RouteSchema, many=True)
-    compression = fields.Boolean()
     compression_types = fields.List(fields.String())
-    rate_limit = fields.Boolean()
     rate_limit_per_sec = fields.Integer()
     sans = fields.List(fields.String())
     ssl_protocols = fields.List(fields.String())
@@ -142,9 +140,7 @@ class ServiceDao(DuckDAO):
                 bindings JSON,
                 headers JSON,
                 routes JSON,
-                compression BOOLEAN,
                 compression_types JSON,
-                rate_limit BOOLEAN,
                 rate_limit_per_sec INTEGER,
                 sans JSON,
                 ssl_protocols JSON,

@@ -85,9 +85,7 @@ export interface Service {
     body_limit: number;
     timeout: number;
     buffer: number;
-    compression: boolean;
     compression_types: Array<string>;
-    rate_limit: boolean;
     rate_limit_per_sec: number;
     sans: string[];
     ssl_protocols: Array<string>;
