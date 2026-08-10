@@ -144,7 +144,7 @@ def update(service_id: str) -> Response:
         with ServiceDao() as dao:
             service_dict = dao.json_load(request.json)
             sv_check = dao.get_by_sans(service_dict["sans"])
-            if sv_check and service_id not in sv_check["_id"]:
+            if sv_check and str(service_id) != str(sv_check["_id"]):
                 return response_error("Domains in use", code=406)
 
             dao.update_by_id(service_id, service_dict)

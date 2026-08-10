@@ -30,7 +30,7 @@ routes = [
     (service_routes, f"{config.APP_CONTEXT}/api/service"),
     (transaction_routes, f"{config.APP_CONTEXT}/api/trn"),
     (upstream_routes, f"{config.APP_CONTEXT}/api/upstream"),
-    (user_routes, f"{config.APP_CONTEXT}/api/users"),
+    (user_routes, f"{config.APP_CONTEXT}/api/user"),
 ]
 
 
