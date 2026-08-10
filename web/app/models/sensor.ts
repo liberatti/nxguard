@@ -37,8 +37,6 @@ export interface SensorScore {
 export interface SensorVariables {
     allowed_http_versions?: string[] | string;
     max_file_size?: number;
-    allowed_methods?: string[] | string;
-    allowed_content_type?: string[] | string;
     restricted_extensions?: string[] | string;
     max_num_args?: number;
     arg_name_length?: number;

@@ -36,6 +36,10 @@
     "gateway": "Gateway",
     "transactions": "Transações"
   },
+  "ROUTE": {
+    "ALLOWED_METHODS": "Métodos HTTP Permitidos",
+    "ALLOWED_CONTENT_TYPE": "Content Types Permitidos"
+  },
   "SENSOR": {
     "CONFIG": "Configuração",
     "IP_REPUTATION": "Reputação de IP",

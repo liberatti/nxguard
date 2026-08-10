@@ -23,6 +23,7 @@ import {MatSelectModule} from '@angular/material/select';
 import {MatChipsModule} from '@angular/material/chips';
 import {MatSlideToggle} from '@angular/material/slide-toggle';
 import {MatTabGroup, MatTabsModule} from '@angular/material/tabs';
+import {TranslatePipe} from '@ngx-translate/core';
 import {StaticServer} from "../../models/static";
 import {StaticService} from "../../services/static.service";
 import {RoutefilterService} from "../../services/routefilter.service";
@@ -32,7 +33,7 @@ import {RoutefilterService} from "../../services/routefilter.service";
     selector: 'app-service-route-form-dialog',
     templateUrl: './service-route-form-dialog.component.html',
     standalone: true,
-    imports: [ReactiveFormsModule, CommonModule,
+    imports: [ReactiveFormsModule, CommonModule, TranslatePipe,
         MatFormFieldModule, MatChipsModule,
         MatInputModule,
         FormsModule, MatCardModule,
@@ -47,6 +48,17 @@ import {RoutefilterService} from "../../services/routefilter.service";
 export class ServiceRouteFormDialogComponent implements OnInit {
     @ViewChild('tabGroup') tabGroup!: MatTabGroup;
     _supportedTypes: string[] = ['upstream', 'redirect']
+    _allowed_methods: string[] = [
+        'GET', 'HEAD', 'POST', 'OPTIONS', 'PUT', 'PATCH', 'DELETE'
+    ];
+    _allowed_content_type: string[] = [
+        '|application/x-www-form-urlencoded|',
+        '|multipart/form-data|',
+        '|text/xml|',
+        '|application/xml|',
+        '|application/soap+xml|',
+        '|application/json|'
+    ];
     separatorKeysCodes = [COMMA, ENTER];
     _upstreams: Upstream[] = [];
     _sensors: Sensor[] = [];
@@ -60,6 +72,12 @@ export class ServiceRouteFormDialogComponent implements OnInit {
 
     methodForm = new FormGroup({
         method: new FormControl<string>('')
+    });
+    allowedMethodForm = new FormGroup({
+        allowedMethod: new FormControl<string>('')
+    });
+    allowedContentTypeForm = new FormGroup({
+        allowedContentType: new FormControl<string>('')
     });
     cacheMethodForm = new FormGroup({
         cacheMethod: new FormControl<string>('')
@@ -79,6 +97,15 @@ export class ServiceRouteFormDialogComponent implements OnInit {
         }),
         paths: new FormControl<Array<string>>([]),
         methods: new FormControl<Array<string>>(['GET', 'POST','PUT', 'PATCH', 'DELETE']),
+        allowed_methods: new FormControl<Array<string> | string>(['GET', 'HEAD', 'POST', 'OPTIONS', 'PUT', 'PATCH', 'DELETE']),
+        allowed_content_type: new FormControl<Array<string> | string>([
+            '|application/x-www-form-urlencoded|',
+            '|multipart/form-data|',
+            '|text/xml|',
+            '|application/xml|',
+            '|application/soap+xml|',
+            '|application/json|'
+        ]),
         monitor_only: new FormControl<boolean>(false),
         sensor: new FormControl<Sensor>(<Sensor>{}),
         cache_methods: new FormControl<Array<string>>([]),
@@ -119,6 +146,23 @@ export class ServiceRouteFormDialogComponent implements OnInit {
             this.form.get('redirect')?.setValue(this.routeData.redirect);
             this.form.get('paths')?.setValue(this.routeData.paths);
             this.form.get('methods')?.setValue(this.routeData.methods);
+            if (this.routeData.allowed_methods) {
+                this.form.get('allowed_methods')?.setValue(this.routeData.allowed_methods);
+            } else {
+                this.form.get('allowed_methods')?.setValue(['GET', 'HEAD', 'POST', 'OPTIONS', 'PUT', 'PATCH', 'DELETE']);
+            }
+            if (this.routeData.allowed_content_type) {
+                this.form.get('allowed_content_type')?.setValue(this.routeData.allowed_content_type);
+            } else {
+                this.form.get('allowed_content_type')?.setValue([
+                    '|application/x-www-form-urlencoded|',
+                    '|multipart/form-data|',
+                    '|text/xml|',
+                    '|application/xml|',
+                    '|application/soap+xml|',
+                    '|application/json|'
+                ]);
+            }
             this.form.get('monitor_only')?.setValue(this.routeData.monitor_only);
             this.form.get('sensor')?.setValue(this.routeData.sensor);
             this.form.get('type')?.setValue(this.routeData.type);
@@ -205,6 +249,62 @@ export class ServiceRouteFormDialogComponent implements OnInit {
                 this.form.value.cache_methods.splice(index, 1);
             }
         }
+    }
+
+    onAddAllowedMethod(): void {
+        let data = this.allowedMethodForm.value.allowedMethod as string;
+        if (!data) return;
+        let current = this.getArrayVal(this.form.value.allowed_methods);
+        if (!current.includes(data)) {
+            current.push(data);
+            this.form.get('allowed_methods')?.setValue(current);
+        }
+        this.allowedMethodForm.reset();
+    }
+
+    onRemoveAllowedMethod(keyword: any): void {
+        let current = this.getArrayVal(this.form.value.allowed_methods);
+        let index = current.indexOf(keyword);
+        if (index >= 0) {
+            current.splice(index, 1);
+            this.form.get('allowed_methods')?.setValue(current);
+        }
+    }
+
+    filterActiveAllowedMethod(list: string[]): string[] {
+        const selected = this.getArrayVal(this.form.value.allowed_methods);
+        return list.filter(item => !selected.includes(item));
+    }
+
+    onAddAllowedContentType(): void {
+        let data = this.allowedContentTypeForm.value.allowedContentType as string;
+        if (!data) return;
+        let current = this.getArrayVal(this.form.value.allowed_content_type);
+        if (!current.includes(data)) {
+            current.push(data);
+            this.form.get('allowed_content_type')?.setValue(current);
+        }
+        this.allowedContentTypeForm.reset();
+    }
+
+    onRemoveAllowedContentType(keyword: any): void {
+        let current = this.getArrayVal(this.form.value.allowed_content_type);
+        let index = current.indexOf(keyword);
+        if (index >= 0) {
+            current.splice(index, 1);
+            this.form.get('allowed_content_type')?.setValue(current);
+        }
+    }
+
+    filterActiveAllowedContentType(list: string[]): string[] {
+        const selected = this.getArrayVal(this.form.value.allowed_content_type);
+        return list.filter(item => !selected.includes(item));
+    }
+
+    getArrayVal(val: any): string[] {
+        if (!val) return [];
+        if (typeof val === 'string') return val.split(' ').filter(x => x);
+        return [...val];
     }
 
     compareFn(object1: any, object2: any) {

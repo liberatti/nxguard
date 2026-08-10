@@ -70,6 +70,8 @@ export interface Route {
     sensor: Sensor;
     paths: Array<string>;
     methods: Array<string>;
+    allowed_methods?: Array<string> | string;
+    allowed_content_type?: Array<string> | string;
     cache_methods: Array<string>;
     filters: Array<RouteFilter>;
 }

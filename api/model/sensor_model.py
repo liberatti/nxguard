@@ -30,8 +30,6 @@ class SensorVariablesSchema(Schema):
 
     allowed_http_versions = fields.Raw(allow_none=True)
     max_file_size = fields.Integer(allow_none=True)
-    allowed_methods = fields.Raw(allow_none=True)
-    allowed_content_type = fields.Raw(allow_none=True)
     restricted_extensions = fields.Raw(allow_none=True)
     max_num_args = fields.Integer(allow_none=True)
     arg_name_length = fields.Integer(allow_none=True)

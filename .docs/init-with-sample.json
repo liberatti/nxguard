@@ -90,23 +90,6 @@
             "HTTP/2.0"
           ],
           "max_file_size": 26214400,
-          "allowed_methods": [
-            "GET",
-            "HEAD",
-            "POST",
-            "OPTIONS",
-            "PUT",
-            "PATCH",
-            "DELETE"
-          ],
-          "allowed_content_type": [
-            "|application/x-www-form-urlencoded|",
-            "|multipart/form-data|",
-            "|text/xml|",
-            "|application/xml|",
-            "|application/soap+xml|",
-            "|application/json|"
-          ],
           "restricted_extensions": [
             ".asa/",
             ".asax/",
@@ -287,6 +270,23 @@
             "GET",
             "POST"
           ],
+          "allowed_methods": [
+            "GET",
+            "HEAD",
+            "POST",
+            "OPTIONS",
+            "PUT",
+            "PATCH",
+            "DELETE"
+          ],
+          "allowed_content_type": [
+            "|application/x-www-form-urlencoded|",
+            "|multipart/form-data|",
+            "|text/xml|",
+            "|application/xml|",
+            "|application/soap+xml|",
+            "|application/json|"
+          ],
           "monitor_only": false,
           "name": "graphql-route",
           "paths": [
@@ -304,12 +304,22 @@
         {
           "cache_methods": [],
           "filters": [],
-          "methods": [
+          "allowed_methods": [
             "GET",
+            "HEAD",
             "POST",
+            "OPTIONS",
             "PUT",
             "PATCH",
             "DELETE"
+          ],
+          "allowed_content_type": [
+            "|application/x-www-form-urlencoded|",
+            "|multipart/form-data|",
+            "|text/xml|",
+            "|application/xml|",
+            "|application/soap+xml|",
+            "|application/json|"
           ],
           "monitor_only": false,
           "name": "all-req",
@@ -327,8 +337,17 @@
         {
           "cache_methods": [],
           "filters": [],
-          "methods": [
-            "GET"
+          "allowed_methods": [
+            "GET",
+            "HEAD"
+          ],
+          "allowed_content_type": [
+            "|application/x-www-form-urlencoded|",
+            "|multipart/form-data|",
+            "|text/xml|",
+            "|application/xml|",
+            "|application/soap+xml|",
+            "|application/json|"
           ],
           "monitor_only": false,
           "name": "all-req",

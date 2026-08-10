@@ -86,6 +86,10 @@
     }
   },
   "aboutMessage": "Thanks",
+  "ROUTE": {
+    "ALLOWED_METHODS": "Allowed HTTP Methods",
+    "ALLOWED_CONTENT_TYPE": "Allowed Content Types"
+  },
   "SENSOR": {
     "CONFIG": "Config",
     "IP_REPUTATION": "IP Reputation",

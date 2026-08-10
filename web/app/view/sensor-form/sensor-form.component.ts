@@ -63,17 +63,6 @@ export class SensorFormComponent implements OnInit {
     _allowed_http_versions: string[] = [
         'HTTP/1.0', 'HTTP/1.1', 'HTTP/2', 'HTTP/2.0'
     ];
-    _allowed_methods: string[] = [
-        'GET', 'HEAD', 'POST', 'OPTIONS', 'PUT', 'PATCH', 'DELETE'
-    ];
-    _allowed_content_type: string[] = [
-        '|application/x-www-form-urlencoded|',
-        '|multipart/form-data|',
-        '|text/xml|',
-        '|application/xml|',
-        '|application/soap+xml|',
-        '|application/json|'
-    ];
     _restricted_extensions: string[] = [
         '.asa/', '.asax/', '.ascx/', '.axd/', '.backup/', '.bak/', '.bat/', '.cdx/', '.cer/',
         '.cfg/', '.cmd/', '.com/', '.config/', '.conf/', '.cs/', '.csproj/', '.csr/', '.dat/',
@@ -113,17 +102,6 @@ export class SensorFormComponent implements OnInit {
                     'HTTP/1.0', 'HTTP/1.1', 'HTTP/2', 'HTTP/2.0'
                 ]),
                 max_file_size: new FormControl<number>(26214400),
-                allowed_methods: new FormControl<string[] | string>([
-                    'GET', 'HEAD', 'POST', 'OPTIONS', 'PUT', 'PATCH', 'DELETE'
-                ]),
-                allowed_content_type: new FormControl<string[] | string>([
-                    '|application/x-www-form-urlencoded|',
-                    '|multipart/form-data|',
-                    '|text/xml|',
-                    '|application/xml|',
-                    '|application/soap+xml|',
-                    '|application/json|'
-                ]),
                 restricted_extensions: new FormControl<string[] | string>([
                     '.asa/', '.asax/', '.ascx/', '.axd/', '.backup/', '.bak/', '.bat/', '.cdx/', '.cer/',
                     '.cfg/', '.cmd/', '.com/', '.config/', '.conf/', '.cs/', '.csproj/', '.csr/', '.dat/',
