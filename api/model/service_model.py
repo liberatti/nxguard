@@ -3,7 +3,7 @@ from typing import Dict, Any, List, Optional
 
 from nxcore.middleware.logging_manager import logger
 from .duck_db import DuckDAO
-from marshmallow import EXCLUDE, Schema, fields
+from marshmallow import EXCLUDE, Schema, fields, post_load
 
 import config
 from api.model.certificate_model import CertificateDao, CertificateSchema
@@ -25,7 +25,16 @@ class BindSchema(Schema):
 
     port = fields.Integer()
     protocol = fields.String()
-    ssl_upgrade = fields.Boolean(load_default=False, dump_default=False)
+    ssl_upgrade = fields.Boolean(allow_none=True, load_default=False, dump_default=False)
+    ssl_upgrade_port = fields.Integer(allow_none=True, load_default=443, dump_default=443)
+
+    @post_load
+    def make_bind(self, data, **kwargs):
+        if data.get("ssl_upgrade") is None:
+            data["ssl_upgrade"] = False
+        if data.get("ssl_upgrade_port") is None:
+            data["ssl_upgrade_port"] = 443
+        return data
 
 
 class RedirectSchema(Schema):

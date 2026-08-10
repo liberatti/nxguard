@@ -145,43 +145,42 @@ export class ServiceFormComponent implements OnInit {
         const { id } = this.route.snapshot.params;
         this.isAddMode = !id;
 
-        // If editing, fetch service and patch form values
-        if (!this.isAddMode) {
-            this.serviceService.getById(id).subscribe(data => {
-                this.form.patchValue({
-                    _id: data._id as string,
-                    name: data.name,
-                    headers: data.headers,
-                    routes: data.routes,
-                    bindings: data.bindings,
-                    body_limit: data.body_limit,
-                    timeout: data.timeout,
-                    buffer: data.buffer,
-                    sans: data.sans,
-                    compression_types: data.compression_types || ['text/plain', 'text/css', 'application/json',
-                        'application/javascript','text/javascript',
-                        'application/x-javascript', 'text/xml', 'application/xml', 'application/xml+rss', 'text/javascript'],
-                    rate_limit_per_sec: data.rate_limit_per_sec,
-                    certificate: data.certificate,
-                    ssl_protocols: data.ssl_protocols || ['TLSv1', 'TLSv1.1', 'TLSv1.2', 'TLSv1.3'],
-                    ssl_client_auth: data.ssl_client_auth,
-                    ssl_client_ca: data.ssl_client_auth ? data.ssl_client_ca : ''
+        this.certificateService.get().subscribe(certData => {
+            this._certificates = certData.data;
+
+            if (!this.isAddMode) {
+                this.serviceService.getById(id).subscribe(data => {
+                    this.form.patchValue({
+                        _id: data._id as string,
+                        name: data.name,
+                        headers: data.headers,
+                        routes: data.routes,
+                        bindings: data.bindings,
+                        body_limit: data.body_limit,
+                        timeout: data.timeout,
+                        buffer: data.buffer,
+                        sans: data.sans,
+                        compression_types: data.compression_types || ['text/plain', 'text/css', 'application/json',
+                            'application/javascript', 'text/javascript',
+                            'application/x-javascript', 'text/xml', 'application/xml', 'application/xml+rss', 'text/javascript'],
+                        rate_limit_per_sec: data.rate_limit_per_sec,
+                        certificate: data.certificate,
+                        ssl_protocols: data.ssl_protocols || ['TLSv1', 'TLSv1.1', 'TLSv1.2', 'TLSv1.3'],
+                        ssl_client_auth: data.ssl_client_auth,
+                        ssl_client_ca: data.ssl_client_auth ? data.ssl_client_ca : ''
+                    });
+
+                    // Update data sources
+                    this.headerDS.data = data.headers;
+                    this.routeDS.data = data.routes;
+                    this.bindingDS.data = data.bindings;
                 });
-
-                // Update data sources
-                this.headerDS.data = data.headers;
-                this.routeDS.data = data.routes;
-                this.bindingDS.data = data.bindings;
-            });
-        } else {
-            this.form.get('headers')?.setValue(this.basicHeaders);
-            this.headerDS.data = this.basicHeaders;
-            this.form.get('bindings')?.setValue([{'port': 80, 'protocol': ProtocolType.HTTP, 'ssl_upgrade': false}] as Array<Bind>);
-            this.bindingDS.data = this.form.get('bindings')?.value as Array<Bind>;
-        }
-
-        this.certificateService.get().subscribe(data => {
-            this._certificates = data.data;
+            } else {
+                this.form.get('headers')?.setValue(this.basicHeaders);
+                this.headerDS.data = this.basicHeaders;
+                this.form.get('bindings')?.setValue([{ 'port': 80, 'protocol': ProtocolType.HTTP, 'ssl_upgrade': false }] as Array<Bind>);
+                this.bindingDS.data = this.form.get('bindings')?.value as Array<Bind>;
+            }
         });
     }
 
@@ -290,7 +289,7 @@ export class ServiceFormComponent implements OnInit {
                 const data = this.bindingDS.data;
                 data.push(result);
                 this.bindingDS.data = data;
-                this.form.get('bindings')?.reset(data);
+                this.form.get('bindings')?.setValue(data);
             }
         });
     }
@@ -308,7 +307,7 @@ export class ServiceFormComponent implements OnInit {
                 const data = this.bindingDS.data;
                 data.push(result);
                 this.bindingDS.data = data;
-                this.form.get('bindings')?.reset(data);
+                this.form.get('bindings')?.setValue(data);
             }
         });
     }
@@ -410,7 +409,14 @@ export class ServiceFormComponent implements OnInit {
     }
 
     compareFn(object1: any, object2: any) {
-        return object1 && object2 && object1._id === object2._id;
+        if (!object1 || !object2) return false;
+        if (object1._id != null && object2._id != null) {
+            return String(object1._id) === String(object2._id);
+        }
+        if (object1.name && object2.name) {
+            return object1.name === object2.name;
+        }
+        return object1 === object2;
     }
 
     get f(): { [key: string]: AbstractControl } {

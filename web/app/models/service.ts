@@ -1,7 +1,7 @@
-import {StaticServer} from "./static";
-import {Sensor} from "./sensor";
-import {Upstream} from "./upstream";
-import {Certificate} from "./certificate";
+import { StaticServer } from "./static";
+import { Sensor } from "./sensor";
+import { Upstream } from "./upstream";
+import { Certificate } from "./certificate";
 
 export enum ProtocolType {
     HTTP = 'HTTP',
@@ -38,6 +38,7 @@ export interface Bind {
     port: number;
     protocol: ProtocolType;
     ssl_upgrade: boolean;
+    ssl_upgrade_port: number;
 }
 
 export interface Redirect {

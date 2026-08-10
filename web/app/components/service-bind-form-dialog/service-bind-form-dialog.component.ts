@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import {
     MAT_DIALOG_DATA,
     MatDialogActions,
@@ -6,17 +6,17 @@ import {
     MatDialogRef,
     MatDialogTitle
 } from '@angular/material/dialog';
-import {AbstractControl, FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {CommonModule} from '@angular/common';
-import {MatButtonModule} from '@angular/material/button';
-import {MatCardModule} from '@angular/material/card';
-import {MatFormFieldModule} from '@angular/material/form-field';
-import {MatIconModule} from '@angular/material/icon';
-import {MatInputModule} from '@angular/material/input';
-import {Bind, ProtocolType} from 'app/models/service';
-import {MatSelectModule} from '@angular/material/select';
-import {MatCheckboxModule} from '@angular/material/checkbox';
-import {MatChipsModule} from '@angular/material/chips';
+import { AbstractControl, FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { Bind, ProtocolType } from 'app/models/service';
+import { MatSelectModule } from '@angular/material/select';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatChipsModule } from '@angular/material/chips';
 
 @Component({
     selector: 'app-service-bind-form-dialog',
@@ -42,6 +42,8 @@ export class ServiceBindFormDialogComponent implements OnInit {
         port: new FormControl<number>(80),
         protocol: new FormControl<ProtocolType>(ProtocolType.HTTP),
         ssl_upgrade: new FormControl<boolean>(false),
+        ssl_upgrade_port: new FormControl<number>(443),
+
     });
 
     constructor(
@@ -56,6 +58,7 @@ export class ServiceBindFormDialogComponent implements OnInit {
             this.form.get('port')?.setValue(this.bindData.port);
             this.form.get('protocol')?.setValue(this.bindData.protocol);
             this.form.get('ssl_upgrade')?.setValue(this.bindData.ssl_upgrade ?? false);
+            this.form.get('ssl_upgrade_port')?.setValue(this.bindData.ssl_upgrade_port ?? 443);
         }
     }
 
@@ -68,7 +71,8 @@ export class ServiceBindFormDialogComponent implements OnInit {
             return;
         }
         let data = this.form.value as Bind;
-
+        data.ssl_upgrade = !!data.ssl_upgrade;
+        data.ssl_upgrade_port = data.ssl_upgrade_port ?? 443;
 
         this.dialogRef.close(data);
     }

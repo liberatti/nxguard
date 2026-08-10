@@ -9,7 +9,8 @@
                 <mat-form-field class="full-width">
                     <mat-label>Protocol</mat-label>
                     <mat-select formControlName="protocol" id="service-bind-protocol-select">
-                        <mat-option *ngFor="let ut of _supportedProtocols" [value]="ut" id="service-bind-protocol-option-{{ut}}">
+                        <mat-option *ngFor="let ut of _supportedProtocols" [value]="ut"
+                            id="service-bind-protocol-option-{{ut}}">
                             {{ ut }}
                         </mat-option>
                     </mat-select>
@@ -29,8 +30,16 @@
         </div>
         <div class="mat-row">
             <div class="mat-col-12">
-                @if (form.value.protocol == 'HTTPS') {
-                    <mat-checkbox formControlName="ssl_upgrade" id="service-bind-ssl-upgrade">Force service to ssl</mat-checkbox>
+                @if (form.value.protocol == 'HTTP') {
+                <mat-checkbox formControlName="ssl_upgrade" id="service-bind-ssl-upgrade">Force service to
+                    ssl</mat-checkbox>
+
+                @if (form.value.ssl_upgrade) {
+                <mat-form-field class="full-width margin-top">
+                    <mat-label>SSL Upgrade Port</mat-label>
+                    <input matInput type="number" formControlName="ssl_upgrade_port" id="service-bind-ssl-upgrade-port-input">
+                </mat-form-field>
+                }
                 }
             </div>
         </div>

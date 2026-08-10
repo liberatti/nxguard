@@ -83,12 +83,12 @@ server {
   {% for b in bindings %}
   {% if b.protocol == 'HTTP' %}
   listen {{b.port}};
+  {% if b.ssl_upgrade %}
+  if ($ssl_upgrade) { return 301 https://$server_name:{{b.ssl_upgrade_port if b.ssl_upgrade_port else 443}}$request_uri; }
+  {% endif %}
   {% endif %}
   {% if b.protocol == 'HTTPS' %}
   listen {{b.port}} ssl;
-  {% if b.ssl_upgrade %}
-  if ($ssl_upgrade) { return 301 https://$server_name:{{b.port}}$request_uri; }
-  {% endif %}
   {% endif %}
   {% endfor %}
 

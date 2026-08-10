@@ -213,8 +213,8 @@
         {
           "port": 80,
           "protocol": "HTTP",
-          "ssl_upgrade": false,
-          "ssl_port": 443
+          "ssl_upgrade": true,
+          "ssl_upgrade_port": 443
         },
         {
           "port": 443,
