@@ -58,37 +58,18 @@ class SensorDao(DuckDAO):
                 _id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT,
                 description TEXT,
-                categories_json TEXT,
-                exclusions_json TEXT,
-                security_json TEXT,
-                inspection_json TEXT
+                categories JSON,
+                exclusions JSON,
+                security JSON,
+                inspection JSON
             );
         """
         )
 
-    def from_dict(self, vo: Dict[str, Any]) -> Dict[str, Any]:
-        if "categories" in vo:
-            vo.update({"categories_json": json.dumps(vo.pop("categories"))})
-        if "exclusions" in vo:
-            vo.update({"exclusions_json": json.dumps(vo.pop("exclusions"))})
-        if "security" in vo:
-            vo.update({"security_json": json.dumps(vo.pop("security"))})
-        if "inspection" in vo:
-            vo.update({"inspection_json": json.dumps(vo.pop("inspection"))})
-        return super().from_dict(vo)
-
     def to_dict(self, row: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
         if row:
-            if "categories_json" in row:
-                val = row.pop("categories_json")
-                row.update({"categories": json.loads(val) if val else []})
-            if "exclusions_json" in row:
-                val = row.pop("exclusions_json")
-                row.update({"exclusions": json.loads(val) if val else []})
-            if "security_json" in row:
-                val = row.pop("security_json")
-                row.update({"security": json.loads(val) if val else {}})
-            if "inspection_json" in row:
-                val = row.pop("inspection_json")
-                row.update({"inspection": json.loads(val) if val else {}})
+            row["categories"] = json.loads(row.get("categories", "[]"))
+            row["exclusions"] = json.loads(row.get("exclusions", "[]"))
+            row["security"] = json.loads(row.get("security", "{}"))
+            row["inspection"] = json.loads(row.get("inspection", "{}"))
         return super().to_dict(row)

@@ -59,7 +59,12 @@
         "955-WEB-SHELLS",
         "956-DATA-LEAKAGES-RUBY"
       ],
-      "exclusions": [],
+      "exclusions": [
+        "920272",
+        "942430",
+        "942431",
+        "942460"
+      ],
       "security": {
         "geo_codes": [
           "US",
@@ -76,6 +81,16 @@
         "score": {
           "inbound": 5,
           "outbound": 10
+        },
+        "variables": {
+          "allowed_http_versions": "HTTP/1.0 HTTP/1.1 HTTP/2 HTTP/2.0",
+          "max_file_size": 26214400,
+          "allowed_methods": "GET HEAD POST OPTIONS PUT PATCH DELETE",
+          "allowed_content_type": "|application/x-www-form-urlencoded| |multipart/form-data| |text/xml| |application/xml| |application/soap+xml| |application/json|",
+          "restricted_extensions": ".asa/ .asax/ .ascx/ .axd/ .backup/ .bak/ .bat/ .cdx/ .cer/ .cfg/ .cmd/ .com/ .config/ .conf/ .cs/ .csproj/ .csr/ .dat/ .db/ .dbf/ .dll/ .dos/ .htr/ .htw/ .ida/ .idc/ .idq/ .inc/ .ini/ .key/ .licx/ .lnk/ .log/ .mdb/ .old/ .pass/ .pdb/ .pol/ .printer/ .pwd/ .rdb/ .resources/ .resx/ .sql/ .swp/ .sys/ .vb/ .vbs/ .vbproj/ .vsdisco/ .webinfo/ .xsd/ .xsx/",
+          "max_num_args": 255,
+          "arg_name_length": 100,
+          "arg_length": 2000
         },
         "level": 3
       }

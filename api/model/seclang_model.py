@@ -34,14 +34,14 @@ class RuleDao(DuckDAO):
                 code INTEGER,
                 category_id TEXT,
                 action TEXT,
-                scope_json TEXT,
+                scope_json JSON,
                 msg TEXT,
                 logdata TEXT,
                 raw TEXT,
                 attachment TEXT,
                 phase INTEGER,
                 seq INTEGER,
-                tags_json TEXT
+                tags_json JSON
             );
         """
         )
@@ -106,7 +106,7 @@ class RuleCategoryDao(DuckDAO):
                 name TEXT,
                 phase INTEGER,
                 file TEXT,
-                exclusions_json TEXT DEFAULT '[]',
+                exclusions_json JSON DEFAULT '[]',
                 scope TEXT,
                 seq INTEGER,
                 system BOOLEAN DEFAULT FALSE

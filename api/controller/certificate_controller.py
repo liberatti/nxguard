@@ -11,14 +11,11 @@ from nxcore.controllers.base_controller import (
     get_pagination,
     has_any_authority,
     response_error_500,
-    response_data_removed
+    response_data_removed,
 )
 from nxcore.middleware.socket_manager import emit_event
 
-from nxcore.common_utils import (
-    deep_merge,
-    replace_tz
-)
+from nxcore.common_utils import deep_merge, replace_tz
 from api.model.certificate_model import CertificateDao
 from api.model.config_model import ChangeDao
 from api.model.service_model import ServiceDao
@@ -36,11 +33,16 @@ def after(response: Response) -> Response:
     Returns:
         Response: The modified response object
     """
-    if request.method in ["PUT", "POST", "DELETE", "PATCH"] and response.status_code in [200, 201]:
+    if request.method in [
+        "PUT",
+        "POST",
+        "DELETE",
+        "PATCH",
+    ] and response.status_code in [200, 201]:
         with ChangeDao() as dao:
             if not dao.get_by_name("certificate"):
                 dao.persist({"name": "certificate"})
-            emit_event('tracking_evt')
+            emit_event("tracking_evt")
     return response
 
 
@@ -58,7 +60,11 @@ def get(certificate_id: str) -> Response:
     """
     with CertificateDao() as dao:
         certificate = dao.get_by_id(certificate_id)
-        return response_data(certificate, schema=dao.schema) if certificate else response_error_404()
+        return (
+            response_data(certificate, schema=dao.schema)
+            if certificate
+            else response_error_404()
+        )
 
 
 @routes.route("", methods=["GET"])
@@ -71,21 +77,16 @@ def search() -> Response:
         Response: JSON response containing paginated certificate list or 404 error
     """
     with CertificateDao() as dao:
-        result = dao.get_all(pagination=get_pagination(), filters=[])
+        result = dao.get_all(pagination=get_pagination())
 
         if result and result["metadata"]["total_elements"] > 0:
             renew_date = replace_tz(datetime.now())
             for cert in result["data"]:
-                not_after = cert.get("not_after")
-                if isinstance(not_after, str):
-                    try:
-                        not_after = datetime.fromisoformat(not_after)
-                    except Exception:
-                        not_after = None
                 is_expired = False
+                not_after = cert.get("not_after")
                 if cert.get("force_renew"):
                     is_expired = True
-                elif not_after:
+                elif not_after and isinstance(not_after, datetime):
                     is_expired = replace_tz(not_after) < renew_date
                 cert["status"] = "EXPIRED" if is_expired else "VALID"
             return response_data(result, schema=dao.pageSchema)
@@ -111,13 +112,19 @@ def save() -> Response:
             pk = None
 
             # Handle EXTERNAL certificate
-            if 'EXTERNAL' in dto['provider']:
+            if "EXTERNAL" in dto["provider"]:
                 crt = SSLTool.crt_from_pem(dto["certificate"])
                 dto.update(SSLTool.extract_info_from_crt(crt))
-                dto.update({
-                    "status": "EXPIRED" if dto["not_after"] <= datetime.now(TZ) else "VALID",
-                    "force_renew": False
-                })
+                dto.update(
+                    {
+                        "status": (
+                            "EXPIRED"
+                            if dto["not_after"] <= datetime.now(TZ)
+                            else "VALID"
+                        ),
+                        "force_renew": False,
+                    }
+                )
                 pk = dao.persist(dto)
 
             # Handle MANAGED or SELF certificates
@@ -133,7 +140,7 @@ def save() -> Response:
                     "not_before": self_crt["not_before"],
                     "not_after": self_crt["not_after"],
                     "force_renew": True,
-                    "provider": dto["provider"]
+                    "provider": dto["provider"],
                 }
                 pk = dao.persist(crt)
 
@@ -160,13 +167,19 @@ def update(certificate_id: str) -> Response:
             dto = dao.json_load(request.json)
 
             # Handle EXTERNAL certificate update
-            if dto['provider'] in ['EXTERNAL']:
+            if dto["provider"] in ["EXTERNAL"]:
                 crt = SSLTool.crt_from_pem(dto["certificate"])
                 dto.update(SSLTool.extract_info_from_crt(crt))
-                dto.update({
-                    "status": "EXPIRED" if dto["not_after"] <= datetime.now(TZ) else "VALID",
-                    "force_renew": True
-                })
+                dto.update(
+                    {
+                        "status": (
+                            "EXPIRED"
+                            if dto["not_after"] <= datetime.now(TZ)
+                            else "VALID"
+                        ),
+                        "force_renew": True,
+                    }
+                )
                 dao.update_by_id(certificate_id, dto)
 
             # Handle MANAGED or SELF certificate update
@@ -182,7 +195,7 @@ def update(certificate_id: str) -> Response:
                     "not_before": self_crt["not_before"],
                     "not_after": self_crt["not_after"],
                     "force_renew": True,
-                    "provider": dto["provider"]
+                    "provider": dto["provider"],
                 }
                 dao.update_by_id(certificate_id, crt)
 

@@ -1,8 +1,13 @@
 ## IPXA API
 
 ###
+# @name getIpSet
+GET http://localhost:5001/api/feed?type=bypass
+Content-Type: application/json
+
+###
 # @name ipinfo
-POST http://localhost:3001/api/ip/info/1.0.164.165
+POST http://localhost:5001/api/ip/info/1.0.164.165
 Content-Type: application/json
 
 response_headers:

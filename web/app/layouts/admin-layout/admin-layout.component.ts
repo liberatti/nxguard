@@ -200,8 +200,9 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
             } as FrontendConfig;
             this.localStorage.set('ui_config', this.config);
         }
-        this.translate.use(this.config.locale);
-        moment.locale(this.config.locale);
+        const langKey = typeof this.config.locale === 'object' ? (this.config.locale?.key || this.config.locale?.id || 'en_US') : (this.config.locale || 'en_US');
+        this.translate.use(langKey);
+        moment.locale(langKey);
 
         this.changeDetectorRef.detectChanges();
         const apiUrl = this.injector.get(REST_API_URL);

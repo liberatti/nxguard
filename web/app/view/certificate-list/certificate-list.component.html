@@ -42,7 +42,7 @@
                     <th mat-header-cell *matHeaderCellDef mat-sort-header> subjects</th>
                     <td mat-cell *matCellDef="let element">
                         <mat-chip-listbox>
-                            <mat-chip-row *ngFor="let p of element.subjects">
+                            <mat-chip-row *ngFor="let p of getSubjects(element.subjects)">
                                 {{ p }}
                             </mat-chip-row>
                         </mat-chip-listbox>

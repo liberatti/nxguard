@@ -65,12 +65,12 @@ class TransactionDao(DuckDAO):
                 upstream_id TEXT,
                 score INTEGER,
                 archived BOOLEAN DEFAULT 0,
-                user_agent_json TEXT,
-                source_json TEXT,
-                destination_json TEXT,
-                http_json TEXT,
-                upstream_json TEXT,
-                audit_json TEXT
+                user_agent_json JSON,
+                source_json JSON,
+                destination_json JSON,
+                http_json JSON,
+                upstream_json JSON,
+                audit_json JSON
             );
         """
         )

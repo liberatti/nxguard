@@ -8,6 +8,7 @@ from nxcore.middleware.logging_manager import logger
 from engine.seclang.seclang_indexer import get_default_vars
 import config
 from api.model.seclang_model import RuleCategoryDao
+from api.services.ipxa_services import FeedService
 
 
 def _remove_file(file_path: str) -> None:
@@ -28,6 +29,14 @@ def _render_template_to_file(
     template_content = re.sub(r"(\n\s*){2,}", "\n\n", template_content)
     with open(output_path, "w") as f:
         f.write(template_content)
+
+
+def _generate_trusted_ips(output_dir):
+    with FeedService() as ipxa_feed:
+        ipsets = ipxa_feed.get_by_type("bypass")
+        for ipset in ipsets:
+            with open(f"{output_dir}/IPSET-{ipset['name']}.data", "w") as f:
+                f.write(ipset["data"])
 
 
 def clean(data, output_dir=config.BASE_PATH, test=False):
@@ -103,10 +112,8 @@ def _generate_sensors(
     """Generates Lua sensor configuration files for LuaJIT."""
     logger.info(f"[{output_dir}] - Generate sensor")
     prefix = "test-" if test else ""
-    default_vars = get_default_vars()
 
     for sensor in data["sensors"]:
-        sensor.update(default_vars)
         sensor.update(
             {
                 "ipxa_url": data["config"]["ipxa"]["url"],
@@ -116,6 +123,26 @@ def _generate_sensors(
                 "trusted": ",".join(sensor["security"]["trusted"]),
             }
         )
+
+        exclusions = sensor.get("exclusion") or sensor.get("exclusions") or []
+        if isinstance(exclusions, str):
+            exclusions = [x.strip() for x in exclusions.split(",") if x.strip()]
+        chunk_size = 10
+        exclusion_lists = [
+            ",".join(
+                f"ctl:ruleRemoveById={str(x).strip()}"
+                for x in exclusions[i : i + chunk_size]
+            )
+            for i in range(0, len(exclusions), chunk_size)
+        ]
+        trusted_ipsets = []
+        for t in sensor["security"]["trusted"]:
+            if os.path.exists(f"{output_dir}/modsec/coreruleset/IPSET-{t}.data"):
+                trusted_ipsets.append(t)
+            else:
+                logger.warning(
+                    f"Trusted ipset {t} not found for sensor {sensor['name']}"
+                )
 
         sensor.update(
             {
@@ -127,6 +154,8 @@ def _generate_sensors(
                     "outbound"
                 ],
                 "paranoia_level": sensor["inspection"]["level"],
+                "exclusion_lists": exclusion_lists,
+                "trusted_ipsets": trusted_ipsets,
             }
         )
         os.makedirs(f"{config.LUA_LIBS_PATH}/nxguard/sensors", exist_ok=True)
@@ -296,6 +325,7 @@ def generate(data, output_dir=config.BASE_PATH, test=False):
         _generate_certificates(env, output_dir, prefix, data["certificates"])
 
     if "sensors" in data:
+        _generate_trusted_ips(f"{config.BASE_PATH}/modsec/coreruleset")
         _generate_sensors(env, output_dir, data, test)
 
     if "services" in data:

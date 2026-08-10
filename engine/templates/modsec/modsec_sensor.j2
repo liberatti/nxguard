@@ -1,12 +1,14 @@
-# SENSOR
+##################################################
+# SENSOR {{ name }}
+##################################################
 SecRuleEngine On
 SecRule &TX:inbound_anomaly_score_threshold "@eq 0" "id:901100,phase:1,pass,nolog,ver:'OWASP_CRS/4.25.1',setvar:'tx.inbound_anomaly_score_threshold={{ inbound_anomaly_score_threshold }}'"
 SecRule &TX:outbound_anomaly_score_threshold "@eq 0" "id:901110,phase:1,pass,nolog,ver:'OWASP_CRS/4.25.1',setvar:'tx.outbound_anomaly_score_threshold={{ outbound_anomaly_score_threshold }}'"
 SecRule &TX:blocking_paranoia_level "@eq 0" "id:901120,phase:1,pass,nolog,ver:'OWASP_CRS/4.25.1',setvar:'tx.blocking_paranoia_level={{ paranoia_level }}'"
 SecRule &TX:detection_paranoia_level "@eq 0" "id:901125,phase:1,pass,nolog,ver:'OWASP_CRS/4.25.1',setvar:'tx.detection_paranoia_level={{ paranoia_level }}'"
 SecRule &TX:executing_paranoia_level "@eq 0" "id:901126,phase:1,pass,nolog,ver:'OWASP_CRS/4.25.1',setvar:'tx.executing_paranoia_level={{ paranoia_level }}'"
-SecRule &TX:allowed_http_versions "@eq 0" "id:901163,phase:1,pass,nolog,ver:'OWASP_CRS/4.25.1',setvar:'tx.allowed_http_versions={{ allowed_http_versions }}'"
-SecAction "id:900340,phase:1,pass,nolog,noauditlog,t:none,setvar:tx.max_file_size={{ max_file_size }}"
+SecRule &TX:allowed_http_versions "@eq 0" "id:901163,phase:1,pass,nolog,ver:'OWASP_CRS/4.25.1',setvar:'tx.allowed_http_versions={{ inspection.variables.allowed_http_versions }}'"
+SecAction "id:900340,phase:1,pass,nolog,noauditlog,t:none,setvar:tx.max_file_size={{ inspection.variables.max_file_size }}"
 
 # REQUEST-901-INITIALIZATION    
 SecRule &TX:sampling_percentage "@eq 0" "id:901130,phase:1,pass,nolog,ver:'OWASP_CRS/4.25.1',setvar:'tx.sampling_percentage=100'"
@@ -29,6 +31,26 @@ SecRule REQBODY_PROCESSOR "!@rx (?:URLENCODED|MULTIPART|XML|JSON)" "id:901340,ph
 SecRule TX:enforce_bodyproc_urlencoded "@eq 1" "id:901350,phase:1,pass,t:none,t:urlDecodeUni,nolog,noauditlog,msg:'Enabling forced body inspection for ASCII content',ver:'OWASP_CRS/4.25.1',chain"
 SecRule REQBODY_PROCESSOR "!@rx (?:URLENCODED|MULTIPART|XML|JSON)" "ctl:requestBodyProcessor=URLENCODED"
 SecRule TX:executing_paranoia_level "@lt %{tx.blocking_paranoia_level}" "id:901500,phase:1,deny,status:500,t:none,log,msg:'Executing paranoia level configured is lower than the paranoia level itself. This is illegal. Blocking request. Aborting',ver:'OWASP_CRS/4.25.1'"
+
+#### TRUSTED IPS
+{% for ipset in trusted_ipsets %}
+SecRule REMOTE_ADDR "@ipMatchFromFile IPSET-{{ ipset }}.data" \
+    "id:91{{"%02d"|format(loop.index)}}, \
+    phase:1,\
+    pass,\
+    nolog,\
+    ctl:ruleEngine=Off"
+{% endfor %}
+
+#### RULE EXCLUSION
+{%for el in exclusion_lists %}
+SecRule REQUEST_URI "@unconditionalMatch" \
+            "id:90{{"%02d"|format(loop.index)}}, \
+            phase:1, \
+            nolog, \
+            pass, \
+            {{ el }}"
+{% endfor %}
 
 ####################################################################################
 # Categories

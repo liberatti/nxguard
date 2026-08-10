@@ -5,9 +5,9 @@ SecAction "id:600100,phase:1,pass,nolog,noauditlog,t:none,ctl:ruleEngine=Detecti
 SecAction "id:600100,phase:1,pass,nolog,noauditlog,t:none,ctl:ruleEngine=On"
 {%- endif %}
 
-SecAction "id:900300,phase:1,pass,nolog,noauditlog,t:none,setvar:tx.max_num_args={{ sensor.max_num_args }}"
-SecAction "id:900310,phase:1,pass,nolog,noauditlog,t:none,setvar:tx.arg_name_length={{ sensor.arg_name_length }}"
-SecAction "id:900320,phase:1,pass,nolog,noauditlog,t:none,setvar:tx.arg_length={{ sensor.arg_length }}"
-SecAction "id:900330,phase:1,pass,nolog,noauditlog,t:none,setvar:'tx.allowed_methods={{ sensor.allowed_methods }}'"
-SecAction "id:900350,phase:1,pass,nolog,noauditlog,t:none,setvar:'tx.restricted_extensions={{ sensor.restricted_extensions }}'"
-SecAction "id:900360,phase:1,pass,nolog,noauditlog,t:none,setvar:'tx.allowed_request_content_type={{ sensor.allowed_content_type }}'"
+SecAction "id:900300,phase:1,pass,nolog,noauditlog,t:none,setvar:tx.max_num_args={{ sensor.inspection.variables.max_num_args }}"
+SecAction "id:900310,phase:1,pass,nolog,noauditlog,t:none,setvar:tx.arg_name_length={{ sensor.inspection.variables.arg_name_length }}"
+SecAction "id:900320,phase:1,pass,nolog,noauditlog,t:none,setvar:tx.arg_length={{ sensor.inspection.variables.arg_length }}"
+SecAction "id:900330,phase:1,pass,nolog,noauditlog,t:none,setvar:'tx.allowed_methods={{ sensor.inspection.variables.allowed_methods }}'"
+SecAction "id:900350,phase:1,pass,nolog,noauditlog,t:none,setvar:'tx.restricted_extensions={{ sensor.inspection.variables.restricted_extensions }}'"
+SecAction "id:900360,phase:1,pass,nolog,noauditlog,t:none,setvar:'tx.allowed_request_content_type={{ sensor.inspection.variables.allowed_content_type }}'"

@@ -121,4 +121,20 @@ export class CertificateListComponent implements OnInit {
             });
         });
     }
+
+    getSubjects(subjects: any): string[] {
+        if (Array.isArray(subjects)) return subjects;
+        if (typeof subjects === 'string') {
+            try {
+                let parsed = JSON.parse(subjects);
+                if (typeof parsed === 'string') {
+                    parsed = JSON.parse(parsed);
+                }
+                return Array.isArray(parsed) ? parsed : [parsed];
+            } catch {
+                return subjects.replace(/^\[|\]$/g, '').split(',').map(s => s.trim().replace(/^"|"$/g, '')).filter(Boolean);
+            }
+        }
+        return [];
+    }
 }

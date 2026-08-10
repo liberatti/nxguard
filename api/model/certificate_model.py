@@ -48,7 +48,7 @@ class CertificateDao(DuckDAO):
             CREATE TABLE IF NOT EXISTS {self.table_name} (
                 _id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT NOT NULL,
-                subjects TEXT NOT NULL,
+                subjects JSON NOT NULL,
                 chain TEXT,
                 certificate TEXT NOT NULL,
                 private_key TEXT NOT NULL,
@@ -62,10 +62,19 @@ class CertificateDao(DuckDAO):
         """
         )
 
-    def from_dict(self, vo):
-        if "subjects" in vo:
-            vo.update({"subjects": json.dumps(vo.pop("subjects"))})
-        return super().from_dict(vo)
+    def to_dict(self, row):
+        if not row:
+            return row
+        row["subjects"] = json.loads(row.get("subjects", "[]"))
+
+        for key in ("not_before", "not_after"):
+            date_str = row.get(key)
+            if isinstance(date_str, str):
+                try:
+                    row[key] = datetime.fromisoformat(date_str)
+                except Exception:
+                    pass
+        return super().to_dict(row)
 
     def persist(self, o: Dict[str, Any]) -> str:
         try:

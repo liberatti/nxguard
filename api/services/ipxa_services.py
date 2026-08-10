@@ -56,26 +56,44 @@ class FeedService:
         )
         self.pageSchema = page_class()
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
+
     def json_load(self, json_data):
         return self.schema.load(json_data)
 
     def get_all(self, pagination=None):
         try:
-            url, headers = IPXAService.get_api_config("/api/feed/")
+            url, headers = IPXAService.get_api_config("/api/feed")
             params = {}
             if pagination:
-                params["page"] = pagination.get("page", 1)
-                params["per_page"] = pagination.get("per_page", 10)
+                params = {
+                    "page": pagination.get("page", 1),
+                    "size": pagination.get("per_page", 10),
+                }
 
             response = requests.get(url, headers=headers, params=params, timeout=5)
             if response.status_code == 200:
                 res_data = response.json()
-                if isinstance(res_data, dict) and "data" in res_data and isinstance(res_data["data"], list):
+                if (
+                    isinstance(res_data, dict)
+                    and "data" in res_data
+                    and isinstance(res_data["data"], list)
+                ):
                     feeds = res_data["data"]
                     pagination_meta = res_data.get("metadata", {})
                 else:
-                    feeds = res_data.get("feeds", []) if isinstance(res_data, dict) else []
-                    pag = res_data.get("pagination", {}) if isinstance(res_data, dict) else {}
+                    feeds = (
+                        res_data.get("feeds", []) if isinstance(res_data, dict) else []
+                    )
+                    pag = (
+                        res_data.get("pagination", {})
+                        if isinstance(res_data, dict)
+                        else {}
+                    )
                     pagination_meta = {
                         "total_elements": pag.get("total", len(feeds)),
                         "page": pag.get("page", 1),
@@ -112,6 +130,58 @@ class FeedService:
                 "metadata": {"total_elements": 0, "page": 1, "per_page": 10},
                 "data": [],
             }
+
+    def get_by_type(self, t):
+        try:
+            url, headers = IPXAService.get_api_config(f"/api/feed?type={t}")
+            response = requests.get(url, headers=headers, timeout=5)
+            if response.status_code == 200:
+                res_data = response.json()
+                if (
+                    isinstance(res_data, dict)
+                    and "data" in res_data
+                    and isinstance(res_data["data"], list)
+                ):
+                    feeds = res_data["data"]
+                elif isinstance(res_data, list):
+                    feeds = res_data
+                else:
+                    feeds = (
+                        res_data.get("feeds", []) if isinstance(res_data, dict) else []
+                    )
+
+                mapped_feeds = []
+                for f in feeds:
+                    content = f.get("content", [])
+                    if isinstance(content, list):
+                        data_str = "\n".join(str(x) for x in content)
+                    else:
+                        data_str = str(f.get("data", content or ""))
+
+                    mapped_feeds.append(
+                        {
+                            "_id": str(f.get("_id") or f.get("id", "")),
+                            "name": f.get("name"),
+                            "slug": f.get("slug") or f.get("name"),
+                            "type": f.get("type"),
+                            "content": content,
+                            "data": data_str,
+                            "source": f.get("source") or f.get("url"),
+                            "description": f.get("description"),
+                            "provider": f.get("provider", "ipxa"),
+                            "version": f.get("version", "1.0"),
+                            "action": f.get("action", "deny"),
+                            "scope": f.get("scope", "system"),
+                            "update_interval": f.get("update_interval", "daily"),
+                            "updated_on": _parse_dt(f.get("updated_on")),
+                        }
+                    )
+
+                return mapped_feeds
+            return []
+        except Exception as e:
+            logger.error(f"Error fetching feeds by type from IPXA: {e}")
+            return []
 
     def get_by_id(self, _id):
         try:
@@ -230,7 +300,9 @@ class IPXAService:
             response = requests.get(url, headers=headers, timeout=5)
             if response.status_code in [200, 201]:
                 res_data = response.json()
-                data = res_data.get("data", res_data) if isinstance(res_data, dict) else {}
+                data = (
+                    res_data.get("data", res_data) if isinstance(res_data, dict) else {}
+                )
                 loc = data.get("location", {})
                 org = data.get("organization", {})
                 asn_number = org.get("asn_number")
@@ -241,7 +313,8 @@ class IPXAService:
                         "ans_number": (
                             str(asn_number) if asn_number is not None else None
                         ),
-                        "organization": org.get("asn_name") or org.get("asn_description"),
+                        "organization": org.get("asn_name")
+                        or org.get("asn_description"),
                         "latitude": loc.get("latitude"),
                         "longitude": loc.get("longitude"),
                     }
@@ -275,7 +348,9 @@ class IPXAService:
             response = requests.get(url, headers=headers, timeout=5)
             if response.status_code in [200, 201]:
                 res_data = response.json()
-                data = res_data.get("data", res_data) if isinstance(res_data, dict) else {}
+                data = (
+                    res_data.get("data", res_data) if isinstance(res_data, dict) else {}
+                )
                 risk_score = data.get("risk_score", 0)
                 reasons = data.get("reasons", [])
                 blocked = (risk_score >= 5) or len(reasons) > 0

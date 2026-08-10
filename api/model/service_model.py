@@ -138,15 +138,15 @@ class ServiceDao(DuckDAO):
                 timeout INTEGER,
                 active BOOLEAN,
                 buffer INTEGER,
-                bindings_json TEXT,
-                headers_json TEXT,
-                routes_json TEXT,
+                bindings JSON,
+                headers JSON,
+                routes JSON,
                 compression BOOLEAN,
-                compression_types_json TEXT,
+                compression_types JSON,
                 rate_limit BOOLEAN,
                 rate_limit_per_sec INTEGER,
-                sans_json TEXT,
-                ssl_protocols_json TEXT,
+                sans JSON,
+                ssl_protocols JSON,
                 certificate_id TEXT,
                 ssl_client_ca TEXT,
                 ssl_client_auth BOOLEAN DEFAULT 0
@@ -168,25 +168,6 @@ class ServiceDao(DuckDAO):
                     }
                 )
 
-        if "routes" in vo:
-            vo.update({"routes_json": json.dumps(vo.pop("routes"))})
-
-        if "bindings" in vo:
-            vo.update({"bindings_json": json.dumps(vo.pop("bindings"))})
-
-        if "compression_types" in vo:
-            vo.update(
-                {"compression_types_json": json.dumps(vo.pop("compression_types"))}
-            )
-
-        if "sans" in vo:
-            vo.update({"sans_json": json.dumps(vo.pop("sans"))})
-
-        if "headers" in vo:
-            vo.update({"headers_json": json.dumps(vo.pop("headers"))})
-
-        if "ssl_protocols" in vo:
-            vo.update({"ssl_protocols_json": json.dumps(vo.pop("ssl_protocols"))})
         return super().from_dict(vo)
 
     def to_dict(self, vo: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
@@ -204,43 +185,19 @@ class ServiceDao(DuckDAO):
                 }
             )
 
-        if "routes_json" in vo:
-            val = vo.pop("routes_json")
-            vo.update({"routes": json.loads(val) if val else []})
-
-        if "bindings_json" in vo:
-            val = vo.pop("bindings_json")
-            vo.update({"bindings": json.loads(val) if val else []})
-
-        if "headers_json" in vo:
-            val = vo.pop("headers_json")
-            vo.update({"headers": json.loads(val) if val else []})
-
-        if "compression_types_json" in vo:
-            val = vo.pop("compression_types_json")
-            vo.update({"compression_types": json.loads(val) if val else []})
-
-        if "sans_json" in vo:
-            val = vo.pop("sans_json")
-            vo.update({"sans": json.loads(val) if val else []})
-
-        if "ssl_protocols_json" in vo:
-            val = vo.pop("ssl_protocols_json")
-            vo.update({"ssl_protocols": json.loads(val) if val else []})
-
-        # if "sensor_id" in route:
-        #    sensor_id = route.pop("sensor_id")
-        #    sen_dao = SensorDao()
-        #    route.update({"sensor": sen_dao.get_descr_by_id(sensor_id)})
+        vo["routes"] = json.loads(vo.get("routes", "[]"))
+        vo["bindings"] = json.loads(vo.get("bindings", "[]"))
+        vo["compression_types"] = json.loads(vo.get("compression_types", "[]"))
+        vo["sans"] = json.loads(vo.get("sans", "[]"))
+        vo["headers"] = json.loads(vo.get("headers", "[]"))
+        vo["ssl_protocols"] = json.loads(vo.get("ssl_protocols", "[]"))
         return vo
 
     def get_by_sans(
         self, sans: List[str], active: Optional[bool] = None
     ) -> Optional[Dict[str, Any]]:
         try:
-            query = (
-                f"SELECT * from {self.table_name} WHERE sans_json LIKE '%{sans[0]}%'"
-            )
+            query = f"SELECT * from {self.table_name} WHERE sans LIKE '%{sans[0]}%'"
             if active is not None:
                 query += f" AND active = {active}"
 

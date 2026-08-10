@@ -235,7 +235,7 @@ chown -R nxguard:nxguard /opt/nxguard
 
 %changelog
 * Thu Aug 06 2026 Gustavo Liberatti <gustavo@liberatti.com.br> - 1.29.2-4
-- Fix ModSecurity-nginx module path and LuaJIT build paths in %prep and %install
+- Fix ModSecurity-nginx module path and LuaJIT build paths in %%prep and %%install
 
 * Fri Apr 24 2026 Gustavo Liberatti <gustavo@liberatti.com.br> - 1.29.2-4
 - Update project license to Apache 2.0 and improve documentation

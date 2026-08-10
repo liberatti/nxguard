@@ -111,6 +111,7 @@ inspection:
 | Range                     | Description                |
 |:--------------------------|:---------------------------|
 | **1 - 99,999**            | Local/Internal Use         |
+| **9001 - 9010**           | NXGuard Exclusion Lists (up to 10 items) |
 | **100,000 - 199,999**     | Oracle Published Rules     |
 | **200,000 - 299,999**     | Comodo Published Rules     |
 | **300,000 - 399,999**     | GotRoot.com Rules          |

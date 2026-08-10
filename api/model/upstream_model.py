@@ -69,8 +69,8 @@ class UpstreamDao(DuckDAO):
                 protocol TEXT,
                 script_path TEXT,
                 type TEXT,
-                targets_json TEXT,
-                persist_json TEXT,
+                targets JSON,
+                persist JSON,
                 target_index TEXT,
                 target_content TEXT
             );
@@ -89,25 +89,14 @@ class UpstreamDao(DuckDAO):
             raise
 
     def from_dict(self, vo: Dict[str, Any]) -> Dict[str, Any]:
-        if "targets" in vo:
-            vo.update({"targets_json": json.dumps(vo.pop("targets"))})
-        if "persist" in vo:
-            vo.update({"persist_json": json.dumps(vo.pop("persist"))})
-
         if "type" not in vo:
             vo.update({"type": "backend"})
         return super().from_dict(vo)
 
     def to_dict(self, row):
         if row:
-            targets_val = row.pop("targets_json") if "targets_json" in row else None
-            persist_val = row.pop("persist_json") if "persist_json" in row else None
-            row.update(
-                {
-                    "targets": json.loads(targets_val) if targets_val else [],
-                    "persist": json.loads(persist_val) if persist_val else {},
-                }
-            )
+            row.update({"targets": json.loads(row.get("targets", "[]"))})
+            row.update({"persist": json.loads(row.get("persist", "{}"))})
         return super().to_dict(row)
 
 
