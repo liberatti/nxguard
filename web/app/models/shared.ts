@@ -24,10 +24,10 @@ export interface APIOperations<T, ID> {
 }
 export interface APIErrorResponse {
     code: number;
-    details:string;
-    message:string;
-    method:string;
-    url:string;
+    details?: any;
+    message: string;
+    method: string;
+    url: string;
 }
 
 

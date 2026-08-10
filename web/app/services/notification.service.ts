@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MultiSnackbarComponent } from 'app/components/multi-snackbar/multi-snackbar.component';
+import { APIErrorResponse } from 'app/models/shared';
+
 @Injectable({
     providedIn: 'root'
 })
@@ -25,5 +27,16 @@ export class NotificationService {
                 horizontalPosition: 'center'
             });
         }
+    }
+
+    public openErrorSnackBar(error: APIErrorResponse) {
+        const title = `[${error.code || 400}] ${error.message || 'Validation Error'}`;
+        this.snackBar.openFromComponent(MultiSnackbarComponent, {
+            data: { message: title, errorData: error },
+            duration: 8000,
+            panelClass: 'snackbar-error',
+            verticalPosition: 'bottom',
+            horizontalPosition: 'center'
+        });
     }
 }

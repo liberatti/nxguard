@@ -1,0 +1,46 @@
+<h2 mat-dialog-title class="dialog-header">
+    <mat-icon color="warn">error_outline</mat-icon>
+    <span>[{{ data.code || 'Error' }}] {{ data.message || 'Validation Error' }}</span>
+</h2>
+
+<mat-dialog-content class="dialog-content">
+    <div class="error-meta-card mb-3" *ngIf="data.method || data.url">
+        <span *ngIf="data.method" class="method-badge" [ngClass]="data.method.toLowerCase()">{{ data.method }}</span>
+        <span *ngIf="data.url" class="url-text">{{ data.url }}</span>
+    </div>
+
+    <!-- Validation Error Field Highlights -->
+    <div *ngIf="fieldErrors.length > 0" class="validation-errors-section mb-3">
+        <div class="section-title">
+            <mat-icon color="warn">warning</mat-icon>
+            <span>Validation Error Fields</span>
+        </div>
+        <div class="field-error-list">
+            <div *ngFor="let item of fieldErrors" class="field-error-card">
+                <div class="field-header">
+                    <span class="field-name-badge">{{ item.field }}</span>
+                </div>
+                <ul class="error-msg-list">
+                    <li *ngFor="let msg of item.messages">{{ msg }}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Raw JSON / Full Payload details -->
+    <mat-expansion-panel class="json-panel" [expanded]="fieldErrors.length === 0">
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                <mat-icon class="mr-2">code</mat-icon>
+                Full Details (JSON)
+            </mat-panel-title>
+        </mat-expansion-panel-header>
+        <pre class="json-code"><code>{{ rawJson }}</code></pre>
+    </mat-expansion-panel>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="bottom-actions">
+    <button mat-flat-button color="primary" (click)="onClose()">
+        Close
+    </button>
+</mat-dialog-actions>

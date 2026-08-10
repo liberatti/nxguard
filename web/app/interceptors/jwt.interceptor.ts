@@ -34,21 +34,14 @@ export const JwtInterceptor: HttpInterceptorFn = (req, next) => {
         }
     }
 
-    function isAPIErrorResponse(error: any): error is APIErrorResponse {
+    function isAPIErrorResponse(error: any): boolean {
         return (
+            error && error.error &&
             typeof error.error.code === 'number' &&
-            typeof error.error.message === 'string' &&
-            typeof error.error.method === 'string' &&
-            typeof error.error.url === 'string'
+            typeof error.error.message === 'string'
         );
     }
 
-    //console.log('Requisição HTTP:', req);
-    //console.log('Cabeçalhos:', req.headers);
-    //if (req.body instanceof FormData)
-    //    (req.body as FormData).forEach((v, k) => {
-    //        console.log(`Key: ${k}, Value: ${v}`);
-    //    });
     return next(authReq).pipe(
         catchError((err: any) => {
             if (err instanceof HttpErrorResponse) {
@@ -77,9 +70,15 @@ export const JwtInterceptor: HttpInterceptorFn = (req, next) => {
                     }
                 } else {
                     if (isAPIErrorResponse(err)) {
-                        notificationService.openSnackBar('[' + err.error.code + '] ' + err.error.message);
+                        notificationService.openErrorSnackBar(err.error);
                     } else {
-                        console.error('Unknown error:', {status: err.status, message: err.message});
+                        notificationService.openErrorSnackBar({
+                            code: err.status || 500,
+                            message: err.statusText || 'Error',
+                            method: req.method,
+                            url: req.url,
+                            details: err.error || err.message
+                        });
                     }
                 }
             } else {
