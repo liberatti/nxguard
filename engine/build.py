@@ -12,6 +12,7 @@ from api.model.config_model import ConfigDao, ConfigBackupDao, ChangeDao
 from api.model.oauth_model import UserDao
 from api.model.sensor_model import SensorDao
 from api.model.service_model import ServiceDao
+from api.model.route_model import RouteDao
 from api.model.upstream_model import UpstreamDao, NodeStatusDao
 from api.model.transaction_model import TransactionDao
 from api.tools.network_tool import NetworkTool
@@ -31,8 +32,12 @@ def get_config():
     with CertificateDao() as dao:
         c.update({"certificates": dao.get_all()["data"]})
 
-    with ServiceDao() as dao:
-        c.update({"services": dao.get_all()["data"]})
+    with ServiceDao() as s_dao, RouteDao() as r_dao:
+        services = s_dao.get_all()["data"]
+        for s in services:
+            if "_id" in s:
+                s["routes"] = r_dao.get_all_by_service_id(s["_id"])
+        c.update({"services": services})
 
     with SensorDao() as dao:
         c.update({"sensors": dao.get_all()["data"]})
@@ -87,6 +92,8 @@ def create_db():
     with CertificateDao() as dao:
         dao.create_schema()
     with ServiceDao() as dao:
+        dao.create_schema()
+    with RouteDao() as dao:
         dao.create_schema()
     with SensorDao() as dao:
         dao.create_schema()
@@ -151,10 +158,10 @@ def init_from_data(data_file="init-data.json"):
 
 def validate(data):
     """Validates target hostname/IP resolution for upstreams in the configuration."""
-    for u in data["upstreams"]:
-        for t in u["targets"]:
-            if not NetworkTool.is_host(t["host"]):
-                ipaddr = NetworkTool.hostbyname(t["host"])
+    for u in data.get("upstreams", []):
+        for t in u.get("targets", []):
+            if not NetworkTool.is_host(t.get("host")):
+                ipaddr = NetworkTool.hostbyname(t.get("host"))
                 if ipaddr:
                     t.update({"host": ipaddr})
                 else:

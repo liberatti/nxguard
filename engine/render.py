@@ -146,7 +146,7 @@ def _generate_sensors(
 
         sensor.update(
             {
-                "name": sensor["name"].lower(),
+                "name": sensor["name"],
                 "inbound_anomaly_score_threshold": sensor["inspection"]["score"][
                     "inbound"
                 ],
@@ -194,65 +194,26 @@ def _generate_sensors(
             )
 
 
-def __resolve_sensor(sensor_ref, data):
+def __resolve_sensor_by_name(sensor_name, data):
     sensors = data.get("sensors", [])
-    if isinstance(sensor_ref, dict):
-        if "name" in sensor_ref and sensor_ref["name"]:
-            target_name = str(sensor_ref["name"]).lower()
-            for s in sensors:
-                if s.get("name", "").lower() == target_name:
-                    return s
-        if "_id" in sensor_ref and sensor_ref["_id"] is not None:
-            target_id = str(sensor_ref["_id"])
-            for s in sensors:
-                if str(s.get("_id")) == target_id:
-                    return s
-        if sensor_ref.get("name"):
-            return sensor_ref
-
-    elif sensor_ref is not None and sensor_ref != "":
-        target = str(sensor_ref).lower()
-        for s in sensors:
-            if s.get("name", "").lower() == target or str(s.get("_id")) == target:
-                return s
-
-    if sensors:
-        return sensors[0]
-
+    for s in sensors:
+        if s.get("name") == sensor_name:
+            return s
+    logger.warning(
+        f"__resolve_sensor_by_name: {sensor_name} not found in {data['sensors']}"
+    )
     return None
 
 
-def __resolve_upstream(upstream_ref, data):
+def __resolve_upstream_by_name(upstream_name, data):
     upstreams = data.get("upstreams", [])
-    if isinstance(upstream_ref, dict):
-        if "name" in upstream_ref and upstream_ref["name"]:
-            target_name = str(upstream_ref["name"])
-            for u in upstreams:
-                if u.get("name") == target_name:
-                    return u
-            return upstream_ref
-        if "_id" in upstream_ref and upstream_ref["_id"] is not None:
-            target_id = str(upstream_ref["_id"])
-            for u in upstreams:
-                if str(u.get("_id")) == target_id:
-                    return u
-        if upstreams:
-            return upstreams[0]
-        return upstream_ref
-
-    if upstream_ref is not None and upstream_ref != "":
-        target = str(upstream_ref)
-        for u in upstreams:
-            if u.get("name") == target or str(u.get("_id")) == target:
-                return u
-        if upstreams:
-            return upstreams[0]
-        return {"name": target}
-
-    if upstreams:
-        return upstreams[0]
-
-    return {"name": ""}
+    for u in upstreams:
+        if u.get("name") == upstream_name:
+            return u
+    logger.warning(
+        f"__resolve_upstream_by_name: {upstream_name} not found in {data['upstreams']}"
+    )
+    return None
 
 
 def _generate_services(
@@ -272,62 +233,36 @@ def _generate_services(
         os.makedirs(f"{output_dir}/cache/{service['name']}", exist_ok=True)
         service_path = f"{conf_dir}/service-{service['name']}.conf"
         logger.info(f"[{output_dir}] - Generate {service_path}")
-        if "bindings" in service:
-            for b in service["bindings"]:
-                if b["protocol"] == "HTTPS":
-                    service.update({"ssl_enable": True})
+        for b in service.get("bindings", []):
+            if b["protocol"] == "HTTPS":
+                service.update({"ssl_enable": True})
 
-        if "routes" in service:
-            for r in service["routes"]:
-                r["upstream"] = __resolve_upstream(r.get("upstream"), data)
-                sensor = __resolve_sensor(r.get("sensor"), data)
-
-                if sensor and sensor.get("name"):
-                    s_name = sensor["name"].lower()
-
-                    service.update(
-                        {
-                            "has_inspection": True,
-                            "service_policy_file": f"{output_dir}/modsec/conf/{prefix}service-{service['name']}.policy",
-                        }
-                    )
-                    if "allowed_methods" not in r or r["allowed_methods"] is None:
-                        r["allowed_methods"] = [
-                            "GET",
-                            "HEAD",
-                            "POST",
-                            "OPTIONS",
-                            "PUT",
-                            "PATCH",
-                            "DELETE",
-                        ]
-                    if (
-                        "allowed_content_type" not in r
-                        or r["allowed_content_type"] is None
-                    ):
-                        r["allowed_content_type"] = [
-                            "application/x-www-form-urlencoded",
-                            "multipart/form-data",
-                            "text/xml",
-                            "application/xml",
-                            "application/soap+xml",
-                            "application/json",
-                        ]
-                    r.update(
-                        {
-                            "sensor": sensor,
-                            "route_policy_file": f"{output_dir}/modsec/conf/{prefix}route-{service['name']}.{r['name']}.policy",
-                            "sensor_policy_file": f"{output_dir}/modsec/coreruleset/{prefix}sensor-{s_name}.policy",
-                        }
-                    )
-                    _render_template_to_file(
-                        env,
-                        "modsec/modsec_route.j2",
-                        r["route_policy_file"],
-                        r,
-                    )
-                elif sensor:
-                    r["sensor"] = sensor
+        for r in service.get("routes", []):
+            if "upstream" in r and "name" in r["upstream"]:
+                r["upstream"] = __resolve_upstream_by_name(
+                    r["upstream"].get("name"), data
+                )
+            if "sensor" in r and "name" in r["sensor"]:
+                sensor = __resolve_sensor_by_name(r["sensor"].get("name"), data)
+                service.update(
+                    {
+                        "has_inspection": True,
+                        "service_policy_file": f"{output_dir}/modsec/conf/{prefix}SERVICE-{service['name']}.policy",
+                    }
+                )
+                r.update(
+                    {
+                        "sensor": sensor,
+                        "route_policy_file": f"{output_dir}/modsec/conf/{prefix}ROUTE-{service['name']}.{r['name']}.policy",
+                        "sensor_policy_file": f"{output_dir}/modsec/coreruleset/{prefix}SENSOR-{sensor['name']}.policy",
+                    }
+                )
+                _render_template_to_file(
+                    env,
+                    "modsec/modsec_route.j2",
+                    r["route_policy_file"],
+                    r,
+                )
 
         _render_template_to_file(env, "nginx/service.conf.j2", service_path, service)
 

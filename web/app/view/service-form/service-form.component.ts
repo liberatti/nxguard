@@ -1,29 +1,29 @@
-import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute, Router, RouterModule} from '@angular/router';
-import {AbstractControl, FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import {MatTableDataSource, MatTableModule} from '@angular/material/table';
-import {MatDialog} from '@angular/material/dialog';
-import {CommonModule} from '@angular/common';
-import {MatMomentDateModule} from '@angular/material-moment-adapter';
-import {MatButtonModule} from '@angular/material/button';
-import {MatCardModule} from '@angular/material/card';
-import {MatCheckboxModule} from '@angular/material/checkbox';
-import {MatChipsModule} from '@angular/material/chips';
-import {MatFormFieldModule} from '@angular/material/form-field';
-import {MatGridListModule} from '@angular/material/grid-list';
-import {MatIconModule} from '@angular/material/icon';
-import {MatInputModule} from '@angular/material/input';
-import {MatListModule} from '@angular/material/list';
-import {MatMenuModule} from '@angular/material/menu';
-import {MatPaginatorModule} from '@angular/material/paginator';
-import {MatProgressBarModule} from '@angular/material/progress-bar';
-import {MatSelectModule} from '@angular/material/select';
-import {MatSidenavModule} from '@angular/material/sidenav';
-import {MatSlideToggleModule} from '@angular/material/slide-toggle';
-import {MatSortModule} from '@angular/material/sort';
-import {MatTabsModule} from '@angular/material/tabs';
-import {MatTooltipModule} from '@angular/material/tooltip';
-import {TranslatePipe} from '@ngx-translate/core';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatDialog } from '@angular/material/dialog';
+import { CommonModule } from '@angular/common';
+import { MatMomentDateModule } from '@angular/material-moment-adapter';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatGridListModule } from '@angular/material/grid-list';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatListModule } from '@angular/material/list';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatSortModule } from '@angular/material/sort';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { TranslatePipe } from '@ngx-translate/core';
 import {
     ServiceBindFormDialogComponent
 } from 'app/components/service-bind-form-dialog/service-bind-form-dialog.component';
@@ -33,19 +33,19 @@ import {
 import {
     ServiceRouteFormDialogComponent
 } from 'app/components/service-route-form-dialog/service-route-form-dialog.component';
-import {Upstream} from 'app/models/upstream';
-import {Sensor} from 'app/models/sensor';
-import {Bind, Header, ProtocolType, Route, Service} from 'app/models/service';
-import {ServiceService} from 'app/services/service.service';
-import {NotificationService} from 'app/services/notification.service';
-import {DragDropModule} from '@angular/cdk/drag-drop';
-import {MatExpansionModule} from '@angular/material/expansion';
-import {Certificate} from "../../models/certificate";
-import {CertificateService} from "../../services/certificate.service";
-import {MatStepperModule} from "@angular/material/stepper";
-import {OAuthService} from "../../services/oauth.service";
-import { MultiSnackbarComponent } from '../../components/multi-snackbar/multi-snackbar.component';
+import { Upstream } from 'app/models/upstream';
+import { Sensor } from 'app/models/sensor';
+import { Bind, Header, ProtocolType, Route, Service } from 'app/models/service';
+import { ServiceService } from 'app/services/service.service';
+import { NotificationService } from 'app/services/notification.service';
+import { DragDropModule } from '@angular/cdk/drag-drop';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { Certificate } from "../../models/certificate";
+import { CertificateService } from "../../services/certificate.service";
+import { MatStepper, MatStepperModule } from "@angular/material/stepper";
+import { OAuthService } from "../../services/oauth.service";
 import { minArrayLength } from '../../validators/min-array-length.validator';
+import { RouteService } from 'app/services/route.service';
 
 @Component({
     selector: 'app-service-form',
@@ -65,9 +65,9 @@ export class ServiceFormComponent implements OnInit {
 
     _certificates: Certificate[];
     basicHeaders = [
-        <Header>{name: "X-Powered-By", content: "NXGuard"},
-        <Header>{name: "X-XSS-Protection", content: "1; mode=block"},
-        <Header>{name: "X-Frame-Options", content: "SAMEORIGIN"}
+        <Header>{ name: "X-Powered-By", content: "NXGuard" },
+        <Header>{ name: "X-XSS-Protection", content: "1; mode=block" },
+        <Header>{ name: "X-Frame-Options", content: "SAMEORIGIN" }
     ];
     isAddMode: boolean;
     bindingDS: MatTableDataSource<Bind>;
@@ -108,13 +108,22 @@ export class ServiceFormComponent implements OnInit {
             ]
         }),
         headers: new FormControl<Array<Header>>([]),
-        routes: new FormControl<Array<Route>>([], [Validators.required, minArrayLength(1)]),
+        routes: new FormControl<Array<Route>>([]),
         inspect_level: new FormControl<number>(3),
         inbound_score: new FormControl<number>(15),
         outbound_score: new FormControl<number>(15),
         buffer: new FormControl<number>(256),
-        compression_types: new FormControl<Array<string>>(['text/plain', 'text/css', 'application/json',
-            'application/javascript','application/x-javascript', 'text/xml', 'application/xml', 'application/xml+rss', 'text/javascript']),
+        compression_types: new FormControl<Array<string>>([
+            'text/plain',
+            'text/html',
+            'text/css',
+            'application/json',
+            'application/xml',
+            'application/javascript',
+            'text/xml',
+            'application/xml+rss',
+            'text/javascript'
+        ]),
         rate_limit_per_sec: new FormControl<number>(256),
         sans: new FormControl<Array<string>>([], [Validators.required, minArrayLength(1)]),
         ssl_protocols: new FormControl<Array<string>>(['TLSv1', 'TLSv1.1', 'TLSv1.2', 'TLSv1.3']),
@@ -130,6 +139,7 @@ export class ServiceFormComponent implements OnInit {
         private confirmDialog: MatDialog,
         private notificationService: NotificationService,
         private serviceService: ServiceService,
+        private routeService: RouteService,
         private certificateService: CertificateService,
         protected oauth: OAuthService,
     ) {
@@ -154,26 +164,28 @@ export class ServiceFormComponent implements OnInit {
                         _id: data._id as string,
                         name: data.name,
                         headers: data.headers,
-                        routes: data.routes,
                         bindings: data.bindings,
                         body_limit: data.body_limit,
                         timeout: data.timeout,
                         buffer: data.buffer,
                         sans: data.sans,
-                        compression_types: data.compression_types || ['text/plain', 'text/css', 'application/json',
-                            'application/javascript', 'text/javascript',
-                            'application/x-javascript', 'text/xml', 'application/xml', 'application/xml+rss', 'text/javascript'],
+                        compression_types: data.compression_types,
                         rate_limit_per_sec: data.rate_limit_per_sec,
                         certificate: data.certificate,
-                        ssl_protocols: data.ssl_protocols || ['TLSv1', 'TLSv1.1', 'TLSv1.2', 'TLSv1.3'],
+                        ssl_protocols: data.ssl_protocols,
                         ssl_client_auth: data.ssl_client_auth,
                         ssl_client_ca: data.ssl_client_auth ? data.ssl_client_ca : ''
                     });
 
                     // Update data sources
                     this.headerDS.data = data.headers;
-                    this.routeDS.data = data.routes;
                     this.bindingDS.data = data.bindings;
+
+                    this.routeService.getByServiceId(id).subscribe((routeRes: any) => {
+                        const routes = routeRes.data || routeRes || [];
+                        this.form.patchValue({ routes: routes });
+                        this.routeDS.data = routes;
+                    });
                 });
             } else {
                 this.form.get('headers')?.setValue(this.basicHeaders);
@@ -214,6 +226,46 @@ export class ServiceFormComponent implements OnInit {
         this.form.reset(_data);
     }
 
+    onNextDetails(stepper: MatStepper) {
+        if (!this.form.get('name')?.valid || !this.form.get('sans')?.valid || !this.form.get('bindings')?.valid) {
+            let errors = [] as Array<string>;
+            if (!this.form.get('name')?.valid) errors.push(' Invalid value on name');
+            if (!this.form.get('sans')?.valid) errors.push(' Invalid value on sans');
+            if (!this.form.get('bindings')?.valid) errors.push(' Invalid value on bindings');
+            this.notificationService.openSnackBar(errors);
+            return;
+        }
+
+        let _data: Service = JSON.parse(JSON.stringify(this.form.value));
+
+        if (_data._id === "") {
+            Reflect.deleteProperty(_data, '_id');
+        }
+
+        if (!this.hasSslSupport()) {
+            Reflect.deleteProperty(_data, 'certificate');
+        } else {
+            _data.certificate = { "_id": _data.certificate._id } as Certificate;
+        }
+
+        if (this.isAddMode) {
+            this.serviceService.save(_data).subscribe((res: any) => {
+                const created = res.data || res;
+                if (created && created._id) {
+                    this.form.patchValue({ _id: String(created._id) });
+                    this.isAddMode = false;
+                    this.notificationService.openSnackBar('Service saved');
+                }
+                stepper.next();
+            });
+        } else {
+            this.serviceService.update(_data._id as string, _data).subscribe(() => {
+                this.notificationService.openSnackBar('Service updated');
+                stepper.next();
+            });
+        }
+    }
+
     onSubmit() {
         if (this.form.status === "INVALID") {
             let errors = [] as Array<string>;
@@ -224,7 +276,7 @@ export class ServiceFormComponent implements OnInit {
                         errors.push(" Invalid value on " + k);
                     }
                 });
-            
+
             if (errors.length > 0) {
                 console.log(this.form.value);
                 this.notificationService.openSnackBar(errors);
@@ -239,18 +291,9 @@ export class ServiceFormComponent implements OnInit {
 
         if (!this.hasSslSupport()) {
             Reflect.deleteProperty(_data, 'certificate');
-        }else{
-            _data.certificate = {"_id": _data.certificate._id} as Certificate;
+        } else {
+            _data.certificate = { "_id": _data.certificate._id } as Certificate;
         }
-
-        if (_data.routes)
-            for (let i = 0; i < _data.routes.length; i++) {
-                _data.routes[i].upstream = <Upstream>{"_id": _data.routes[i].upstream._id};
-                if (_data.routes[i].sensor)
-                    _data.routes[i].sensor = <Sensor>{"_id": _data.routes[i].sensor._id};
-                else
-                    Reflect.deleteProperty(_data.routes[i], 'sensor');
-            }
 
         if (this.isAddMode) {
             this.serviceService.save(_data).subscribe((data) => {
@@ -334,11 +377,25 @@ export class ServiceFormComponent implements OnInit {
     }
 
     onRemoveRoute(index: number) {
-        const currentRoutes = this.form.get('routes')?.value || [];
-        const newRoutes = currentRoutes.slice();
-        newRoutes.splice(index, 1);
-        this.form.get('routes')?.setValue(newRoutes);
-        this.routeDS.data = newRoutes;
+        const targetRoute = this.routeDS.data[index];
+        const serviceId = this.form.get('_id')?.value;
+        if (targetRoute && targetRoute._id) {
+            this.routeService.removeById(targetRoute._id).subscribe(() => {
+                if (serviceId) {
+                    this.routeService.getByServiceId(serviceId).subscribe((res: any) => {
+                        const routes = res.data || res || [];
+                        this.form.get('routes')?.setValue(routes);
+                        this.routeDS.data = routes;
+                    });
+                }
+            });
+        } else {
+            const currentRoutes = this.form.get('routes')?.value || [];
+            const newRoutes = currentRoutes.slice();
+            newRoutes.splice(index, 1);
+            this.form.get('routes')?.setValue(newRoutes);
+            this.routeDS.data = newRoutes;
+        }
     }
 
     onAddRoute() {
@@ -349,27 +406,80 @@ export class ServiceFormComponent implements OnInit {
 
         dialogRef.afterClosed().subscribe(result => {
             if (result) {
-                const currentRoutes = this.form.get('routes')?.value || [];
-                this.form.get('routes')?.setValue([...currentRoutes, result]);
-                this.routeDS.data = this.form.get('routes')?.value || [];
+                const serviceId = this.form.get('_id')?.value;
+                if (serviceId) {
+                    result.service_id = serviceId;
+                    if (result.upstream && result.upstream._id) {
+                        result.upstream = <Upstream>{ _id: result.upstream._id };
+                    }
+                    if (result.sensor && result.sensor._id) {
+                        result.sensor = <Sensor>{ _id: result.sensor._id };
+                    } else {
+                        Reflect.deleteProperty(result, 'sensor');
+                    }
+                    this.routeService.save(result).subscribe(() => {
+                        this.routeService.getByServiceId(serviceId).subscribe((res: any) => {
+                            const routes = res.data || res || [];
+                            this.form.get('routes')?.setValue(routes);
+                            this.routeDS.data = routes;
+                        });
+                    });
+                } else {
+                    const currentRoutes = this.form.get('routes')?.value || [];
+                    this.form.get('routes')?.setValue([...currentRoutes, result]);
+                    this.routeDS.data = this.form.get('routes')?.value || [];
+                }
             }
         });
     }
 
     onEditRoute(index: number) {
+        const targetRoute = this.routeDS.data[index];
         const dialogRef = this.confirmDialog.open(ServiceRouteFormDialogComponent,
             {
                 maxWidth: undefined,
-                data: this.routeDS.data[index]
+                data: targetRoute
             });
 
         dialogRef.afterClosed().subscribe(result => {
             if (result) {
-                const currentRoutes = this.form.get('routes')?.value || [];
-                const newRoutes = currentRoutes.slice();
-                newRoutes[index] = result;
-                this.form.get('routes')?.setValue(newRoutes);
-                this.routeDS.data = newRoutes;
+                const serviceId = this.form.get('_id')?.value;
+                if (serviceId) {
+                    result.service_id = serviceId;
+                    if (result.upstream && result.upstream._id) {
+                        result.upstream = <Upstream>{ _id: result.upstream._id };
+                    }
+                    if (result.sensor && result.sensor._id) {
+                        result.sensor = <Sensor>{ _id: result.sensor._id };
+                    } else {
+                        Reflect.deleteProperty(result, 'sensor');
+                    }
+
+                    if (targetRoute && targetRoute._id) {
+                        result._id = targetRoute._id;
+                        this.routeService.update(String(targetRoute._id), result).subscribe(() => {
+                            this.routeService.getByServiceId(serviceId).subscribe((res: any) => {
+                                const routes = res.data || res || [];
+                                this.form.get('routes')?.setValue(routes);
+                                this.routeDS.data = routes;
+                            });
+                        });
+                    } else {
+                        this.routeService.save(result).subscribe(() => {
+                            this.routeService.getByServiceId(serviceId).subscribe((res: any) => {
+                                const routes = res.data || res || [];
+                                this.form.get('routes')?.setValue(routes);
+                                this.routeDS.data = routes;
+                            });
+                        });
+                    }
+                } else {
+                    const currentRoutes = this.form.get('routes')?.value || [];
+                    const newRoutes = currentRoutes.slice();
+                    newRoutes[index] = result;
+                    this.form.get('routes')?.setValue(newRoutes);
+                    this.routeDS.data = newRoutes;
+                }
             }
         });
     }

@@ -162,28 +162,6 @@
             </div>
         </div>
 
-        <!-- Filters Section -->
-
-        <form [formGroup]="filterForm" id="service-route-filter-form">
-            <mat-form-field class="full-width mt-2">
-                <mat-label>Route Filter</mat-label>
-                <mat-select formControlName="filter" [compareWith]="compareFn" id="service-route-filter-select"
-                            (selectionChange)="onAddFilter()">
-                    <mat-option *ngFor="let c of _filters;" [value]="c" id="service-route-filter-option-{{c._id}}">
-                        {{ c.name }}
-                    </mat-option>
-                </mat-select>
-            </mat-form-field>
-            <mat-chip-listbox id="service-route-filters-list">
-                <mat-chip-row *ngFor="let p of form.value.filters" (removed)="onRemoveFilter(p)" id="service-route-filter-chip-{{p._id}}">
-                    {{ p.name }}
-                    <button matChipRemove id="remove-service-route-filter-{{p._id}}">
-                        <mat-icon>cancel</mat-icon>
-                    </button>
-                </mat-chip-row>
-            </mat-chip-listbox>
-        </form>
-
         <!-- Security Sensor and Monitor Only -->
         <mat-card class="mt-2">
             <mat-form-field class="full-width">

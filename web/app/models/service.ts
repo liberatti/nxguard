@@ -46,22 +46,9 @@ export interface Redirect {
     url: string;
 }
 
-export interface RouteFilter {
-    _id: string;
-    name: string;
-    description: string;
-    type: string; // SSL_CLIENT_AUTH, LDAP_AUTH
-    ssl_dn_regex: string;
-    ssl_fingerprints: string;
-    ldap_host: string;
-    ldap_base_dn: string;
-    ldap_bind_dn: string;
-    ldap_bind_password: string;
-    ldap_group_dn: string;
-    geo_block_list: string;
-}
-
 export interface Route {
+    _id?: string;
+    service_id?: string | number;
     name: string;
     type: string;
     upstream: Upstream;
@@ -74,7 +61,6 @@ export interface Route {
     allowed_methods?: Array<string> | string;
     allowed_content_type?: Array<string> | string;
     cache_methods: Array<string>;
-    filters: Array<RouteFilter>;
 }
 
 export interface Service {

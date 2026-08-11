@@ -96,10 +96,12 @@ server {
   {% for p in r.paths %}
   location ~ {{p}} {
     set $route '{{r.name}}';
-    set $sensor '{{r.sensor.name if r.sensor and r.sensor.name else "Default"}}';
-    set $upstream '{{r.upstream.name if r.upstream and r.upstream.name else "default"}}';
+    set $sensor '{{r.sensor.name if r.sensor and r.sensor.name else "-"}}';
+    set $upstream '{{r.upstream.name if r.upstream and r.upstream.name else "-"}}';
 
-    access_by_lua_file {{BASE_PATH}}/luajit/share/lua/5.1/nxguard/sensors/{{r.sensor.name | lower if r.sensor and r.sensor.name else "default"}}.lua;
+    {% if r.sensor and r.sensor.name %}
+    access_by_lua_file {{BASE_PATH}}/luajit/share/lua/5.1/nxguard/sensors/{{r.sensor.name | lower}}.lua;
+    {% endif %}
 
     {% if has_inspection and r.route_policy_file %}
     modsecurity_rules_file {{r.route_policy_file | lower}};

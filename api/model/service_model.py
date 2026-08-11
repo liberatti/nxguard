@@ -7,8 +7,11 @@ from marshmallow import EXCLUDE, Schema, fields, post_load
 
 import config
 from api.model.certificate_model import CertificateDao, CertificateSchema
-from api.model.upstream_model import UpstreamSchema
-from api.model.sensor_model import SensorSchema
+from api.model.route_model import (
+    RouteDao,
+    RouteSchema,
+    RedirectSchema,
+)
 
 
 class HeaderSchema(Schema):
@@ -25,8 +28,12 @@ class BindSchema(Schema):
 
     port = fields.Integer()
     protocol = fields.String()
-    ssl_upgrade = fields.Boolean(allow_none=True, load_default=False, dump_default=False)
-    ssl_upgrade_port = fields.Integer(allow_none=True, load_default=443, dump_default=443)
+    ssl_upgrade = fields.Boolean(
+        allow_none=True, load_default=False, dump_default=False
+    )
+    ssl_upgrade_port = fields.Integer(
+        allow_none=True, load_default=443, dump_default=443
+    )
 
     @post_load
     def make_bind(self, data, **kwargs):
@@ -35,48 +42,6 @@ class BindSchema(Schema):
         if data.get("ssl_upgrade_port") is None:
             data["ssl_upgrade_port"] = 443
         return data
-
-
-class RedirectSchema(Schema):
-    class Meta:
-        unknown = EXCLUDE
-
-    code = fields.Integer()
-    url = fields.String()
-
-
-class RouteFilterSchema(Schema):
-    class Meta:
-        unknown = EXCLUDE
-
-    _id = fields.Integer()
-    name = fields.String()
-    description = fields.String()
-    type = fields.String()  # SSL_CLIENT_AUTH, LDAP_AUTH
-    ssl_dn_regex = fields.String()
-    ssl_fingerprints = fields.List(fields.String())
-    ldap_host = fields.String()
-    ldap_base_dn = fields.String()
-    ldap_bind_dn = fields.String()
-    ldap_bind_password = fields.String()
-    ldap_group_dn = fields.String()
-
-
-class RouteSchema(Schema):
-    class Meta:
-        unknown = EXCLUDE
-
-    name = fields.String()
-    type = fields.String()
-    paths = fields.List(fields.String())
-    allowed_methods = fields.Raw(allow_none=True)
-    allowed_content_type = fields.Raw(allow_none=True)
-    upstream = fields.Nested(UpstreamSchema)
-    redirect = fields.Nested(RedirectSchema)
-    sensor = fields.Nested(SensorSchema)
-    monitor_only = fields.Boolean()
-    cache_methods = fields.List(fields.String())
-    filters = fields.Nested(RouteFilterSchema, many=True)
 
 
 class ServiceSchema(Schema):
@@ -91,7 +56,7 @@ class ServiceSchema(Schema):
     buffer = fields.Integer()
     bindings = fields.Nested(BindSchema, many=True)
     headers = fields.Nested(HeaderSchema, many=True)
-    routes = fields.Nested(RouteSchema, many=True)
+    routes = fields.Nested(RouteSchema, many=True, allow_none=True, load_default=[])
     compression_types = fields.List(fields.String())
     rate_limit_per_sec = fields.Integer()
     sans = fields.List(fields.String())
@@ -101,40 +66,18 @@ class ServiceSchema(Schema):
     ssl_client_auth = fields.Boolean(load_default=False, dump_default=False)
 
 
-class RouteFilterDao(DuckDAO):
-
-    def __init__(self):
-        super().__init__(
-            db_path=config.DB_PATH, table_name="route_filters", schema=RouteFilterSchema
-        )
-
-    def create_schema(self):
-        self.ddl(
-            f"""
-            CREATE TABLE IF NOT EXISTS {self.table_name} (
-                _id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT,
-                description TEXT,
-                type TEXT,
-                ssl_dn_regex TEXT,
-                ssl_fingerprints TEXT,
-                ldap_host TEXT,
-                ldap_base_dn TEXT,
-                ldap_bind_dn TEXT,
-                ldap_bind_password TEXT,
-                ldap_group_dn TEXT
-            );
-        """
-        )
-
-
 class ServiceDao(DuckDAO):
     def __init__(self):
         super().__init__(
             db_path=config.DB_PATH, table_name="service", schema=ServiceSchema
         )
         self.certificateDao = CertificateDao()
-        self.certificateDao.connect()
+        self.routeDao = RouteDao()
+
+    def connect(self) -> None:
+        super().connect()
+        self.certificateDao.conn = self.conn
+        self.routeDao.conn = self.conn
 
     def create_schema(self):
         self.ddl(
@@ -148,7 +91,6 @@ class ServiceDao(DuckDAO):
                 buffer INTEGER,
                 bindings JSON,
                 headers JSON,
-                routes JSON,
                 compression_types JSON,
                 rate_limit_per_sec INTEGER,
                 sans JSON,
@@ -159,6 +101,7 @@ class ServiceDao(DuckDAO):
             );
         """
         )
+        self.routeDao.create_schema()
 
     def from_dict(self, vo: Dict[str, Any]) -> Dict[str, Any]:
         if "certificate" in vo:
@@ -191,12 +134,31 @@ class ServiceDao(DuckDAO):
                 }
             )
 
-        vo["routes"] = json.loads(vo.get("routes", "[]"))
-        vo["bindings"] = json.loads(vo.get("bindings", "[]"))
-        vo["compression_types"] = json.loads(vo.get("compression_types", "[]"))
-        vo["sans"] = json.loads(vo.get("sans", "[]"))
-        vo["headers"] = json.loads(vo.get("headers", "[]"))
-        vo["ssl_protocols"] = json.loads(vo.get("ssl_protocols", "[]"))
+        vo["bindings"] = (
+            json.loads(vo.get("bindings", "[]"))
+            if isinstance(vo.get("bindings"), str)
+            else vo.get("bindings", [])
+        )
+        vo["compression_types"] = (
+            json.loads(vo.get("compression_types", "[]"))
+            if isinstance(vo.get("compression_types"), str)
+            else vo.get("compression_types", [])
+        )
+        vo["sans"] = (
+            json.loads(vo.get("sans", "[]"))
+            if isinstance(vo.get("sans"), str)
+            else vo.get("sans", [])
+        )
+        vo["headers"] = (
+            json.loads(vo.get("headers", "[]"))
+            if isinstance(vo.get("headers"), str)
+            else vo.get("headers", [])
+        )
+        vo["ssl_protocols"] = (
+            json.loads(vo.get("ssl_protocols", "[]"))
+            if isinstance(vo.get("ssl_protocols"), str)
+            else vo.get("ssl_protocols", [])
+        )
         return vo
 
     def get_by_sans(

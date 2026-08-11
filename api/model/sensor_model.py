@@ -51,7 +51,7 @@ class SensorSchema(Schema):
 
     _id = fields.Integer()
     name = fields.String()
-    description = fields.String(allow_none=True, load_default="", dump_default="")
+    description = fields.String(allow_none=True)
     categories = fields.List(fields.String(), allow_none=True)
     exclusions = fields.List(fields.Raw(), allow_none=True)
     security = fields.Nested(SensorSecuritySchema, allow_none=True)

@@ -265,10 +265,6 @@
         {
           "cache_methods": [],
           "filters": [],
-          "methods": [
-            "GET",
-            "POST"
-          ],
           "allowed_methods": [
             "GET",
             "HEAD",

@@ -9,7 +9,7 @@ import {
 import {AbstractControl, FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {Sensor} from 'app/models/sensor';
-import {Route, RouteFilter} from 'app/models/service';
+import {Route} from 'app/models/service';
 import {Upstream} from 'app/models/upstream';
 import {UpstreamService} from 'app/services/upstream.service';
 import {SensorService} from 'app/services/sensor.service';
@@ -26,7 +26,6 @@ import {MatTabGroup, MatTabsModule} from '@angular/material/tabs';
 import {TranslatePipe} from '@ngx-translate/core';
 import {StaticServer} from "../../models/static";
 import {StaticService} from "../../services/static.service";
-import {RoutefilterService} from "../../services/routefilter.service";
 
 
 @Component({
@@ -62,7 +61,6 @@ export class ServiceRouteFormDialogComponent implements OnInit {
     separatorKeysCodes = [COMMA, ENTER];
     _upstreams: Upstream[] = [];
     _sensors: Sensor[] = [];
-    _filters: RouteFilter[] = [];
     isAddMode: boolean;
     submitted = false;
 
@@ -81,10 +79,6 @@ export class ServiceRouteFormDialogComponent implements OnInit {
     });
     cacheMethodForm = new FormGroup({
         cacheMethod: new FormControl<string>('')
-    });
-
-    filterForm = new FormGroup({
-        filter: new FormControl<RouteFilter>({} as RouteFilter)
     });
 
     form = new FormGroup({
@@ -110,7 +104,6 @@ export class ServiceRouteFormDialogComponent implements OnInit {
         sensor: new FormControl<Sensor>(<Sensor>{}),
         cache_methods: new FormControl<Array<string>>([]),
         type: new FormControl<string>("upstream"),
-        filters: new FormControl<Array<RouteFilter>>([]),
     });
 
     constructor(
@@ -118,7 +111,6 @@ export class ServiceRouteFormDialogComponent implements OnInit {
         private upstreamService: UpstreamService,
         private staticService: StaticService,
         private sensorService: SensorService,
-        private routeFilterService: RoutefilterService,
         @Inject(MAT_DIALOG_DATA) public routeData: Route
     ) {
         this.isAddMode = false;
@@ -134,9 +126,6 @@ export class ServiceRouteFormDialogComponent implements OnInit {
             if (this.isAddMode) {
                 this.form.get('sensor')?.setValue(this._sensors[0]);
             }
-        });
-        this.routeFilterService.get().subscribe(data => {
-            this._filters = data.data;
         });
         this.isAddMode = !this.routeData;
         if (!this.isAddMode) {
@@ -170,11 +159,6 @@ export class ServiceRouteFormDialogComponent implements OnInit {
                 this.form.get('cache_methods')?.setValue(this.routeData.cache_methods);
             } else {
                 this.form.get('cache_methods')?.setValue([]);
-            }
-            if (this.routeData.filters) {
-                this.form.get('filters')?.setValue(this.routeData.filters);
-            } else {
-                this.form.get('filters')?.setValue([]);
             }
         }
     }
@@ -217,21 +201,6 @@ export class ServiceRouteFormDialogComponent implements OnInit {
             let index = this.form.value.methods.indexOf(keyword);
             if (index >= 0) {
                 this.form.value.methods.splice(index, 1);
-            }
-        }
-    }
-
-    onAddFilter(): void {
-        let data = this.filterForm.value.filter as RouteFilter;
-        this.form.value.filters?.push(data);
-        this.filterForm.reset();
-    }
-
-    onRemoveFilter(keyword: any): void {
-        if (this.form.value.filters != null) {
-            let index = this.form.value.filters.indexOf(keyword);
-            if (index >= 0) {
-                this.form.value.filters.splice(index, 1);
             }
         }
     }

@@ -16,8 +16,6 @@ import {ConfigFormComponent} from './view/config-form/config-form.component';
 import {FeedListComponent} from "./view/feed-list/feed-list.component";
 import {FeedFormComponent} from "./view/feed-form/feed-form.component";
 import {DashboardHomeComponent} from "./view/dashboard-home/dashboard-home.component";
-import {RouteFilterListComponent} from "./view/route_filter-list/route_filter-list.component";
-import {RouteFilterFormComponent} from "./view/route_filter-form/route_filter-form.component";
 import {UserListComponent} from "./view/user-list/user-list.component";
 import {UserFormComponent} from "./view/user-form/user-form.component";
 
@@ -58,14 +56,6 @@ export const routes: Routes = [
                     {path: '', component: UserListComponent},
                     {path: 'add', component: UserFormComponent},
                     {path: 'edit/:id', component: UserFormComponent},
-                ]
-            },
-            {
-                path: 'route_filter',
-                children: [
-                    {path: '', component: RouteFilterListComponent},
-                    {path: 'add', component: RouteFilterFormComponent},
-                    {path: 'edit/:id', component: RouteFilterFormComponent},
                 ]
             },
             {
