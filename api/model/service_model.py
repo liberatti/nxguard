@@ -83,19 +83,18 @@ class ServiceDao(DuckDAO):
         self.ddl(
             f"""
             CREATE TABLE IF NOT EXISTS {self.table_name} (
-                _id INTEGER PRIMARY KEY AUTOINCREMENT,
+                certificate_id INTEGER,
                 name TEXT,
                 body_limit INTEGER,
                 timeout INTEGER,
                 active BOOLEAN,
                 buffer INTEGER,
+                rate_limit_per_sec INTEGER,
                 bindings JSON,
                 headers JSON,
                 compression_types JSON,
-                rate_limit_per_sec INTEGER,
                 sans JSON,
                 ssl_protocols JSON,
-                certificate_id TEXT,
                 ssl_client_ca TEXT,
                 ssl_client_auth BOOLEAN DEFAULT 0
             );
@@ -104,18 +103,28 @@ class ServiceDao(DuckDAO):
         self.routeDao.create_schema()
 
     def from_dict(self, vo: Dict[str, Any]) -> Dict[str, Any]:
+        vo = dict(vo)
+        for field in [
+            "bindings",
+            "headers",
+            "compression_types",
+            "sans",
+            "ssl_protocols",
+        ]:
+            if field in vo and vo[field] is not None and not isinstance(vo[field], str):
+                vo[field] = json.dumps(vo[field])
+
         if "certificate" in vo:
-            certificate = vo.pop("certificate")
-            if "_id" in certificate:
-                vo.update({"certificate_id": certificate["_id"]})
-            if "name" in certificate:
-                vo.update(
-                    {
-                        "certificate_id": self.certificateDao.get_by_name(
-                            certificate["name"]
-                        )["_id"]
-                    }
-                )
+            cert = vo.pop("certificate")
+            if isinstance(cert, dict) and cert and "_id" in cert:
+                vo["certificate_id"] = cert["_id"]
+            elif cert is not None and not isinstance(cert, dict):
+                vo["certificate_id"] = cert
+            elif "certificate_id" not in vo:
+                vo["certificate_id"] = None
+
+        if "routes" in vo:
+            vo.pop("routes")
 
         return super().from_dict(vo)
 
@@ -159,7 +168,55 @@ class ServiceDao(DuckDAO):
             if isinstance(vo.get("ssl_protocols"), str)
             else vo.get("ssl_protocols", [])
         )
+        vo["routes"] = self.routeDao.get_all_by_service_id(vo["_id"])
         return vo
+
+    def persist(self, vo: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        routes = vo.get("routes", []) if "routes" in vo else []
+        service = super().persist(vo)
+        if service:
+            self.routeDao.delete_by_service_id(service["_id"])
+            for route in routes:
+                route.update({"service_id": service["_id"]})
+                self.routeDao.persist(route)
+        return service
+
+    def persist_many(self, arr: List[Dict[str, Any]]):
+        if not arr:
+            return False
+        all_routes = []
+        for vo in arr:
+            if "routes" in vo and vo["routes"]:
+                svc_id = vo.get("_id")
+                for r in vo["routes"]:
+                    if svc_id is not None:
+                        r["service_id"] = svc_id
+                    all_routes.append(r)
+        result = super().persist_many(arr)
+        if result and all_routes:
+            for r in all_routes:
+                self.routeDao.persist(r)
+        return result
+
+    def update_by_id(self, id: str, vo: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        routes = vo.get("routes", []) if "routes" in vo else []
+        service = super().update_by_id(id, vo)
+        if service:
+            self.routeDao.delete_by_service_id(service["_id"])
+            for route in routes:
+                route.update({"service_id": service["_id"]})
+                self.routeDao.persist(route)
+        return service
+
+    def delete_by_id(self, id: str) -> Optional[Dict[str, Any]]:
+        routes = self.routeDao.get_all_by_service_id(id)
+        if routes:
+            self.routeDao.delete_by_service_id(id)
+        return super().delete_by_id(id)
+
+    def delete_all(self):
+        self.routeDao.delete_all()
+        super().delete_all()
 
     def get_by_sans(
         self, sans: List[str], active: Optional[bool] = None

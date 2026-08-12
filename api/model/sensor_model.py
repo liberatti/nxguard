@@ -59,9 +59,12 @@ class SensorSchema(Schema):
 
 
 class SensorDao(DuckDAO):
-    def __init__(self):
+    def __init__(self, conn=None):
         super().__init__(
-            db_path=config.DB_PATH, table_name="sensor", schema=SensorSchema
+            db_path=config.DB_PATH,
+            table_name="sensor",
+            schema=SensorSchema,
+            conn=conn,
         )
 
     def create_schema(self):

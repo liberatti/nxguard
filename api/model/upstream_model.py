@@ -51,9 +51,12 @@ class UpstreamSchema(Schema):
 
 class UpstreamDao(DuckDAO):
 
-    def __init__(self):
+    def __init__(self, conn=None):
         super().__init__(
-            db_path=config.DB_PATH, table_name="upstream", schema=UpstreamSchema
+            db_path=config.DB_PATH,
+            table_name="upstream",
+            schema=UpstreamSchema,
+            conn=conn,
         )
 
     def create_schema(self):

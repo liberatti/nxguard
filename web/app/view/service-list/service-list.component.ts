@@ -26,7 +26,6 @@ import {TranslatePipe} from '@ngx-translate/core';
 import {ConfirmDialogComponent} from 'app/components/confirm-dialog/confirm-dialog.component';
 import {Service} from 'app/models/service';
 import {ServiceService} from 'app/services/service.service';
-import {RouteService} from 'app/services/route.service';
 import {NotificationService} from 'app/services/notification.service';
 import {OAuthService} from "../../services/oauth.service";
 
@@ -52,7 +51,6 @@ export class ServiceListComponent implements OnInit {
     constructor(
         private notificationService: NotificationService,
         private serviceService: ServiceService,
-        private routeService: RouteService,
         private confirmDialog: MatDialog,
         private responsive: BreakpointObserver,
         protected oauth: OAuthService,
@@ -69,13 +67,6 @@ export class ServiceListComponent implements OnInit {
             if (data.metadata) {
                 this.serviceDS.data = data.data;
                 this.servicePA.total_elements = data.metadata.total_elements;
-                this.serviceDS.data.forEach(s => {
-                    if (s._id) {
-                        this.routeService.getByServiceId(s._id).subscribe((res: any) => {
-                            s.routes = res.data || res || [];
-                        });
-                    }
-                });
             } else {
                 this.serviceDS.data = [];
                 this.servicePA.total_elements = 0;

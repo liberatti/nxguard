@@ -6,8 +6,8 @@ from nxcore.middleware.logging_manager import logger
 
 import config
 from .duck_db import DuckDAO
-from api.model.upstream_model import UpstreamSchema
-from api.model.sensor_model import SensorSchema
+from api.model.upstream_model import UpstreamDao, UpstreamSchema
+from api.model.sensor_model import SensorDao, SensorSchema
 
 
 class RedirectSchema(Schema):
@@ -41,6 +41,13 @@ class RouteDao(DuckDAO):
         super().__init__(
             db_path=config.DB_PATH, table_name="routes", schema=RouteSchema, conn=conn
         )
+        self.upstreamDao = UpstreamDao()
+        self.sensorDao = SensorDao()
+
+    def connect(self) -> None:
+        super().connect()
+        self.upstreamDao.conn = self.conn
+        self.sensorDao.conn = self.conn
 
     def create_schema(self):
         self.ddl(
@@ -48,16 +55,16 @@ class RouteDao(DuckDAO):
             CREATE TABLE IF NOT EXISTS {self.table_name} (
                 _id INTEGER PRIMARY KEY AUTOINCREMENT,
                 service_id INTEGER,
+                upstream_id INTEGER,
+                sensor_id INTEGER,
+                monitor_only BOOLEAN,
                 name TEXT,
                 type TEXT,
                 paths JSON,
+                cache_methods JSON,
                 allowed_methods JSON,
                 allowed_content_type JSON,
-                upstream JSON,
-                redirect JSON,
-                sensor JSON,
-                monitor_only BOOLEAN,
-                cache_methods JSON
+                redirect JSON
             );
         """
         )
@@ -68,13 +75,30 @@ class RouteDao(DuckDAO):
             "paths",
             "allowed_methods",
             "allowed_content_type",
-            "upstream",
             "redirect",
-            "sensor",
             "cache_methods",
         ]:
             if field in vo and vo[field] is not None and not isinstance(vo[field], str):
                 vo[field] = json.dumps(vo[field])
+
+        if "upstream" in vo:
+            ups = vo.pop("upstream")
+            if isinstance(ups, dict) and ups and "_id" in ups:
+                vo["upstream_id"] = ups["_id"]
+            elif ups is not None and not isinstance(ups, dict):
+                vo["upstream_id"] = ups
+            elif "upstream_id" not in vo:
+                vo["upstream_id"] = None
+
+        if "sensor" in vo:
+            sns = vo.pop("sensor")
+            if isinstance(sns, dict) and sns and "_id" in sns:
+                vo["sensor_id"] = sns["_id"]
+            elif sns is not None and not isinstance(sns, dict):
+                vo["sensor_id"] = sns
+            elif "sensor_id" not in vo:
+                vo["sensor_id"] = None
+
         return super().from_dict(vo)
 
     def to_dict(self, vo: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
@@ -85,9 +109,7 @@ class RouteDao(DuckDAO):
             "paths",
             "allowed_methods",
             "allowed_content_type",
-            "upstream",
             "redirect",
-            "sensor",
             "cache_methods",
         ]:
             if field in vo and isinstance(vo[field], str):

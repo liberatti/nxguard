@@ -45,7 +45,6 @@ import { CertificateService } from "../../services/certificate.service";
 import { MatStepper, MatStepperModule } from "@angular/material/stepper";
 import { OAuthService } from "../../services/oauth.service";
 import { minArrayLength } from '../../validators/min-array-length.validator';
-import { RouteService } from 'app/services/route.service';
 
 @Component({
     selector: 'app-service-form',
@@ -139,7 +138,6 @@ export class ServiceFormComponent implements OnInit {
         private confirmDialog: MatDialog,
         private notificationService: NotificationService,
         private serviceService: ServiceService,
-        private routeService: RouteService,
         private certificateService: CertificateService,
         protected oauth: OAuthService,
     ) {
@@ -160,11 +158,13 @@ export class ServiceFormComponent implements OnInit {
 
             if (!this.isAddMode) {
                 this.serviceService.getById(id).subscribe(data => {
+                    const routes = data.routes || [];
                     this.form.patchValue({
                         _id: data._id as string,
                         name: data.name,
                         headers: data.headers,
                         bindings: data.bindings,
+                        routes: routes,
                         body_limit: data.body_limit,
                         timeout: data.timeout,
                         buffer: data.buffer,
@@ -178,14 +178,9 @@ export class ServiceFormComponent implements OnInit {
                     });
 
                     // Update data sources
-                    this.headerDS.data = data.headers;
-                    this.bindingDS.data = data.bindings;
-
-                    this.routeService.getByServiceId(id).subscribe((routeRes: any) => {
-                        const routes = routeRes.data || routeRes || [];
-                        this.form.patchValue({ routes: routes });
-                        this.routeDS.data = routes;
-                    });
+                    this.headerDS.data = data.headers || [];
+                    this.bindingDS.data = data.bindings || [];
+                    this.routeDS.data = routes;
                 });
             } else {
                 this.form.get('headers')?.setValue(this.basicHeaders);
@@ -219,11 +214,12 @@ export class ServiceFormComponent implements OnInit {
     }
 
     moveRoute(event: any) {
-        const _data = this.form.value as Service;
-        let element = _data.routes[event.previousIndex];
-        _data.routes.splice(event.previousIndex, 1);
-        _data.routes.splice(event.currentIndex, 0, element);
-        this.form.reset(_data);
+        const currentRoutes = (this.form.get('routes')?.value || []).slice();
+        const element = currentRoutes[event.previousIndex];
+        currentRoutes.splice(event.previousIndex, 1);
+        currentRoutes.splice(event.currentIndex, 0, element);
+        this.form.get('routes')?.setValue(currentRoutes);
+        this.routeDS.data = currentRoutes;
     }
 
     onNextDetails(stepper: MatStepper) {
@@ -377,25 +373,10 @@ export class ServiceFormComponent implements OnInit {
     }
 
     onRemoveRoute(index: number) {
-        const targetRoute = this.routeDS.data[index];
-        const serviceId = this.form.get('_id')?.value;
-        if (targetRoute && targetRoute._id) {
-            this.routeService.removeById(targetRoute._id).subscribe(() => {
-                if (serviceId) {
-                    this.routeService.getByServiceId(serviceId).subscribe((res: any) => {
-                        const routes = res.data || res || [];
-                        this.form.get('routes')?.setValue(routes);
-                        this.routeDS.data = routes;
-                    });
-                }
-            });
-        } else {
-            const currentRoutes = this.form.get('routes')?.value || [];
-            const newRoutes = currentRoutes.slice();
-            newRoutes.splice(index, 1);
-            this.form.get('routes')?.setValue(newRoutes);
-            this.routeDS.data = newRoutes;
-        }
+        const currentRoutes = (this.form.get('routes')?.value || []).slice();
+        currentRoutes.splice(index, 1);
+        this.form.get('routes')?.setValue(currentRoutes);
+        this.routeDS.data = currentRoutes;
     }
 
     onAddRoute() {
@@ -406,29 +387,18 @@ export class ServiceFormComponent implements OnInit {
 
         dialogRef.afterClosed().subscribe(result => {
             if (result) {
-                const serviceId = this.form.get('_id')?.value;
-                if (serviceId) {
-                    result.service_id = serviceId;
-                    if (result.upstream && result.upstream._id) {
-                        result.upstream = <Upstream>{ _id: result.upstream._id };
-                    }
-                    if (result.sensor && result.sensor._id) {
-                        result.sensor = <Sensor>{ _id: result.sensor._id };
-                    } else {
-                        Reflect.deleteProperty(result, 'sensor');
-                    }
-                    this.routeService.save(result).subscribe(() => {
-                        this.routeService.getByServiceId(serviceId).subscribe((res: any) => {
-                            const routes = res.data || res || [];
-                            this.form.get('routes')?.setValue(routes);
-                            this.routeDS.data = routes;
-                        });
-                    });
-                } else {
-                    const currentRoutes = this.form.get('routes')?.value || [];
-                    this.form.get('routes')?.setValue([...currentRoutes, result]);
-                    this.routeDS.data = this.form.get('routes')?.value || [];
+                if (result.upstream && result.upstream._id) {
+                    result.upstream = <Upstream>{ _id: result.upstream._id };
                 }
+                if (result.sensor && result.sensor._id) {
+                    result.sensor = <Sensor>{ _id: result.sensor._id };
+                } else {
+                    Reflect.deleteProperty(result, 'sensor');
+                }
+                const currentRoutes = this.form.get('routes')?.value || [];
+                const newRoutes = [...currentRoutes, result];
+                this.form.get('routes')?.setValue(newRoutes);
+                this.routeDS.data = newRoutes;
             }
         });
     }
@@ -443,43 +413,21 @@ export class ServiceFormComponent implements OnInit {
 
         dialogRef.afterClosed().subscribe(result => {
             if (result) {
-                const serviceId = this.form.get('_id')?.value;
-                if (serviceId) {
-                    result.service_id = serviceId;
-                    if (result.upstream && result.upstream._id) {
-                        result.upstream = <Upstream>{ _id: result.upstream._id };
-                    }
-                    if (result.sensor && result.sensor._id) {
-                        result.sensor = <Sensor>{ _id: result.sensor._id };
-                    } else {
-                        Reflect.deleteProperty(result, 'sensor');
-                    }
-
-                    if (targetRoute && targetRoute._id) {
-                        result._id = targetRoute._id;
-                        this.routeService.update(String(targetRoute._id), result).subscribe(() => {
-                            this.routeService.getByServiceId(serviceId).subscribe((res: any) => {
-                                const routes = res.data || res || [];
-                                this.form.get('routes')?.setValue(routes);
-                                this.routeDS.data = routes;
-                            });
-                        });
-                    } else {
-                        this.routeService.save(result).subscribe(() => {
-                            this.routeService.getByServiceId(serviceId).subscribe((res: any) => {
-                                const routes = res.data || res || [];
-                                this.form.get('routes')?.setValue(routes);
-                                this.routeDS.data = routes;
-                            });
-                        });
-                    }
-                } else {
-                    const currentRoutes = this.form.get('routes')?.value || [];
-                    const newRoutes = currentRoutes.slice();
-                    newRoutes[index] = result;
-                    this.form.get('routes')?.setValue(newRoutes);
-                    this.routeDS.data = newRoutes;
+                if (result.upstream && result.upstream._id) {
+                    result.upstream = <Upstream>{ _id: result.upstream._id };
                 }
+                if (result.sensor && result.sensor._id) {
+                    result.sensor = <Sensor>{ _id: result.sensor._id };
+                } else {
+                    Reflect.deleteProperty(result, 'sensor');
+                }
+                if (targetRoute && targetRoute._id) {
+                    result._id = targetRoute._id;
+                }
+                const currentRoutes = (this.form.get('routes')?.value || []).slice();
+                currentRoutes[index] = result;
+                this.form.get('routes')?.setValue(currentRoutes);
+                this.routeDS.data = currentRoutes;
             }
         });
     }
