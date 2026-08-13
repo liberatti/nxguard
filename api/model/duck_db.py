@@ -51,6 +51,8 @@ class DuckDAO:
                 },
             )
             self.pageSchema = page_class()
+        if not self.is_connected():
+            self.connect()
 
     def connect(self) -> None:
         """Establishes connection to the DuckDB database."""

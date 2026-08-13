@@ -32,7 +32,7 @@
   "sensors": [
     {
       "name": "Default",
-      "description": "Default sensor for web application",
+      "description": "",
       "categories": [
         "905-COMMON-EXCEPTIONS",
         "911-METHOD-ENFORCEMENT",
@@ -213,8 +213,8 @@
         {
           "port": 80,
           "protocol": "HTTP",
-          "ssl_upgrade": true,
-          "ssl_upgrade_port": 443
+          "ssl_upgrade": false,
+          "ssl_port": 443
         },
         {
           "port": 443,
@@ -264,7 +264,6 @@
       "routes": [
         {
           "cache_methods": [],
-          "filters": [],
           "allowed_methods": [
             "GET",
             "HEAD",
@@ -298,7 +297,6 @@
         },
         {
           "cache_methods": [],
-          "filters": [],
           "allowed_methods": [
             "GET",
             "HEAD",
@@ -331,7 +329,6 @@
         },
         {
           "cache_methods": [],
-          "filters": [],
           "allowed_methods": [
             "GET",
             "HEAD"

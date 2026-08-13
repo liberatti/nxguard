@@ -32,12 +32,8 @@ def get_config():
     with CertificateDao() as dao:
         c.update({"certificates": dao.get_all()["data"]})
 
-    with ServiceDao() as s_dao, RouteDao() as r_dao:
-        services = s_dao.get_all()["data"]
-        for s in services:
-            if "_id" in s:
-                s["routes"] = r_dao.get_all_by_service_id(s["_id"])
-        c.update({"services": services})
+    with ServiceDao() as s_dao:
+        c.update({"services": s_dao.get_all()["data"]})
 
     with SensorDao() as dao:
         c.update({"sensors": dao.get_all()["data"]})
@@ -91,11 +87,11 @@ def create_db():
         dao.create_schema()
     with CertificateDao() as dao:
         dao.create_schema()
+    with SensorDao() as dao:
+        dao.create_schema()
     with ServiceDao() as dao:
         dao.create_schema()
     with RouteDao() as dao:
-        dao.create_schema()
-    with SensorDao() as dao:
         dao.create_schema()
     with TransactionDao() as dao:
         dao.create_schema()
@@ -110,7 +106,7 @@ def create_db():
 def init_from_data(data_file="init-data.json"):
     """Populates database tables from an initial dataset dictionary."""
 
-    logger.info(f"Iinitialize from {data_file}")
+    logger.info(f"Initialize from {data_file}")
 
     data = read_from_json(data_file)
     with ConfigDao() as dao:
@@ -144,16 +140,14 @@ def init_from_data(data_file="init-data.json"):
         dao.delete_all()
         dao.persist_many(data["certificates"])
         logger.info(f"Certificates: {len(data['certificates'])}")
-
-    with ServiceDao() as dao:
-        dao.delete_all()
-        dao.persist_many(data["services"])
-        logger.info(f"Services: {len(data['services'])}")
-
     with SensorDao() as dao:
         dao.delete_all()
         dao.persist_many(data["sensors"])
         logger.info(f"Sensors: {len(data['sensors'])}")
+    with ServiceDao() as dao:
+        dao.delete_all()
+        dao.persist_many(data["services"])
+        logger.info(f"Services: {len(data['services'])}")
 
 
 def validate(data):

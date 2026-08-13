@@ -83,7 +83,15 @@
   "aboutMessage": "Thanks",
   "ROUTE": {
     "ALLOWED_METHODS": "Allowed HTTP Methods",
-    "ALLOWED_CONTENT_TYPE": "Allowed Content Types"
+    "ALLOWED_CONTENT_TYPE": "Allowed Content Types",
+    "NAME": "Name",
+    "TYPE": "Type",
+    "REQUEST_PATH": "Request Path",
+    "UPSTREAM": "Upstream",
+    "SECURITY_SENSOR": "Security Sensor",
+    "MONITOR_ONLY": "Monitor Only",
+    "REQUEST_METHODS": "Request Methods",
+    "CACHE_METHODS": "Cache Methods"
   },
   "SENSOR": {
     "CONFIG": "Config",

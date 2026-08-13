@@ -71,18 +71,14 @@ class ServiceDao(DuckDAO):
         super().__init__(
             db_path=config.DB_PATH, table_name="service", schema=ServiceSchema
         )
-        self.certificateDao = CertificateDao()
-        self.routeDao = RouteDao()
-
-    def connect(self) -> None:
-        super().connect()
-        self.certificateDao.conn = self.conn
-        self.routeDao.conn = self.conn
+        self.certificateDao = CertificateDao(conn=self.conn)
+        self.routeDao = RouteDao(conn=self.conn)
 
     def create_schema(self):
         self.ddl(
             f"""
             CREATE TABLE IF NOT EXISTS {self.table_name} (
+                _id INTEGER PRIMARY KEY AUTOINCREMENT,
                 certificate_id INTEGER,
                 name TEXT,
                 body_limit INTEGER,
@@ -116,15 +112,12 @@ class ServiceDao(DuckDAO):
 
         if "certificate" in vo:
             cert = vo.pop("certificate")
-            if isinstance(cert, dict) and cert and "_id" in cert:
+            if "_id" in cert:
                 vo["certificate_id"] = cert["_id"]
-            elif cert is not None and not isinstance(cert, dict):
-                vo["certificate_id"] = cert
-            elif "certificate_id" not in vo:
-                vo["certificate_id"] = None
-
-        if "routes" in vo:
-            vo.pop("routes")
+            elif "name" in cert:
+                crt = self.certificateDao.get_by_name(cert["name"])
+                if crt:
+                    vo["certificate_id"] = crt["_id"]
 
         return super().from_dict(vo)
 
@@ -135,13 +128,7 @@ class ServiceDao(DuckDAO):
 
         if "certificate_id" in vo:
             crt_id = vo.pop("certificate_id")
-            vo.update(
-                {
-                    "certificate": (
-                        self.certificateDao.get_by_id(crt_id) if crt_id else None
-                    )
-                }
-            )
+            vo["certificate"] = self.certificateDao.get_by_id(crt_id)
 
         vo["bindings"] = (
             json.loads(vo.get("bindings", "[]"))
@@ -172,46 +159,37 @@ class ServiceDao(DuckDAO):
         return vo
 
     def persist(self, vo: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-        routes = vo.get("routes", []) if "routes" in vo else []
-        service = super().persist(vo)
-        if service:
-            self.routeDao.delete_by_service_id(service["_id"])
+        routes = vo.pop("routes")
+        pk_val = super().persist(vo)
+        if pk_val:
+            self.routeDao.delete_by_service_id(pk_val)
             for route in routes:
-                route.update({"service_id": service["_id"]})
+                route.update({"service_id": pk_val})
                 self.routeDao.persist(route)
-        return service
+        return pk_val
 
     def persist_many(self, arr: List[Dict[str, Any]]):
         if not arr:
             return False
-        all_routes = []
-        for vo in arr:
-            if "routes" in vo and vo["routes"]:
-                svc_id = vo.get("_id")
-                for r in vo["routes"]:
-                    if svc_id is not None:
-                        r["service_id"] = svc_id
-                    all_routes.append(r)
-        result = super().persist_many(arr)
-        if result and all_routes:
-            for r in all_routes:
-                self.routeDao.persist(r)
-        return result
+        pks = []
+        for s in arr:
+            pk_val = self.persist(s)
+            if pk_val:
+                pks.append(pk_val)
+        return pks
 
     def update_by_id(self, id: str, vo: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-        routes = vo.get("routes", []) if "routes" in vo else []
-        service = super().update_by_id(id, vo)
-        if service:
-            self.routeDao.delete_by_service_id(service["_id"])
+        routes = vo.pop("routes")
+        vo = super().update_by_id(id, vo)
+        if vo:
+            self.routeDao.delete_by_service_id(vo["_id"])
             for route in routes:
-                route.update({"service_id": service["_id"]})
+                route.update({"service_id": vo["_id"]})
                 self.routeDao.persist(route)
-        return service
+        return vo
 
     def delete_by_id(self, id: str) -> Optional[Dict[str, Any]]:
-        routes = self.routeDao.get_all_by_service_id(id)
-        if routes:
-            self.routeDao.delete_by_service_id(id)
+        self.routeDao.delete_by_service_id(id)
         return super().delete_by_id(id)
 
     def delete_all(self):

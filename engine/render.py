@@ -33,10 +33,13 @@ def _render_template_to_file(
 
 def _generate_trusted_ips(output_dir):
     with FeedService() as ipxa_feed:
-        ipsets = ipxa_feed.get_by_type("bypass")
-        for ipset in ipsets:
-            with open(f"{output_dir}/IPSET-{ipset['name']}.data", "w") as f:
-                f.write(ipset["data"])
+        try:
+            ipsets = ipxa_feed.get_by_type("bypass")
+            for ipset in ipsets:
+                with open(f"{output_dir}/IPSET-{ipset['name']}.data", "w") as f:
+                    f.write(ipset["data"])
+        except Exception as e:
+            logger.error(f"Error generating trusted ips: {e}")
 
 
 def clean(data, output_dir=config.BASE_PATH, test=False):
@@ -189,7 +192,7 @@ def _generate_sensors(
             _render_template_to_file(
                 env,
                 "modsec/modsec_sensor.j2",
-                f"{output_dir}/modsec/coreruleset/{prefix}sensor-{sensor['name']}.policy",
+                f"{output_dir}/modsec/coreruleset/{prefix}SENSOR-{sensor['name']}.policy",
                 sensor,
             )
 
@@ -246,7 +249,6 @@ def _generate_services(
                 sensor = __resolve_sensor_by_name(r["sensor"].get("name"), data)
                 service.update(
                     {
-                        "has_inspection": True,
                         "service_policy_file": f"{output_dir}/modsec/conf/{prefix}SERVICE-{service['name']}.policy",
                     }
                 )
@@ -263,16 +265,14 @@ def _generate_services(
                     r["route_policy_file"],
                     r,
                 )
-
+                _render_template_to_file(
+                    env,
+                    "modsec/modsec_service.j2",
+                    service["service_policy_file"],
+                    service,
+                )
+        logger.info(f"[{output_dir}] - {service}")
         _render_template_to_file(env, "nginx/service.conf.j2", service_path, service)
-
-        if "has_inspection" in service:
-            _render_template_to_file(
-                env,
-                "modsec/modsec_service.j2",
-                service["service_policy_file"],
-                service,
-            )
 
 
 def generate(data, output_dir=config.BASE_PATH, test=False):

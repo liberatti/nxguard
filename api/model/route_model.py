@@ -41,13 +41,8 @@ class RouteDao(DuckDAO):
         super().__init__(
             db_path=config.DB_PATH, table_name="routes", schema=RouteSchema, conn=conn
         )
-        self.upstreamDao = UpstreamDao()
-        self.sensorDao = SensorDao()
-
-    def connect(self) -> None:
-        super().connect()
-        self.upstreamDao.conn = self.conn
-        self.sensorDao.conn = self.conn
+        self.upstreamDao = UpstreamDao(conn=self.conn)
+        self.sensorDao = SensorDao(conn=self.conn)
 
     def create_schema(self):
         self.ddl(
@@ -83,21 +78,17 @@ class RouteDao(DuckDAO):
 
         if "upstream" in vo:
             ups = vo.pop("upstream")
-            if isinstance(ups, dict) and ups and "_id" in ups:
+            if "_id" in ups:
                 vo["upstream_id"] = ups["_id"]
-            elif ups is not None and not isinstance(ups, dict):
-                vo["upstream_id"] = ups
-            elif "upstream_id" not in vo:
-                vo["upstream_id"] = None
+            elif "name" in ups:
+                vo["upstream_id"] = self.upstreamDao.get_by_name(ups["name"])["_id"]
 
         if "sensor" in vo:
             sns = vo.pop("sensor")
-            if isinstance(sns, dict) and sns and "_id" in sns:
+            if "_id" in sns:
                 vo["sensor_id"] = sns["_id"]
-            elif sns is not None and not isinstance(sns, dict):
-                vo["sensor_id"] = sns
-            elif "sensor_id" not in vo:
-                vo["sensor_id"] = None
+            elif "name" in sns:
+                vo["sensor_id"] = self.sensorDao.get_by_name(sns["name"])["_id"]
 
         return super().from_dict(vo)
 
@@ -117,6 +108,13 @@ class RouteDao(DuckDAO):
                     vo[field] = json.loads(vo[field])
                 except (json.JSONDecodeError, TypeError):
                     pass
+        upstream_id = vo.pop("upstream_id")
+        if upstream_id:
+            vo["upstream"] = self.upstreamDao.get_by_id(upstream_id)
+        sensor_id = vo.pop("sensor_id")
+        if sensor_id:
+            vo["sensor"] = self.sensorDao.get_by_id(sensor_id)
+        vo.pop("service_id")
         return vo
 
     def get_all_by_service_id(self, service_id: Any) -> List[Dict[str, Any]]:

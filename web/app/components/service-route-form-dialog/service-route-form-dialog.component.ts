@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit, ViewChild} from '@angular/core';
+import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import {
     MAT_DIALOG_DATA,
     MatDialogActions,
@@ -6,26 +6,26 @@ import {
     MatDialogRef,
     MatDialogTitle
 } from '@angular/material/dialog';
-import {AbstractControl, FormControl, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {COMMA, ENTER} from '@angular/cdk/keycodes';
-import {Sensor} from 'app/models/sensor';
-import {Route} from 'app/models/service';
-import {Upstream} from 'app/models/upstream';
-import {UpstreamService} from 'app/services/upstream.service';
-import {SensorService} from 'app/services/sensor.service';
-import {CommonModule} from '@angular/common';
-import {MatButtonModule} from '@angular/material/button';
-import {MatCardModule} from '@angular/material/card';
-import {MatFormFieldModule} from '@angular/material/form-field';
-import {MatIconModule} from '@angular/material/icon';
-import {MatInputModule} from '@angular/material/input';
-import {MatSelectModule} from '@angular/material/select';
-import {MatChipsModule} from '@angular/material/chips';
-import {MatSlideToggle} from '@angular/material/slide-toggle';
-import {MatTabGroup, MatTabsModule} from '@angular/material/tabs';
-import {TranslatePipe} from '@ngx-translate/core';
-import {StaticServer} from "../../models/static";
-import {StaticService} from "../../services/static.service";
+import { AbstractControl, FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { COMMA, ENTER } from '@angular/cdk/keycodes';
+import { Sensor } from 'app/models/sensor';
+import { Route } from 'app/models/service';
+import { Upstream } from 'app/models/upstream';
+import { UpstreamService } from 'app/services/upstream.service';
+import { SensorService } from 'app/services/sensor.service';
+import { CommonModule } from '@angular/common';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatSlideToggle } from '@angular/material/slide-toggle';
+import { MatTabGroup, MatTabsModule } from '@angular/material/tabs';
+import { TranslatePipe } from '@ngx-translate/core';
+import { StaticServer } from "../../models/static";
+import { StaticService } from "../../services/static.service";
 
 
 @Component({
@@ -90,7 +90,7 @@ export class ServiceRouteFormDialogComponent implements OnInit {
             url: new FormControl<string>('')
         }),
         paths: new FormControl<Array<string>>([]),
-        methods: new FormControl<Array<string>>(['GET', 'POST','PUT', 'PATCH', 'DELETE']),
+        methods: new FormControl<Array<string>>(['GET', 'POST', 'PUT', 'PATCH', 'DELETE']),
         allowed_methods: new FormControl<Array<string> | string>(['GET', 'HEAD', 'POST', 'OPTIONS', 'PUT', 'PATCH', 'DELETE']),
         allowed_content_type: new FormControl<Array<string> | string>([
             'application/x-www-form-urlencoded',
@@ -129,37 +129,27 @@ export class ServiceRouteFormDialogComponent implements OnInit {
         });
         this.isAddMode = !this.routeData;
         if (!this.isAddMode) {
-            this.form.get('name')?.setValue(this.routeData.name);
-            this.form.get('upstream')?.setValue(this.routeData.upstream);
-            this.form.get('static')?.setValue(this.routeData.static);
-            this.form.get('redirect')?.setValue(this.routeData.redirect);
-            this.form.get('paths')?.setValue(this.routeData.paths);
-            this.form.get('methods')?.setValue(this.routeData.methods);
-            if (this.routeData.allowed_methods) {
-                this.form.get('allowed_methods')?.setValue(this.routeData.allowed_methods);
-            } else {
-                this.form.get('allowed_methods')?.setValue(['GET', 'HEAD', 'POST', 'OPTIONS', 'PUT', 'PATCH', 'DELETE']);
-            }
-            if (this.routeData.allowed_content_type) {
-                this.form.get('allowed_content_type')?.setValue(this.routeData.allowed_content_type);
-            } else {
-                this.form.get('allowed_content_type')?.setValue([
+            this.form.patchValue({
+                name: this.routeData.name,
+                upstream: this.routeData.upstream,
+                static: this.routeData.static,
+                redirect: this.routeData.redirect,
+                paths: this.routeData.paths,
+                methods: this.routeData.methods,
+                allowed_methods: this.routeData.allowed_methods || ['GET', 'HEAD', 'POST', 'OPTIONS', 'PUT', 'PATCH', 'DELETE'],
+                allowed_content_type: this.routeData.allowed_content_type || [
                     'application/x-www-form-urlencoded',
                     'multipart/form-data',
                     'text/xml',
                     'application/xml',
                     'application/soap+xml',
                     'application/json'
-                ]);
-            }
-            this.form.get('monitor_only')?.setValue(this.routeData.monitor_only);
-            this.form.get('sensor')?.setValue(this.routeData.sensor);
-            this.form.get('type')?.setValue(this.routeData.type);
-            if (this.routeData.cache_methods) {
-                this.form.get('cache_methods')?.setValue(this.routeData.cache_methods);
-            } else {
-                this.form.get('cache_methods')?.setValue([]);
-            }
+                ],
+                monitor_only: this.routeData.monitor_only,
+                sensor: this.routeData.sensor,
+                type: this.routeData.type,
+                cache_methods: this.routeData.cache_methods || []
+            });
         }
     }
 
@@ -277,7 +267,14 @@ export class ServiceRouteFormDialogComponent implements OnInit {
     }
 
     compareFn(object1: any, object2: any) {
-        return object1 && object2 && object1._id === object2._id;
+        if (!object1 || !object2) return false;
+        if (object1._id != null && object2._id != null) {
+            return String(object1._id) === String(object2._id);
+        }
+        if (object1.name && object2.name) {
+            return object1.name === object2.name;
+        }
+        return object1 === object2;
     }
 
     get f(): { [key: string]: AbstractControl } {

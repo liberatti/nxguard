@@ -38,7 +38,15 @@
   },
   "ROUTE": {
     "ALLOWED_METHODS": "Métodos HTTP Permitidos",
-    "ALLOWED_CONTENT_TYPE": "Content Types Permitidos"
+    "ALLOWED_CONTENT_TYPE": "Content Types Permitidos",
+    "NAME": "Nome",
+    "TYPE": "Tipo",
+    "REQUEST_PATH": "Caminho da Requisição",
+    "UPSTREAM": "Upstream",
+    "SECURITY_SENSOR": "Sensor de Segurança",
+    "MONITOR_ONLY": "Apenas Monitorar",
+    "REQUEST_METHODS": "Métodos de Requisição",
+    "CACHE_METHODS": "Métodos de Cache"
   },
   "SENSOR": {
     "CONFIG": "Configuração",
