@@ -9,7 +9,7 @@ import {
 import { AbstractControl, FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { Sensor } from 'app/models/sensor';
-import { Route } from 'app/models/service';
+import { Route, RouteType } from 'app/models/service';
 import { Upstream } from 'app/models/upstream';
 import { UpstreamService } from 'app/services/upstream.service';
 import { SensorService } from 'app/services/sensor.service';
@@ -46,7 +46,7 @@ import { StaticService } from "../../services/static.service";
 
 export class ServiceRouteFormDialogComponent implements OnInit {
     @ViewChild('tabGroup') tabGroup!: MatTabGroup;
-    _supportedTypes: string[] = ['upstream', 'redirect']
+    _supportedTypes: RouteType[] = [RouteType.UPSTREAM, RouteType.REDIRECT];
     _allowed_methods: string[] = [
         'GET', 'HEAD', 'POST', 'OPTIONS', 'PUT', 'PATCH', 'DELETE'
     ];
@@ -103,7 +103,7 @@ export class ServiceRouteFormDialogComponent implements OnInit {
         monitor_only: new FormControl<boolean>(false),
         sensor: new FormControl<Sensor>(<Sensor>{}),
         cache_methods: new FormControl<Array<string>>([]),
-        type: new FormControl<string>("upstream"),
+        type: new FormControl<RouteType>(RouteType.UPSTREAM),
     });
 
     constructor(

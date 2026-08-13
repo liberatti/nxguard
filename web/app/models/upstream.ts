@@ -1,10 +1,10 @@
-import {ProtocolType, SessionPersistenceEntity} from "./service";
+import { ProtocolType, SessionPersistenceEntity, UpstreamType } from "./service";
 
 export interface Upstream {
     _id: string;
     name: string;
     script_path: string; //fastcgi
-    type: string; // backend, static
+    type: UpstreamType; // backend, static
     description: string;
     protocol: ProtocolType;
     retry: number;

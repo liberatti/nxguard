@@ -352,8 +352,8 @@
                                                     {{ r.name }}
                                                 </td>
                                                 <td class="no-wrap">
-                                                    <ng-container *ngIf="r.type != 'redirect'">
-                                                        {{ r.upstream.name }}
+                                                    <ng-container *ngIf="r.type != 'REDIRECT'">
+                                                        {{ r.upstream?.name }}
                                                     </ng-container>
                                                 </td>
                                                 <td class="full-width">

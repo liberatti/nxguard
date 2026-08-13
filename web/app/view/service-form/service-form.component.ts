@@ -35,7 +35,7 @@ import {
 } from 'app/components/service-route-form-dialog/service-route-form-dialog.component';
 import { Upstream } from 'app/models/upstream';
 import { Sensor } from 'app/models/sensor';
-import { Bind, Header, ProtocolType, Route, Service } from 'app/models/service';
+import { Bind, Header, ProtocolType, Route, RouteType, Service } from 'app/models/service';
 import { ServiceService } from 'app/services/service.service';
 import { NotificationService } from 'app/services/notification.service';
 import { DragDropModule } from '@angular/cdk/drag-drop';
@@ -223,43 +223,7 @@ export class ServiceFormComponent implements OnInit {
     }
 
     onNextDetails(stepper: MatStepper) {
-        if (!this.form.get('name')?.valid || !this.form.get('sans')?.valid || !this.form.get('bindings')?.valid) {
-            let errors = [] as Array<string>;
-            if (!this.form.get('name')?.valid) errors.push(' Invalid value on name');
-            if (!this.form.get('sans')?.valid) errors.push(' Invalid value on sans');
-            if (!this.form.get('bindings')?.valid) errors.push(' Invalid value on bindings');
-            this.notificationService.openSnackBar(errors);
-            return;
-        }
-
-        let _data: Service = JSON.parse(JSON.stringify(this.form.value));
-
-        if (_data._id === "") {
-            Reflect.deleteProperty(_data, '_id');
-        }
-
-        if (!this.hasSslSupport()) {
-            Reflect.deleteProperty(_data, 'certificate');
-        } else {
-            _data.certificate = { "_id": _data.certificate._id } as Certificate;
-        }
-
-        if (this.isAddMode) {
-            this.serviceService.save(_data).subscribe((res: any) => {
-                const created = res.data || res;
-                if (created && created._id) {
-                    this.form.patchValue({ _id: String(created._id) });
-                    this.isAddMode = false;
-                    this.notificationService.openSnackBar('Service saved');
-                }
-                stepper.next();
-            });
-        } else {
-            this.serviceService.update(_data._id as string, _data).subscribe(() => {
-                this.notificationService.openSnackBar('Service updated');
-                stepper.next();
-            });
-        }
+        stepper.next();
     }
 
     onSubmit() {
@@ -289,6 +253,27 @@ export class ServiceFormComponent implements OnInit {
             Reflect.deleteProperty(_data, 'certificate');
         } else {
             _data.certificate = { "_id": _data.certificate._id } as Certificate;
+        }
+
+        for (let r of _data.routes) {
+            if (r.sensor) {
+                r.sensor = {
+                    "_id": r.sensor._id
+                } as any;
+            }
+            if (r.type == RouteType.UPSTREAM) {
+                Reflect.deleteProperty(r, 'redirect');
+                Reflect.deleteProperty(r, 'static');
+                if (r.upstream) {
+                    r.upstream = { "_id": r.upstream._id } as Upstream;
+                }
+            } else if (r.type == RouteType.REDIRECT) {
+                Reflect.deleteProperty(r, 'static');
+                Reflect.deleteProperty(r, 'upstream');
+            } else if (r.type == RouteType.STATIC) {
+                Reflect.deleteProperty(r, 'redirect');
+                Reflect.deleteProperty(r, 'upstream');
+            }
         }
 
         if (this.isAddMode) {

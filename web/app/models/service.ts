@@ -10,6 +10,19 @@ export enum ProtocolType {
     AJP = 'AJP'
 }
 
+export enum RouteType {
+    UPSTREAM = 'UPSTREAM',
+    STATIC = 'STATIC',
+    REDIRECT = 'REDIRECT'
+}
+
+export enum UpstreamType {
+    BACKEND = 'BACKEND',
+    STATIC = 'STATIC',
+    FASTCGI = 'FASTCGI',
+    AJP = 'AJP'
+}
+
 export enum SessionPersistenceType {
     NONE = 'NONE',
     COOKIE = 'COOKIE',
@@ -50,10 +63,10 @@ export interface Route {
     _id?: string;
     service_id?: string | number;
     name: string;
-    type: string;
-    upstream: Upstream;
-    static: StaticServer;
-    redirect: Redirect;
+    type: RouteType;
+    upstream?: Upstream;
+    static?: StaticServer;
+    redirect?: Redirect;
     monitor_only: boolean;
     sensor: Sensor;
     paths: Array<string>;

@@ -47,7 +47,7 @@
         </form>
 
         <!-- Conditional Fields based on Type -->
-        <div *ngIf="form.value.type === 'upstream'">
+        <div *ngIf="form.value.type === 'UPSTREAM'">
             <mat-form-field class="full-width mt-2">
                 <mat-label>{{ 'ROUTE.UPSTREAM' | translate }}</mat-label>
                 <mat-select formControlName="upstream" [compareWith]="compareFn" color="accent" id="service-route-upstream-select">
@@ -59,7 +59,7 @@
             </mat-form-field>
         </div>
 
-        <div *ngIf="form.value.type === 'redirect'">
+        <div *ngIf="form.value.type === 'REDIRECT'">
             <div formGroupName="redirect">
                 <mat-form-field class="full-width mt-2">
                     <mat-label>Code</mat-label>
