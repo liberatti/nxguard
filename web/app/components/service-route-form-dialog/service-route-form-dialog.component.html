@@ -75,18 +75,19 @@
         <!-- Methods and Cache Methods -->
         <div class="mat-row">
             <div class="mat-col-6">
-                <form [formGroup]="methodForm">
+                <form [formGroup]="allowedMethodForm">
                     <mat-form-field class="full-width">
-                        <mat-label>{{ 'ROUTE.REQUEST_METHODS' | translate }}</mat-label>
-                        <input matInput formControlName="method" id="service-route-method-input">
-                        <button color="primary" matSuffix mat-icon-button (click)="onAddMethod()" id="add-service-route-method-btn">
-                            <mat-icon>add</mat-icon>
-                        </button>
+                        <mat-label>{{ 'ROUTE.ALLOWED_METHODS' | translate }}</mat-label>
+                        <mat-select formControlName="allowedMethod" (selectionChange)="onAddAllowedMethod()" id="service-route-allowed-method-select">
+                            <mat-option *ngFor="let m of filterActiveAllowedMethod(_allowed_methods); let i = index" [value]="m" id="service-route-allowed-method-option-{{i}}">
+                                {{ m }}
+                            </mat-option>
+                        </mat-select>
                     </mat-form-field>
-                    <mat-chip-listbox id="service-route-methods-list">
-                        <mat-chip-row *ngFor="let p of form.value.methods" (removed)="onRemoveMethod(p)" id="service-route-method-chip-{{p}}">
+                    <mat-chip-listbox id="service-route-allowed-methods-list">
+                        <mat-chip-row *ngFor="let p of getArrayVal(form.value.allowed_methods)" (removed)="onRemoveAllowedMethod(p)" id="service-route-allowed-method-chip-{{p}}">
                             {{ p }}
-                            <button matChipRemove id="remove-service-route-method-{{p}}">
+                            <button matChipRemove id="remove-service-route-allowed-method-{{p}}">
                                 <mat-icon>cancel</mat-icon>
                             </button>
                         </mat-chip-row>
@@ -106,30 +107,6 @@
                         <mat-chip-row *ngFor="let p of form.value.cache_methods" (removed)="onRemoveCacheMethod(p)" id="service-route-cache-method-chip-{{p}}">
                             {{ p }}
                             <button matChipRemove id="remove-service-route-cache-method-{{p}}">
-                                <mat-icon>cancel</mat-icon>
-                            </button>
-                        </mat-chip-row>
-                    </mat-chip-listbox>
-                </form>
-            </div>
-        </div>
-
-        <!-- Allowed HTTP Methods -->
-        <div class="mat-row mt-2">
-            <div class="mat-col-12">
-                <form [formGroup]="allowedMethodForm">
-                    <mat-form-field class="full-width">
-                        <mat-label>{{ 'ROUTE.ALLOWED_METHODS' | translate }}</mat-label>
-                        <mat-select formControlName="allowedMethod" (selectionChange)="onAddAllowedMethod()" id="service-route-allowed-method-select">
-                            <mat-option *ngFor="let m of filterActiveAllowedMethod(_allowed_methods); let i = index" [value]="m" id="service-route-allowed-method-option-{{i}}">
-                                {{ m }}
-                            </mat-option>
-                        </mat-select>
-                    </mat-form-field>
-                    <mat-chip-listbox id="service-route-allowed-methods-list">
-                        <mat-chip-row *ngFor="let p of getArrayVal(form.value.allowed_methods)" (removed)="onRemoveAllowedMethod(p)" id="service-route-allowed-method-chip-{{p}}">
-                            {{ p }}
-                            <button matChipRemove id="remove-service-route-allowed-method-{{p}}">
                                 <mat-icon>cancel</mat-icon>
                             </button>
                         </mat-chip-row>

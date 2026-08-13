@@ -8,9 +8,9 @@
     "allowed_methods": "GET HEAD POST OPTIONS PUT PATCH DELETE",
     "allowed_content_type": "|application/x-www-form-urlencoded| |multipart/form-data| |text/xml| |application/xml| |application/soap+xml| |application/json|",
     "restricted_extensions": ".asa/ .asax/ .ascx/ .axd/ .backup/ .bak/ .bat/ .cdx/ .cer/ .cfg/ .cmd/ .com/ .config/ .conf/ .cs/ .csproj/ .csr/ .dat/ .db/ .dbf/ .dll/ .dos/ .htr/ .htw/ .ida/ .idc/ .idq/ .inc/ .ini/ .key/ .licx/ .lnk/ .log/ .mdb/ .old/ .pass/ .pdb/ .pol/ .printer/ .pwd/ .rdb/ .resources/ .resx/ .sql/ .swp/ .sys/ .vb/ .vbs/ .vbproj/ .vsdisco/ .webinfo/ .xsd/ .xsx/",
-    "max_num_args": 255,
-    "arg_name_length": 100,
-    "arg_length": 400
+    "max_num_args": 1024,
+    "arg_name_length": 1024,
+    "arg_length": 1024
   },
   "categories": [
     {

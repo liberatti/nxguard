@@ -271,7 +271,6 @@ def _generate_services(
                     service["service_policy_file"],
                     service,
                 )
-        logger.info(f"[{output_dir}] - {service}")
         _render_template_to_file(env, "nginx/service.conf.j2", service_path, service)
 
 
