@@ -21,10 +21,22 @@ simplicity.
 
 ---
 
-## 📸 Dashboard Preview
+## 📸 Screenshots & UI Preview
 
-![NXGuard Dashboard Preview](.docs/dashboard_mockup.png)
+### Dashboard
+![NXGuard Dashboard](.docs/dashboard.png)
 *Modern, intuitive management interface for full control over your API security.*
+
+### Transaction Monitoring
+![Transactions Log](.docs/transactions.png)
+*Real-time transaction logging and traffic inspection.*
+
+### Request & Rule Inspection
+![Transaction Raw Details](.docs/transaction-raw.png)
+*Detailed raw request and response inspection.*
+
+![Transaction Rule Details](.docs/transaction-rule-raw.png)
+*Granular ModSecurity rule match details and trigger analysis.*
 
 ---
 

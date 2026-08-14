@@ -23,6 +23,7 @@ class DuckDAO:
         schema: type[Schema] | None = None,
         conn: duckdb.DuckDBPyConnection | None = None,
         auto_commit: bool = True,
+        db_name: str = "app.duckdb",
     ):
         """
         Initializes the DuckDAO with connection details and optional schema.
@@ -33,11 +34,13 @@ class DuckDAO:
             schema (type[Schema], optional): Marshmallow schema for serialization. Defaults to None.
             conn (duckdb.DuckDBPyConnection, optional): Existing connection. Defaults to None.
             auto_commit (bool, optional): Whether to commit changes automatically. Defaults to True.
+            db_name (str, optional): Database filename. Defaults to "app.duckdb".
         """
         self.table_name = table_name
         self.schema = schema() if schema else None
         self.pageSchema = None
         self.db_path = db_path
+        self.db_name = db_name
         self.conn = conn
         self.auto_commit = auto_commit
 
@@ -57,7 +60,7 @@ class DuckDAO:
     def connect(self) -> None:
         """Establishes connection to the DuckDB database."""
         if not self.is_connected():
-            db_file = f"{self.db_path}/app.duckdb"
+            db_file = f"{self.db_path}/{self.db_name}"
             logger.debug(f"DuckDAO: {db_file}")
             os.makedirs(self.db_path, exist_ok=True)
             self.conn = duckdb.connect(db_file)

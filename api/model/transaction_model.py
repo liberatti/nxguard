@@ -80,6 +80,7 @@ class TransactionDao(DuckDAO):
             db_path=config.DB_PATH,
             table_name="transaction_logs",
             schema=TransactionSchema,
+            db_name="log.duckdb",
         )
         self.create_schema()
 
