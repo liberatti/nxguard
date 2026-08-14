@@ -279,6 +279,27 @@ class TransactionDao(DuckDAO):
 
         return super().to_dict(row)
 
+    def get_by_unique_id(self, unique_id: str) -> Optional[Dict[str, Any]]:
+        if not unique_id:
+            return None
+        sql = f"SELECT * FROM {self.table_name} WHERE unique_id = ? LIMIT 1"
+        res = self._query(sql, (unique_id,), fetch=True)
+        if res and len(res) > 0:
+            return self.to_dict(res[0])
+        return None
+
+    def upsert_by_unique_id(self, vo: Dict[str, Any]):
+        unique_id = vo.get("unique_id")
+        if unique_id:
+            existing = self.get_by_unique_id(unique_id)
+            if existing and "_id" in existing:
+                self.update_by_id(existing["_id"], vo)
+                return existing["_id"]
+        return self.persist(vo)
+
+    def update(self, _id, vo):
+        return self.update_by_id(_id, vo)
+
     def get_all(self, pagination=None, dt_start=None, dt_end=None, filters=None):
         start_str = dt_start.strftime(config.DATETIME_FMT) if dt_start else None
         end_str = dt_end.strftime(config.DATETIME_FMT) if dt_end else None
@@ -405,7 +426,9 @@ class TransactionDao(DuckDAO):
                 EXTRACT(day FROM CAST(logtime AS TIMESTAMP)) AS day,
                 EXTRACT(hour FROM CAST(logtime AS TIMESTAMP)) AS hour,
                 EXTRACT(minute FROM CAST(logtime AS TIMESTAMP)) AS minute,
-                COUNT(*) AS count
+                COUNT(*) AS count,
+                COALESCE(SUM(TRY_CAST(json_extract_string(CAST(http_json AS JSON), '$.request.bytes') AS UBIGINT)), 0) AS bytes_in,
+                COALESCE(SUM(TRY_CAST(json_extract_string(CAST(http_json AS JSON), '$.response.bytes') AS UBIGINT)), 0) AS bytes_out
             FROM {self.table_name}
             {where_sql}
             GROUP BY year, month, day, hour, minute
@@ -427,6 +450,8 @@ class TransactionDao(DuckDAO):
                             ),
                         },
                         "count": int(r["count"]) if r["count"] is not None else 0,
+                        "bytes_in": int(r["bytes_in"]) if r.get("bytes_in") is not None else 0,
+                        "bytes_out": int(r["bytes_out"]) if r.get("bytes_out") is not None else 0,
                     }
                 )
         return tpm

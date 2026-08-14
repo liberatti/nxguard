@@ -7,6 +7,8 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
 import moment from 'moment';
 import Chart from 'chart.js/auto';
 
@@ -17,6 +19,7 @@ import { TransactionService } from '../../services/transaction.service';
 import { EngineNode, Health } from '../../models/config';
 import { TransactionLog } from '../../models/transaction';
 import { DateFormatPipe } from '../../pipes/date_format.pipe';
+import { ByteFormatPipe } from '../../pipes/format_bytes.pipe';
 import { NodeDetailsDialogComponent } from '../../components/node-details-dialog/node-details-dialog.component';
 import { TransactionRAWDialogComponent } from '../../components/transaction-raw-dialog/transaction-raw-dialog.component';
 
@@ -28,11 +31,14 @@ import { TransactionRAWDialogComponent } from '../../components/transaction-raw-
         RouterModule,
         FormsModule,
         ReactiveFormsModule,
+        MatFormFieldModule,
+        MatSelectModule,
         MatIconModule,
         MatButtonModule,
         MatCardModule,
         MatTooltipModule,
         DateFormatPipe,
+        ByteFormatPipe,
     ],
     templateUrl: './dashboard-home.component.html',
     styleUrl: './dashboard-home.component.css',
@@ -40,13 +46,22 @@ import { TransactionRAWDialogComponent } from '../../components/transaction-raw-
 export class DashboardHomeComponent implements OnInit, AfterViewInit, OnDestroy {
     health: Health = {} as Health;
     totalThreats: number = 0;
+    totalRequests: number = 0;
+    blockedRequests: number = 0;
+    warnRequests: number = 0;
     totalRoutes: number = 0;
     threatLogs: TransactionLog[] = [];
     criticalIncidents: number = 0;
     highIncidents: number = 0;
     peakTpm: number = 0;
     avgTpm: number = 0;
-    chart: any;
+    totalBytesIn: number = 0;
+    totalBytesOut: number = 0;
+    bandwidthChart: any;
+    requestsChart: any;
+
+    refreshIntervalSeconds: number = 10;
+    private autoRefreshTimer: any = null;
 
     constructor(
         private detailsDialog: MatDialog,
@@ -72,6 +87,7 @@ export class DashboardHomeComponent implements OnInit, AfterViewInit, OnDestroy 
 
     ngOnInit(): void {
         this.refresh();
+        this.startAutoRefresh();
     }
 
     ngAfterViewInit(): void {
@@ -81,15 +97,43 @@ export class DashboardHomeComponent implements OnInit, AfterViewInit, OnDestroy 
     }
 
     ngOnDestroy(): void {
-        if (this.chart) {
-            this.chart.destroy();
+        this.stopAutoRefresh();
+        if (this.bandwidthChart) {
+            this.bandwidthChart.destroy();
+        }
+        if (this.requestsChart) {
+            this.requestsChart.destroy();
+        }
+    }
+
+    onRefreshIntervalChange(seconds: number): void {
+        this.refreshIntervalSeconds = seconds;
+        this.stopAutoRefresh();
+        if (this.refreshIntervalSeconds > 0) {
+            this.startAutoRefresh();
+        }
+    }
+
+    startAutoRefresh(): void {
+        this.stopAutoRefresh();
+        if (this.refreshIntervalSeconds > 0) {
+            this.autoRefreshTimer = setInterval(() => {
+                this.refresh();
+            }, this.refreshIntervalSeconds * 1000);
+        }
+    }
+
+    stopAutoRefresh(): void {
+        if (this.autoRefreshTimer) {
+            clearInterval(this.autoRefreshTimer);
+            this.autoRefreshTimer = null;
         }
     }
 
     refresh(): void {
         this.loadHealth();
         this.loadProtectedAssets();
-        this.loadTotalThreats();
+        this.loadRequestStats();
         this.loadThreatLogs();
         this.loadTrafficChart();
     }
@@ -145,22 +189,48 @@ export class DashboardHomeComponent implements OnInit, AfterViewInit, OnDestroy 
         });
     }
 
-    loadTotalThreats(): void {
+    loadRequestStats(): void {
+        const start = moment().subtract(24, 'hours').toDate();
+        const end = moment().toDate();
+
+        this.transactionService
+            .search({ start, end, filters: [] }, { page: 1, per_page: 1 } as any)
+            .subscribe({
+                next: (res) => {
+                    this.totalRequests = res?.metadata?.total_elements || 0;
+                },
+                error: () => {
+                    this.totalRequests = 0;
+                },
+            });
+
         this.transactionService
             .search(
-                {
-                    start: moment().subtract(24, 'hours').toDate(),
-                    end: moment().toDate(),
-                    filters: ['{"action": "DENY"}'],
-                },
+                { start, end, filters: ['{"action": "DENY"}'] },
                 { page: 1, per_page: 1 } as any
             )
             .subscribe({
                 next: (res) => {
-                    this.totalThreats = res?.metadata?.total_elements || 0;
+                    this.blockedRequests = res?.metadata?.total_elements || 0;
+                    this.totalThreats = this.blockedRequests;
                 },
                 error: () => {
+                    this.blockedRequests = 0;
                     this.totalThreats = 0;
+                },
+            });
+
+        this.transactionService
+            .search(
+                { start, end, filters: ['{"action": "WARN"}'] },
+                { page: 1, per_page: 1 } as any
+            )
+            .subscribe({
+                next: (res) => {
+                    this.warnRequests = res?.metadata?.total_elements || 0;
+                },
+                error: () => {
+                    this.warnRequests = 0;
                 },
             });
     }
@@ -213,19 +283,10 @@ export class DashboardHomeComponent implements OnInit, AfterViewInit, OnDestroy 
     }
 
     renderChart(data: any[]): void {
-        if (this.chart) {
-            this.chart.destroy();
-        }
-        const canvas = document.getElementById(
-            'dashboard-traffic-chart'
-        ) as HTMLCanvasElement;
-        if (!canvas) return;
-
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return;
-
         const labels = data.map((d) => moment(d.logtime).format('HH:mm'));
-        const counts = data.map((d) => d.count);
+        const counts = data.map((d) => d.count || 0);
+        const bytesIn = data.map((d) => d.bytes_in || 0);
+        const bytesOut = data.map((d) => d.bytes_out || 0);
 
         if (counts.length > 0) {
             this.peakTpm = Math.max(...counts);
@@ -236,94 +297,262 @@ export class DashboardHomeComponent implements OnInit, AfterViewInit, OnDestroy 
             this.avgTpm = 0;
         }
 
-        const gradient = ctx.createLinearGradient(0, 0, 0, 260);
-        gradient.addColorStop(0, 'rgba(2, 132, 199, 0.25)');
-        gradient.addColorStop(0.6, 'rgba(2, 132, 199, 0.05)');
-        gradient.addColorStop(1, 'rgba(2, 132, 199, 0.0)');
+        this.totalBytesIn = bytesIn.reduce((a, b) => a + b, 0);
+        this.totalBytesOut = bytesOut.reduce((a, b) => a + b, 0);
 
-        this.chart = new Chart(canvas, {
-            type: 'line',
-            data: {
-                labels:
-                    labels.length > 0
-                        ? labels
-                        : ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '24:00'],
-                datasets: [
-                    {
-                        label: 'Requests / min',
-                        data: counts.length > 0 ? counts : [0, 0, 0, 0, 0, 0, 0],
-                        borderColor: '#0284c7',
-                        backgroundColor: gradient,
-                        fill: true,
-                        tension: 0.35,
-                        borderWidth: 2.5,
-                        pointRadius: 0,
-                        pointHoverRadius: 6,
-                        pointHoverBackgroundColor: '#0284c7',
-                        pointHoverBorderColor: '#ffffff',
-                        pointHoverBorderWidth: 2,
+        const formatBytes = (bytes: number, decimals: number = 1): string => {
+            if (!bytes || bytes === 0) return '0 B';
+            const k = 1024;
+            const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+        };
+
+        const defaultLabels = ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '24:00'];
+        const defaultZeros = [0, 0, 0, 0, 0, 0, 0];
+        const chartLabels = labels.length > 0 ? labels : defaultLabels;
+
+        // 1. Render Bandwidth Chart
+        if (this.bandwidthChart) {
+            this.bandwidthChart.destroy();
+        }
+        const canvasBandwidth = document.getElementById(
+            'dashboard-bandwidth-chart'
+        ) as HTMLCanvasElement;
+        if (canvasBandwidth) {
+            const ctxB = canvasBandwidth.getContext('2d');
+            if (ctxB) {
+                const gradientIn = ctxB.createLinearGradient(0, 0, 0, 180);
+                gradientIn.addColorStop(0, 'rgba(2, 132, 199, 0.28)');
+                gradientIn.addColorStop(0.7, 'rgba(2, 132, 199, 0.05)');
+                gradientIn.addColorStop(1, 'rgba(2, 132, 199, 0.0)');
+
+                const gradientOut = ctxB.createLinearGradient(0, 0, 0, 180);
+                gradientOut.addColorStop(0, 'rgba(16, 185, 129, 0.28)');
+                gradientOut.addColorStop(0.7, 'rgba(16, 185, 129, 0.05)');
+                gradientOut.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
+
+                this.bandwidthChart = new Chart(canvasBandwidth, {
+                    type: 'line',
+                    data: {
+                        labels: chartLabels,
+                        datasets: [
+                            {
+                                label: 'Bytes In (Inbound)',
+                                data: bytesIn.length > 0 ? bytesIn : defaultZeros,
+                                borderColor: '#0284c7',
+                                backgroundColor: gradientIn,
+                                fill: true,
+                                tension: 0.35,
+                                borderWidth: 2,
+                                pointRadius: 0,
+                                pointHoverRadius: 5,
+                                pointHoverBackgroundColor: '#0284c7',
+                                pointHoverBorderColor: '#ffffff',
+                                pointHoverBorderWidth: 2,
+                            },
+                            {
+                                label: 'Bytes Out (Outbound)',
+                                data: bytesOut.length > 0 ? bytesOut : defaultZeros,
+                                borderColor: '#10b981',
+                                backgroundColor: gradientOut,
+                                fill: true,
+                                tension: 0.35,
+                                borderWidth: 2,
+                                pointRadius: 0,
+                                pointHoverRadius: 5,
+                                pointHoverBackgroundColor: '#10b981',
+                                pointHoverBorderColor: '#ffffff',
+                                pointHoverBorderWidth: 2,
+                            },
+                        ],
                     },
-                ],
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                interaction: {
-                    intersect: false,
-                    mode: 'index',
-                },
-                plugins: {
-                    legend: {
-                        display: false,
-                    },
-                    tooltip: {
-                        enabled: true,
-                        backgroundColor: '#0f172a',
-                        titleColor: '#f8fafc',
-                        bodyColor: '#38bdf8',
-                        titleFont: { size: 12, weight: 'bold' },
-                        bodyFont: { size: 14, weight: 'bold' },
-                        padding: 12,
-                        cornerRadius: 8,
-                        borderColor: 'rgba(2, 132, 199, 0.4)',
-                        borderWidth: 1,
-                        displayColors: false,
-                        callbacks: {
-                            label: (context) => `${context.parsed.y} req / min`,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                            intersect: false,
+                            mode: 'index',
+                        },
+                        plugins: {
+                            datalabels: {
+                                display: false,
+                            },
+                            legend: {
+                                display: true,
+                                position: 'top',
+                                align: 'end',
+                                labels: {
+                                    boxWidth: 10,
+                                    boxHeight: 10,
+                                    usePointStyle: true,
+                                    pointStyle: 'circle',
+                                    color: '#475569',
+                                    font: { size: 11, weight: 'bold' },
+                                    padding: 10,
+                                },
+                            },
+                            tooltip: {
+                                enabled: true,
+                                backgroundColor: '#0f172a',
+                                titleColor: '#f8fafc',
+                                bodyColor: '#e2e8f0',
+                                titleFont: { size: 12, weight: 'bold' },
+                                bodyFont: { size: 12, weight: 'normal' },
+                                padding: 10,
+                                cornerRadius: 8,
+                                borderColor: 'rgba(255, 255, 255, 0.1)',
+                                borderWidth: 1,
+                                displayColors: true,
+                                boxWidth: 8,
+                                boxHeight: 8,
+                                usePointStyle: true,
+                                callbacks: {
+                                    label: (context) => {
+                                        const val = context.parsed.y ?? 0;
+                                        return ` ${context.dataset.label}: ${formatBytes(val)}`;
+                                    },
+                                },
+                            },
+                        },
+                        scales: {
+                            x: {
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.04)',
+                                },
+                                ticks: {
+                                    color: '#64748b',
+                                    font: { size: 10, weight: 500 },
+                                    maxTicksLimit: 8,
+                                },
+                                border: {
+                                    display: false,
+                                },
+                            },
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.04)',
+                                },
+                                ticks: {
+                                    color: '#64748b',
+                                    font: { size: 10, weight: 500 },
+                                    callback: (val: any) => formatBytes(Number(val)),
+                                },
+                                border: {
+                                    display: false,
+                                },
+                            },
                         },
                     },
-                },
-                scales: {
-                    x: {
-                        grid: {
-                            color: 'rgba(0, 0, 0, 0.05)',
+                });
+            }
+        }
+
+        // 2. Render Requests Chart
+        if (this.requestsChart) {
+            this.requestsChart.destroy();
+        }
+        const canvasRequests = document.getElementById(
+            'dashboard-requests-chart'
+        ) as HTMLCanvasElement;
+        if (canvasRequests) {
+            const ctxR = canvasRequests.getContext('2d');
+            if (ctxR) {
+                const gradientReq = ctxR.createLinearGradient(0, 0, 0, 180);
+                gradientReq.addColorStop(0, 'rgba(139, 92, 246, 0.28)');
+                gradientReq.addColorStop(0.7, 'rgba(139, 92, 246, 0.05)');
+                gradientReq.addColorStop(1, 'rgba(139, 92, 246, 0.0)');
+
+                this.requestsChart = new Chart(canvasRequests, {
+                    type: 'line',
+                    data: {
+                        labels: chartLabels,
+                        datasets: [
+                            {
+                                label: 'Requests / min',
+                                data: counts.length > 0 ? counts : defaultZeros,
+                                borderColor: '#8b5cf6',
+                                backgroundColor: gradientReq,
+                                fill: true,
+                                tension: 0.35,
+                                borderWidth: 2,
+                                pointRadius: 0,
+                                pointHoverRadius: 5,
+                                pointHoverBackgroundColor: '#8b5cf6',
+                                pointHoverBorderColor: '#ffffff',
+                                pointHoverBorderWidth: 2,
+                            },
+                        ],
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                            intersect: false,
+                            mode: 'index',
                         },
-                        ticks: {
-                            color: '#64748b',
-                            font: { size: 11, weight: 500 },
-                            maxTicksLimit: 8,
+                        plugins: {
+                            datalabels: {
+                                display: false,
+                            },
+                            legend: {
+                                display: false,
+                            },
+                            tooltip: {
+                                enabled: true,
+                                backgroundColor: '#0f172a',
+                                titleColor: '#f8fafc',
+                                bodyColor: '#e2e8f0',
+                                titleFont: { size: 12, weight: 'bold' },
+                                bodyFont: { size: 12, weight: 'normal' },
+                                padding: 10,
+                                cornerRadius: 8,
+                                borderColor: 'rgba(255, 255, 255, 0.1)',
+                                borderWidth: 1,
+                                displayColors: false,
+                                callbacks: {
+                                    label: (context) => {
+                                        const val = context.parsed.y ?? 0;
+                                        return ` Requests: ${val} req/m`;
+                                    },
+                                },
+                            },
                         },
-                        border: {
-                            display: false,
+                        scales: {
+                            x: {
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.04)',
+                                },
+                                ticks: {
+                                    color: '#64748b',
+                                    font: { size: 10, weight: 500 },
+                                    maxTicksLimit: 8,
+                                },
+                                border: {
+                                    display: false,
+                                },
+                            },
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.04)',
+                                },
+                                ticks: {
+                                    color: '#64748b',
+                                    font: { size: 10, weight: 500 },
+                                    precision: 0,
+                                },
+                                border: {
+                                    display: false,
+                                },
+                            },
                         },
                     },
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: 'rgba(0, 0, 0, 0.05)',
-                        },
-                        ticks: {
-                            color: '#64748b',
-                            font: { size: 11, weight: 500 },
-                            precision: 0,
-                        },
-                        border: {
-                            display: false,
-                        },
-                    },
-                },
-            },
-        });
+                });
+            }
+        }
     }
 
     show_details(nodeData: EngineNode): void {

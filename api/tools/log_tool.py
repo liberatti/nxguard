@@ -144,6 +144,9 @@ class LogParserTool:
         setattr(cur_thread, "active", True)
         logger.info(f"Start merge transaction for {service_name}")
 
+        pending_access: Dict[str, tuple[Dict[str, Any], float]] = {}
+        pending_audit: Dict[str, tuple[Dict[str, Any], float]] = {}
+
         while getattr(cur_thread, "active", True):
             time.sleep(2)
             try:
@@ -158,30 +161,58 @@ class LogParserTool:
                         audit_records = list(cache.audit_log)
                         cache.audit_log.clear()
 
-                if not access_records and not audit_records:
-                    continue
-
-                audit_by_uid = {}
-                for a in audit_records:
-                    uid = a.get("unique_id")
-                    if uid:
-                        audit_by_uid[uid] = a
-
+                now = time.time()
                 merged_records = []
-                unmatched_access = []
 
+                # Correlate incoming access records
                 for acc in access_records:
                     uid = acc.get("unique_id")
-                    if uid and uid in audit_by_uid:
-                        aud = audit_by_uid.pop(uid)
-                        merged = cls._combine_access_and_audit(acc, aud)
-                        merged_records.append(merged)
+                    if uid:
+                        if uid in pending_audit:
+                            aud, _ = pending_audit.pop(uid)
+                            merged = cls._combine_access_and_audit(
+                                acc, aud, service_name
+                            )
+                            merged_records.append(merged)
+                        else:
+                            pending_access[uid] = (acc, now)
                     else:
-                        unmatched_access.append(acc)
+                        if not acc.get("service") or not acc["service"].get("_id"):
+                            acc["service"] = {"_id": service_name, "name": service_name}
+                        merged_records.append(acc)
 
-                merged_records.extend(unmatched_access)
+                # Correlate incoming audit records
+                for aud in audit_records:
+                    uid = aud.get("unique_id")
+                    if uid:
+                        if uid in pending_access:
+                            acc, _ = pending_access.pop(uid)
+                            merged = cls._combine_access_and_audit(
+                                acc, aud, service_name
+                            )
+                            merged_records.append(merged)
+                        else:
+                            pending_audit[uid] = (aud, now)
+                    else:
+                        standalone = cls._audit_to_transaction(aud, service_name)
+                        merged_records.append(standalone)
 
-                for aud in audit_by_uid.values():
+                # Flush pending access records older than 4 seconds
+                expired_access_uids = [
+                    uid for uid, (_, t) in pending_access.items() if now - t > 4.0
+                ]
+                for uid in expired_access_uids:
+                    acc, _ = pending_access.pop(uid)
+                    if not acc.get("service") or not acc["service"].get("_id"):
+                        acc["service"] = {"_id": service_name, "name": service_name}
+                    merged_records.append(acc)
+
+                # Flush pending audit records older than 4 seconds
+                expired_audit_uids = [
+                    uid for uid, (_, t) in pending_audit.items() if now - t > 4.0
+                ]
+                for uid in expired_audit_uids:
+                    aud, _ = pending_audit.pop(uid)
                     standalone = cls._audit_to_transaction(aud, service_name)
                     merged_records.append(standalone)
 
@@ -189,7 +220,7 @@ class LogParserTool:
                     with TransactionDao() as model:
                         for record in merged_records:
                             try:
-                                model.persist(record)
+                                model.upsert_by_unique_id(record)
                             except Exception as e:
                                 logger.error(
                                     f"Error persisting merged transaction: {e}"
@@ -203,7 +234,7 @@ class LogParserTool:
 
     @classmethod
     def _combine_access_and_audit(
-        cls, access: Dict[str, Any], audit: Dict[str, Any]
+        cls, access: Dict[str, Any], audit: Dict[str, Any], service_name: str = None
     ) -> Dict[str, Any]:
         merged = dict(access)
         if "audit" in audit and audit["audit"]:
@@ -211,10 +242,23 @@ class LogParserTool:
         if "score" in audit and audit["score"]:
             merged["score"] = max(merged.get("score", 0), audit["score"])
 
+        # Determine action (DENY takes precedence over WARN over PASSED)
         if audit.get("action") == "DENY" or merged.get("action") == "DENY":
             merged["action"] = "DENY"
         elif audit.get("action") == "WARN" or merged.get("action") == "WARN":
             merged["action"] = "WARN"
+
+        # Check status code for blocking
+        status_code = merged.get("http", {}).get("response", {}).get("status_code")
+        if not status_code and "http" in audit:
+            status_code = audit.get("http", {}).get("response", {}).get("status_code")
+        if status_code in [403, 406]:
+            merged["action"] = "DENY"
+
+        if service_name and (
+            not merged.get("service") or not merged["service"].get("_id")
+        ):
+            merged["service"] = {"_id": service_name, "name": service_name}
 
         if "http" in audit and audit["http"]:
             aud_http = audit["http"]
@@ -245,6 +289,12 @@ class LogParserTool:
                     acc_http.setdefault("response", {})["headers"] = aud_http[
                         "response"
                     ]["headers"]
+                if "status_code" in aud_http["response"] and not acc_http.get(
+                    "response", {}
+                ).get("status_code"):
+                    acc_http.setdefault("response", {})["status_code"] = aud_http[
+                        "response"
+                    ]["status_code"]
 
             merged["http"] = acc_http
 
@@ -258,6 +308,9 @@ class LogParserTool:
         remote_ip = audit.get("source", {}).get("ip", "")
         geo_info = {"ip": remote_ip, "country": "--"}
 
+        status_code = audit.get("http", {}).get("response", {}).get("status_code", 403)
+        action = audit.get("action") or cls.resolve_status_code(status_code)
+
         record = {
             "logtime": audit.get("logtime") or datetime.now(),
             "unique_id": audit.get("unique_id", ""),
@@ -266,7 +319,7 @@ class LogParserTool:
             "route_name": "-",
             "upstream": None,
             "sensor": None,
-            "action": audit.get("action", "PASSED"),
+            "action": action,
             "limit_req_status": "",
             "geoip_status": "",
             "rbl_status": "",
@@ -293,58 +346,79 @@ class LogParserTool:
 
     @classmethod
     def follow_file(cls, file_path, log_type, cache):
-        while not os.path.exists(file_path):
-            time.sleep(1)
-            pass
-
         cur_thread = threading.current_thread()
         setattr(cur_thread, "active", True)
-        try:
-            with open(file_path, "r", encoding="utf-8", errors="ignore") as file:
-                logger.debug(f"Following {file_path} for {log_type}")
-                file.seek(0, 2)
-                buffer = ""
-                while getattr(cur_thread, "active", True):
-                    chunk = file.readline()
-                    if not chunk:
-                        time.sleep(0.5)
-                        continue
-                    if not chunk.endswith("\n"):
-                        buffer += chunk
-                        time.sleep(0.1)
-                        continue
+        logger.info(f"Starting continuous watcher on {file_path} for {log_type}")
 
-                    line = (buffer + chunk).strip()
+        while getattr(cur_thread, "active", True):
+            if not os.path.exists(file_path):
+                time.sleep(1)
+                continue
+
+            try:
+                with open(file_path, "r", encoding="utf-8", errors="ignore") as file:
+                    logger.info(f"Opened {file_path} for continuous {log_type} tailing")
+                    file.seek(0, 2)
                     buffer = ""
-                    if not line:
-                        continue
+                    last_ino = os.fstat(file.fileno()).st_ino
 
-                    records = []
-                    if log_type == "ERROR":
-                        r = cls.error_log(line)
-                        if r:
-                            records = [r] if not isinstance(r, list) else r
-                    elif log_type == "ACCESS":
-                        r = cls.access_log(line)
-                        if r:
-                            records = [r] if not isinstance(r, list) else r
-                    elif log_type == "AUDIT":
-                        r = cls.audit_log(line)
-                        if r:
-                            records = [r] if not isinstance(r, list) else r
+                    while getattr(cur_thread, "active", True):
+                        try:
+                            st = os.stat(file_path)
+                            if st.st_ino != last_ino or file.tell() > st.st_size:
+                                logger.info(
+                                    f"File {file_path} rotated or truncated, reopening"
+                                )
+                                break
+                        except Exception:
+                            pass
 
-                    if records:
-                        with cache.lock:
+                        chunk = file.readline()
+                        if not chunk:
+                            time.sleep(0.3)
+                            continue
+
+                        if not chunk.endswith("\n"):
+                            buffer += chunk
+                            time.sleep(0.05)
+                            continue
+
+                        line = (buffer + chunk).strip()
+                        buffer = ""
+                        if not line:
+                            continue
+
+                        records = []
+                        try:
                             if log_type == "ERROR":
-                                cache.error_log.extend(records)
+                                r = cls.error_log(line)
+                                if r:
+                                    records = [r] if not isinstance(r, list) else r
                             elif log_type == "ACCESS":
-                                cache.access_log.extend(records)
+                                r = cls.access_log(line)
+                                if r:
+                                    records = [r] if not isinstance(r, list) else r
                             elif log_type == "AUDIT":
-                                cache.audit_log.extend(records)
-                logger.info(f"{file_path} shutdown")
+                                r = cls.audit_log(line)
+                                if r:
+                                    records = [r] if not isinstance(r, list) else r
+                        except Exception as e:
+                            logger.error(f"Error parsing {log_type} line: {e}")
 
-        except Exception as e:
-            logger.error(f"Read file error {file_path} {e}, retry")
+                        if records:
+                            with cache.lock:
+                                if log_type == "ERROR":
+                                    cache.error_log.extend(records)
+                                elif log_type == "ACCESS":
+                                    cache.access_log.extend(records)
+                                elif log_type == "AUDIT":
+                                    cache.audit_log.extend(records)
+
+            except Exception as e:
+                logger.error(f"Continuous tailing exception on {file_path}: {e}")
+                time.sleep(1)
+
+        logger.info(f"Continuous watcher on {file_path} stopped")
 
     @classmethod
     def error_log(cls, line):
@@ -369,6 +443,7 @@ class LogParserTool:
                     unique_id = trn.get("unique_id") or trn.get("uniqueid")
 
                     record = {
+                        "logtime": cls.parse_logtime(trn.get("time_stamp")),
                         "server_id": trn_server_id,
                         "unique_id": unique_id,
                         "destination": {
@@ -398,23 +473,19 @@ class LogParserTool:
                         }
                         http.update({"request": request})
 
+                    action = "PASSED"
                     if "response" in trn:
                         response_raw = trn.pop("response")
+                        status_code = response_raw.get("http_code", 200)
                         response = {
-                            "status_code": response_raw.get("http_code", 200),
+                            "status_code": status_code,
                             "headers": cls.parse_headers(
                                 response_raw.get("headers", {})
                             ),
                         }
-                        record.update(
-                            {
-                                "action": cls.resolve_status_code(
-                                    response_raw.get("http_code")
-                                )
-                            }
-                        )
+                        action = cls.resolve_status_code(status_code)
                         http.update({"response": response})
-                    record.update({"http": http})
+                    record.update({"http": http, "action": action})
 
                     audit = {}
                     if "producer" in trn:
@@ -473,6 +544,30 @@ class LogParserTool:
 
                             messages.append(msg)
                         audit["messages"] = messages
+
+                        # Fallback score calculation if not explicitly set by 949110
+                        if "score" not in record and messages:
+                            calculated_score = 0
+                            for m in messages:
+                                sev = str(m.get("severity") or "")
+                                if sev == "2":
+                                    calculated_score += 5
+                                elif sev == "3":
+                                    calculated_score += 4
+                                elif sev == "4":
+                                    calculated_score += 3
+                                elif sev in ["5", "1"]:
+                                    calculated_score += 2
+                            record["score"] = calculated_score
+
+                        # Check if any blocking / critical security rule triggered
+                        if record.get("action") != "DENY":
+                            if any(
+                                str(m.get("severity") or "") in ["2", "3"]
+                                for m in messages
+                            ):
+                                record["action"] = "DENY"
+
                     record.update({"audit": audit})
                     records.append(record)
             except Exception as e:
@@ -556,6 +651,18 @@ class LogParserTool:
                 host_header = dto.get("host", "")
                 host_ip = host_header.split(":")[0] if host_header else ""
 
+                req_method = dto.get("method")
+                req_uri = ""
+                if dto.get("request_line"):
+                    req_parts = dto["request_line"].strip().split()
+                    if req_parts:
+                        if not req_method:
+                            req_method = req_parts[0]
+                        if len(req_parts) > 1:
+                            req_uri = req_parts[1]
+                if not req_method:
+                    req_method = "GET"
+
                 record = {
                     "logtime": cls.parse_logtime(dto.get("time")),
                     "unique_id": dto.get("uniqueid") or dto.get("unique_id"),
@@ -598,7 +705,8 @@ class LogParserTool:
                         "referer": dto.get("referer", ""),
                         "request_line": dto.get("request_line", ""),
                         "request": {
-                            "method": dto.get("method", "GET"),
+                            "method": req_method,
+                            "uri": req_uri,
                             "bytes": dto.get("bytes_in", 0),
                         },
                         "response": {

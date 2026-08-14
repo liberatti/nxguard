@@ -40,6 +40,7 @@ services:
       - "./engine:/opt/nxguard/admin/engine"
       - "./lualib:/opt/nxguard/luajit/share/lua/5.1/nxguard"
       - "./data:/data"
+      - "./logs:/opt/nxguard/logs"
     extra_hosts:
       - "host.docker.internal:host-gateway"
 

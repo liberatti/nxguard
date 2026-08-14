@@ -55,13 +55,13 @@ import {DatetimeFieldComponent} from '../../components/datetime-field/datetime-f
     standalone: true,
     animations: [
         trigger('detailExpand', [
-            state('collapsed', style({height: '0px', minHeight: '0'})),
-            state('isExpanded', style({height: '*'})),
+            state('collapsed, void', style({ height: '0px', minHeight: '0', display: 'none' })),
+            state('expanded', style({ height: '*' })),
             transition(
-                'isExpanded <=> collapsed',
+                'expanded <=> collapsed',
                 animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')
-            )
-        ])
+            ),
+        ]),
     ],
     imports: [RouterModule, CommonModule, MatButtonToggleModule,
         ReactiveFormsModule, TranslatePipe, MatTabsModule, MatDatepickerModule,
@@ -90,11 +90,12 @@ export class TransactionListComponent implements OnInit {
         filters: new FormControl<Array<string>>([]),
     });
 
-    transactionDC: string[] = ['logtime', 'score', 'source', 'service', 'request_line', 'duration', 'expand'];
+    transactionDC: string[] = ['expand', 'logtime', 'score', 'source', 'service', 'request_line', 'duration'];
     transactionDS: MatTableDataSource<TransactionLog>;
     transactionPA = new DefaultPageMeta();
     transactions: Array<TransactionLog> = [];
     currentRowSelected: TransactionLog = {} as TransactionLog;
+    expandedElement: TransactionLog | null = null;
 
     chart: any;
     chartConfig = {
@@ -205,29 +206,44 @@ export class TransactionListComponent implements OnInit {
         this.responsive.observe([Breakpoints.Small])
             .subscribe(result => {
                 if (result.breakpoints[Breakpoints.Small]) {
-                    this.transactionDC = ['logtime', 'source', 'service', 'request_line', 'expand'];
+                    this.transactionDC = ['expand', 'logtime', 'source', 'service', 'request_line'];
                 }
             });
     }
 
+    isRowExpanded(row: any): boolean {
+        if (!row || !this.expandedElement) return false;
+        if (row === this.expandedElement) return true;
+        if (row._id && this.expandedElement._id) {
+            return row._id === this.expandedElement._id;
+        }
+        if (row.unique_id && this.expandedElement.unique_id) {
+            return row.unique_id === this.expandedElement.unique_id;
+        }
+        return false;
+    }
+
     expandCollapse(row: any) {
         if (!row) return;
-        const willExpand = !row.isExpanded;
-
-        for (const item of this.transactions) {
-            item.isExpanded = false;
+        if (this.isRowExpanded(row)) {
+            this.expandedElement = null;
+            this.currentRowSelected = {} as TransactionLog;
+        } else {
+            this.expandedElement = row;
+            this.currentRowSelected = row;
         }
-        if (this.transactionDS && this.transactionDS.data) {
-            for (const item of this.transactionDS.data) {
-                item.isExpanded = false;
-            }
-        }
-
-        row.isExpanded = willExpand;
-        this.currentRowSelected = willExpand ? row : ({} as TransactionLog);
     }
 
     ngOnInit(): void {
+        this.onSearch();
+    }
+
+    onRefresh(): void {
+        const now = moment().toDate();
+        this.form.get('end')?.setValue(now);
+        if (this.endField) {
+            this.endField.writeValue(now);
+        }
         this.onSearch();
     }
 
@@ -297,19 +313,31 @@ export class TransactionListComponent implements OnInit {
 
     onShowRAW(trn: TransactionLog) {
         this.confirmDialog.open(TransactionRAWDialogComponent, {
-            data: trn
+            data: trn,
+            width: '780px',
+            maxWidth: '90vw',
         });
     }
 
     onShowRuleDetails(rule_code: number) {
         this.ruleService.get_by_code(rule_code).subscribe(data => {
             this.confirmDialog.open(RuleDetailsDialogComponent, {
-                data: data
+                data: data,
+                width: '780px',
+                maxWidth: '90vw',
             });
         });
     }
 
     ngAfterViewInit(): void {
+        setTimeout(() => {
+            if (this.startField) {
+                this.startField.writeValue(this.form.get('start')?.value);
+            }
+            if (this.endField) {
+                this.endField.writeValue(this.form.get('end')?.value);
+            }
+        });
         this.responsive.observe([Breakpoints.Small])
             .subscribe(result => {
                 if (this.chart) {

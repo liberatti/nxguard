@@ -1,12 +1,64 @@
-<h2 mat-dialog-title>Rule Details</h2>
-<mat-dialog-content class="mat-typography">
-    <pre><code [highlight]="jsonData" language="json" id="rule-details-code"></code></pre>
-</mat-dialog-content>
-<mat-dialog-actions align="end" class="dialog-actions">
-    <button mat-raised-button color="primary" (click)="onDismiss()" id="rule-details-close-btn">
-        <mat-icon>
-            exit_to_app
-        </mat-icon>
-        Close
-    </button>
-</mat-dialog-actions>
+<div class="rule-dialog-container">
+    <div class="rule-dialog-header">
+        <div class="header-title-group">
+            <mat-icon class="header-icon">shield</mat-icon>
+            <div>
+                <h2 class="dialog-title" mat-dialog-title>Rule Details</h2>
+                <div class="meta-row">
+                    @if (data?.code || data?._id) {
+                        <span class="meta-badge rule-code">
+                            Rule: {{ data.code || data._id }}
+                        </span>
+                    }
+                    @if (data?.action) {
+                        <span class="meta-badge action-{{ data.action | lowercase }}">
+                            {{ data.action }}
+                        </span>
+                    }
+                    @if (data?.phase !== undefined && data?.phase !== null) {
+                        <span class="meta-badge phase">
+                            Phase: {{ data.phase }}
+                        </span>
+                    }
+                    @if (data?.category_id) {
+                        <span class="meta-badge category">
+                            Cat: {{ data.category_id }}
+                        </span>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="header-actions">
+            <button mat-icon-button (click)="copyToClipboard()" matTooltip="Copy JSON to clipboard">
+                <mat-icon>{{ copied ? 'check' : 'content_copy' }}</mat-icon>
+            </button>
+            <button mat-icon-button (click)="onDismiss()" matTooltip="Close dialog">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+    </div>
+
+    @if (data?.msg) {
+        <div class="rule-msg-banner">
+            <mat-icon class="msg-icon">info</mat-icon>
+            <span class="msg-text">{{ data.msg }}</span>
+        </div>
+    }
+
+    <mat-dialog-content class="rule-dialog-content">
+        <div class="code-wrapper">
+            <pre><code [highlight]="jsonData" language="json" id="rule-details-code"></code></pre>
+        </div>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end" class="rule-dialog-actions">
+        <button mat-stroked-button (click)="copyToClipboard()">
+            <mat-icon>{{ copied ? 'check' : 'content_copy' }}</mat-icon>
+            {{ copied ? 'Copied' : 'Copy JSON' }}
+        </button>
+        <button mat-flat-button color="primary" (click)="onDismiss()" id="rule-details-close-btn">
+            Close
+        </button>
+    </mat-dialog-actions>
+</div>

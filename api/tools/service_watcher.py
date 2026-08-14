@@ -19,6 +19,8 @@ class ServiceWatcher:
         self.cache = LogCache()
 
     def stop(self):
+        if not self.w_threads:
+            return
         service_name = self.service.get("name") or self.service.get("_id")
         logger.info(f"[stop watcher] {service_name}")
         for t in self.w_threads:
