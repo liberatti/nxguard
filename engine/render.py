@@ -8,6 +8,7 @@ from nxcore.middleware.logging_manager import logger
 from engine.seclang.seclang_indexer import get_default_vars
 import config
 from api.model.seclang_model import RuleCategoryDao
+from api.model.route_model import RouteType
 from api.services.ipxa_services import FeedService
 
 
@@ -241,10 +242,15 @@ def _generate_services(
                 service.update({"ssl_enable": True})
 
         for r in service.get("routes", []):
-            if "upstream" in r and "name" in r["upstream"]:
+            if r["type"] == RouteType.UPSTREAM:
                 r["upstream"] = __resolve_upstream_by_name(
                     r["upstream"].get("name"), data
                 )
+            if r["type"] == RouteType.STATIC:
+                r.update({"upstream": None})
+            if r["type"] == RouteType.REDIRECT:
+                r.update({"upstream": None})
+
             if "sensor" in r and "name" in r["sensor"]:
                 sensor = __resolve_sensor_by_name(r["sensor"].get("name"), data)
                 service.update(

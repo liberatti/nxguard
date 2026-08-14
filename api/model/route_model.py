@@ -1,4 +1,5 @@
 import json
+from enum import Enum
 from typing import Dict, Any, List, Optional
 
 from marshmallow import EXCLUDE, Schema, fields
@@ -8,6 +9,12 @@ import config
 from .duck_db import DuckDAO
 from api.model.upstream_model import UpstreamDao, UpstreamSchema
 from api.model.sensor_model import SensorDao, SensorSchema
+
+
+class RouteType(str, Enum):
+    UPSTREAM = "UPSTREAM"
+    STATIC = "STATIC"
+    REDIRECT = "REDIRECT"
 
 
 class RedirectSchema(Schema):

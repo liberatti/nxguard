@@ -1,385 +1,419 @@
 <ng-container>
-    <mat-card>
+    <mat-card class="service-form-card">
         <mat-card-header>
-            <mat-card-title>{{ 'view.service.title'|translate }}</mat-card-title>
-            <mat-card-subtitle>{{ (isAddMode ? 'actions.create' : 'actions.edit')| translate }}</mat-card-subtitle>
+            <mat-card-title>{{ 'view.service.title' | translate }}</mat-card-title>
+            <mat-card-subtitle>{{ (isAddMode ? 'actions.create' : 'actions.edit') | translate }}</mat-card-subtitle>
         </mat-card-header>
-        <mat-card-content style="padding: 0px !important;">
+        <mat-card-content>
             <form [formGroup]="form">
-                <mat-stepper [linear]="false" #stepper>
-                    <mat-step label="Details">
-                        <div class="details-step-container"
-                            style="display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-start; gap: 24px; max-width: 1600px; margin: 0 auto;">
-                            <div class="details-main" style="flex: 2 1;">
-                                <div class="mat-row" style="display: flex; flex-direction: column; gap: 16px;">
-                                    <div class="mat-col-12">
-                                        <mat-form-field class="full-width">
-                                            <mat-label>Name</mat-label>
-                                            <input matInput formControlName="name" id="service-name-input">
-                                        </mat-form-field>
-                                        <div class="mat-row">
-                                            <div class="mat-col-4">
+                <mat-stepper [linear]="false" #stepper class="service-stepper">
+                    <!-- Step 1: Details -->
+                    <mat-step [label]="'SERVICE.DETAILS' | translate">
+                        <div class="step-content-container">
+                            <div class="details-layout">
+                                <!-- Left Column: Service Configuration -->
+                                <div class="column-stack">
+                                    <!-- General Information -->
+                                    <mat-card appearance="outlined" class="section-card">
+                                        <mat-card-header>
+                                            <span class="card-title-row">
+                                                <mat-icon class="card-title-icon">tune</mat-icon>
+                                                {{ 'SERVICE.GENERAL_INFO' | translate }}
+                                            </span>
+                                        </mat-card-header>
+                                        <mat-card-content>
+                                            <mat-form-field class="full-width mt-1">
+                                                <mat-label>{{ 'SERVICE.NAME' | translate }}</mat-label>
+                                                <input matInput formControlName="name" id="service-name-input">
+                                            </mat-form-field>
+                                            <div class="fields-row-3">
                                                 <mat-form-field class="full-width">
-                                                    <mat-label>Buffer (KB)</mat-label>
-                                                    <input matInput type="number" formControlName="buffer"
-                                                        id="buffer-input">
+                                                    <mat-label>{{ 'SERVICE.BUFFER' | translate }}</mat-label>
+                                                    <input matInput type="number" formControlName="buffer" id="buffer-input">
+                                                </mat-form-field>
+                                                <mat-form-field class="full-width">
+                                                    <mat-label>{{ 'SERVICE.BODY_LIMIT' | translate }}</mat-label>
+                                                    <input matInput type="number" formControlName="body_limit" id="body-limit-input">
+                                                </mat-form-field>
+                                                <mat-form-field class="full-width">
+                                                    <mat-label>{{ 'SERVICE.TIMEOUT' | translate }}</mat-label>
+                                                    <input matInput type="number" formControlName="timeout" id="timeout-input">
                                                 </mat-form-field>
                                             </div>
-                                            <div class="mat-col-4">
-                                                <mat-form-field class="full-width">
-                                                    <mat-label>Request Body Limit (MB)</mat-label>
-                                                    <input matInput type="number" formControlName="body_limit"
-                                                        id="body-limit-input">
-                                                </mat-form-field>
-                                            </div>
-                                            <div class="mat-col-4">
-                                                <mat-form-field class="full-width">
-                                                    <mat-label>Request Timeout (seconds)</mat-label>
-                                                    <input matInput type="number" formControlName="timeout"
-                                                        id="timeout-input">
-                                                </mat-form-field>
-                                            </div>
-                                        </div>
-                                        <form [formGroup]="sansForm">
-                                            <mat-card appearance="outlined">
-                                                <mat-form-field>
-                                                    <mat-label>Domain</mat-label>
-                                                    <input id="sans-domain" matInput formControlName="cn">
-                                                    <button id="btn-add-sans" color="primary" matSuffix mat-icon-button
-                                                        (click)="onAddCN()">
+                                        </mat-card-content>
+                                    </mat-card>
+
+                                    <!-- Domains (SANs) -->
+                                    <mat-card appearance="outlined" class="section-card">
+                                        <mat-card-header>
+                                            <span class="card-title-row">
+                                                <mat-icon class="card-title-icon">language</mat-icon>
+                                                {{ 'SERVICE.DOMAINS' | translate }}
+                                            </span>
+                                        </mat-card-header>
+                                        <mat-card-content>
+                                            <form [formGroup]="sansForm">
+                                                <mat-form-field class="full-width mt-1">
+                                                    <mat-label>{{ 'SERVICE.DOMAIN_INPUT' | translate }}</mat-label>
+                                                    <input id="sans-domain" matInput formControlName="cn" (keyup.enter)="onAddCN()">
+                                                    <button id="btn-add-sans" type="button" color="primary" matSuffix mat-icon-button (click)="onAddCN()">
                                                         <mat-icon>add</mat-icon>
                                                     </button>
                                                 </mat-form-field>
-                                                <mat-card-content>
-                                                    <mat-chip-listbox>
-                                                        <mat-chip-row *ngFor="let p of form.value.sans"
-                                                            (removed)="onRemoveCN(p)" id="sans-chip-{{p}}">
-                                                            {{ p }}
-                                                            <button matChipRemove id="remove-sans-{{p}}">
-                                                                <mat-icon>cancel</mat-icon>
-                                                            </button>
-                                                        </mat-chip-row>
-                                                    </mat-chip-listbox>
-                                                </mat-card-content>
-                                            </mat-card>
-                                        </form>
-                                    </div>
-                                </div>
-                                <div class="mat-row" style="display: flex; flex-direction: column; gap: 16px;">
-                                    <div class="mat-col-12">
-                                        <mat-card appearance="outlined" class="mt-2">
-                                            <mat-card-header style="padding: 5px;">
-                                                <mat-card-subtitle style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                                                    <span>Limit requests</span>
-                                                </mat-card-subtitle>
-                                            </mat-card-header>
-                                            <mat-card-content>
-                                                <mat-form-field class="full-width mt-2" appearance="outline">
-                                                    <mat-label>Requests per second (0 to disable)</mat-label>
-                                                    <input matInput type="number"
-                                                        formControlName="rate_limit_per_sec"
-                                                        id="rate-limit-input">
+                                                <mat-chip-listbox class="chips-container" *ngIf="form.value.sans?.length">
+                                                    <mat-chip-row *ngFor="let p of form.value.sans"
+                                                        (removed)="onRemoveCN(p)" id="sans-chip-{{p}}" class="chip-mono">
+                                                        {{ p }}
+                                                        <button matChipRemove id="remove-sans-{{p}}">
+                                                            <mat-icon>cancel</mat-icon>
+                                                        </button>
+                                                    </mat-chip-row>
+                                                </mat-chip-listbox>
+                                                <div class="empty-state" *ngIf="!form.value.sans?.length">
+                                                    <span class="empty-state-text">{{ 'SERVICE.NO_DOMAINS' | translate }}</span>
+                                                </div>
+                                            </form>
+                                        </mat-card-content>
+                                    </mat-card>
+
+                                    <!-- Limit Requests -->
+                                    <mat-card appearance="outlined" class="section-card">
+                                        <mat-card-header>
+                                            <span class="card-title-row">
+                                                <mat-icon class="card-title-icon">speed</mat-icon>
+                                                {{ 'SERVICE.RATE_LIMIT_TITLE' | translate }}
+                                            </span>
+                                        </mat-card-header>
+                                        <mat-card-content>
+                                            <mat-form-field class="full-width mt-1">
+                                                <mat-label>{{ 'SERVICE.RATE_LIMIT' | translate }}</mat-label>
+                                                <input matInput type="number" formControlName="rate_limit_per_sec" id="rate-limit-input">
+                                            </mat-form-field>
+                                        </mat-card-content>
+                                    </mat-card>
+
+                                    <!-- Compression -->
+                                    <mat-card appearance="outlined" class="section-card">
+                                        <mat-card-header>
+                                            <span class="card-title-row">
+                                                <mat-icon class="card-title-icon">compress</mat-icon>
+                                                {{ 'SERVICE.COMPRESSION_TITLE' | translate }}
+                                            </span>
+                                        </mat-card-header>
+                                        <mat-card-content>
+                                            <form [formGroup]="compressionForm">
+                                                <mat-form-field class="full-width mt-1">
+                                                    <mat-label>{{ 'SERVICE.COMPRESSION_ADD' | translate }}</mat-label>
+                                                    <input id="compression-type" matInput formControlName="type" (keyup.enter)="onAddCompressionType()">
+                                                    <button id="btn-add-compression-type" type="button" color="primary" matSuffix mat-icon-button
+                                                        (click)="onAddCompressionType()">
+                                                        <mat-icon>add</mat-icon>
+                                                    </button>
                                                 </mat-form-field>
-                                            </mat-card-content>
-                                        </mat-card>
-                                    </div>
+                                                <mat-chip-listbox class="chips-container">
+                                                    <mat-chip-row *ngFor="let p of form.value.compression_types"
+                                                        (removed)="onRemoveCompressionType(p)" id="compression-chip-{{p}}" class="chip-mono">
+                                                        {{ p }}
+                                                        <button matChipRemove id="remove-compression-{{p}}">
+                                                            <mat-icon>cancel</mat-icon>
+                                                        </button>
+                                                    </mat-chip-row>
+                                                </mat-chip-listbox>
+                                            </form>
+                                        </mat-card-content>
+                                    </mat-card>
                                 </div>
-                                <div class="mat-row">
-                                    <div class="mat-col-12">
-                                        <mat-card appearance="outlined" class="mt-2">
-                                            <mat-card-header style="padding: 5px;">
-                                                <mat-card-subtitle style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                                                    <span>Compression</span>
-                                                </mat-card-subtitle>
-                                            </mat-card-header>
-                                            <mat-card-content>
-                                                <form [formGroup]="compressionForm">
-                                                    <mat-form-field appearance="outline" class="full-width mt-2">
-                                                        <mat-label>Add Compression Type</mat-label>
-                                                        <input id="compression-type" matInput
-                                                            formControlName="type">
-                                                        <button id="btn-add-compression-type" color="primary"
-                                                            matSuffix mat-icon-button
-                                                            (click)="onAddCompressionType()">
+
+                                <!-- Right Column: Network & Security -->
+                                <div class="column-stack">
+                                    <!-- Port Bindings -->
+                                    <mat-card appearance="outlined" class="section-card">
+                                        <mat-card-header>
+                                            <span class="card-title-row">
+                                                <mat-icon class="card-title-icon">hub</mat-icon>
+                                                {{ 'SERVICE.PORT_BINDINGS' | translate }}
+                                            </span>
+                                            <mat-card-actions class="align-right">
+                                                <button mat-flat-button color="primary" type="button" *ngIf="form.enabled" (click)="onAddBind()"
+                                                    id="service-form-add-bind-button">
+                                                    <mat-icon>add</mat-icon>
+                                                    {{ 'actions.create' | translate }}
+                                                </button>
+                                            </mat-card-actions>
+                                        </mat-card-header>
+                                        <mat-card-content>
+                                            <table mat-table [dataSource]="bindingDS" class="custom-table">
+                                                <tr mat-header-row *matHeaderRowDef="bindingDC"></tr>
+                                                <tr mat-row *matRowDef="let row; columns: bindingDC;"></tr>
+
+                                                <ng-container matColumnDef="port">
+                                                    <th mat-header-cell *matHeaderCellDef>{{ 'SERVICE.PORT' | translate }}</th>
+                                                    <td mat-cell *matCellDef="let element">
+                                                        <strong>{{ element.port }}</strong>
+                                                    </td>
+                                                </ng-container>
+
+                                                <ng-container matColumnDef="protocol">
+                                                    <th mat-header-cell *matHeaderCellDef>{{ 'SERVICE.PROTOCOL' | translate }}</th>
+                                                    <td mat-cell *matCellDef="let element">
+                                                        <span class="target-badge">{{ element.protocol }}</span>
+                                                    </td>
+                                                </ng-container>
+
+                                                <ng-container matColumnDef="ssl_upgrade">
+                                                    <th mat-header-cell *matHeaderCellDef class="no-wrap">{{ 'SERVICE.FORCE_SSL' | translate }}</th>
+                                                    <td mat-cell *matCellDef="let element">
+                                                        @if (element.ssl_upgrade) {
+                                                        <mat-icon color="primary">security</mat-icon>
+                                                        }
+                                                    </td>
+                                                </ng-container>
+
+                                                <ng-container matColumnDef="action">
+                                                    <th mat-header-cell *matHeaderCellDef class="text-right"></th>
+                                                    <td mat-cell *matCellDef="let element; let i = index;" class="text-right">
+                                                        <div class="table-cell-actions">
+                                                            <button mat-icon-button type="button" [matMenuTriggerFor]="menu">
+                                                                <mat-icon>more_vert</mat-icon>
+                                                            </button>
+                                                            <mat-menu #menu="matMenu" xPosition="before">
+                                                                <button mat-menu-item type="button" (click)="onEditBind(i)" id="edit-bind-{{i}}">
+                                                                    <mat-icon>edit</mat-icon>
+                                                                    {{ 'actions.edit' | translate }}
+                                                                </button>
+                                                                <button mat-menu-item type="button" *ngIf="form.enabled" (click)="onBindRemove(i)" id="remove-bind-{{i}}">
+                                                                    <mat-icon>delete</mat-icon>
+                                                                    {{ 'actions.delete' | translate }}
+                                                                </button>
+                                                            </mat-menu>
+                                                        </div>
+                                                    </td>
+                                                </ng-container>
+                                            </table>
+
+                                            <div class="empty-state" *ngIf="bindingDS.data.length === 0">
+                                                <mat-icon class="empty-state-icon">hub</mat-icon>
+                                                <span class="empty-state-text">{{ 'SERVICE.NO_BINDINGS' | translate }}</span>
+                                            </div>
+                                        </mat-card-content>
+                                    </mat-card>
+
+                                    <!-- SSL Configuration -->
+                                    <mat-card appearance="outlined" class="section-card" *ngIf="hasSslSupport()">
+                                        <mat-card-header>
+                                            <span class="card-title-row">
+                                                <mat-icon class="card-title-icon">lock</mat-icon>
+                                                {{ 'SERVICE.SSL_CONFIG' | translate }}
+                                            </span>
+                                        </mat-card-header>
+                                        <mat-card-content>
+                                            <mat-form-field class="full-width mt-1">
+                                                <mat-label>{{ 'SERVICE.CERTIFICATE' | translate }}</mat-label>
+                                                <mat-select id="certificate" formControlName="certificate" [compareWith]="compareFn">
+                                                    <mat-option id="certificate-{{i}}" *ngFor="let c of _certificates; let i = index" [value]="c">
+                                                        {{ c.name }}
+                                                    </mat-option>
+                                                </mat-select>
+                                            </mat-form-field>
+
+                                            <div class="mt-1">
+                                                <mat-checkbox formControlName="ssl_client_auth">
+                                                    {{ 'SERVICE.SSL_CLIENT_AUTH' | translate }}
+                                                </mat-checkbox>
+                                            </div>
+
+                                            @if (form.value.ssl_client_auth) {
+                                            <mat-form-field class="full-width mt-1">
+                                                <mat-label>{{ 'SERVICE.SSL_CA' | translate }}</mat-label>
+                                                <textarea matInput cdkTextareaAutosize #autosize="cdkTextareaAutosize"
+                                                    cdkAutosizeMinRows="4" cdkAutosizeMaxRows="10"
+                                                    formControlName="ssl_client_ca"></textarea>
+                                            </mat-form-field>
+                                            }
+
+                                            <div class="mt-2">
+                                                <form [formGroup]="protocolForm">
+                                                    <mat-form-field class="full-width">
+                                                        <mat-label>{{ 'SERVICE.PROTOCOL_INPUT' | translate }}</mat-label>
+                                                        <input matInput formControlName="text" (keyup.enter)="onAddProto()">
+                                                        <button color="primary" matSuffix mat-icon-button type="button"
+                                                            *ngIf="form.enabled" (click)="onAddProto()">
                                                             <mat-icon>add</mat-icon>
                                                         </button>
                                                     </mat-form-field>
-                                                    <mat-chip-listbox>
-                                                        <mat-chip-row
-                                                            *ngFor="let p of form.value.compression_types"
-                                                            (removed)="onRemoveCompressionType(p)"
-                                                            id="compression-chip-{{p}}">
-                                                            {{ p }}
-                                                            <button matChipRemove id="remove-compression-{{p}}">
-                                                                <mat-icon>cancel</mat-icon>
-                                                            </button>
-                                                        </mat-chip-row>
-                                                    </mat-chip-listbox>
-                                                </form>
-                                            </mat-card-content>
-                                        </mat-card>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="details-side" style="flex: 1 1;">
-                                <mat-card appearance="outlined" class="mt-2">
-                                    <mat-card-header>
-                                        <mat-card-subtitle>Service Port Bindings</mat-card-subtitle>
-                                        <mat-card-actions class="align-right">
-                                            <button mat-button color="primary" *ngIf="form.enabled" (click)="onAddBind()"
-                                                id="service-form-add-bind-button">
-                                                <mat-icon>add</mat-icon>
-                                                {{ 'actions.create'|translate }}
-                                            </button>
-                                        </mat-card-actions>
-                                    </mat-card-header>
-                                    <mat-card-content>
-                                        <table mat-table [dataSource]="bindingDS">
-                                            <tr mat-header-row *matHeaderRowDef="bindingDC"></tr>
-                                            <tr mat-row *matRowDef="let row; columns: bindingDC;"></tr>
-
-                                            <ng-container matColumnDef="port">
-                                                <th mat-header-cell *matHeaderCellDef> Port</th>
-                                                <td mat-cell *matCellDef="let element">
-                                                    {{ element.port }}
-                                                </td>
-                                            </ng-container>
-                                            <ng-container matColumnDef="protocol">
-                                                <th mat-header-cell *matHeaderCellDef> Protocol</th>
-                                                <td mat-cell *matCellDef="let element">
-                                                    {{ element.protocol }}
-                                                </td>
-                                            </ng-container>
-                                            <ng-container matColumnDef="ssl_upgrade">
-                                                <th mat-header-cell *matHeaderCellDef class="no-wrap"> Force SSL</th>
-                                                <td mat-cell *matCellDef="let element">
-                                                    @if (element.ssl_upgrade) {
-                                                    <mat-icon color="primary">security</mat-icon>
-                                                    }
-                                                </td>
-                                            </ng-container>
-                                            <ng-container matColumnDef="action">
-                                                <th mat-header-cell *matHeaderCellDef></th>
-                                                <td mat-cell *matCellDef="let element;let i = index;">
-                                                    <div class="table-cell-actions">
-                                                        <button mat-button type="button" [matMenuTriggerFor]="menu">
-                                                            <mat-icon>more_vert</mat-icon>
-                                                        </button>
-                                                        <mat-menu #menu="matMenu" xPosition="before"
-                                                            [overlapTrigger]="true">
-                                                            <button mat-menu-item type="button" (click)="onEditBind(i)"
-                                                                id="edit-bind-{{i}}">
-                                                                <mat-icon>edit</mat-icon>
-                                                                Edit
-                                                            </button>
-                                                            <button mat-menu-item type="button" *ngIf="form.enabled"
-                                                                (click)="onBindRemove(i)" id="remove-bind-{{i}}">
-                                                                <mat-icon>delete</mat-icon>
-                                                                Delete
-                                                            </button>
-                                                        </mat-menu>
-                                                    </div>
-                                                </td>
-                                            </ng-container>
-                                        </table>
-
-                                    </mat-card-content>
-                                </mat-card>
-                                @if (hasSslSupport()) {
-                                <mat-card class="mt-2" appearance="outlined">
-                                    <mat-card-header>
-                                        <mat-card-subtitle>SSL Configuration</mat-card-subtitle>
-                                    </mat-card-header>
-                                    <mat-card-content>
-                                        <mat-form-field class="mt-2 full-width">
-                                            <mat-label>Certificate</mat-label>
-                                            <mat-select id="certificate" formControlName="certificate"
-                                                [compareWith]="compareFn">
-                                                <mat-option id="certificate-{{i}}"
-                                                    *ngFor="let c of _certificates;  let i = index" [value]="c">
-                                                    {{ c.name }}
-                                                </mat-option>
-                                            </mat-select>
-                                        </mat-form-field>
-                                        <mat-checkbox formControlName="ssl_client_auth">Support SSL Client Auth
-                                        </mat-checkbox>
-                                        @if (form.value.ssl_client_auth) {
-                                        <mat-form-field class="full-width">
-                                            <mat-label>Certificate Authority</mat-label>
-                                            <textarea matInput cdkTextareaAutosize #autosize="cdkTextareaAutosize"
-                                                cdkAutosizeMinRows="6" cdkAutosizeMaxRows="15"
-                                                formControlName="ssl_client_ca"></textarea>
-                                        </mat-form-field>
-                                        }
-                                        <form [formGroup]="protocolForm">
-                                            <mat-card>
-                                                <mat-form-field class="full-width">
-                                                    <mat-label>Protocol</mat-label>
-                                                    <input matInput formControlName="text">
-                                                    <button color="primary" matSuffix mat-icon-button
-                                                        *ngIf="form.enabled" (click)="onAddProto()">
-                                                        <mat-icon>add</mat-icon>
-                                                    </button>
-                                                </mat-form-field>
-                                                <mat-card-content>
-                                                    <mat-chip-listbox>
+                                                    <mat-chip-listbox class="chips-container">
                                                         <mat-chip-row *ngFor="let p of form.value.ssl_protocols"
-                                                            (removed)="onRemoveProto(p)">
+                                                            (removed)="onRemoveProto(p)" class="chip-mono">
                                                             {{ p }}
                                                             <button matChipRemove>
                                                                 <mat-icon>cancel</mat-icon>
                                                             </button>
                                                         </mat-chip-row>
                                                     </mat-chip-listbox>
-                                                </mat-card-content>
-                                            </mat-card>
-                                        </form>
-                                    </mat-card-content>
-                                </mat-card>
-                                }
+                                                </form>
+                                            </div>
+                                        </mat-card-content>
+                                    </mat-card>
+                                </div>
+                            </div>
 
+                            <!-- Details Step Actions -->
+                            <div class="step-actions">
+                                <button type="button" mat-stroked-button [routerLink]="['/service']" id="service-form-back-btn">
+                                    <mat-icon>close</mat-icon>
+                                    {{ 'actions.cancel' | translate }}
+                                </button>
+                                <button type="button" mat-flat-button color="primary" (click)="onNextDetails(stepper)" id="stepper-details-next-button">
+                                    {{ 'actions.next' | translate }}
+                                    <mat-icon>arrow_forward</mat-icon>
+                                </button>
                             </div>
                         </div>
-                        <mat-card-actions align="end" class="mat-mdc-card-actions bottom-actions">
-                            <button mat-flat-button color="primary" (click)="onNextDetails(stepper)" id="stepper-details-next-button">
-                                Next
-                                <mat-icon>arrow_forward</mat-icon>
-                            </button>
-                            <button type="button" mat-stroked-button [routerLink]="['/service']" id="service-form-back-btn">
-                                <mat-icon>arrow_back</mat-icon>
-                                Cancel
-                            </button>
-                        </mat-card-actions>
                     </mat-step>
-                    <mat-step label="Overrides">
-                        <div style="padding: 10px;">
-                            <mat-card appearance="outlined">
+
+                    <!-- Step 2: Overrides -->
+                    <mat-step [label]="'SERVICE.OVERRIDES' | translate">
+                        <div class="step-content-container">
+                            <mat-card appearance="outlined" class="section-card">
                                 <mat-card-header>
-                                    <mat-card-subtitle>Headers</mat-card-subtitle>
+                                    <span class="card-title-row">
+                                        <mat-icon class="card-title-icon">format_list_bulleted</mat-icon>
+                                        {{ 'SERVICE.HEADERS_TITLE' | translate }}
+                                    </span>
                                     <mat-card-actions class="align-right">
-                                        <button mat-button color="primary" *ngIf="form.enabled" (click)="onAddHeader()" id="add-header-button">
+                                        <button mat-flat-button color="primary" type="button" *ngIf="form.enabled" (click)="onAddHeader()" id="add-header-button">
                                             <mat-icon>add</mat-icon>
-                                            {{ 'actions.create'|translate }}
+                                            {{ 'actions.create' | translate }}
                                         </button>
                                     </mat-card-actions>
                                 </mat-card-header>
                                 <mat-card-content>
-                                    <table mat-table [dataSource]="headerDS">
+                                    <table mat-table [dataSource]="headerDS" class="custom-table">
                                         <tr mat-header-row *matHeaderRowDef="headerDC"></tr>
                                         <tr mat-row *matRowDef="let row; columns: headerDC;"></tr>
 
                                         <ng-container matColumnDef="name">
-                                            <th mat-header-cell *matHeaderCellDef> Name</th>
-                                            <td mat-cell *matCellDef="let element"> {{ element.name }}</td>
+                                            <th mat-header-cell *matHeaderCellDef>{{ 'SERVICE.HEADER_NAME' | translate }}</th>
+                                            <td mat-cell *matCellDef="let element">
+                                                <strong>{{ element.name }}</strong>
+                                            </td>
                                         </ng-container>
 
                                         <ng-container matColumnDef="content">
-                                            <th mat-header-cell *matHeaderCellDef> Content</th>
-                                            <td mat-cell *matCellDef="let element"> {{ element.content }}</td>
+                                            <th mat-header-cell *matHeaderCellDef>{{ 'SERVICE.HEADER_VALUE' | translate }}</th>
+                                            <td mat-cell *matCellDef="let element">
+                                                <code class="path-chip">{{ element.content }}</code>
+                                            </td>
                                         </ng-container>
 
                                         <ng-container matColumnDef="action">
-                                            <th mat-header-cell *matHeaderCellDef></th>
-                                            <td mat-cell *matCellDef="let element;let i = index;">
-                                                <div class="table-cell-actions">
-                                                    <button mat-button type="button" [matMenuTriggerFor]="menu"
-                                                        *ngIf="form.enabled">
+                                            <th mat-header-cell *matHeaderCellDef class="text-right"></th>
+                                            <td mat-cell *matCellDef="let element; let i = index;" class="text-right">
+                                                <div class="table-cell-actions" *ngIf="form.enabled">
+                                                    <button mat-icon-button type="button" [matMenuTriggerFor]="menu">
                                                         <mat-icon>more_vert</mat-icon>
                                                     </button>
-                                                    <mat-menu #menu="matMenu" xPosition="before"
-                                                        [overlapTrigger]="true">
-                                                        <button mat-menu-item type="button" (click)="onRemoveHeader(i)"
-                                                            id="remove-header-{{i}}">
+                                                    <mat-menu #menu="matMenu" xPosition="before">
+                                                        <button mat-menu-item type="button" (click)="onRemoveHeader(i)" id="remove-header-{{i}}">
                                                             <mat-icon>delete</mat-icon>
-                                                            Delete
+                                                            {{ 'actions.delete' | translate }}
                                                         </button>
                                                     </mat-menu>
                                                 </div>
                                             </td>
                                         </ng-container>
                                     </table>
+
+                                    <div class="empty-state" *ngIf="headerDS.data.length === 0">
+                                        <mat-icon class="empty-state-icon">receipt_long</mat-icon>
+                                        <span class="empty-state-text">{{ 'SERVICE.NO_HEADERS' | translate }}</span>
+                                    </div>
                                 </mat-card-content>
                             </mat-card>
 
+                            <!-- Overrides Step Actions -->
+                            <div class="step-actions">
+                                <button type="button" mat-stroked-button matStepperPrevious id="stepper-overrides-back-button">
+                                    <mat-icon>arrow_back</mat-icon>
+                                    {{ 'actions.back' | translate }}
+                                </button>
+                                <button type="button" mat-flat-button color="primary" matStepperNext id="stepper-overrides-next-button">
+                                    {{ 'actions.next' | translate }}
+                                    <mat-icon>arrow_forward</mat-icon>
+                                </button>
+                            </div>
                         </div>
-                        <mat-card-actions align="end" class="mat-mdc-card-actions bottom-actions">
-                            <button mat-flat-button color="primary" matStepperNext id="stepper-overrides-next-button">
-                                Next
-                                <mat-icon>arrow_forward</mat-icon>
-                            </button>
-                            <button type="button" mat-stroked-button matStepperPrevious id="stepper-overrides-back-button">
-                                <mat-icon>arrow_back</mat-icon>
-                                Back
-                            </button>
-                        </mat-card-actions>
                     </mat-step>
-                    <mat-step label="Routes">
-                        <div style="padding: 10px;">
-                            <mat-card appearance="outlined">
+
+                    <!-- Step 3: Routes -->
+                    <mat-step [label]="'SERVICE.ROUTES' | translate">
+                        <div class="step-content-container">
+                            <mat-card appearance="outlined" class="section-card">
                                 <mat-card-header>
-                                    <mat-card-subtitle>Routes</mat-card-subtitle>
+                                    <div>
+                                        <span class="card-title-row">
+                                            <mat-icon class="card-title-icon">alt_route</mat-icon>
+                                            {{ 'SERVICE.ROUTES_TITLE' | translate }}
+                                        </span>
+                                        <div class="section-subtitle">{{ 'SERVICE.ROUTES_SUBTITLE' | translate }}</div>
+                                    </div>
                                     <mat-card-actions class="align-right">
-                                        <button mat-button color="primary" *ngIf="form.enabled" (click)="onAddRoute()" id="add-route-button">
+                                        <button mat-flat-button color="primary" type="button" *ngIf="form.enabled" (click)="onAddRoute()" id="add-route-button">
                                             <mat-icon>add</mat-icon>
-                                            {{ 'actions.create'|translate }}
+                                            {{ 'actions.create' | translate }}
                                         </button>
                                     </mat-card-actions>
                                 </mat-card-header>
                                 <mat-card-content>
-                                    <table class="mat-mdc-table mdc-data-table__table cdk-table cdk-drop-list-table">
+                                    <table class="custom-table cdk-drop-list-table">
                                         <thead>
-                                            <tr
-                                                class="mat-mdc-header-row mdc-data-table__header-row cdk-header-row no-wrap">
-                                                <th
-                                                    class="mat-mdc-header-cell mdc-data-table__header-cell cdk-header-cell">
-                                                </th>
-                                                <th *ngFor="let h of routeDC"
-                                                    class="mat-mdc-header-cell mdc-data-table__header-cell cdk-header-cell">
-                                                    <div *ngIf="h != 'action'">
-                                                        {{ h }}
-                                                    </div>
-                                                </th>
+                                            <tr>
+                                                <th class="drag-handle-cell"></th>
+                                                <th>{{ 'ROUTE.NAME' | translate }}</th>
+                                                <th>{{ 'ROUTE.UPSTREAM' | translate }}</th>
+                                                <th>{{ 'ROUTE.REQUEST_PATH' | translate }}</th>
+                                                <th class="text-right"></th>
                                             </tr>
                                         </thead>
-                                        <tbody cdkDropList [cdkDropListData]="form.value.routes"
-                                            (cdkDropListDropped)="moveRoute($event)">
-                                            <tr cdkDrag *ngFor="let r of form.value.routes; let i = index;"
-                                                class="mat-mdc-row mdc-data-table__row cdk-row">
-                                                <td cdkDragHandle>
+                                        <tbody cdkDropList [cdkDropListData]="form.value.routes" (cdkDropListDropped)="moveRoute($event)">
+                                            <tr cdkDrag *ngFor="let r of form.value.routes; let i = index;">
+                                                <td cdkDragHandle class="drag-handle-cell">
                                                     <mat-icon>drag_indicator</mat-icon>
                                                 </td>
-                                                <td class="no-wrap">
+                                                <td class="route-name-cell">
                                                     {{ r.name }}
                                                 </td>
-                                                <td class="no-wrap">
-                                                    <ng-container *ngIf="r.type != 'REDIRECT'">
+                                                <td>
+                                                    <span class="target-badge" *ngIf="r.type != 'REDIRECT' && r.type != 'STATIC'">
                                                         {{ r.upstream?.name }}
-                                                    </ng-container>
+                                                    </span>
+                                                    <span class="target-badge redirect" *ngIf="r.type == 'REDIRECT'">
+                                                        REDIRECT
+                                                    </span>
+                                                    <span class="target-badge static" *ngIf="r.type == 'STATIC'">
+                                                        STATIC
+                                                    </span>
                                                 </td>
-                                                <td class="full-width">
-                                                    <mat-chip-listbox>
-                                                        <mat-chip-row *ngFor="let p of r.paths">
+                                                <td>
+                                                    <div class="paths-list">
+                                                        <span class="path-chip" *ngFor="let p of r.paths">
                                                             {{ p }}
-                                                        </mat-chip-row>
-                                                    </mat-chip-listbox>
+                                                        </span>
+                                                    </div>
                                                 </td>
-                                                <td class="table-cell-actions">
-                                                    <div class="toggle-container">
-                                                        <button mat-button type="button" [matMenuTriggerFor]="menu"
-                                                            *ngIf="form.enabled">
+                                                <td class="text-right">
+                                                    <div class="table-cell-actions" *ngIf="form.enabled">
+                                                        <button mat-icon-button type="button" [matMenuTriggerFor]="menu">
                                                             <mat-icon>more_vert</mat-icon>
                                                         </button>
-                                                        <mat-menu #menu="matMenu" xPosition="before"
-                                                            [overlapTrigger]="true">
-                                                            <button mat-menu-item type="button" (click)="onEditRoute(i)"
-                                                                id="edit-route-{{i}}">
+                                                        <mat-menu #menu="matMenu" xPosition="before">
+                                                            <button mat-menu-item type="button" (click)="onEditRoute(i)" id="edit-route-{{i}}">
                                                                 <mat-icon>edit</mat-icon>
-                                                                Edit
+                                                                {{ 'actions.edit' | translate }}
                                                             </button>
-                                                            <button mat-menu-item type="button"
-                                                                (click)="onRemoveRoute(i)" id="remove-route-{{i}}">
+                                                            <button mat-menu-item type="button" (click)="onRemoveRoute(i)" id="remove-route-{{i}}">
                                                                 <mat-icon>delete</mat-icon>
-                                                                Delete
+                                                                {{ 'actions.delete' | translate }}
                                                             </button>
                                                         </mat-menu>
                                                     </div>
@@ -387,24 +421,31 @@
                                             </tr>
                                         </tbody>
                                     </table>
+
+                                    <div class="empty-state" *ngIf="!form.value.routes?.length">
+                                        <mat-icon class="empty-state-icon">alt_route</mat-icon>
+                                        <span class="empty-state-text">{{ 'SERVICE.NO_ROUTES' | translate }}</span>
+                                    </div>
                                 </mat-card-content>
                             </mat-card>
+
+                            <!-- Routes Step Actions -->
+                            <div class="step-actions">
+                                <button type="button" mat-stroked-button [routerLink]="['/service']" id="stepper-routes-cancel-button">
+                                    <mat-icon>close</mat-icon>
+                                    {{ 'actions.cancel' | translate }}
+                                </button>
+                                <button type="button" mat-stroked-button matStepperPrevious id="stepper-routes-back-button">
+                                    <mat-icon>arrow_back</mat-icon>
+                                    {{ 'actions.back' | translate }}
+                                </button>
+                                <button type="button" mat-flat-button color="primary" *ngIf="form.enabled" (click)="onSubmit()"
+                                    id="stepper-routes-save-button">
+                                    <mat-icon>save</mat-icon>
+                                    {{ 'actions.save' | translate }}
+                                </button>
+                            </div>
                         </div>
-                        <mat-card-actions align="end" class="mat-mdc-card-actions bottom-actions">
-                            <button type="button" mat-flat-button color="primary" *ngIf="form.enabled" (click)="onSubmit()"
-                                id="stepper-routes-save-button">
-                                <mat-icon>save</mat-icon>
-                                {{ 'actions.save' | translate }}
-                            </button>
-                            <button type="button" mat-stroked-button matStepperPrevious id="stepper-routes-back-button">
-                                <mat-icon>arrow_back</mat-icon>
-                                Back
-                            </button>
-                            <button type="button" mat-stroked-button [routerLink]="['/service']" id="stepper-routes-cancel-button">
-                                <mat-icon>close</mat-icon>
-                                Cancel
-                            </button>
-                        </mat-card-actions>
                     </mat-step>
                 </mat-stepper>
             </form>
