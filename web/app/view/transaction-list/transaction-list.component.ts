@@ -106,7 +106,13 @@ export class TransactionListComponent implements OnInit {
                 {
                     label: "TPM",
                     data: [],
-                    backgroundColor: 'limegreen'
+                    borderColor: '#0284c7',
+                    backgroundColor: 'rgba(2, 132, 199, 0.15)',
+                    fill: true,
+                    tension: 0.3,
+                    borderWidth: 2,
+                    pointRadius: 2,
+                    pointHoverRadius: 5,
                 }
             ]
         },
@@ -142,7 +148,12 @@ export class TransactionListComponent implements OnInit {
             scales: {
                 x: {
                     type: 'time',
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)',
+                    },
                     ticks: {
+                        color: '#64748b',
+                        font: { size: 11 },
                         autoSkip: true,
                         autoSkipPadding: 50,
                         maxRotation: 0
@@ -155,15 +166,26 @@ export class TransactionListComponent implements OnInit {
                             minute: 'HH:mm',
                             second: 'HH:mm:ss'
                         }
+                    },
+                    border: {
+                        display: false
                     }
                 },
                 y: {
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)',
+                    },
                     ticks: {
+                        color: '#64748b',
+                        font: { size: 11 },
                         callback: (value: any) => {
                             return this.formatService.tpm(value);
                         }
                     },
                     beginAtZero: true,
+                    border: {
+                        display: false
+                    }
                 }
             }
         },
@@ -189,15 +211,20 @@ export class TransactionListComponent implements OnInit {
     }
 
     expandCollapse(row: any) {
-        if (this.currentRowSelected && this.currentRowSelected != row)
-            this.currentRowSelected.isExpanded = false;
-        this.currentRowSelected = row;
+        if (!row) return;
+        const willExpand = !row.isExpanded;
 
-        if (row.isExpanded) {
-            row.isExpanded = false;
-        } else {
-            row.isExpanded = true;
+        for (const item of this.transactions) {
+            item.isExpanded = false;
         }
+        if (this.transactionDS && this.transactionDS.data) {
+            for (const item of this.transactionDS.data) {
+                item.isExpanded = false;
+            }
+        }
+
+        row.isExpanded = willExpand;
+        this.currentRowSelected = willExpand ? row : ({} as TransactionLog);
     }
 
     ngOnInit(): void {
@@ -206,27 +233,47 @@ export class TransactionListComponent implements OnInit {
 
     onSearch() {
         let filter = this.form.value as TransactionFilter;
-        this.transactionService.getTpm(filter).subscribe(data => {
-            if (this.chart != null) {
-                this.chart.destroy();
+        this.transactionService.getTpm(filter).subscribe({
+            next: (data) => {
+                if (this.chart != null) {
+                    this.chart.destroy();
+                }
+                this.chart = new Chart("trn-chart", this.chartConfig);
+                this.chart.data.labels = [];
+                this.chart.data.datasets[0].data = [];
+                if (data && Array.isArray(data)) {
+                    for (let i = 0; i < data.length; i++) {
+                        this.chart.data.labels.push(moment(data[i].logtime));
+                        this.chart.data.datasets[0].data.push(data[i].count);
+                    }
+                }
+                this.chart.update();
+            },
+            error: () => {
+                if (this.chart != null) {
+                    this.chart.destroy();
+                }
+                this.chart = new Chart("trn-chart", this.chartConfig);
+                this.chart.data.labels = [];
+                this.chart.data.datasets[0].data = [];
+                this.chart.update();
             }
-            ;
-            this.chart = new Chart("trn-chart", this.chartConfig);
-            this.chart.data.labels = [];
-            this.chart.data.datasets[0].data = [];
-            for (let i = 0; i < data.length; i++) {
-                this.chart.data.labels.push(moment(data[i].logtime));
-                this.chart.data.datasets[0].data.push(data[i].count);
-            }
-            this.chart.update();
         });
 
-        this.transactionService.search(filter, this.transactionPA).subscribe(data => {
-            this.transactions = data.data;
-            this.transactionDS.data = data.data;
-            if (data.metadata) {
-                this.transactionPA = data.metadata;
-            } else {
+        this.transactionService.search(filter, this.transactionPA).subscribe({
+            next: (data) => {
+                const list = (data && data.data) ? data.data : [];
+                this.transactions = list;
+                this.transactionDS.data = list;
+                if (data && data.metadata) {
+                    this.transactionPA = data.metadata;
+                } else {
+                    this.transactionPA = new DefaultPageMeta();
+                }
+            },
+            error: () => {
+                this.transactions = [];
+                this.transactionDS.data = [];
                 this.transactionPA = new DefaultPageMeta();
             }
         });

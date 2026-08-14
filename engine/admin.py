@@ -11,7 +11,52 @@ from nxcore.middleware.logging_manager import logger
 
 import engine.render as c_render
 from api.model.config_model import ConfigBackupDao, ConfigDao
+from api.tools.service_watcher import ServiceWatcher
 from config import BASE_PATH
+
+ACTIVE_WATCHERS = {}
+
+
+def sync_watchers(conf):
+    """Synchronizes log watchers for all configured services."""
+    global ACTIVE_WATCHERS
+    if not conf or "services" not in conf:
+        return
+
+    services = conf.get("services", [])
+    current_service_names = set()
+
+    for svc in services:
+        if not svc.get("active", True):
+            continue
+        svc_name = svc.get("name") or svc.get("_id")
+        current_service_names.add(svc_name)
+        if svc_name not in ACTIVE_WATCHERS:
+            try:
+                watcher = ServiceWatcher(svc)
+                watcher.start()
+                ACTIVE_WATCHERS[svc_name] = watcher
+            except Exception as e:
+                logger.error(f"Failed to start ServiceWatcher for {svc_name}: {e}")
+
+    for svc_name in list(ACTIVE_WATCHERS.keys()):
+        if svc_name not in current_service_names:
+            try:
+                ACTIVE_WATCHERS[svc_name].stop()
+            except Exception as e:
+                logger.warning(f"Error stopping watcher for {svc_name}: {e}")
+            del ACTIVE_WATCHERS[svc_name]
+
+
+def stop_watchers():
+    """Stops all running log watchers."""
+    global ACTIVE_WATCHERS
+    for svc_name, watcher in list(ACTIVE_WATCHERS.items()):
+        try:
+            watcher.stop()
+        except Exception as e:
+            logger.warning(f"Error stopping watcher for {svc_name}: {e}")
+    ACTIVE_WATCHERS.clear()
 
 
 def validate(conf):
@@ -65,6 +110,7 @@ def apply(scn):
             active_config = config_dao.get_active()
             if active_config:
                 config_dao.update_by_id(active_config["_id"], {"active_scn": scn})
+        sync_watchers(conf)
 
     return {"status": "ok", "scn": scn}
 

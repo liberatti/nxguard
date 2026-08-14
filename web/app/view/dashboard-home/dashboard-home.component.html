@@ -1,18 +1,18 @@
 <div class="container-premium">
     <!-- Dashboard Header -->
-    <div class="chart-header" style="margin-bottom: 32px;">
+    <div class="chart-header" style="margin-bottom: 32px; display: flex; justify-content: space-between; align-items: center;">
         <div>
             <h1 class="gradient-text" style="font-size: 2.25rem; margin: 0; letter-spacing: -1px;">Security Overview</h1>
             <p class="text-dim" style="margin: 4px 0 0; font-size: 0.9rem;">Real-time threat monitoring and system health</p>
         </div>
         <div style="display: flex; gap: 12px;">
-            <button mat-stroked-button style="border-radius: 10px;">
-                <mat-icon>calendar_today</mat-icon>
-                Last 24 Hours
+            <button mat-stroked-button style="border-radius: 10px;" routerLink="/trn">
+                <mat-icon>receipt_long</mat-icon>
+                View Transactions
             </button>
-            <button mat-flat-button color="primary">
-                <mat-icon>download</mat-icon>
-                Export Report
+            <button mat-flat-button color="primary" (click)="ngOnInit()">
+                <mat-icon>refresh</mat-icon>
+                Refresh
             </button>
         </div>
     </div>
@@ -24,10 +24,10 @@
                 <div class="stat-label">Total Threats</div>
                 <mat-icon style="color: var(--primary); font-size: 20px; width: 20px; height: 20px;">security</mat-icon>
             </div>
-            <div class="stat-value">1,842</div>
+            <div class="stat-value">{{ totalThreats | number }}</div>
             <div class="status-active" style="display: flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 600;">
-                <mat-icon style="font-size: 16px; width: 16px; height: 16px;">trending_up</mat-icon>
-                +12% | Chart
+                <mat-icon style="font-size: 16px; width: 16px; height: 16px;">block</mat-icon>
+                Blocked Requests
             </div>
         </mat-card>
 
@@ -37,8 +37,8 @@
                 <mat-icon style="color: var(--error); font-size: 20px; width: 20px; height: 20px;">warning</mat-icon>
             </div>
             <div style="display: flex; align-items: baseline; gap: 20px; margin: 12px 0;">
-                <div class="stat-value" style="margin: 0;">29</div>
-                <div style="font-size: 1.5rem; font-weight: 700; color: var(--text-muted);">87</div>
+                <div class="stat-value" style="margin: 0;">{{ criticalIncidents }}</div>
+                <div style="font-size: 1.5rem; font-weight: 700; color: var(--text-muted);">{{ highIncidents }}</div>
             </div>
             <div style="display: flex; gap: 12px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase;">
                 <span class="status-critical">Critical</span>
@@ -51,9 +51,9 @@
                 <div class="stat-label">Protected Assets</div>
                 <mat-icon style="color: var(--info); font-size: 20px; width: 20px; height: 20px;">shield</mat-icon>
             </div>
-            <div class="stat-value">14,512</div>
+            <div class="stat-value">{{ totalRoutes | number }}</div>
             <div class="status-active" style="font-size: 0.85rem; font-weight: 600;">
-                Active & Monitored
+                Active Routes
             </div>
         </mat-card>
 
@@ -62,67 +62,98 @@
                 <div class="stat-label">System Health</div>
                 <mat-icon style="color: var(--success); font-size: 20px; width: 20px; height: 20px;">check_circle</mat-icon>
             </div>
-            <div class="stat-value">98.6%</div>
+            <div class="stat-value">{{ systemStatus }}</div>
             <div class="status-active" style="font-size: 0.85rem; font-weight: 600;">
-                Stable Performance
+                {{ activeNodesCount }} Active Nodes
             </div>
         </mat-card>
     </div>
 
     <!-- Middle Row: Chart & Log -->
-    <div style="display: grid; grid-template-columns: 1.8fr 1.2fr; gap: 24px; margin-bottom: 32px;">
+    <div style="display: grid; grid-template-columns: 1.65fr 1.35fr; gap: 24px; margin-bottom: 32px;">
         <mat-card class="widget-card glass-effect" style="padding: 24px;">
-            <div class="chart-header" style="margin-bottom: 24px;">
-                <span class="chart-title" style="font-size: 1.25rem; font-weight: 700;">Real-Time Traffic Monitor</span>
-                <div style="display: flex; gap: 12px; align-items: center;">
-                    <span class="text-dim" style="font-size: 0.8rem;">Activity</span>
-                    <mat-icon class="text-dim">expand_more</mat-icon>
+            <div class="chart-header" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                <div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span class="chart-title" style="font-size: 1.25rem; font-weight: 700;">Real-Time Traffic Monitor</span>
+                        <span class="live-pill">
+                            <span class="live-dot"></span> LIVE
+                        </span>
+                    </div>
+                    <p class="text-dim" style="margin: 4px 0 0; font-size: 0.8rem;">Incoming traffic throughput over time</p>
+                </div>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <div class="stat-badge">
+                        <span class="stat-badge-label">PEAK</span>
+                        <span class="stat-badge-value">{{ peakTpm }} <small>req/m</small></span>
+                    </div>
+                    <div class="stat-badge">
+                        <span class="stat-badge-label">AVG</span>
+                        <span class="stat-badge-value">{{ avgTpm }} <small>req/m</small></span>
+                    </div>
+                    <span class="time-range-pill">Last 24h</span>
                 </div>
             </div>
-            <div style="height: 350px; position: relative; background: rgba(0,0,0,0.2); border-radius: 12px; overflow: hidden; display: flex; align-items: flex-end;">
-                <!-- Animated Chart Placeholder Background -->
-                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: url('https://upload.wikimedia.org/wikipedia/commons/e/ec/World_map_blank_without_borders.svg') center/contain no-repeat; opacity: 0.05; filter: invert(1);"></div>
-                <svg width="100%" height="100%" preserveAspectRatio="none" style="filter: drop-shadow(0 0 10px rgba(0, 242, 254, 0.4));">
-                    <path d="M0 350 Q100 200 200 280 T400 150 T600 220 T800 100 T1000 300" fill="none" stroke="url(#gradient)" stroke-width="4" />
-                    <defs>
-                        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                            <stop offset="0%" stop-color="var(--primary)" />
-                            <stop offset="100%" stop-color="var(--secondary)" />
-                        </linearGradient>
-                    </defs>
-                </svg>
-                <!-- Nodes -->
-                <div style="position: absolute; top: 40%; left: 30%; width: 12px; height: 12px; background: var(--primary); border-radius: 50%; box-shadow: 0 0 15px var(--primary);"></div>
-                <div style="position: absolute; top: 20%; left: 60%; width: 12px; height: 12px; background: var(--secondary); border-radius: 50%; box-shadow: 0 0 15px var(--secondary);"></div>
+            <div class="chart-canvas-wrapper">
+                <canvas id="dashboard-traffic-chart"></canvas>
             </div>
         </mat-card>
 
         <mat-card class="widget-card glass-effect" style="padding: 24px;">
-            <div class="chart-header" style="margin-bottom: 24px;">
-                <span class="chart-title" style="font-size: 1.25rem; font-weight: 700;">Threat Detection Log</span>
-                <mat-icon class="text-dim">more_horiz</mat-icon>
+            <div class="chart-header" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <span class="chart-title" style="font-size: 1.25rem; font-weight: 700;">Threat Detection Log</span>
+                    <p class="text-dim" style="margin: 4px 0 0; font-size: 0.8rem;">Recent inspected transactions</p>
+                </div>
+                <button mat-icon-button routerLink="/trn" matTooltip="View all transactions">
+                    <mat-icon class="text-dim">open_in_new</mat-icon>
+                </button>
             </div>
-            <div style="overflow-y: auto; height: 350px;">
-                <table class="premium-table">
+            <div style="overflow-y: auto; height: 330px;">
+                <table class="premium-table" style="width: 100%; border-collapse: collapse;">
                     <thead>
                         <tr style="border-bottom: 1px solid var(--border-dim);">
                             <th style="text-align: left; padding: 12px 8px;">TIMESTAMP</th>
-                            <th style="text-align: left; padding: 12px 8px;">EVENT</th>
+                            <th style="text-align: left; padding: 12px 8px;">EVENT / ROUTE</th>
+                            <th style="text-align: left; padding: 12px 8px;">CLIENT IP</th>
                             <th style="text-align: right; padding: 12px 8px;">STATUS</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @for (i of [1,2,3,4,5,6]; track i) {
-                            <tr style="border-bottom: 1px solid var(--border-dim); transition: background 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
-                                <td style="padding: 16px 8px; font-size: 0.8rem;" class="text-dim">10:32:0{{i}}</td>
-                                <td style="padding: 16px 8px;">
-                                    <div style="font-weight: 600;">{{ i % 2 === 0 ? 'DDoS Attack' : 'SQL Injection' }}</div>
-                                    <div style="font-size: 0.7rem;" class="text-muted">192.168.1.5{{i}}</div>
-                                </td>
-                                <td style="padding: 16px 8px; text-align: right;">
-                                    <span [class]="i % 3 === 0 ? 'status-critical' : 'status-warning'" style="font-size: 0.7rem; padding: 4px 8px; background: rgba(255,255,255,0.05); border-radius: 4px;">
-                                        {{ i % 3 === 0 ? 'CRITICAL' : 'HIGH' }}
-                                    </span>
+                        @if (threatLogs && threatLogs.length > 0) {
+                            @for (log of threatLogs; track log.unique_id || log._id) {
+                                <tr style="border-bottom: 1px solid var(--border-dim); transition: background 0.3s; cursor: pointer;"
+                                    (click)="showRawLog(log)">
+                                    <td style="padding: 14px 8px; font-size: 0.8rem;" class="text-dim">
+                                        {{ log.logtime | dateFormat }}
+                                    </td>
+                                    <td style="padding: 14px 8px;">
+                                        <div style="font-weight: 600; font-size: 0.85rem;">
+                                            {{ (log.route_name && log.route_name !== '-') ? log.route_name : (log.http ? log.http.request_line : 'HTTP Request') }}
+                                        </div>
+                                        <div style="font-size: 0.75rem;" class="text-muted">
+                                            {{ log.service ? log.service.name : 'Service' }} {{ log.upstream ? '→ ' + log.upstream.name : '' }}
+                                        </div>
+                                    </td>
+                                    <td style="padding: 14px 8px; font-size: 0.85rem;">
+                                        {{ log.source ? log.source.ip : '-' }}
+                                        @if (log.source && log.source.geo && log.source.geo.country && log.source.geo.country !== '--') {
+                                            <span class="fi fi-{{ log.source.geo.country | lowercase }}"
+                                                  [matTooltip]="log.source.geo.country"></span>
+                                        }
+                                    </td>
+                                    <td style="padding: 14px 8px; text-align: right;">
+                                        <span class="status-chip {{ log.action | lowercase }}"
+                                              style="font-size: 0.7rem; padding: 4px 8px; border-radius: 4px; font-weight: 600;">
+                                            {{ log.action }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            }
+                        } @else {
+                            <tr>
+                                <td colspan="4" style="text-align: center; padding: 32px; color: var(--text-muted);">
+                                    No threat logs recorded yet
                                 </td>
                             </tr>
                         }

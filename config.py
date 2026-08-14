@@ -37,7 +37,7 @@ MAINTENANCE_WINDOW = "01:00"
 LOGLEVEL = os.environ.get("LOGLEVEL", "INFO").upper()
 
 # Security config
-SECURITY_ENABLED = bool(os.environ.get("SECURITY_ENABLED", "false"))
+SECURITY_ENABLED = bool(os.environ.get("SECURITY_ENABLED", "true"))
 KEY_SIZE = 2048
 JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", secrets.token_urlsafe(32))
 JWT_EXPIRE = 3600

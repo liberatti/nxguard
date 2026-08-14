@@ -7,6 +7,7 @@ from api.controller.config_controller import routes as config_routes
 from api.controller.feed_controller import routes as feed_routes
 from api.controller.oauth_controller import routes as oauth_routes
 from api.controller.replica_controller import routes as replica_routes
+from api.controller.route_controller import routes as route_routes
 from api.controller.rulecat_controller import routes as rulecat_routes
 from api.controller.rulesec_controller import routes as rulesec_routes
 from api.controller.sensor_controller import routes as sensor_routes
@@ -22,6 +23,7 @@ routes = [
     (feed_routes, f"{config.APP_CONTEXT}/api/feed"),
     (oauth_routes, f"{config.APP_CONTEXT}/api/oauth"),
     (replica_routes, f"{config.APP_CONTEXT}/api/replica"),
+    (route_routes, f"{config.APP_CONTEXT}/api/route"),
     (rulecat_routes, f"{config.APP_CONTEXT}/api/rulecat"),
     (rulesec_routes, f"{config.APP_CONTEXT}/api/rulesec"),
     (sensor_routes, f"{config.APP_CONTEXT}/api/sensor"),

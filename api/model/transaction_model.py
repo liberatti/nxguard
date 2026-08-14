@@ -15,7 +15,7 @@ class TransactionSchema(Schema):
         unknown = EXCLUDE
 
     _id = fields.Integer(required=False)
-    logtime = fields.DateTime(format=DATETIME_FMT)
+    logtime = fields.Raw(required=False)
     unique_id = fields.String(required=False)
     server_id = fields.String(required=False)
     service = fields.Dict(required=False)
@@ -23,6 +23,11 @@ class TransactionSchema(Schema):
     limit_req_status = fields.String(required=False)
     geoip_status = fields.String(required=False)
     rbl_status = fields.String(required=False)
+    ipxa = fields.String(required=False)
+    rate_limit = fields.Dict(required=False)
+    geoip = fields.Dict(required=False)
+    reputation = fields.Dict(required=False)
+    mtls = fields.Dict(required=False)
     user_agent = fields.Dict(required=False)
     source = fields.Dict(required=False)
     destination = fields.Dict(required=False)
@@ -40,12 +45,43 @@ class TransactionDao(DuckDAO):
     DAO for managing transaction log records using DuckDB.
     """
 
+    ALLOWED_COLUMNS = {
+        "_id",
+        "logtime",
+        "unique_id",
+        "server_id",
+        "service_id",
+        "action",
+        "limit_req_status",
+        "geoip_status",
+        "rbl_status",
+        "ipxa",
+        "route_name",
+        "sensor_id",
+        "upstream_id",
+        "score",
+        "archived",
+        "user_agent_json",
+        "source_json",
+        "destination_json",
+        "http_json",
+        "upstream_json",
+        "service_json",
+        "sensor_json",
+        "rate_limit_json",
+        "geoip_json",
+        "reputation_json",
+        "mtls_json",
+        "audit_json",
+    }
+
     def __init__(self):
         super().__init__(
             db_path=config.DB_PATH,
             table_name="transaction_logs",
             schema=TransactionSchema,
         )
+        self.create_schema()
 
     def create_schema(self):
         self.ddl(
@@ -60,6 +96,7 @@ class TransactionDao(DuckDAO):
                 limit_req_status TEXT,
                 geoip_status TEXT,
                 rbl_status TEXT,
+                ipxa TEXT,
                 route_name TEXT,
                 sensor_id TEXT,
                 upstream_id TEXT,
@@ -70,59 +107,176 @@ class TransactionDao(DuckDAO):
                 destination_json JSON,
                 http_json JSON,
                 upstream_json JSON,
+                service_json JSON,
+                sensor_json JSON,
+                rate_limit_json JSON,
+                geoip_json JSON,
+                reputation_json JSON,
+                mtls_json JSON,
                 audit_json JSON
             );
         """
         )
+        # Migrate existing table if missing new columns
+        new_columns = [
+            ("ipxa", "TEXT"),
+            ("service_json", "JSON"),
+            ("sensor_json", "JSON"),
+            ("rate_limit_json", "JSON"),
+            ("geoip_json", "JSON"),
+            ("reputation_json", "JSON"),
+            ("mtls_json", "JSON"),
+        ]
+        for col_name, col_type in new_columns:
+            try:
+                self.ddl(
+                    f"ALTER TABLE {self.table_name} ADD COLUMN IF NOT EXISTS {col_name} {col_type};"
+                )
+            except Exception:
+                pass
+
+    @staticmethod
+    def _normalize_filters(filters) -> Dict[str, Any]:
+        if not filters:
+            return {}
+        if isinstance(filters, dict):
+            return filters
+        if isinstance(filters, list):
+            merged = {}
+            for item in filters:
+                if isinstance(item, str):
+                    try:
+                        parsed = json.loads(item)
+                        if isinstance(parsed, dict):
+                            merged.update(parsed)
+                    except Exception:
+                        pass
+                elif isinstance(item, dict):
+                    merged.update(item)
+            return merged
+        return {}
 
     def from_dict(self, vo: Dict[str, Any]) -> Dict[str, Any]:
-        if "logtime" in vo and isinstance(vo["logtime"], datetime):
-            vo["logtime"] = vo["logtime"].strftime(config.DATETIME_FMT)
+        data = dict(vo)
+        if "logtime" in data:
+            if isinstance(data["logtime"], datetime):
+                data["logtime"] = data["logtime"].strftime(config.DATETIME_FMT)
+            elif isinstance(data["logtime"], str):
+                data["logtime"] = data["logtime"]
 
-        if "service" in vo and vo["service"]:
-            vo["service_id"] = str(vo["service"].get("_id", ""))
-        if "sensor" in vo and vo["sensor"]:
-            vo["sensor_id"] = str(vo["sensor"].get("_id", ""))
-        if "upstream" in vo and vo["upstream"]:
-            vo["upstream_id"] = str(vo["upstream"].get("_id", ""))
+        if "service" in data and data["service"]:
+            if isinstance(data["service"], dict):
+                data["service_id"] = str(
+                    data["service"].get("_id")
+                    or data["service"].get("id")
+                    or data["service"].get("name")
+                    or ""
+                )
+            else:
+                data["service_id"] = str(data["service"])
+                data["service"] = {"_id": str(data["service"]), "name": str(data["service"])}
+
+        if "sensor" in data and data["sensor"]:
+            if isinstance(data["sensor"], dict):
+                data["sensor_id"] = str(
+                    data["sensor"].get("_id")
+                    or data["sensor"].get("id")
+                    or data["sensor"].get("name")
+                    or ""
+                )
+            else:
+                data["sensor_id"] = str(data["sensor"])
+                data["sensor"] = {"_id": str(data["sensor"]), "name": str(data["sensor"])}
+
+        if "upstream" in data and data["upstream"]:
+            if isinstance(data["upstream"], dict):
+                data["upstream_id"] = str(
+                    data["upstream"].get("_id")
+                    or data["upstream"].get("id")
+                    or data["upstream"].get("name")
+                    or ""
+                )
+            else:
+                data["upstream_id"] = str(data["upstream"])
+                data["upstream"] = {
+                    "_id": str(data["upstream"]),
+                    "name": str(data["upstream"]),
+                }
 
         def datetime_handler(obj):
             if isinstance(obj, datetime):
                 return obj.strftime(config.DATETIME_FMT)
             raise TypeError(f"Type {type(obj)} not serializable")
 
-        for key in ["user_agent", "source", "destination", "http", "upstream", "audit"]:
-            if key in vo:
-                vo[f"{key}_json"] = json.dumps(vo.pop(key), default=datetime_handler)
-        return super().from_dict(vo)
+        json_keys = [
+            "user_agent",
+            "source",
+            "destination",
+            "http",
+            "upstream",
+            "service",
+            "sensor",
+            "rate_limit",
+            "geoip",
+            "reputation",
+            "mtls",
+            "audit",
+        ]
+        for key in json_keys:
+            if key in data:
+                data[f"{key}_json"] = json.dumps(data.pop(key), default=datetime_handler)
+
+        cleaned = {k: v for k, v in data.items() if k in self.ALLOWED_COLUMNS}
+        return super().from_dict(cleaned)
 
     def to_dict(self, row: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
         if row:
-            for key in [
+            if "logtime" in row and isinstance(row["logtime"], datetime):
+                row["logtime"] = row["logtime"].strftime(config.DATETIME_FMT)
+            elif "logtime" in row and row["logtime"] is not None:
+                row["logtime"] = str(row["logtime"])
+
+            json_keys = [
                 "user_agent",
                 "source",
                 "destination",
                 "http",
                 "upstream",
+                "service",
+                "sensor",
+                "rate_limit",
+                "geoip",
+                "reputation",
+                "mtls",
                 "audit",
-            ]:
+            ]
+            for key in json_keys:
                 json_key = f"{key}_json"
                 if json_key in row:
                     val = row.pop(json_key)
                     row[key] = json.loads(val) if val else {}
 
             if "service_id" in row:
-                svc_id = row.pop("service_id")
-                row["service"] = {"_id": svc_id} if svc_id else None
+                svc_id = row.pop("service_id", None)
+                if not row.get("service"):
+                    row["service"] = {"_id": svc_id, "name": svc_id} if svc_id else None
+                elif isinstance(row["service"], dict) and svc_id and "_id" not in row["service"]:
+                    row["service"]["_id"] = svc_id
+
             if "sensor_id" in row:
-                sns_id = row.pop("sensor_id")
-                row["sensor"] = {"_id": sns_id} if sns_id else None
+                sns_id = row.pop("sensor_id", None)
+                if not row.get("sensor"):
+                    row["sensor"] = {"_id": sns_id, "name": sns_id} if sns_id else None
+                elif isinstance(row["sensor"], dict) and sns_id and "_id" not in row["sensor"]:
+                    row["sensor"]["_id"] = sns_id
+
             if "upstream_id" in row:
-                ups_id = row.pop("upstream_id")
-                if "upstream" not in row or not row["upstream"]:
-                    row["upstream"] = {"_id": ups_id} if ups_id else None
-                elif ups_id:
+                ups_id = row.pop("upstream_id", None)
+                if not row.get("upstream"):
+                    row["upstream"] = {"_id": ups_id, "name": ups_id} if ups_id else None
+                elif isinstance(row["upstream"], dict) and ups_id and "_id" not in row["upstream"]:
                     row["upstream"]["_id"] = ups_id
+
         return super().to_dict(row)
 
     def get_all(self, pagination=None, dt_start=None, dt_end=None, filters=None):
@@ -139,14 +293,15 @@ class TransactionDao(DuckDAO):
             where_clauses.append("logtime <= ?")
             params.append(end_str)
 
-        if filters:
-            for key, val in filters.items():
+        filter_dict = self._normalize_filters(filters)
+        if filter_dict:
+            for key, val in filter_dict.items():
                 col = None
                 if key == "server_id":
                     col = "server_id"
                 elif key == "action":
                     col = "action"
-                elif key in ["service._id", "service.id", "service_id"]:
+                elif key in ["service._id", "service.id", "service_id", "service.name"]:
                     col = "service_id"
                 elif key in ["sensor._id", "sensor.id", "sensor_id"]:
                     col = "sensor_id"
@@ -156,6 +311,8 @@ class TransactionDao(DuckDAO):
                     col = "rbl_status"
                 elif key == "geoip_status":
                     col = "geoip_status"
+                elif key == "ipxa":
+                    col = "ipxa"
                 elif key == "archived":
                     col = "archived"
 
@@ -205,8 +362,9 @@ class TransactionDao(DuckDAO):
             where_clauses.append("logtime <= ?")
             params.append(end_str)
 
-        if filters:
-            for key, val in filters.items():
+        filter_dict = self._normalize_filters(filters)
+        if filter_dict:
+            for key, val in filter_dict.items():
                 col = None
                 if key == "server_id":
                     col = "server_id"
@@ -222,6 +380,8 @@ class TransactionDao(DuckDAO):
                     col = "rbl_status"
                 elif key == "geoip_status":
                     col = "geoip_status"
+                elif key == "ipxa":
+                    col = "ipxa"
                 elif key == "archived":
                     col = "archived"
 

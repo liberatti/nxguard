@@ -50,6 +50,7 @@ class RouteDao(DuckDAO):
         )
         self.upstreamDao = UpstreamDao(conn=self.conn)
         self.sensorDao = SensorDao(conn=self.conn)
+        self.create_schema()
 
     def create_schema(self):
         self.ddl(
@@ -85,17 +86,23 @@ class RouteDao(DuckDAO):
 
         if "upstream" in vo:
             ups = vo.pop("upstream")
-            if "_id" in ups:
-                vo["upstream_id"] = ups["_id"]
-            elif "name" in ups:
-                vo["upstream_id"] = self.upstreamDao.get_by_name(ups["name"])["_id"]
+            if ups:
+                if "_id" in ups:
+                    vo["upstream_id"] = ups["_id"]
+                elif "name" in ups:
+                    upstream_record = self.upstreamDao.get_by_name(ups["name"])
+                    if upstream_record:
+                        vo["upstream_id"] = upstream_record["_id"]
 
         if "sensor" in vo:
             sns = vo.pop("sensor")
-            if "_id" in sns:
-                vo["sensor_id"] = sns["_id"]
-            elif "name" in sns:
-                vo["sensor_id"] = self.sensorDao.get_by_name(sns["name"])["_id"]
+            if sns:
+                if "_id" in sns:
+                    vo["sensor_id"] = sns["_id"]
+                elif "name" in sns:
+                    sensor_record = self.sensorDao.get_by_name(sns["name"])
+                    if sensor_record:
+                        vo["sensor_id"] = sensor_record["_id"]
 
         return super().from_dict(vo)
 
@@ -115,13 +122,13 @@ class RouteDao(DuckDAO):
                     vo[field] = json.loads(vo[field])
                 except (json.JSONDecodeError, TypeError):
                     pass
-        upstream_id = vo.pop("upstream_id")
+        upstream_id = vo.pop("upstream_id", None)
         if upstream_id:
             vo["upstream"] = self.upstreamDao.get_by_id(upstream_id)
-        sensor_id = vo.pop("sensor_id")
+        sensor_id = vo.pop("sensor_id", None)
         if sensor_id:
             vo["sensor"] = self.sensorDao.get_by_id(sensor_id)
-        vo.pop("service_id")
+        vo.pop("service_id", None)
         return vo
 
     def get_all_by_service_id(self, service_id: Any) -> List[Dict[str, Any]]:

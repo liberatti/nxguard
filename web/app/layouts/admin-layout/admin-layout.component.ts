@@ -1,15 +1,15 @@
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { AfterViewInit, ChangeDetectorRef, Component, Injector, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, Injector, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router, RouterModule } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import * as moment from 'moment';
-import { Subject, takeUntil } from 'rxjs';
+import { filter, interval, Subject, takeUntil } from 'rxjs';
 import { FrontendConfig, MenuLink } from 'app/models/shared';
 import { LocalStorageService } from 'app/services/localstorage.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
@@ -89,7 +89,8 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
         protected injector: Injector,
         private route: ActivatedRoute,
         private router: Router,
-        private healthService: HealthService
+        private healthService: HealthService,
+        private ngZone: NgZone
     ) {
         this.httpClient = this.injector.get(HttpClient);
         breakpointObserver
@@ -196,6 +197,14 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.toggleSubMenu(undefined);
             }
         });
+        this.router.events
+            .pipe(
+                filter((event) => event instanceof NavigationEnd),
+                takeUntil(this.destroyed)
+            )
+            .subscribe(() => {
+                this.loadChanges();
+            });
         this.loadChanges();
     }
 
@@ -249,17 +258,32 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
             reconnectionDelayMax: 20000,
             timeout: 10000,
         });
+
         this.socket.on('tracking_evt', () => {
-            this.loadChanges();
+            this.ngZone.run(() => {
+                this.loadChanges();
+            });
         });
+
         this.socket.on('tracking_aply', () => {
-            this.trackingEvt = false;
-            this.changes = [];
-            this.changeDetectorRef.detectChanges();
+            this.ngZone.run(() => {
+                this.trackingEvt = false;
+                this.changes = [];
+                this.changeDetectorRef.detectChanges();
+            });
         });
+
+        // Polling fallback to keep changes synchronized even if websocket reconnects
+        interval(10000)
+            .pipe(takeUntil(this.destroyed))
+            .subscribe(() => {
+                this.loadChanges();
+            });
     }
 
     ngOnDestroy() {
+        this.destroyed.next();
+        this.destroyed.complete();
         if (this.socket) {
             this.socket.disconnect();
         }
