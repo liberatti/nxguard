@@ -26,7 +26,7 @@ REPLICATE_MAX_RETRIES = 3
 DATETIME_FMT = "%Y-%m-%dT%H:%M:%S.%fZ"
 TZ = pytz.timezone("UTC")
 
-TELEMETRY_ENABLE = bool(os.environ.get("TELEMETRY_ENABLE", "true"))
+TELEMETRY_ENABLE = bool(os.environ.get("TELEMETRY_ENABLE", "false"))
 TELEMETRY_INTERVAL = int(
     os.environ.get("TELEMETRY_INTERVAL", "60")
 )  # in transaction merge (10 minutes)
@@ -37,7 +37,7 @@ MAINTENANCE_WINDOW = "01:00"
 LOGLEVEL = os.environ.get("LOGLEVEL", "INFO").upper()
 
 # Security config
-SECURITY_ENABLED = bool(os.environ.get("SECURITY_ENABLED", "true"))
+SECURITY_ENABLED = bool(os.environ.get("SECURITY_ENABLED", "false"))
 KEY_SIZE = 2048
 JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", secrets.token_urlsafe(32))
 JWT_EXPIRE = 3600
