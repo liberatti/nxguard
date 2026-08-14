@@ -33,7 +33,6 @@ export interface TransactionFilter {
 export interface TransactionHeader {
     name: string;
     content: string;
-    certificate: string;
 }
 
 export interface TransactionHttp {

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -12,6 +12,7 @@ import Chart from 'chart.js/auto';
 
 import { HealthService } from '../../services/config.service';
 import { RouteService } from '../../services/route.service';
+import { ServiceService } from '../../services/service.service';
 import { TransactionService } from '../../services/transaction.service';
 import { EngineNode, Health } from '../../models/config';
 import { TransactionLog } from '../../models/transaction';
@@ -36,7 +37,7 @@ import { TransactionRAWDialogComponent } from '../../components/transaction-raw-
     templateUrl: './dashboard-home.component.html',
     styleUrl: './dashboard-home.component.css',
 })
-export class DashboardHomeComponent implements OnInit, OnDestroy {
+export class DashboardHomeComponent implements OnInit, AfterViewInit, OnDestroy {
     health: Health = {} as Health;
     totalThreats: number = 0;
     totalRoutes: number = 0;
@@ -51,6 +52,7 @@ export class DashboardHomeComponent implements OnInit, OnDestroy {
         private detailsDialog: MatDialog,
         private healthService: HealthService,
         private routeService: RouteService,
+        private serviceService: ServiceService,
         private transactionService: TransactionService
     ) {}
 
@@ -69,17 +71,27 @@ export class DashboardHomeComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        this.loadHealth();
-        this.loadProtectedAssets();
-        this.loadTotalThreats();
-        this.loadThreatLogs();
-        this.loadTrafficChart();
+        this.refresh();
+    }
+
+    ngAfterViewInit(): void {
+        setTimeout(() => {
+            this.loadTrafficChart();
+        }, 100);
     }
 
     ngOnDestroy(): void {
         if (this.chart) {
             this.chart.destroy();
         }
+    }
+
+    refresh(): void {
+        this.loadHealth();
+        this.loadProtectedAssets();
+        this.loadTotalThreats();
+        this.loadThreatLogs();
+        this.loadTrafficChart();
     }
 
     loadHealth(): void {
@@ -94,11 +106,38 @@ export class DashboardHomeComponent implements OnInit, OnDestroy {
     }
 
     loadProtectedAssets(): void {
-        this.routeService.get({ page: 1, per_page: 1 } as any).subscribe({
-            next: (res) => {
-                this.totalRoutes =
+        this.routeService.get().subscribe({
+            next: (res: any) => {
+                const total =
                     res?.metadata?.total_elements ??
-                    (Array.isArray(res?.data) ? res.data.length : 0);
+                    (Array.isArray(res?.data)
+                        ? res.data.length
+                        : Array.isArray(res)
+                        ? res.length
+                        : 0);
+                if (total > 0) {
+                    this.totalRoutes = total;
+                } else {
+                    this.loadRoutesFromServices();
+                }
+            },
+            error: () => {
+                this.loadRoutesFromServices();
+            },
+        });
+    }
+
+    private loadRoutesFromServices(): void {
+        this.serviceService.get().subscribe({
+            next: (res: any) => {
+                const services = res?.data || (Array.isArray(res) ? res : []);
+                let count = 0;
+                for (const svc of services) {
+                    if (svc.routes && Array.isArray(svc.routes)) {
+                        count += svc.routes.length;
+                    }
+                }
+                this.totalRoutes = count;
             },
             error: () => {
                 this.totalRoutes = 0;

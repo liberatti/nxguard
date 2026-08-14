@@ -38,9 +38,9 @@ class ServiceWatcher:
         access_log = threading.Thread(
             target=LogParserTool.follow_file,
             args=(
-                cache,
                 f"{BASE_PATH}/logs/access.json",
                 "ACCESS",
+                cache,
             ),
             daemon=True,
         )
@@ -49,9 +49,9 @@ class ServiceWatcher:
         error_log = threading.Thread(
             target=LogParserTool.follow_file,
             args=(
-                cache,
                 f"{BASE_PATH}/logs/error.log",
                 "ERROR",
+                cache,
             ),
             daemon=True,
         )
@@ -60,9 +60,9 @@ class ServiceWatcher:
         audit_log = threading.Thread(
             target=LogParserTool.follow_file,
             args=(
-                cache,
                 f"{BASE_PATH}/logs/audit_log-{service_name}.log",
                 "AUDIT",
+                cache,
             ),
             daemon=True,
         )
@@ -71,8 +71,8 @@ class ServiceWatcher:
         merge = threading.Thread(
             target=LogParserTool.merge_transactions,
             args=(
-                cache,
                 service_name,
+                cache,
             ),
             daemon=True,
         )
