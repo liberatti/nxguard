@@ -24,18 +24,23 @@ import {TranslatePipe} from '@ngx-translate/core';
 import {CertificateService} from 'app/services/certificate.service';
 import {OAuthService} from "../../services/oauth.service";
 
+import {TextFieldModule} from '@angular/cdk/text-field';
+
 @Component({
     selector: 'app-certificate-form',
     standalone: true,
-    imports: [RouterModule, CommonModule,
+    imports: [
+        RouterModule, CommonModule,
         ReactiveFormsModule, TranslatePipe,
         MatMomentDateModule,
         MatSidenavModule, MatIconModule, MatButtonModule,
         MatListModule, MatCardModule, MatProgressBarModule, MatInputModule,
         MatTableModule, MatMenuModule, MatSortModule,
         MatTooltipModule, MatSelectModule, MatPaginatorModule,
-        MatFormFieldModule, MatChipsModule],
-    templateUrl: './certificate-form.component.html'
+        MatFormFieldModule, MatChipsModule, TextFieldModule
+    ],
+    templateUrl: './certificate-form.component.html',
+    styleUrl: './certificate-form.component.css'
 })
 
 export class CertificateFormComponent implements OnInit {

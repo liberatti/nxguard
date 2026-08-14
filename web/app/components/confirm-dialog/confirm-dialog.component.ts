@@ -1,7 +1,7 @@
 import {Component, Inject} from '@angular/core';
+import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
-import {MatCardModule} from '@angular/material/card';
 import {
     MAT_DIALOG_DATA,
     MatDialogActions,
@@ -9,23 +9,23 @@ import {
     MatDialogRef,
     MatDialogTitle
 } from '@angular/material/dialog';
-import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatIconModule} from '@angular/material/icon';
-import {MatInputModule} from '@angular/material/input';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
     selector: 'app-confirm-dialog',
     templateUrl: './confirm-dialog.component.html',
+    styleUrl: './confirm-dialog.component.css',
     standalone: true,
     imports: [
-        MatFormFieldModule,
-        MatInputModule,
-        FormsModule,MatCardModule,
+        CommonModule,
+        FormsModule,
         MatButtonModule,
         MatDialogTitle,
         MatDialogContent,
         MatDialogActions,
-        MatIconModule
+        MatIconModule,
+        TranslatePipe
     ],
 })
 

@@ -13,8 +13,6 @@ import {ServiceFormComponent} from './view/service-form/service-form.component';
 import {AccountComponent} from './view/account-form/account-form.component';
 import {TransactionListComponent} from './view/transaction-list/transaction-list.component';
 import {ConfigFormComponent} from './view/config-form/config-form.component';
-import {FeedListComponent} from "./view/feed-list/feed-list.component";
-import {FeedFormComponent} from "./view/feed-form/feed-form.component";
 import {DashboardHomeComponent} from "./view/dashboard-home/dashboard-home.component";
 import {UserListComponent} from "./view/user-list/user-list.component";
 import {UserFormComponent} from "./view/user-form/user-form.component";
@@ -40,14 +38,6 @@ export const routes: Routes = [
                     {path: '', component: ServiceListComponent},
                     {path: 'add', component: ServiceFormComponent},
                     {path: 'edit/:id', component: ServiceFormComponent},
-                ]
-            },
-            {
-                path: 'feed',
-                children: [
-                    {path: '', component: FeedListComponent},
-                    {path: 'add', component: FeedFormComponent},
-                    {path: 'edit/:id', component: FeedFormComponent},
                 ]
             },
             {

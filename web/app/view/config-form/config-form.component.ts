@@ -27,17 +27,22 @@ import {MatTabsModule} from '@angular/material/tabs';
 import {MatExpansionModule} from '@angular/material/expansion';
 import {OAuthService} from "../../services/oauth.service";
 
+import {TextFieldModule} from '@angular/cdk/text-field';
+
 @Component({
     selector: 'app-config-form',
     standalone: true,
-    imports: [RouterModule, CommonModule,
+    imports: [
+        RouterModule, CommonModule,
         ReactiveFormsModule, TranslatePipe,
         MatMomentDateModule,
         MatSidenavModule, MatIconModule, MatButtonModule,
         MatListModule, MatCardModule, MatProgressBarModule, MatInputModule,
         MatTableModule, MatMenuModule, MatSortModule,
         MatTooltipModule, MatSelectModule, MatPaginatorModule, MatSlideToggleModule,
-        MatFormFieldModule, MatChipsModule, MatTabsModule, MatExpansionModule],
+        MatFormFieldModule, MatChipsModule, MatTabsModule, MatExpansionModule,
+        TextFieldModule
+    ],
     templateUrl: './config-form.component.html',
     styleUrl: './config-form.component.css'
 })

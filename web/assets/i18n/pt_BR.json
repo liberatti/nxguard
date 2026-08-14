@@ -11,11 +11,24 @@
     "save": "Salvar",
     "import": "Importar",
     "refresh": "Atualizar",
+    "close": "Fechar",
     "cancel": "Cancelar",
+    "confirm": "Confirmar",
     "next": "Próximo",
     "back": "Voltar",
     "add": "Adicionar",
-    "apply": "Aplicar"
+    "apply": "Aplicar",
+    "backup": "Backup",
+    "restore": "Restaurar"
+  },
+  "about": {
+    "title": "Sobre o NXGuard",
+    "subtitle": "API Gateway de Alta Performance & Motor de Segurança",
+    "tab_about": "Sobre",
+    "tab_restore": "Restaurar Config",
+    "choose_file": "Escolher arquivo ZIP para restauração",
+    "selected_file": "Arquivo Selecionado",
+    "powered_by": "Desenvolvido com OpenResty & ModSecurity"
   },
   "attr": {
     "name": "Nome",
@@ -118,6 +131,46 @@
     "ERROR_TITLE": "Falha ao Aplicar Configurações",
     "NO_CHANGES": "Nenhuma alteração pendente detectada. A configuração está atualizada.",
     "PENDING_CHANGE": "Modificado — recarga pendente"
+  },
+  "CERT_FORM": {
+    "NAME": "Nome do Certificado",
+    "NAME_HINT": "Identificador alfanumérico exclusivo para este certificado",
+    "PROVIDER": "Provedor do Certificado",
+    "GENERAL_INFO": "Configurações Gerais",
+    "CREDENTIALS_TITLE": "Dados do Certificado e Chave",
+    "MANAGED_TITLE": "Certificado ACME Automatizado",
+    "MANAGED_NOTICE": "Certificados gerenciados são automaticamente requisitados, provisionados e renovados via Let's Encrypt / ACME.",
+    "EXTERNAL_NOTICE": "Cole seu certificado X.509 codificado em PEM, chave privada e cadeia intermediária de AC abaixo.",
+    "CERTIFICATE_LABEL": "Certificado (PEM / CRT)",
+    "KEY_LABEL": "Chave Privada (PEM / KEY)",
+    "CHAIN_LABEL": "Cadeia da Autoridade Certificadora (PEM / Opcional)"
+  },
+  "CONFIG_PAGE": {
+    "TITLE": "Configuração Global",
+    "SUBTITLE": "Gerencie configurações globais do motor, certificados PKI e políticas de transações",
+    "PANEL_GENERAL": "Geral & Integrações",
+    "PANEL_GENERAL_DESC": "Chaves de API de terceiros e endpoints de diretório externo",
+    "MAXMIND_KEY": "Chave de Licença MaxMind Geolocation",
+    "MAXMIND_HINT": "Utilizada para geolocalização de IP e bloqueio por país",
+    "ACME_URL": "URL do Diretório ACME",
+    "ACME_HINT": "Endpoint do diretório Let's Encrypt / ACME (ex.: https://acme-v02.api.letsencrypt.org/directory)",
+    "PANEL_CA": "Autoridade Certificadora (CA Interna)",
+    "PANEL_CA_DESC": "Gerencie o certificado CA raiz e chave privada para certificados de cliente e inspeção TLS",
+    "CA_CERT": "Certificado CA Raiz (PEM)",
+    "CA_KEY": "Chave Privada CA Raiz (PEM)",
+    "PANEL_POLICY": "Políticas de Transações",
+    "PANEL_POLICY_DESC": "Configure arquivamento automatizado e expurgo de retenção de banco de dados",
+    "ARCHIVE_TITLE": "Arquivamento de Transações",
+    "ARCHIVE_TOGGLE": "Ativar Arquivamento",
+    "ARCHIVE_DESC": "Transfira e arquive automaticamente a telemetria de transações para um cluster Elasticsearch / OpenSearch externo.",
+    "ARCHIVE_AFTER": "Arquivar após (minutos)",
+    "CLUSTER_URL": "URL do Cluster",
+    "CLUSTER_USER": "Usuário",
+    "CLUSTER_PASS": "Senha",
+    "PURGE_TITLE": "Expurgo de Transações",
+    "PURGE_TOGGLE": "Ativar Expurgo do Banco de Dados",
+    "PURGE_DESC": "Remova automaticamente registros antigos do banco local DuckDB para manter alta performance e economizar armazenamento.",
+    "PURGE_AFTER": "Idade Máxima dos Dados (dias)"
   },
   "format": {
     "parse": {

@@ -12,11 +12,23 @@
     "refresh": "Refresh",
     "close": "Close",
     "cancel": "Cancel",
+    "confirm": "Confirm",
     "next": "Next",
     "back": "Back",
     "add": "Add",
     "delete": "Delete",
-    "apply": "Apply"
+    "apply": "Apply",
+    "backup": "Backup",
+    "restore": "Restore"
+  },
+  "about": {
+    "title": "About NXGuard",
+    "subtitle": "High-Performance API Gateway & Security Engine",
+    "tab_about": "About",
+    "tab_restore": "Restore Config",
+    "choose_file": "Choose ZIP file to restore",
+    "selected_file": "Selected File",
+    "powered_by": "Powered by OpenResty & ModSecurity"
   },
   "attr": {
     "active": "Active",
@@ -61,11 +73,6 @@
       "link": "Certificate",
       "title": "Certificate",
       "subtitle": "List of all certificate"
-    },
-    "feed": {
-      "link": "Security Feed",
-      "title": "Security Feed",
-      "subtitle": "List of all feeds"
     },
     "sensor": {
       "link": "Sensor",
@@ -163,6 +170,46 @@
     "ERROR_TITLE": "Failed to Apply Configuration",
     "NO_CHANGES": "No pending changes detected. Configuration is up to date.",
     "PENDING_CHANGE": "Modified — pending reload"
+  },
+  "CERT_FORM": {
+    "NAME": "Certificate Name",
+    "NAME_HINT": "Unique alphanumeric identifier for this certificate",
+    "PROVIDER": "Certificate Provider",
+    "GENERAL_INFO": "General Configuration",
+    "CREDENTIALS_TITLE": "Certificate & Key Material",
+    "MANAGED_TITLE": "Automated ACME Certificate",
+    "MANAGED_NOTICE": "Managed certificates are automatically requested, provisioned and renewed via Let's Encrypt / ACME.",
+    "EXTERNAL_NOTICE": "Paste your custom PEM-encoded certificate, private key, and intermediate CA chain below.",
+    "CERTIFICATE_LABEL": "Certificate (PEM / CRT)",
+    "KEY_LABEL": "Private Key (PEM / KEY)",
+    "CHAIN_LABEL": "Certificate Authority Chain (PEM / Optional)"
+  },
+  "CONFIG_PAGE": {
+    "TITLE": "Global Configuration",
+    "SUBTITLE": "Manage global engine settings, PKI certificates, and transaction policies",
+    "PANEL_GENERAL": "General & Integrations",
+    "PANEL_GENERAL_DESC": "Third-party API keys and external directory endpoints",
+    "MAXMIND_KEY": "MaxMind Geolocation License Key",
+    "MAXMIND_HINT": "Used for IP geolocation and country-based security blocking",
+    "ACME_URL": "ACME Directory URL",
+    "ACME_HINT": "Let's Encrypt / ACME directory endpoint (e.g. https://acme-v02.api.letsencrypt.org/directory)",
+    "PANEL_CA": "Certification Authority (Internal CA)",
+    "PANEL_CA_DESC": "Manage root CA certificate and private key for client certificates & TLS inspection",
+    "CA_CERT": "Root CA Certificate (PEM)",
+    "CA_KEY": "Root CA Private Key (PEM)",
+    "PANEL_POLICY": "Transaction Policies",
+    "PANEL_POLICY_DESC": "Configure automated data archiving and database retention purging",
+    "ARCHIVE_TITLE": "Transaction Archiving",
+    "ARCHIVE_TOGGLE": "Enable Archiving",
+    "ARCHIVE_DESC": "Automatically stream and archive transaction telemetry to an external Elasticsearch / OpenSearch cluster for audit compliance.",
+    "ARCHIVE_AFTER": "Archive After (minutes)",
+    "CLUSTER_URL": "Cluster URL",
+    "CLUSTER_USER": "Username",
+    "CLUSTER_PASS": "Password",
+    "PURGE_TITLE": "Transaction Purging",
+    "PURGE_TOGGLE": "Enable Database Purging",
+    "PURGE_DESC": "Automatically delete outdated transactional records from the local DuckDB database to preserve high performance and disk storage.",
+    "PURGE_AFTER": "Maximum Data Age (days)"
   },
   "format": {
     "display": {

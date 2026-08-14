@@ -17,6 +17,8 @@ import { environment } from 'environments/environment';
 import {ConfigService} from "../../services/config.service";
 
 
+import {MatTooltipModule} from '@angular/material/tooltip';
+
 @Component({
     selector: 'app-about-dialog',
     templateUrl: './about-dialog.component.html',
@@ -30,7 +32,7 @@ import {ConfigService} from "../../services/config.service";
         MatButtonModule,
         MatDialogContent,
         MatDialogActions,
-        MatTabsModule, MatIconModule, TranslatePipe
+        MatTabsModule, MatIconModule, MatTooltipModule, TranslatePipe
     ],
 })
 
@@ -88,5 +90,21 @@ export class AboutDialogComponent {
 
     onTabChanged(event: MatTabChangeEvent) {
         this.currentTab = event.index;
+    }
+
+    clearSelectedFile(event?: Event): void {
+        if (event) {
+            event.stopPropagation();
+            event.preventDefault();
+        }
+        this.selectedFile = null;
+    }
+
+    formatFileSize(bytes?: number): string {
+        if (!bytes) return '0 B';
+        const k = 1024;
+        const sizes = ['B', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     }
 }

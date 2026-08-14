@@ -1,51 +1,136 @@
-<mat-dialog-content class="dialog-content">
-    <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="end" (selectedTabChange)="onTabChanged($event)" class="custom-tab-group" id="about-dialog-tabs">
-        <mat-tab label="About" class="about-tab" id="about-tab">
-            <div class="about-content">
-                <p [innerHTML]="'content.about' |translate" class="about-text"></p>
-                <div class="links-container">
-                    <a href="https://github.com/liberatti/nxguard" target="_blank" class="link-button" id="about-github-link">
-                        <img class="img-round github-icon" src="assets/github-mark.png" alt="GitHub"/>
-                        <span>GitHub</span>
-                    </a>
-                    <a class="link-button" href="{{_REST_API_URL}}/api-docs" target="_blank" id="about-api-link">
-                        <mat-icon>description</mat-icon>
-                        <span>API</span>
-                    </a>
+<div class="about-dialog-container">
+    <!-- Header -->
+    <div class="about-dialog-header">
+        <div class="header-brand">
+            <img class="brand-logo" src="assets/logo.png" alt="NXGuard Logo" />
+            <div class="brand-info">
+                <div class="title-row">
+                    <h2 class="brand-title">{{ 'about.title' | translate }}</h2>
+                    <span class="version-badge">v1.0</span>
                 </div>
+                <p class="brand-subtitle">{{ 'about.subtitle' | translate }}</p>
             </div>
-        </mat-tab>
-        <mat-tab label="Restore config" class="restore-tab" id="restore-tab">
-            <div class="restore-content">
-                <div class="loading-box" *ngIf="!restoreReady">
-                    <div class="spinner"></div>
-                </div>
-                <form enctype="multipart/form-data" *ngIf="restoreReady" #fileForm class="restore-form" id="restore-form">
-                    <p [innerHTML]="'content.restore_notice' |translate" class="restore-notice"></p>
-                    <div class="file-upload-container">
-                        <input class="file-input" type="file" id="uploadConfig"
-                               accept="application/zip, .zip" (change)="onFileSelected($event)">
-                        <label for="uploadConfig" class="file-upload-label" id="upload-config-label">
-                            <mat-icon>upload_file</mat-icon>
-                            <span>Choose file</span>
-                        </label>
+        </div>
+        <button mat-icon-button (click)="onDismiss()" class="close-header-btn" id="about-dialog-header-close-btn">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+
+    <!-- Tab Group -->
+    <mat-dialog-content class="dialog-content">
+        <mat-tab-group (selectedTabChange)="onTabChanged($event)" class="custom-tab-group" id="about-dialog-tabs">
+            <!-- About Tab -->
+            <mat-tab [label]="'about.tab_about' | translate" id="about-tab">
+                <div class="tab-content about-content">
+                    <p [innerHTML]="'content.about' | translate" class="about-description"></p>
+
+                    <div class="feature-pills">
+                        <div class="feature-pill">
+                            <mat-icon class="pill-icon">shield</mat-icon>
+                            <span>ModSecurity v3</span>
+                        </div>
+                        <div class="feature-pill">
+                            <mat-icon class="pill-icon">bolt</mat-icon>
+                            <span>OpenResty / LuaJIT</span>
+                        </div>
+                        <div class="feature-pill">
+                            <mat-icon class="pill-icon">insights</mat-icon>
+                            <span>Real-Time Telemetry</span>
+                        </div>
                     </div>
-                </form>
-            </div>
-        </mat-tab>
-    </mat-tab-group>
-</mat-dialog-content>
-<mat-dialog-actions align="end" class="dialog-actions">
-    <button *ngIf="currentTab==1" mat-raised-button color="warn" (click)="onSubmit()" [disabled]="!restoreReady" class="action-button" id="restore-config-btn">
-        <mat-icon>restore</mat-icon>
-        <span>Restore</span>
-    </button>
-    <button *ngIf="currentTab==0" mat-raised-button color="primary" (click)="downloadConfig()" class="action-button" id="download-config-btn">
-        <mat-icon>file_download</mat-icon>
-        <span>Backup</span>
-    </button>
-    <button (click)="onDismiss()" mat-raised-button class="action-button" id="about-dialog-close-btn">
-        <mat-icon>exit_to_app</mat-icon>
-        <span>{{ 'actions.close'|translate }}</span>
-    </button>
-</mat-dialog-actions>
+
+                    <div class="links-container">
+                        <a href="https://github.com/liberatti/nxguard" target="_blank" class="link-card" id="about-github-link">
+                            <img class="link-icon github-icon" src="assets/github-mark.png" alt="GitHub" />
+                            <div class="link-info">
+                                <span class="link-title">GitHub</span>
+                                <span class="link-sub">Source code & issues</span>
+                            </div>
+                            <mat-icon class="link-arrow">open_in_new</mat-icon>
+                        </a>
+                        <a [href]="_REST_API_URL + '/api-docs'" target="_blank" class="link-card" id="about-api-link">
+                            <div class="api-icon-wrapper">
+                                <mat-icon class="link-icon">menu_book</mat-icon>
+                            </div>
+                            <div class="link-info">
+                                <span class="link-title">API Docs</span>
+                                <span class="link-sub">Swagger / OpenAPI</span>
+                            </div>
+                            <mat-icon class="link-arrow">open_in_new</mat-icon>
+                        </a>
+                    </div>
+                </div>
+            </mat-tab>
+
+            <!-- Restore Tab -->
+            <mat-tab [label]="'about.tab_restore' | translate" id="restore-tab">
+                <div class="tab-content restore-content">
+                    <div class="notice-banner">
+                        <mat-icon class="notice-icon">warning_amber</mat-icon>
+                        <p class="notice-text" [innerHTML]="'content.restore_notice' | translate"></p>
+                    </div>
+
+                    <div *ngIf="!restoreReady" class="loading-box">
+                        <div class="spinner"></div>
+                        <p class="loading-text">{{ 'APPLY_DIALOG.APPLYING' | translate }}</p>
+                    </div>
+
+                    <form *ngIf="restoreReady" class="restore-form" id="restore-form">
+                        <div class="file-dropzone" [class.has-file]="selectedFile">
+                            <input class="file-input" type="file" id="uploadConfig"
+                                   accept="application/zip, .zip" (change)="onFileSelected($event)">
+                            
+                            <label for="uploadConfig" class="dropzone-label" id="upload-config-label" *ngIf="!selectedFile">
+                                <div class="dropzone-icon-wrapper">
+                                    <mat-icon class="dropzone-icon">cloud_upload</mat-icon>
+                                </div>
+                                <span class="dropzone-title">{{ 'about.choose_file' | translate }}</span>
+                                <span class="dropzone-hint">.ZIP format only</span>
+                            </label>
+
+                            <div class="file-selected-card" *ngIf="selectedFile">
+                                <div class="file-info-group">
+                                    <div class="file-icon-badge">
+                                        <mat-icon>folder_zip</mat-icon>
+                                    </div>
+                                    <div class="file-details">
+                                        <span class="file-name">{{ selectedFile.name }}</span>
+                                        <span class="file-size">{{ formatFileSize(selectedFile.size) }}</span>
+                                    </div>
+                                </div>
+                                <button type="button" mat-icon-button (click)="clearSelectedFile($event)" matTooltip="Remove file" id="clear-selected-file-btn">
+                                    <mat-icon>close</mat-icon>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </mat-tab>
+        </mat-tab-group>
+    </mat-dialog-content>
+
+    <!-- Actions -->
+    <mat-dialog-actions align="end" class="dialog-actions">
+        <ng-container *ngIf="currentTab === 0">
+            <button mat-flat-button color="primary" (click)="downloadConfig()" class="action-btn" id="download-config-btn">
+                <mat-icon>file_download</mat-icon>
+                <span>{{ 'actions.backup' | translate }}</span>
+            </button>
+            <button mat-stroked-button (click)="onDismiss()" class="action-btn" id="about-dialog-close-btn">
+                <mat-icon>close</mat-icon>
+                <span>{{ 'actions.close' | translate }}</span>
+            </button>
+        </ng-container>
+
+        <ng-container *ngIf="currentTab === 1">
+            <button mat-stroked-button (click)="onDismiss()" class="action-btn" id="about-dialog-cancel-btn">
+                <mat-icon>close</mat-icon>
+                <span>{{ 'actions.cancel' | translate }}</span>
+            </button>
+            <button mat-flat-button color="warn" (click)="onSubmit()" [disabled]="!selectedFile || !restoreReady" class="action-btn" id="restore-config-btn">
+                <mat-icon>restore</mat-icon>
+                <span>{{ 'actions.restore' | translate }}</span>
+            </button>
+        </ng-container>
+    </mat-dialog-actions>
+</div>

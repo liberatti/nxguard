@@ -1,121 +1,371 @@
+.about-dialog-container {
+    padding: 0;
+    min-width: 440px;
+    max-width: 520px;
+}
+
+.about-dialog-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px 16px 24px;
+    border-bottom: 1px solid var(--border-dim);
+}
+
+.header-brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.brand-logo {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    object-fit: contain;
+}
+
+.brand-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.title-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.brand-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text-main);
+}
+
+.version-badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 12px;
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--primary);
+    border: 1px solid rgba(37, 99, 235, 0.2);
+}
+
+.brand-subtitle {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    margin: 0;
+}
+
+.close-header-btn {
+    color: var(--text-muted);
+}
+
+.close-header-btn:hover {
+    color: var(--text-main);
+}
+
 .dialog-content {
-  padding: 24px;
-  color: rgba(0, 0, 0, 0.87);
+    padding: 0 24px;
+    margin: 0;
 }
 
 .custom-tab-group {
-  margin-bottom: 20px;
+    margin-top: 4px;
 }
 
-.about-content, .restore-content {
-  padding: 20px 0;
-  color: rgba(0, 0, 0, 0.87);
+.tab-content {
+    padding: 16px 0 8px 0;
 }
 
-.about-text {
-  margin-bottom: 24px;
-  line-height: 1.6;
-  color: rgba(0, 0, 0, 0.87);
+.about-description {
+    font-size: 0.925rem;
+    line-height: 1.6;
+    color: var(--text-dim);
+    margin: 0 0 16px 0;
+}
+
+.feature-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.feature-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    background: var(--bg-darker);
+    border: 1px solid var(--border-dim);
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-dim);
+}
+
+.pill-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: var(--primary);
 }
 
 .links-container {
-  display: flex;
-  gap: 16px;
-  margin-top: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
 }
 
-.link-button {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  border-radius: 4px;
-  text-decoration: none;
-  color: rgba(0, 0, 0, 0.87);
-  transition: background-color 0.2s;
-  background-color: rgba(0, 0, 0, 0.04);
+.link-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border-dim);
+    background: var(--bg-darker);
+    text-decoration: none;
+    color: var(--text-main);
+    transition: all 0.2s var(--transition);
 }
 
-.link-button:hover {
-  background-color: rgba(0, 0, 0, 0.08);
+.link-card:hover {
+    border-color: var(--primary);
+    background: var(--bg-main);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.link-icon {
+    width: 24px;
+    height: 24px;
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.api-icon-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
 }
 
 .github-icon {
-  height: 24px;
-  width: auto;
+    object-fit: contain;
 }
 
-.restore-form {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+.link-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
 }
 
-.restore-notice {
-  margin-bottom: 16px;
-  line-height: 1.6;
-  color: rgba(0, 0, 0, 0.87);
+.link-title {
+    font-size: 0.875rem;
+    font-weight: 600;
 }
 
-.file-upload-container {
-  position: relative;
+.link-sub {
+    font-size: 0.725rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.link-arrow {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: var(--text-muted);
+}
+
+/* Restore Tab */
+.notice-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: rgba(245, 158, 11, 0.08);
+    border: 1px solid rgba(245, 158, 11, 0.25);
+    margin-bottom: 16px;
+}
+
+.notice-icon {
+    color: var(--warning, #f59e0b);
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.notice-text {
+    font-size: 0.825rem;
+    line-height: 1.5;
+    color: var(--text-dim);
+    margin: 0;
+}
+
+.file-dropzone {
+    position: relative;
+    border: 2px dashed var(--border-bright);
+    border-radius: 12px;
+    background: var(--bg-darker);
+    transition: all 0.2s ease;
+    overflow: hidden;
+}
+
+.file-dropzone:hover {
+    border-color: var(--primary);
+}
+
+.file-dropzone.has-file {
+    border-style: solid;
+    border-color: var(--border-dim);
 }
 
 .file-input {
-  position: absolute;
-  width: 0.1px;
-  height: 0.1px;
-  opacity: 0;
-  overflow: hidden;
-  z-index: -1;
+    position: absolute;
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    z-index: -1;
 }
 
-.file-upload-label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 24px;
-  background-color: rgba(0, 0, 0, 0.04);
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  color: rgba(0, 0, 0, 0.87);
+.dropzone-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+    cursor: pointer;
+    text-align: center;
 }
 
-.file-upload-label:hover {
-  background-color: rgba(0, 0, 0, 0.08);
+.dropzone-icon-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--primary);
+    margin-bottom: 10px;
 }
 
-.dialog-actions {
-  padding: 16px 24px;
-  gap: 12px;
-  background-color: #fafafa;
-  border-top: 1px solid rgba(0, 0, 0, 0.12);
+.dropzone-icon {
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
 }
 
-.action-button {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.dropzone-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 4px;
+}
+
+.dropzone-hint {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.file-selected-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    background: var(--bg-main);
+}
+
+.file-info-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.file-icon-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--primary);
+}
+
+.file-details {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.file-name {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-main);
+    max-width: 240px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.file-size {
+    font-size: 0.75rem;
+    color: var(--text-muted);
 }
 
 .loading-box {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+    gap: 12px;
+}
+
+.loading-text {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    margin: 0;
 }
 
 .spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid rgba(0, 0, 0, 0.12);
-  border-top: 4px solid #1976d2;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
+    width: 36px;
+    height: 36px;
+    border: 3px solid var(--border-dim);
+    border-top: 3px solid var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.dialog-actions {
+    padding: 16px 24px 20px 24px;
+    gap: 10px;
+    margin: 0;
+    border-top: 1px solid var(--border-dim);
+}
+
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
 }

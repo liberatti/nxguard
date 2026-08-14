@@ -34,11 +34,6 @@
         "icon": "browser_updated"
       },
       {
-        "label": "view.feed.link",
-        "route": "/feed",
-        "icon": "rss_feed"
-      },
-      {
         "label": "view.user.link",
         "route": "/users",
         "icon": "supervised_user_circle"

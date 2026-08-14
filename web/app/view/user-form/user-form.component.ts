@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router, RouterModule} from '@angular/router';
 import {AbstractControl, FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import {Feed} from 'app/models/feed';
+import {User} from 'app/models/oauth';
 import {NotificationService} from 'app/services/notification.service';
 import {CommonModule} from '@angular/common';
 import {MatMomentDateModule} from '@angular/material-moment-adapter';
@@ -61,7 +61,7 @@ export class UserFormComponent implements OnInit {
         private notificationService: NotificationService,
         private route: ActivatedRoute,
         private router: Router,
-        private feedService: UserService,
+        private userService: UserService,
         protected oauth: OAuthService
     ) {
         this.isAddMode = false;
@@ -81,7 +81,7 @@ export class UserFormComponent implements OnInit {
 
         // If editing, fetch user and patch form values
         if (!this.isAddMode) {
-            this.feedService.getById(id).subscribe(data => {
+            this.userService.getById(id).subscribe(data => {
                 this.form.patchValue({
                     _id: data._id,
                     name: data.name,
@@ -99,17 +99,17 @@ export class UserFormComponent implements OnInit {
             return;
         }
 
-        const formData = this.form.value as Feed;
+        const formData = this.form.value as User;
 
 
         if (this.isAddMode) {
             Reflect.deleteProperty(formData, '_id');
-            this.feedService.save(formData).subscribe(() => {
+            this.userService.save(formData).subscribe(() => {
                 this.notificationService.openSnackBar('User saved');
                 this.router.navigate(['/users']);
             });
         } else {
-            this.feedService.update(formData._id, formData).subscribe(() => {
+            this.userService.update(formData._id, formData).subscribe(() => {
                 this.notificationService.openSnackBar('User updated');
                 this.router.navigate(['/users']);
             });

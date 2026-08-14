@@ -43,7 +43,7 @@ simplicity.
 ## 🏗️ Architecture
 
 ![NXGuard Architecture Diagram](.docs/architecture_diagram.png)
-*High-performance architecture integrating OpenResty, ModSecurity, and Redis.*
+*High-performance architecture integrating OpenResty, ModSecurity, and IPXA.*
 
 ---
 
@@ -55,10 +55,6 @@ Deploy a full NXGuard stack including the Management UI and ipxa in seconds:
 
 ```yaml
 services:
-  redis:
-    image: redis:7.2
-    command: ["redis-server", "--save", "", "--appendonly", "no"]
-
   nxguard:
     image: liberatti/nxguard:latest
     environment:
