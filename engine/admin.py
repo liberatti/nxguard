@@ -1,9 +1,10 @@
 """Engine administration module for testing, applying, reloading, and checking status of Nginx."""
 
 import datetime
+import json
 import os
 import subprocess
-import json
+import time
 import psutil
 from nxcore.common_utils import gen_random_string
 from nxcore.middleware.logging_manager import logger
@@ -69,23 +70,41 @@ def apply(scn):
 
 
 def is_running() -> bool:
-    """Checks if the Nginx master process is running based on its PID file."""
+    """Checks if the Nginx master process is running based on its PID file and process table."""
     pid_file = f"{BASE_PATH}/run/nginx.pid"
-    try:
-        if os.path.exists(pid_file):
+    if os.path.exists(pid_file):
+        try:
             with open(pid_file, "r") as file:
                 content = file.read().strip()
-                if not content.isdigit():
-                    raise ValueError(f"PID inválido no arquivo: {content!r}")
-                pid = int(content)
-                if pid:
-                    process = psutil.Process(pid)
-                    is_r = process.is_running()
-                    if not is_r:
-                        os.remove(pid_file)
-                    return is_r
+                if content.isdigit():
+                    pid = int(content)
+                    if pid and psutil.pid_exists(pid):
+                        process = psutil.Process(pid)
+                        if process.is_running() and "nginx" in process.name().lower():
+                            return True
+            try:
+                os.remove(pid_file)
+            except OSError:
+                pass
+        except (psutil.NoSuchProcess, psutil.AccessDenied):
+            try:
+                os.remove(pid_file)
+            except OSError:
+                pass
+        except Exception as e:
+            logger.warn("Failed to check engine PID file, %s", e)
+
+    try:
+        for proc in psutil.process_iter(["name"]):
+            try:
+                name = proc.info.get("name") or ""
+                if "nginx" in name.lower():
+                    return True
+            except (psutil.NoSuchProcess, psutil.AccessDenied):
+                continue
     except Exception as e:
-        logger.warn("Failed to check engine, %s", e)
+        logger.warn("Failed to check running processes for engine, %s", e)
+
     return False
 
 
@@ -95,7 +114,7 @@ def restart():
     if is_running():
         logger.info("Nginx is running, reload required")
         result = subprocess.Popen(
-            f"sudo {BASE_PATH}/nginx/sbin/nginx -s reload",
+            f"sudo {BASE_PATH}/nginx/sbin/nginx -c {BASE_PATH}/nginx/conf/enabled/nginx.conf -s reload",
             shell=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -103,7 +122,9 @@ def restart():
         stdout, stderr = result.communicate()
         if result.returncode == 0:
             return
-        logger.warn("Nginx reload failed: %s", stderr.decode().strip())
+        logger.warn("Nginx reload failed: %s. Attempting clean restart...", stderr.decode().strip())
+        subprocess.run("sudo pkill -9 nginx", shell=True)
+        time.sleep(0.5)
 
     logger.info("Nginx is not running, start required")
     result = subprocess.Popen(
@@ -114,4 +135,19 @@ def restart():
     )
     stdout, stderr = result.communicate()
     if result.returncode != 0:
-        logger.error("Failed to start Nginx: %s", stderr.decode().strip())
+        err_msg = stderr.decode().strip()
+        logger.error("Failed to start Nginx: %s", err_msg)
+        if "Address already in use" in err_msg:
+            logger.info("Address already in use. Killing rogue nginx processes and retrying...")
+            subprocess.run("sudo pkill -9 nginx", shell=True)
+            time.sleep(0.5)
+            retry = subprocess.Popen(
+                f"sudo {BASE_PATH}/nginx/sbin/nginx -c {BASE_PATH}/nginx/conf/enabled/nginx.conf",
+                shell=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+            _, retry_err = retry.communicate()
+            if retry.returncode != 0:
+                logger.error("Retry start Nginx failed: %s", retry_err.decode().strip())
+

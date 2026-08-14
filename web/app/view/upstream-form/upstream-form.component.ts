@@ -1,32 +1,32 @@
-import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute, Router, RouterModule} from '@angular/router';
-import {AbstractControl, FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import {MatTableDataSource, MatTableModule} from '@angular/material/table';
-import {MatDialog} from '@angular/material/dialog';
-import {ProtocolType, SessionPersistenceEntity, SessionPersistenceType, TargetEntity} from 'app/models/service';
-import {Upstream} from 'app/models/upstream';
-import {UpstreamService} from 'app/services/upstream.service';
-import {NotificationService} from 'app/services/notification.service';
-import {CommonModule} from '@angular/common';
-import {MatMomentDateModule} from '@angular/material-moment-adapter';
-import {MatButtonModule} from '@angular/material/button';
-import {MatCardModule} from '@angular/material/card';
-import {MatChipsModule} from '@angular/material/chips';
-import {MatFormFieldModule} from '@angular/material/form-field';
-import {MatIconModule} from '@angular/material/icon';
-import {MatInputModule} from '@angular/material/input';
-import {MatListModule} from '@angular/material/list';
-import {MatMenuModule} from '@angular/material/menu';
-import {MatPaginatorModule} from '@angular/material/paginator';
-import {MatProgressBarModule} from '@angular/material/progress-bar';
-import {MatSelectModule} from '@angular/material/select';
-import {MatSidenavModule} from '@angular/material/sidenav';
-import {MatSortModule} from '@angular/material/sort';
-import {MatTooltipModule} from '@angular/material/tooltip';
-import {TranslatePipe} from '@ngx-translate/core';
-import {UpstreamTargetDialogComponent} from 'app/components/upstream-target-dialog/upstream-target-dialog.component';
-import {MatSlideToggleModule} from '@angular/material/slide-toggle';
-import {OAuthService} from "../../services/oauth.service";
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatDialog } from '@angular/material/dialog';
+import { ProtocolType, SessionPersistenceEntity, SessionPersistenceType, TargetEntity } from 'app/models/service';
+import { Upstream } from 'app/models/upstream';
+import { UpstreamService } from 'app/services/upstream.service';
+import { NotificationService } from 'app/services/notification.service';
+import { CommonModule } from '@angular/common';
+import { MatMomentDateModule } from '@angular/material-moment-adapter';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatListModule } from '@angular/material/list';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatSortModule } from '@angular/material/sort';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { TranslatePipe } from '@ngx-translate/core';
+import { UpstreamTargetDialogComponent } from 'app/components/upstream-target-dialog/upstream-target-dialog.component';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { OAuthService } from "../../services/oauth.service";
 
 
 @Component({
@@ -159,7 +159,7 @@ export class UpstreamFormComponent implements OnInit {
         if (this.form.value.type == 'static') {
             formData = new FormData()
             let upstream = this.form.value as Upstream;
-            const jsonBlob = new Blob([JSON.stringify(upstream)], {type: 'application/json'});
+            const jsonBlob = new Blob([JSON.stringify(upstream)], { type: 'application/json' });
             formData.append('metadata', jsonBlob, 'metadata.json');
             if (this.selectedFile) {
                 formData.append('zipfile', this.selectedFile);
@@ -167,6 +167,7 @@ export class UpstreamFormComponent implements OnInit {
         } else {
             this.form.get('targets')?.setValue(this.targetDS.data);
             formData = this.form.value as Upstream;
+            Reflect.deleteProperty(formData, 'script_path');
         }
 
         if (this.isAddMode) {

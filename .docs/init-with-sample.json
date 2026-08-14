@@ -392,6 +392,39 @@
             "application/json"
           ],
           "monitor_only": false,
+          "name": "redirect-default",
+          "paths": [
+            "^/$"
+          ],
+          "sensor": {
+            "name": "NXGuard_API_Sensor"
+          },
+          "type": "REDIRECT",
+          "redirect": {
+            "url": "https://nxguard.local:8443/nxg/",
+            "code": 301
+          }
+        },
+        {
+          "cache_methods": [],
+          "allowed_methods": [
+            "GET",
+            "HEAD",
+            "POST",
+            "OPTIONS",
+            "PUT",
+            "PATCH",
+            "DELETE"
+          ],
+          "allowed_content_type": [
+            "application/x-www-form-urlencoded",
+            "multipart/form-data",
+            "text/xml",
+            "application/xml",
+            "application/soap+xml",
+            "application/json"
+          ],
+          "monitor_only": false,
           "name": "graphql-route",
           "paths": [
             "^/(nxg/graphql.*)",

@@ -30,13 +30,23 @@
                                         <mat-option
                                             *ngFor="let country of filterActiveGeo(_geo_countries);let i = index"
                                             [value]="country" id="geo-country-option-{{i}}">
-                                            {{ country }}
+                                            <span *ngIf="country !== 'None' && country !== 'Unknown'"
+                                                  class="fi fi-{{country | lowercase}}"
+                                                  style="margin-right: 8px; border-radius: 2px;"></span>
+                                            <mat-icon *ngIf="country === 'None' || country === 'Unknown'"
+                                                      style="vertical-align: middle; font-size: 18px; width: 18px; height: 18px; margin-right: 8px;">public_off</mat-icon>
+                                            <span>{{ country }}</span>
                                         </mat-option>
                                     </mat-select>
                                 </mat-form-field>
                                 <mat-chip-listbox class="full-width" [multiple]="false" [selectable]="true">
                                     <mat-chip-option class="small-chip" *ngFor="let p of getGeoCodes()"
                                         (removed)="onRemoveGeo(p)">
+                                        <span *ngIf="p !== 'None' && p !== 'Unknown'"
+                                              class="fi fi-{{p | lowercase}}"
+                                              style="margin-right: 6px; border-radius: 2px;"></span>
+                                        <mat-icon *ngIf="p === 'None' || p === 'Unknown'"
+                                                  style="vertical-align: middle; font-size: 16px; width: 16px; height: 16px; margin-right: 6px;">public_off</mat-icon>
                                         {{ p }}
                                         <button matChipRemove>
                                             <mat-icon>cancel</mat-icon>
