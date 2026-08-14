@@ -176,10 +176,18 @@ class ConfigDao(DuckDAO):
         return active.get("active_scn") if active else None
 
 
+class ChangeSchema(Schema):
+    class Meta:
+        unknown = EXCLUDE
+
+    _id = fields.Integer()
+    name = fields.String()
+
+
 class ChangeDao(DuckDAO):
     def __init__(self):
         super().__init__(
-            db_path=config.DB_PATH, table_name="changes", schema=ConfigSchema
+            db_path=config.DB_PATH, table_name="changes", schema=ChangeSchema
         )
 
     def create_schema(self):
@@ -191,3 +199,4 @@ class ChangeDao(DuckDAO):
             );
         """
         )
+

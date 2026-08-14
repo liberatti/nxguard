@@ -15,7 +15,8 @@
     "next": "Next",
     "back": "Back",
     "add": "Add",
-    "delete": "Delete"
+    "delete": "Delete",
+    "apply": "Apply"
   },
   "attr": {
     "active": "Active",
@@ -151,6 +152,17 @@
     "NO_DOMAINS": "No domains added yet.",
     "NO_HEADERS": "No custom headers configured.",
     "NO_ROUTES": "No routes configured yet."
+  },
+  "APPLY_DIALOG": {
+    "TITLE": "Apply Configuration",
+    "DESCRIPTION": "The following items have pending changes that need to be applied to the proxy engine:",
+    "LOADING": "Loading pending changes...",
+    "APPLYING": "Applying configuration and reloading engine...",
+    "SUCCESS_TITLE": "Configuration Applied",
+    "SUCCESS_MSG": "All changes have been successfully compiled and applied to Nginx.",
+    "ERROR_TITLE": "Failed to Apply Configuration",
+    "NO_CHANGES": "No pending changes detected. Configuration is up to date.",
+    "PENDING_CHANGE": "Modified — pending reload"
   },
   "format": {
     "display": {

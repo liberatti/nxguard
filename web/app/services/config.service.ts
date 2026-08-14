@@ -29,7 +29,11 @@ export class ConfigService extends APIService<Config, string> {
     }
 
     applyConfig(): Observable<any> {
-        return this.httpClient.get<any>(this.END_POINT + "/apply");
+        return this.httpClient.post<any>(this.END_POINT + "/apply", {});
+    }
+
+    getChanges(): Observable<any> {
+        return this.httpClient.get<any>(this.END_POINT + "/changes");
     }
 
     downloadConfig(): Observable<Blob> {

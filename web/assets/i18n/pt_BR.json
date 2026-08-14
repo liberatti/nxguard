@@ -14,7 +14,8 @@
     "cancel": "Cancelar",
     "next": "Próximo",
     "back": "Voltar",
-    "add": "Adicionar"
+    "add": "Adicionar",
+    "apply": "Aplicar"
   },
   "attr": {
     "name": "Nome",
@@ -106,6 +107,17 @@
     "NO_DOMAINS": "Nenhum domínio adicionado ainda.",
     "NO_HEADERS": "Nenhum cabeçalho personalizado configurado.",
     "NO_ROUTES": "Nenhuma rota configurada ainda."
+  },
+  "APPLY_DIALOG": {
+    "TITLE": "Aplicar Configurações",
+    "DESCRIPTION": "Os seguintes itens possuem alterações pendentes para serem aplicadas no proxy:",
+    "LOADING": "Carregando alterações pendentes...",
+    "APPLYING": "Aplicando configurações e recarregando o motor...",
+    "SUCCESS_TITLE": "Configuração Aplicada",
+    "SUCCESS_MSG": "Todas as alterações foram compiladas e aplicadas com sucesso no Nginx.",
+    "ERROR_TITLE": "Falha ao Aplicar Configurações",
+    "NO_CHANGES": "Nenhuma alteração pendente detectada. A configuração está atualizada.",
+    "PENDING_CHANGE": "Modificado — recarga pendente"
   },
   "format": {
     "parse": {

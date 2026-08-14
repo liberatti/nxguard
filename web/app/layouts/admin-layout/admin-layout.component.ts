@@ -23,20 +23,32 @@ import { OAuthService } from 'app/services/oauth.service';
 import { io } from 'socket.io-client';
 import { REST_API_URL } from 'app/app.config';
 import { MatChipsModule } from '@angular/material/chips';
-import { MatTooltip } from "@angular/material/tooltip";
-import { HttpClient } from "@angular/common/http";
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { HttpClient } from '@angular/common/http';
 import { environment } from 'environments/environment';
-import { ConfigService, HealthService } from "../../services/config.service";
-import { Health } from "../../models/config";
+import { ConfigService, HealthService } from '../../services/config.service';
+import { Health } from '../../models/config';
 
 import mainMenuData from '../../../assets/main.menu.json';
 
 @Component({
     selector: 'app-admin-layout',
     standalone: true,
-    imports: [RouterModule, CommonModule, TranslatePipe, MatProgressBarModule,
-        MatSidenavModule, MatIconModule, MatToolbarModule, MatCardModule, MatChipsModule,
-        MatButtonModule, MatListModule, MatMenuModule, MatBadgeModule
+    imports: [
+        RouterModule,
+        CommonModule,
+        TranslatePipe,
+        MatProgressBarModule,
+        MatSidenavModule,
+        MatIconModule,
+        MatToolbarModule,
+        MatCardModule,
+        MatChipsModule,
+        MatButtonModule,
+        MatListModule,
+        MatMenuModule,
+        MatBadgeModule,
+        MatTooltipModule
     ],
     templateUrl: './admin-layout.component.html',
     styleUrl: './admin-layout.component.css'
@@ -45,9 +57,9 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
 
     title: string = environment.name;
     version: string = environment.version;
-    config: FrontendConfig = <FrontendConfig>{ locale: { key: 'en_US' }, navResource: "transaction", sidenavOpened: false };
+    config: FrontendConfig = <FrontendConfig>{ locale: { key: 'en_US' }, navResource: 'transaction', sidenavOpened: false };
     destroyed = new Subject<void>();
-    currentScreenSize: string = "";
+    currentScreenSize: string = '';
     updatePending: boolean = false;
     health: Health = {} as Health;
 
@@ -58,12 +70,13 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
         [Breakpoints.Large, 'Large'],
         [Breakpoints.XLarge, 'XLarge'],
     ]);
-    protected httpClient: HttpClient
+    protected httpClient: HttpClient;
     menu: Array<MenuLink> = (mainMenuData as unknown) as Array<MenuLink>;
-    changes: Array<string> = []
+    changes: Array<any> = [];
     socket: any;
     trackingEvt: boolean = false;
     applyDialogRef: MatDialogRef<ApplyDialogComponent> | null = null;
+
     constructor(
         private changeDetectorRef: ChangeDetectorRef,
         protected oauth: OAuthService,
@@ -78,7 +91,7 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
         private router: Router,
         private healthService: HealthService
     ) {
-        this.httpClient = this.injector.get(HttpClient)
+        this.httpClient = this.injector.get(HttpClient);
         breakpointObserver
             .observe([
                 Breakpoints.XSmall,
@@ -102,7 +115,6 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
         this.oauth.resetTokens();
         this.router.navigate(['/signin']);
     }
-
 
     isMobile() {
         return ['XSmall', 'Small'].includes(this.currentScreenSize);
@@ -140,17 +152,31 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
         window.dispatchEvent(new Event('resize'));
         if (this.config) {
             this.config.sidenavOpened = !this.config.sidenavOpened;
-            this.localStorage.set('ui_config', this.config)
+            this.localStorage.set('ui_config', this.config);
         }
     }
+
     healthCheck() {
         this.healthService.check().subscribe(data => {
-            this.health = data
-            if (data.apply_pendding) {
+            this.health = data;
+            if (data && data.apply_pendding) {
                 this.changes = data.apply_pendding;
-                if (this.changes && this.changes.length > 0) {
-                    this.trackingEvt = true;
-                }
+                this.trackingEvt = this.changes.length > 0;
+                this.changeDetectorRef.detectChanges();
+            }
+        });
+    }
+
+    loadChanges() {
+        this.configService.getChanges().subscribe({
+            next: (res) => {
+                const data = res && res.data ? res.data : (Array.isArray(res) ? res : []);
+                this.changes = data;
+                this.trackingEvt = this.changes.length > 0;
+                this.changeDetectorRef.detectChanges();
+            },
+            error: () => {
+                this.healthCheck();
             }
         });
     }
@@ -170,7 +196,7 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.toggleSubMenu(undefined);
             }
         });
-        this.healthCheck();
+        this.loadChanges();
     }
 
     showAbout() {
@@ -181,8 +207,12 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
 
     onApply() {
         this.applyDialogRef = this.applyDialog.open(ApplyDialogComponent, {
-            width: '450px',
-            disableClose: true
+            width: '480px',
+            disableClose: false,
+            data: { changes: this.changes }
+        });
+        this.applyDialogRef.afterClosed().subscribe((applied) => {
+            this.loadChanges();
         });
     }
 
@@ -195,7 +225,7 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
                 navResource: 'dashboard',
                 sidenavOpened: true,
                 display: {
-                    "datetime": "YYYY-MM-DDTHH:mm:ss"
+                    datetime: 'YYYY-MM-DDTHH:mm:ss'
                 }
             } as FrontendConfig;
             this.localStorage.set('ui_config', this.config);
@@ -220,20 +250,12 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
             timeout: 10000,
         });
         this.socket.on('tracking_evt', () => {
-            this.trackingEvt = true;
+            this.loadChanges();
         });
         this.socket.on('tracking_aply', () => {
             this.trackingEvt = false;
-            this.applyDialogRef?.close();
-        });
-        this.configService.healthCheck().subscribe(data => {
-            this.changes = data.apply_pendding;
-            if (this.changes && this.changes.length > 0) {
-                this.trackingEvt = true;
-            }
-            if (data.apply_active) {
-                this.onApply();
-            }
+            this.changes = [];
+            this.changeDetectorRef.detectChanges();
         });
     }
 

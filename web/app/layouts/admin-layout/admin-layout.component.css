@@ -55,6 +55,21 @@
     color: var(--text-secondary-color, #64748b);
 }
 
+.notification-apply-btn {
+    position: relative;
+    color: var(--text-secondary-color, #64748b);
+    transition: all 0.2s ease;
+}
+
+.notification-apply-btn:hover {
+    background: rgba(0, 0, 0, 0.04) !important;
+    color: var(--primary, #2563eb);
+}
+
+.notification-apply-btn .has-notifications {
+    color: var(--primary, #2563eb);
+}
+
 .user-btn {
     height: 40px !important;
     padding: 0 12px 0 6px !important;

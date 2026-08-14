@@ -98,19 +98,24 @@ server {
   location ~ {{p}} {
     set $route '{{r.name}}';
     set $sensor '{{r.sensor.name if r.sensor and r.sensor.name else "-"}}';
-    set $upstream '{{r.upstream.name if r.upstream and r.upstream.name else "-"}}';
+    {%- if r.type == 'UPSTREAM' and r.upstream.name %}
+    set $upstream '{{r.upstream.name}}';
+    {%- else %}
+    set $upstream '-';
+    {%- endif %}
 
     {% if r.sensor and r.sensor.name %}
     access_by_lua_file {{BASE_PATH}}/luajit/share/lua/5.1/nxguard/sensors/{{r.sensor.name }}.lua;
     {% endif %}
 
-    {% if r.route_policy_file %}
+    {%- if r.route_policy_file %}
     modsecurity_rules_file {{r.route_policy_file }};
     {% endif %}
-    {% if r.sensor and r.sensor_policy_file %}
+    {%- if r.sensor and r.sensor_policy_file %}
     modsecurity_rules_file {{r.sensor_policy_file }};
     {% endif %}
 
+    {%- if r.type == 'UPSTREAM' and r.upstream.name %}
     proxy_http_version 1.1;
     proxy_intercept_errors on;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -121,6 +126,11 @@ server {
     proxy_set_header Connection $connection_upgrade;
     proxy_redirect off;
     proxy_pass http://{{r.upstream.name if r.upstream and r.upstream.name else "default"}}/$1$is_args$args;
+    {%- endif %}
+
+    {%- if r.type == 'REDIRECT' %}
+    return 301 "{{r.redirect.url}}";
+    {%- endif %}
   }
   {% endfor %}
   {% endfor %}

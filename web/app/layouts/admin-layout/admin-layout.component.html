@@ -13,23 +13,16 @@
         <span class="navbar-spacer"></span>
 
         <div class="navbar-actions">
-            <!-- Notifications -->
-            @if (trackingEvt) {
-                <button mat-icon-button [matMenuTriggerFor]="notificationMenu" (click)="healthCheck()" id="notification-btn" class="nav-icon-btn">
-                    <mat-icon matBadge matBadgeColor="warn" [matBadge]="changes.length || null">notifications</mat-icon>
-                </button>
-                <mat-menu #notificationMenu="matMenu" class="premium-menu">
-                    <div style="padding: 16px; min-width: 250px;">
-                        <div style="font-weight: 600; margin-bottom: 12px; color: var(--text-color);">System Notifications</div>
-                        @for (p of changes; track p) {
-                            <div style="padding: 8px 0; border-bottom: 1px solid var(--surface-border); font-size: 0.85rem;">
-                                {{ 'view.' + p + '.link' |translate }} changed
-                            </div>
-                        }
-                        <button mat-flat-button color="primary" style="width: 100%; margin-top: 12px;" (click)="onApply()">Apply Changes</button>
-                    </div>
-                </mat-menu>
-            }
+            <!-- Notifications / Apply Icon Button -->
+            <button mat-icon-button
+                    (click)="onApply()"
+                    id="navbar-apply-btn"
+                    class="nav-icon-btn notification-apply-btn"
+                    [matTooltip]="'APPLY_DIALOG.TITLE' | translate">
+                <mat-icon [matBadge]="changes.length || null" matBadgeColor="warn" [matBadgeHidden]="!changes.length" [class.has-notifications]="trackingEvt">
+                    notifications
+                </mat-icon>
+            </button>
 
             <!-- User Profile -->
             <button mat-button [matMenuTriggerFor]="userMenu" *ngIf="oauth.userInfo()" id="user-menu-btn" class="user-btn">

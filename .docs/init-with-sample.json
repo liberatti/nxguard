@@ -400,7 +400,7 @@
           "sensor": {
             "name": "NXGuard_API_Sensor"
           },
-          "type": "upstream",
+          "type": "UPSTREAM",
           "upstream": {
             "name": "NXGuard_API"
           }
@@ -427,12 +427,13 @@
           "monitor_only": false,
           "name": "api-req",
           "paths": [
-            "^/(nxg/api.*)"
+            "^/(nxg/api.*)",
+            "^/(nxg/socket.io.*)"
           ],
           "sensor": {
             "name": "NXGuard_API_Sensor"
           },
-          "type": "upstream",
+          "type": "UPSTREAM",
           "upstream": {
             "name": "NXGuard_API"
           }
@@ -459,7 +460,7 @@
           "sensor": {
             "name": "Default"
           },
-          "type": "upstream",
+          "type": "UPSTREAM",
           "upstream": {
             "name": "NXGuard_Frontend"
           }
