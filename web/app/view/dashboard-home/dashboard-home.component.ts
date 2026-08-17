@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -68,8 +68,9 @@ export class DashboardHomeComponent implements OnInit, AfterViewInit, OnDestroy 
         private healthService: HealthService,
         private routeService: RouteService,
         private serviceService: ServiceService,
-        private transactionService: TransactionService
-    ) {}
+        private transactionService: TransactionService,
+        private cdr: ChangeDetectorRef
+    ) { }
 
     get systemStatus(): string {
         if (this.health && this.health.nodes && this.health.nodes.length > 0) {
@@ -142,9 +143,11 @@ export class DashboardHomeComponent implements OnInit, AfterViewInit, OnDestroy 
         this.healthService.check().subscribe({
             next: (data) => {
                 this.health = data;
+                this.cdr.markForCheck();
             },
             error: () => {
                 this.health = {} as Health;
+                this.cdr.markForCheck();
             },
         });
     }
@@ -157,10 +160,11 @@ export class DashboardHomeComponent implements OnInit, AfterViewInit, OnDestroy 
                     (Array.isArray(res?.data)
                         ? res.data.length
                         : Array.isArray(res)
-                        ? res.length
-                        : 0);
+                            ? res.length
+                            : 0);
                 if (total > 0) {
                     this.totalRoutes = total;
+                    this.cdr.markForCheck();
                 } else {
                     this.loadRoutesFromServices();
                 }
@@ -182,9 +186,11 @@ export class DashboardHomeComponent implements OnInit, AfterViewInit, OnDestroy 
                     }
                 }
                 this.totalRoutes = count;
+                this.cdr.markForCheck();
             },
             error: () => {
                 this.totalRoutes = 0;
+                this.cdr.markForCheck();
             },
         });
     }
@@ -198,9 +204,11 @@ export class DashboardHomeComponent implements OnInit, AfterViewInit, OnDestroy 
             .subscribe({
                 next: (res) => {
                     this.totalRequests = res?.metadata?.total_elements || 0;
+                    this.cdr.markForCheck();
                 },
                 error: () => {
                     this.totalRequests = 0;
+                    this.cdr.markForCheck();
                 },
             });
 
@@ -213,10 +221,12 @@ export class DashboardHomeComponent implements OnInit, AfterViewInit, OnDestroy 
                 next: (res) => {
                     this.blockedRequests = res?.metadata?.total_elements || 0;
                     this.totalThreats = this.blockedRequests;
+                    this.cdr.markForCheck();
                 },
                 error: () => {
                     this.blockedRequests = 0;
                     this.totalThreats = 0;
+                    this.cdr.markForCheck();
                 },
             });
 
@@ -228,9 +238,11 @@ export class DashboardHomeComponent implements OnInit, AfterViewInit, OnDestroy 
             .subscribe({
                 next: (res) => {
                     this.warnRequests = res?.metadata?.total_elements || 0;
+                    this.cdr.markForCheck();
                 },
                 error: () => {
                     this.warnRequests = 0;
+                    this.cdr.markForCheck();
                 },
             });
     }
@@ -256,11 +268,13 @@ export class DashboardHomeComponent implements OnInit, AfterViewInit, OnDestroy 
                         (t: TransactionLog) =>
                             t.action === 'WARN' || t.action === 'REJECTED'
                     ).length;
+                    this.cdr.markForCheck();
                 },
                 error: () => {
                     this.threatLogs = [];
                     this.criticalIncidents = 0;
                     this.highIncidents = 0;
+                    this.cdr.markForCheck();
                 },
             });
     }

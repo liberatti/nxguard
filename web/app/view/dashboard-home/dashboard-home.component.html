@@ -3,8 +3,10 @@
     <div class="chart-header"
         style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
         <div>
-            <h1 class="gradient-text" style="font-size: 1.5rem; margin: 0; letter-spacing: -0.5px;">Security Overview</h1>
-            <p class="text-dim" style="margin: 1px 0 0; font-size: 0.78rem;">Real-time threat monitoring and system health</p>
+            <h1 class="gradient-text" style="font-size: 1.5rem; margin: 0; letter-spacing: -0.5px;">Security Overview
+            </h1>
+            <p class="text-dim" style="margin: 1px 0 0; font-size: 0.78rem;">Real-time threat monitoring and system
+                health</p>
         </div>
         <div style="display: flex; gap: 10px; align-items: center;">
             <mat-form-field appearance="outline" class="refresh-select-field" subscriptSizing="dynamic">
@@ -90,11 +92,9 @@
                 <div>
                     <div style="display: flex; align-items: center; gap: 6px;">
                         <span class="chart-title" style="font-size: 1rem; font-weight: 700;">Bandwidth Throughput</span>
-                        <span class="live-pill">
-                            <span class="live-dot"></span> LIVE
-                        </span>
                     </div>
-                    <p class="text-dim" style="margin: 1px 0 0; font-size: 0.73rem;">Data volume transferred (Bytes In vs Bytes Out)</p>
+                    <p class="text-dim" style="margin: 1px 0 0; font-size: 0.73rem;">Data volume transferred (Bytes In
+                        vs Bytes Out)</p>
                 </div>
                 <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
                     <div class="stat-badge stat-badge-inbound">
@@ -120,11 +120,9 @@
                 <div>
                     <div style="display: flex; align-items: center; gap: 6px;">
                         <span class="chart-title" style="font-size: 1rem; font-weight: 700;">Request Volume</span>
-                        <span class="live-pill">
-                            <span class="live-dot"></span> LIVE
-                        </span>
                     </div>
-                    <p class="text-dim" style="margin: 1px 0 0; font-size: 0.73rem;">Transaction rate over time (req/min)</p>
+                    <p class="text-dim" style="margin: 1px 0 0; font-size: 0.73rem;">Transaction rate over time
+                        (req/min)</p>
                 </div>
                 <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
                     <div class="stat-badge">
@@ -152,7 +150,8 @@
                 <span class="chart-title" style="font-size: 1.1rem; font-weight: 700;">Threat Detection Log</span>
                 <p class="text-dim" style="margin: 2px 0 0; font-size: 0.75rem;">Recent inspected transactions</p>
             </div>
-            <button mat-icon-button routerLink="/trn" matTooltip="View all transactions" style="width: 32px; height: 32px; line-height: 32px;">
+            <button mat-icon-button routerLink="/trn" matTooltip="View all transactions"
+                style="width: 32px; height: 32px; line-height: 32px;">
                 <mat-icon class="text-dim" style="font-size: 18px; width: 18px; height: 18px;">open_in_new</mat-icon>
             </button>
         </div>
@@ -168,41 +167,45 @@
                 </thead>
                 <tbody>
                     @if (threatLogs && threatLogs.length > 0) {
-                        @for (log of threatLogs; track log.unique_id || log._id) {
-                            <tr style="border-bottom: 1px solid var(--border-dim); transition: background 0.3s; cursor: pointer;"
-                                (click)="showRawLog(log)">
-                                <td style="padding: 9px 12px; font-size: 0.78rem;" class="text-dim">
-                                    {{ log.logtime | dateFormat }}
-                                </td>
-                                <td style="padding: 9px 12px;">
-                                    <div style="font-weight: 600; font-size: 0.82rem;">
-                                        {{ (log.route_name && log.route_name !== '-') ? log.route_name : (log.http ? log.http.request_line : 'HTTP Request') }}
-                                    </div>
-                                    <div style="font-size: 0.72rem;" class="text-muted">
-                                        {{ log.service ? log.service.name : 'Service' }} {{ log.upstream ? '→ ' + log.upstream.name : '' }}
-                                    </div>
-                                </td>
-                                <td style="padding: 9px 12px; font-size: 0.82rem;">
-                                    {{ log.source ? log.source.ip : '-' }}
-                                    @if (log.source && log.source.geo && log.source.geo.country && log.source.geo.country !== '--') {
-                                        <span class="fi fi-{{ log.source.geo.country | lowercase }}"
-                                              [matTooltip]="log.source.geo.country" style="margin-left: 5px;"></span>
-                                    }
-                                </td>
-                                <td style="padding: 9px 12px; text-align: right;">
-                                    <span class="status-chip {{ log.action | lowercase }}"
-                                          style="font-size: 0.7rem; padding: 3px 8px; border-radius: 4px; font-weight: 600;">
-                                        {{ log.action }}
-                                    </span>
-                                </td>
-                            </tr>
-                        }
+                    @for (log of threatLogs; track log.unique_id || log._id) {
+                    <tr style="border-bottom: 1px solid var(--border-dim); transition: background 0.3s; cursor: pointer;"
+                        (click)="showRawLog(log)">
+                        <td style="padding: 9px 12px; font-size: 0.78rem;" class="text-dim">
+                            {{ log.logtime | dateFormat }}
+                        </td>
+                        <td style="padding: 9px 12px;">
+                            <div style="font-weight: 600; font-size: 0.82rem;">
+                                {{ (log.route_name && log.route_name !== '-') ? log.route_name : (log.http ?
+                                log.http.request_line : 'HTTP Request') }}
+                            </div>
+                            <div style="font-size: 0.72rem;" class="text-muted">
+                                {{ log.service ? log.service.name : 'Service' }} {{ log.upstream ? '→ ' +
+                                log.upstream.name : '' }}
+                            </div>
+                        </td>
+                        <td style="padding: 9px 12px; font-size: 0.82rem;">
+                            {{ log.source ? log.source.ip : '-' }}
+                            @if (log.source && log.source.geo && log.source.geo.country && log.source.geo.country !==
+                            '--') {
+                            <span class="fi fi-{{ log.source.geo.country | lowercase }}"
+                                [matTooltip]="log.source.geo.country" style="margin-left: 5px;"></span>
+                            }
+                        </td>
+                        <td style="padding: 9px 12px; text-align: right;">
+                            <span class="status-chip {{ log.action | lowercase }}"
+                                style="font-size: 0.7rem; padding: 3px 8px; border-radius: 4px; font-weight: 600;">
+                                {{ log.action }}
+                            </span>
+                        </td>
+                    </tr>
+                    }
                     } @else {
-                        <tr>
-                            <td colspan="4" style="text-align: center; padding: 24px; color: var(--text-muted); font-size: 0.8rem;">
-                                No threat logs recorded yet
-                            </td>
-                        </tr>
+                    <tr>
+                        <td colspan="4"
+                            style="text-align: center; padding: 24px; color: var(--text-muted); font-size: 0.8rem;">
+                            No threat logs recorded yet
+                        </td>
+                    </tr>
                     }
                 </tbody>
             </table>
