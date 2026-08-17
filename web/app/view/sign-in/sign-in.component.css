@@ -282,6 +282,18 @@
     text-align: center;
 }
 
+.license-link {
+    color: #38bdf8;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.15s ease, text-decoration 0.15s ease;
+}
+
+.license-link:hover {
+    color: #7dd3fc;
+    text-decoration: underline;
+}
+
 /* Responsive Stacking */
 @media (max-width: 768px) {
     .vmware-login-box {

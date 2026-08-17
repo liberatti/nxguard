@@ -188,3 +188,23 @@ td.mat-mdc-cell.text-right .toggle-container {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 10px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* Slide Toggle Modern Standardization */
+.mat-mdc-slide-toggle {
+    display: inline-flex !important;
+    align-items: center !important;
+    cursor: pointer !important;
+}
+
+.mat-mdc-slide-toggle .mdc-label {
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    color: var(--text-dim) !important;
+    cursor: pointer !important;
+    padding-left: 8px !important;
+}
+
+.mat-mdc-slide-toggle.mat-checked .mdc-label {
+    color: var(--text-main) !important;
+}
+

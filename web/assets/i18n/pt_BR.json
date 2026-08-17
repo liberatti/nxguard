@@ -30,7 +30,8 @@
     "PASSWORD": "Senha",
     "FOOTER_NOTICE": "Acesso autorizado apenas. Todas as atividades são monitoradas.",
     "VERSION": "Versão",
-    "COPYRIGHT": "Copyright © NXGUARD Engine"
+    "LICENSE_NOTICE": "Licenciado sob a",
+    "LICENSE_NAME": "Apache License 2.0"
   },
   "ABOUT": {
     "TITLE": "Sobre o NXGuard",
