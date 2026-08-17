@@ -71,8 +71,7 @@ import {DateRangeDialogComponent} from 'app/components/date-range-dialog/date-ra
         MatListModule, MatCardModule, MatProgressBarModule, MatInputModule,
         MatTableModule, MatMenuModule, MatSortModule, MatExpansionModule,
         MatTooltipModule, MatSelectModule, MatPaginatorModule, MatSlideToggleModule,
-        MatFormFieldModule, MatChipsModule, MatRipple, FormsModule, MatSnackBarModule,
-        TransactionFilterDialogComponent, DateRangeDialogComponent],
+        MatFormFieldModule, MatChipsModule, MatRipple, FormsModule, MatSnackBarModule],
     templateUrl: './transaction-list.component.html',
     styleUrl: './transaction-list.component.css',
 })

@@ -214,7 +214,7 @@ export class SensorFormComponent implements OnInit {
         if (event === null) {
             this.feedService.get(new DefaultPageMeta()).subscribe((data: any) => {
                 const list = Array.isArray(data) ? data : (data?.data || []);
-                const allowedTypes = ['reputation', 'by_pass', 'network', 'network_static', 'ip', 'rbl', 'cidr'];
+                const allowedTypes = ['reputation', 'bypass', 'by_pass', 'network', 'network_static', 'ip', 'rbl', 'cidr'];
                 this._rbl_feeds = list.filter((item: any) =>
                     !item['type'] || allowedTypes.includes(item['type'])
                 );
