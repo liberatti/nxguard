@@ -302,6 +302,19 @@
       "CANCEL": "Cancel"
     }
   },
+  "ACCOUNT": {
+    "TITLE": "Account Settings",
+    "SUBTITLE": "Manage your profile details and security credentials",
+    "TAB_PROFILE": "Profile Information",
+    "TAB_SECURITY": "Security & Password",
+    "NAME": "Display Name",
+    "EMAIL": "Email Address",
+    "PASSWORD": "New Password",
+    "PASSWORD_HINT": "Leave blank to keep your current password",
+    "ROLE": "Role",
+    "SUCCESS": "Profile updated successfully",
+    "SAVE": "Save Changes"
+  },
   "FORMAT": {
     "DISPLAY": {
       "DATETIME": "DD/MM/YYYY HH:mm:ss",

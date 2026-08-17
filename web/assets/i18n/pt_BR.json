@@ -302,6 +302,19 @@
       "CANCEL": "Cancelar"
     }
   },
+  "ACCOUNT": {
+    "TITLE": "Configurações da Conta",
+    "SUBTITLE": "Gerencie suas informações de perfil e credenciais de segurança",
+    "TAB_PROFILE": "Informações do Perfil",
+    "TAB_SECURITY": "Segurança e Senha",
+    "NAME": "Nome de Exibição",
+    "EMAIL": "Endereço de E-mail",
+    "PASSWORD": "Nova Senha",
+    "PASSWORD_HINT": "Deixe em branco para manter a senha atual",
+    "ROLE": "Função",
+    "SUCCESS": "Perfil atualizado com sucesso",
+    "SAVE": "Salvar Alterações"
+  },
   "FORMAT": {
     "PARSE": {
       "DATE_INPUT": "YYYY-MM-DDTHH:mm:ss.SSSZ"

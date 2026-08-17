@@ -1,6 +1,137 @@
-#account-form{
-    padding: 32px;
+.account-card {
+    margin-bottom: 24px;
 }
-mat-tab-body{
-    top: 24px;
+
+.account-card-content {
+    padding: 24px !important;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* Profile Hero Banner */
+.profile-hero {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 20px 24px;
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.04) 0%, rgba(124, 58, 237, 0.04) 100%), #ffffff;
+    border: 1px solid var(--border-dim, #e2e8f0);
+    border-radius: 12px;
+}
+
+.hero-avatar-box {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    border: 3px solid #ffffff;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+    background: #ffffff;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.hero-avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.hero-details {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+}
+
+.hero-name-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.hero-name {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-main, #0f172a);
+    letter-spacing: -0.3px;
+}
+
+.role-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--primary, #2563eb);
+    border: 1px solid rgba(37, 99, 235, 0.2);
+}
+
+.role-badge-icon {
+    font-size: 14px !important;
+    width: 14px !important;
+    height: 14px !important;
+}
+
+.hero-email {
+    margin: 0;
+    font-size: 0.88rem;
+    color: var(--text-dim, #475569);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.hero-email-icon {
+    font-size: 16px !important;
+    width: 16px !important;
+    height: 16px !important;
+    color: var(--text-muted, #94a3b8);
+}
+
+/* Tabs & Form */
+.account-tabs {
+    margin-top: 4px;
+}
+
+.tab-icon {
+    font-size: 18px !important;
+    width: 18px !important;
+    height: 18px !important;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+.tab-pane-content {
+    padding: 24px 0 8px 0;
+}
+
+.field-suffix-icon {
+    color: var(--text-muted, #94a3b8);
+    margin-right: 4px;
+}
+
+.password-toggle-btn {
+    color: var(--text-muted, #94a3b8);
+}
+
+.password-toggle-btn:hover {
+    color: var(--primary, #2563eb);
+}
+
+.save-btn {
+    height: 42px !important;
+    padding: 0 24px !important;
+    font-weight: 600 !important;
+    border-radius: 10px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
 }
