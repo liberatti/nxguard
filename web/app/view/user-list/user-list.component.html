@@ -4,7 +4,7 @@
             <mat-card-title>{{ 'view.user.title'|translate }}</mat-card-title>
             <mat-card-subtitle>{{ 'view.user.subtitle'|translate }}</mat-card-subtitle>
             <mat-card-actions class="align-right">
-                <button id="add-user-btn" mat-button color="primary" [routerLink]="['add']" *ngIf="oauth.isRole('superuser')">
+                <button id="add-user-btn" mat-flat-button color="primary" [routerLink]="['add']" *ngIf="oauth.isRole('superuser')">
                     <mat-icon>add</mat-icon>
                     {{ 'actions.create'|translate }}
                 </button>

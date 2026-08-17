@@ -50,13 +50,26 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
 }
 
-.card-title-row {
+.section-card mat-card-header {
+    padding: 16px 16px 8px;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+.section-card mat-card-actions {
+    padding: 8px 16px 16px 16px;
     display: flex;
+    justify-content: flex-end;
+}
+
+.card-title-row {
+    display: inline-flex;
     align-items: center;
     gap: 8px;
     font-size: 1rem;
     font-weight: 600;
     color: var(--text-main);
+    margin: 0;
 }
 
 .card-title-icon {
@@ -69,7 +82,7 @@
 .section-subtitle {
     font-size: 0.8125rem;
     color: var(--text-dim);
-    margin-top: 2px;
+    margin-top: 4px;
 }
 
 /* Grid within cards */

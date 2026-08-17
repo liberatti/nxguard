@@ -1,13 +1,12 @@
 import json
 from datetime import datetime
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, Tuple
 
 from nxcore.middleware.logging_manager import logger
 from .duck_db import DuckDAO
 from marshmallow import EXCLUDE, Schema, fields
 
 import config as config
-from config import DATETIME_FMT
 
 
 class TransactionSchema(Schema):
@@ -156,6 +155,113 @@ class TransactionDao(DuckDAO):
                     merged.update(item)
             return merged
         return {}
+
+    _FILTER_FIELD_MAP = {
+        "server_id": "server_id",
+        "action": "action",
+        "service_id": "service_id",
+        "service._id": "service_id",
+        "service.id": "service_id",
+        "service.name": "service_id",
+        "sensor_id": "sensor_id",
+        "sensor._id": "sensor_id",
+        "sensor.id": "sensor_id",
+        "upstream_id": "upstream_id",
+        "upstream._id": "upstream_id",
+        "upstream.id": "upstream_id",
+        "rbl_status": "rbl_status",
+        "geoip_status": "geoip_status",
+        "ipxa": "ipxa",
+        "archived": "archived",
+        "route_name": "route_name",
+        "unique_id": "unique_id",
+        "score": "score",
+        "limit_req_status": "limit_req_status",
+        "source_ip": "json_extract_string(CAST(source_json AS JSON), '$.ip')",
+        "source.ip": "json_extract_string(CAST(source_json AS JSON), '$.ip')",
+        "source_port": "TRY_CAST(json_extract_string(CAST(source_json AS JSON), '$.port') AS INTEGER)",
+        "source.port": "TRY_CAST(json_extract_string(CAST(source_json AS JSON), '$.port') AS INTEGER)",
+        "country": "COALESCE(json_extract_string(CAST(source_json AS JSON), '$.geo.country'), json_extract_string(CAST(geoip_json AS JSON), '$.country_code'))",
+        "source.geo.country": "COALESCE(json_extract_string(CAST(source_json AS JSON), '$.geo.country'), json_extract_string(CAST(geoip_json AS JSON), '$.country_code'))",
+        "geoip.country_code": "COALESCE(json_extract_string(CAST(source_json AS JSON), '$.geo.country'), json_extract_string(CAST(geoip_json AS JSON), '$.country_code'))",
+        "destination_host": "json_extract_string(CAST(destination_json AS JSON), '$.host')",
+        "destination.host": "json_extract_string(CAST(destination_json AS JSON), '$.host')",
+        "destination_ip": "json_extract_string(CAST(destination_json AS JSON), '$.ip')",
+        "destination.ip": "json_extract_string(CAST(destination_json AS JSON), '$.ip')",
+        "destination_port": "TRY_CAST(json_extract_string(CAST(destination_json AS JSON), '$.port') AS INTEGER)",
+        "destination.port": "TRY_CAST(json_extract_string(CAST(destination_json AS JSON), '$.port') AS INTEGER)",
+        "method": "json_extract_string(CAST(http_json AS JSON), '$.request.method')",
+        "http_method": "json_extract_string(CAST(http_json AS JSON), '$.request.method')",
+        "http.request.method": "json_extract_string(CAST(http_json AS JSON), '$.request.method')",
+        "uri": "json_extract_string(CAST(http_json AS JSON), '$.request.uri')",
+        "http_uri": "json_extract_string(CAST(http_json AS JSON), '$.request.uri')",
+        "http.request.uri": "json_extract_string(CAST(http_json AS JSON), '$.request.uri')",
+        "status": "TRY_CAST(json_extract_string(CAST(http_json AS JSON), '$.response.status_code') AS INTEGER)",
+        "status_code": "TRY_CAST(json_extract_string(CAST(http_json AS JSON), '$.response.status_code') AS INTEGER)",
+        "http.response.status_code": "TRY_CAST(json_extract_string(CAST(http_json AS JSON), '$.response.status_code') AS INTEGER)",
+        "duration": "TRY_CAST(json_extract_string(CAST(http_json AS JSON), '$.duration') AS DOUBLE)",
+        "http.duration": "TRY_CAST(json_extract_string(CAST(http_json AS JSON), '$.duration') AS DOUBLE)",
+        "rate_limit": "COALESCE(json_extract_string(CAST(rate_limit_json AS JSON), '$.action'), limit_req_status)",
+        "rate_limit.action": "COALESCE(json_extract_string(CAST(rate_limit_json AS JSON), '$.action'), limit_req_status)",
+        "user_agent": "json_extract_string(CAST(user_agent_json AS JSON), '$.family')",
+        "user_agent.family": "json_extract_string(CAST(user_agent_json AS JSON), '$.family')",
+        "mtls_verified": "TRY_CAST(json_extract_string(CAST(mtls_json AS JSON), '$.verified') AS BOOLEAN)",
+        "mtls.verified": "TRY_CAST(json_extract_string(CAST(mtls_json AS JSON), '$.verified') AS BOOLEAN)",
+    }
+
+    _LIKE_FIELD_MAP = {
+        "rule_code": "json_extract_string(CAST(audit_json AS JSON), '$.messages')",
+        "audit.rule_code": "json_extract_string(CAST(audit_json AS JSON), '$.messages')",
+        "audit.messages.rule_code": "json_extract_string(CAST(audit_json AS JSON), '$.messages')",
+    }
+
+    @classmethod
+    def _append_dict_condition(cls, expr: str, val: dict, where_clauses: List[str], params: List[Any]):
+        op_map = {"$ne": "!=", "$gte": ">=", "$lte": "<=", "$gt": ">", "$lt": "<"}
+        for op, op_val in val.items():
+            if op in op_map:
+                where_clauses.append(f"{expr} {op_map[op]} ?")
+                params.append(op_val)
+            elif op in ["$like", "$contains"]:
+                where_clauses.append(f"{expr} LIKE ?")
+                params.append(f"%{op_val}%" if not str(op_val).startswith("%") else op_val)
+            elif op == "$in" and isinstance(op_val, list):
+                placeholders = ", ".join(["?"] * len(op_val))
+                where_clauses.append(f"{expr} IN ({placeholders})")
+                params.extend(op_val)
+
+    @classmethod
+    def _build_filter_clauses(cls, filters) -> Tuple[List[str], List[Any]]:
+        where_clauses = []
+        params = []
+        filter_dict = cls._normalize_filters(filters)
+        if not filter_dict:
+            return where_clauses, params
+
+        for key, val in filter_dict.items():
+            expr = cls._FILTER_FIELD_MAP.get(key)
+            is_like = False
+            if not expr and key in cls._LIKE_FIELD_MAP:
+                expr = cls._LIKE_FIELD_MAP[key]
+                is_like = True
+
+            if not expr:
+                continue
+
+            if isinstance(val, list):
+                placeholders = ", ".join(["?"] * len(val))
+                where_clauses.append(f"{expr} IN ({placeholders})")
+                params.extend(val)
+            elif isinstance(val, dict):
+                cls._append_dict_condition(expr, val, where_clauses, params)
+            elif is_like:
+                where_clauses.append(f"{expr} LIKE ?")
+                params.append(f"%{val}%")
+            else:
+                where_clauses.append(f"{expr} = ?")
+                params.append(val)
+
+        return where_clauses, params
 
     def from_dict(self, vo: Dict[str, Any]) -> Dict[str, Any]:
         data = dict(vo)
@@ -315,37 +421,9 @@ class TransactionDao(DuckDAO):
             where_clauses.append("logtime <= ?")
             params.append(end_str)
 
-        filter_dict = self._normalize_filters(filters)
-        if filter_dict:
-            for key, val in filter_dict.items():
-                col = None
-                if key == "server_id":
-                    col = "server_id"
-                elif key == "action":
-                    col = "action"
-                elif key in ["service._id", "service.id", "service_id", "service.name"]:
-                    col = "service_id"
-                elif key in ["sensor._id", "sensor.id", "sensor_id"]:
-                    col = "sensor_id"
-                elif key in ["upstream._id", "upstream.id", "upstream_id"]:
-                    col = "upstream_id"
-                elif key == "rbl_status":
-                    col = "rbl_status"
-                elif key == "geoip_status":
-                    col = "geoip_status"
-                elif key == "ipxa":
-                    col = "ipxa"
-                elif key == "archived":
-                    col = "archived"
-
-                if col:
-                    if isinstance(val, list):
-                        placeholders = ", ".join(["?"] * len(val))
-                        where_clauses.append(f"{col} IN ({placeholders})")
-                        params.extend(val)
-                    else:
-                        where_clauses.append(f"{col} = ?")
-                        params.append(val)
+        f_clauses, f_params = self._build_filter_clauses(filters)
+        where_clauses.extend(f_clauses)
+        params.extend(f_params)
 
         where_sql = ""
         if where_clauses:
@@ -384,37 +462,9 @@ class TransactionDao(DuckDAO):
             where_clauses.append("logtime <= ?")
             params.append(end_str)
 
-        filter_dict = self._normalize_filters(filters)
-        if filter_dict:
-            for key, val in filter_dict.items():
-                col = None
-                if key == "server_id":
-                    col = "server_id"
-                elif key == "action":
-                    col = "action"
-                elif key in ["service._id", "service.id", "service_id"]:
-                    col = "service_id"
-                elif key in ["sensor._id", "sensor.id", "sensor_id"]:
-                    col = "sensor_id"
-                elif key in ["upstream._id", "upstream.id", "upstream_id"]:
-                    col = "upstream_id"
-                elif key == "rbl_status":
-                    col = "rbl_status"
-                elif key == "geoip_status":
-                    col = "geoip_status"
-                elif key == "ipxa":
-                    col = "ipxa"
-                elif key == "archived":
-                    col = "archived"
-
-                if col:
-                    if isinstance(val, list):
-                        placeholders = ", ".join(["?"] * len(val))
-                        where_clauses.append(f"{col} IN ({placeholders})")
-                        params.extend(val)
-                    else:
-                        where_clauses.append(f"{col} = ?")
-                        params.append(val)
+        f_clauses, f_params = self._build_filter_clauses(filters)
+        where_clauses.extend(f_clauses)
+        params.extend(f_params)
 
         where_sql = ""
         if where_clauses:

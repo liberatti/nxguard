@@ -4,7 +4,6 @@ from nxcore.controllers.base_controller import (
     response_error_404,
     has_any_authority,
     response_data,
-    response_data_list,
 )
 
 

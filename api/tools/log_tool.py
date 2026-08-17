@@ -6,7 +6,7 @@ import time
 import threading
 import traceback
 from datetime import datetime
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List
 
 try:
     from user_agents import parse as ua_parse
@@ -345,6 +345,33 @@ class LogParserTool:
         return record
 
     @classmethod
+    def _parse_and_cache_line(cls, log_type: str, line: str, cache):
+        records = []
+        try:
+            if log_type == "ERROR":
+                r = cls.error_log(line)
+            elif log_type == "ACCESS":
+                r = cls.access_log(line)
+            elif log_type == "AUDIT":
+                r = cls.audit_log(line)
+            else:
+                r = None
+
+            if r:
+                records = [r] if not isinstance(r, list) else r
+        except Exception as e:
+            logger.error(f"Error parsing {log_type} line: {e}")
+
+        if records:
+            with cache.lock:
+                if log_type == "ERROR":
+                    cache.error_log.extend(records)
+                elif log_type == "ACCESS":
+                    cache.access_log.extend(records)
+                elif log_type == "AUDIT":
+                    cache.audit_log.extend(records)
+
+    @classmethod
     def follow_file(cls, file_path, log_type, cache):
         cur_thread = threading.current_thread()
         setattr(cur_thread, "active", True)
@@ -388,31 +415,7 @@ class LogParserTool:
                         if not line:
                             continue
 
-                        records = []
-                        try:
-                            if log_type == "ERROR":
-                                r = cls.error_log(line)
-                                if r:
-                                    records = [r] if not isinstance(r, list) else r
-                            elif log_type == "ACCESS":
-                                r = cls.access_log(line)
-                                if r:
-                                    records = [r] if not isinstance(r, list) else r
-                            elif log_type == "AUDIT":
-                                r = cls.audit_log(line)
-                                if r:
-                                    records = [r] if not isinstance(r, list) else r
-                        except Exception as e:
-                            logger.error(f"Error parsing {log_type} line: {e}")
-
-                        if records:
-                            with cache.lock:
-                                if log_type == "ERROR":
-                                    cache.error_log.extend(records)
-                                elif log_type == "ACCESS":
-                                    cache.access_log.extend(records)
-                                elif log_type == "AUDIT":
-                                    cache.audit_log.extend(records)
+                        cls._parse_and_cache_line(log_type, line, cache)
 
             except Exception as e:
                 logger.error(f"Continuous tailing exception on {file_path}: {e}")
@@ -428,6 +431,119 @@ class LogParserTool:
             logger.error(f"Error parsing log {e}")
 
     @classmethod
+    def _parse_audit_message_item(cls, m, record: dict) -> dict:
+        d = m.get("details", {}) if isinstance(m, dict) else {}
+        rule_id = str(d.get("ruleId") or "")
+        msg = {
+            "text": m.get("message", ""),
+            "message": m.get("message", ""),
+            "rule_code": rule_id,
+            "ruleId": rule_id,
+            "match": d.get("match", ""),
+            "reference": d.get("reference", ""),
+            "data": d.get("data", ""),
+            "severity": str(d.get("severity") or ""),
+            "file": d.get("file", ""),
+            "lineNumber": str(d.get("lineNumber") or ""),
+            "tags": d.get("tags", []),
+            "ver": d.get("ver", ""),
+            "rev": d.get("rev", ""),
+            "maturity": str(d.get("maturity") or ""),
+            "accuracy": str(d.get("accuracy") or ""),
+        }
+
+        if rule_id in ["949110", "959100", "980130", "99"]:
+            data_str = str(d.get("data") or m.get("message") or "")
+            score_match = re.search(
+                r"(?:Total\s*(?:Anomaly\s*)?Score|Score|Matched Data):\s*(\d+)",
+                data_str,
+                re.IGNORECASE,
+            )
+            if score_match:
+                try:
+                    record["score"] = max(
+                        record.get("score", 0),
+                        int(score_match.group(1)),
+                    )
+                except (ValueError, TypeError):
+                    pass
+            elif data_str.isdigit():
+                record["score"] = max(record.get("score", 0), int(data_str))
+        return msg
+
+    @classmethod
+    def _calculate_fallback_score(cls, messages: list) -> int:
+        sev_weights = {"2": 5, "3": 4, "4": 3, "5": 2, "1": 2}
+        return sum(sev_weights.get(str(m.get("severity") or ""), 0) for m in messages)
+
+    @classmethod
+    def _parse_audit_transaction(cls, trn: dict, server_id: str) -> dict:
+        trn_server_id = trn.get("server_id") or server_id
+        unique_id = trn.get("unique_id") or trn.get("uniqueid")
+
+        record = {
+            "logtime": cls.parse_logtime(trn.get("time_stamp")),
+            "server_id": trn_server_id,
+            "unique_id": unique_id,
+            "destination": {
+                "ip": trn.get("host_ip", ""),
+                "port": trn.get("host_port", 443),
+            },
+            "source": {
+                "ip": trn.get("client_ip", ""),
+                "port": trn.get("client_port", 0),
+            },
+        }
+
+        http = {}
+        if "request" in trn:
+            request_raw = trn.pop("request")
+            http["version"] = str(request_raw.get("http_version", "1.1"))
+            http["request"] = {
+                "method": request_raw.get("method", "GET"),
+                "uri": request_raw.get("uri", ""),
+                "headers": cls.parse_headers(request_raw.get("headers", {})),
+            }
+
+        action = "PASSED"
+        if "response" in trn:
+            response_raw = trn.pop("response")
+            status_code = response_raw.get("http_code", 200)
+            http["response"] = {
+                "status_code": status_code,
+                "headers": cls.parse_headers(response_raw.get("headers", {})),
+            }
+            action = cls.resolve_status_code(status_code)
+        record.update({"http": http, "action": action})
+
+        audit = {}
+        if "producer" in trn:
+            producer_raw = trn.pop("producer")
+            audit.update(
+                {
+                    "engine": producer_raw.get("modsecurity", ""),
+                    "connector": producer_raw.get("connector", ""),
+                    "mode": producer_raw.get("secrules_engine", ""),
+                    "components": producer_raw.get("components", []),
+                }
+            )
+
+        if "messages" in trn:
+            messages_raw = trn.pop("messages") or []
+            messages = [cls._parse_audit_message_item(m, record) for m in messages_raw]
+            audit["messages"] = messages
+
+            if "score" not in record and messages:
+                record["score"] = cls._calculate_fallback_score(messages)
+
+            if record.get("action") != "DENY":
+                if any(str(m.get("severity") or "") in ["2", "3"] for m in messages):
+                    record["action"] = "DENY"
+
+        record.update({"audit": audit})
+        return record
+
+    @classmethod
     def audit_log(cls, line):
         dtos = cls._extract_json_objects(line)
         if not dtos:
@@ -438,137 +554,9 @@ class LogParserTool:
         for dto in dtos:
             try:
                 if "transaction" in dto:
-                    trn = dto.pop("transaction")
-                    trn_server_id = trn.get("server_id") or server_id
-                    unique_id = trn.get("unique_id") or trn.get("uniqueid")
-
-                    record = {
-                        "logtime": cls.parse_logtime(trn.get("time_stamp")),
-                        "server_id": trn_server_id,
-                        "unique_id": unique_id,
-                        "destination": {
-                            "ip": trn.get("host_ip", ""),
-                            "port": trn.get("host_port", 443),
-                        },
-                        "source": {
-                            "ip": trn.get("client_ip", ""),
-                            "port": trn.get("client_port", 0),
-                        },
-                    }
-
-                    http = {}
-                    if "request" in trn:
-                        request_raw = trn.pop("request")
-                        http.update(
-                            {
-                                "version": str(request_raw.get("http_version", "1.1")),
-                            }
-                        )
-                        request = {
-                            "method": request_raw.get("method", "GET"),
-                            "uri": request_raw.get("uri", ""),
-                            "headers": cls.parse_headers(
-                                request_raw.get("headers", {})
-                            ),
-                        }
-                        http.update({"request": request})
-
-                    action = "PASSED"
-                    if "response" in trn:
-                        response_raw = trn.pop("response")
-                        status_code = response_raw.get("http_code", 200)
-                        response = {
-                            "status_code": status_code,
-                            "headers": cls.parse_headers(
-                                response_raw.get("headers", {})
-                            ),
-                        }
-                        action = cls.resolve_status_code(status_code)
-                        http.update({"response": response})
-                    record.update({"http": http, "action": action})
-
-                    audit = {}
-                    if "producer" in trn:
-                        producer_raw = trn.pop("producer")
-                        audit.update(
-                            {
-                                "engine": producer_raw.get("modsecurity", ""),
-                                "connector": producer_raw.get("connector", ""),
-                                "mode": producer_raw.get("secrules_engine", ""),
-                                "components": producer_raw.get("components", []),
-                            }
-                        )
-                    if "messages" in trn:
-                        messages_raw = trn.pop("messages") or []
-                        messages = []
-                        for m in messages_raw:
-                            d = m.get("details", {}) if isinstance(m, dict) else {}
-                            rule_id = str(d.get("ruleId") or "")
-                            msg = {
-                                "text": m.get("message", ""),
-                                "message": m.get("message", ""),
-                                "rule_code": rule_id,
-                                "ruleId": rule_id,
-                                "match": d.get("match", ""),
-                                "reference": d.get("reference", ""),
-                                "data": d.get("data", ""),
-                                "severity": str(d.get("severity") or ""),
-                                "file": d.get("file", ""),
-                                "lineNumber": str(d.get("lineNumber") or ""),
-                                "tags": d.get("tags", []),
-                                "ver": d.get("ver", ""),
-                                "rev": d.get("rev", ""),
-                                "maturity": str(d.get("maturity") or ""),
-                                "accuracy": str(d.get("accuracy") or ""),
-                            }
-
-                            if rule_id in ["949110", "959100", "980130", "99"]:
-                                data_str = str(d.get("data") or m.get("message") or "")
-                                score_match = re.search(
-                                    r"(?:Total\s*(?:Anomaly\s*)?Score|Score|Matched Data):\s*(\d+)",
-                                    data_str,
-                                    re.IGNORECASE,
-                                )
-                                if score_match:
-                                    try:
-                                        record["score"] = max(
-                                            record.get("score", 0),
-                                            int(score_match.group(1)),
-                                        )
-                                    except (ValueError, TypeError):
-                                        pass
-                                elif data_str.isdigit():
-                                    record["score"] = max(
-                                        record.get("score", 0), int(data_str)
-                                    )
-
-                            messages.append(msg)
-                        audit["messages"] = messages
-
-                        # Fallback score calculation if not explicitly set by 949110
-                        if "score" not in record and messages:
-                            calculated_score = 0
-                            for m in messages:
-                                sev = str(m.get("severity") or "")
-                                if sev == "2":
-                                    calculated_score += 5
-                                elif sev == "3":
-                                    calculated_score += 4
-                                elif sev == "4":
-                                    calculated_score += 3
-                                elif sev in ["5", "1"]:
-                                    calculated_score += 2
-                            record["score"] = calculated_score
-
-                        # Check if any blocking / critical security rule triggered
-                        if record.get("action") != "DENY":
-                            if any(
-                                str(m.get("severity") or "") in ["2", "3"]
-                                for m in messages
-                            ):
-                                record["action"] = "DENY"
-
-                    record.update({"audit": audit})
+                    record = cls._parse_audit_transaction(
+                        dto.pop("transaction"), server_id
+                    )
                     records.append(record)
             except Exception as e:
                 logger.error(f"Error parsing audit log item: {e}")

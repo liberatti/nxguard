@@ -10,7 +10,6 @@ from api.model.certificate_model import CertificateDao, CertificateSchema
 from api.model.route_model import (
     RouteDao,
     RouteSchema,
-    RedirectSchema,
 )
 
 

@@ -7,37 +7,45 @@
 
         <mat-card-content>
             <div class="filter-toolbar">
-                <mat-form-field class="filter-field" appearance="outline">
-                    <mat-label>Query filter</mat-label>
-                    <input matInput [(ngModel)]="input_regex"
-                        placeholder='Example: {"action": "PASSED"} or {"service._id": "local-dev"}'>
-                    <button id="btn-add-sans" matSuffix mat-icon-button (click)="onAddFilter()">
-                        <mat-icon>add</mat-icon>
+                <div class="filter-left-group">
+                    <button mat-flat-button color="primary" class="filter-dialog-btn" (click)="openFilterDialog()"
+                        [matTooltip]="'TRANSACTION.FILTER.DIALOG_TITLE' | translate">
+                        <mat-icon>filter_alt</mat-icon>
+                        {{ 'TRANSACTION.FILTER.ADD_FILTER' | translate }}
                     </button>
-                    <mat-hint>Enter filter as JSON (e.g. &#123;"action": "PASSED"&#125;)</mat-hint>
-                </mat-form-field>
-                <app-datetime-field class="date-field" label="Start Date" placeholder="Select start date"
-                    (confirm)="onDateTimeConfirm($event,'start')" #startField>
-                </app-datetime-field>
-                <app-datetime-field class="date-field" label="End Date" placeholder="Select end date"
-                    (confirm)="onDateTimeConfirm($event,'end')" #endField>
-                </app-datetime-field>
-                <button mat-flat-button color="primary" class="search-btn" (click)="onRefresh()">
+
+                    <button mat-stroked-button class="date-range-btn" (click)="openDateRangeDialog()"
+                        [matTooltip]="'TRANSACTION.DATE_RANGE.TOOLTIP' | translate">
+                        <mat-icon class="date-range-icon">calendar_month</mat-icon>
+                        <span class="date-range-label">{{ formattedDateRange }}</span>
+                        <mat-icon class="date-range-arrow">arrow_drop_down</mat-icon>
+                    </button>
+                </div>
+
+                <button mat-flat-button color="primary" class="search-btn" (click)="onRefresh()"
+                    [matTooltip]="'actions.refresh' | translate">
                     <mat-icon>refresh</mat-icon>
-                    Refresh
+                    <span>Refresh</span>
                 </button>
             </div>
 
             @if (form.value.filters && form.value.filters.length > 0) {
-            <div class="active-filters">
-                <mat-chip-listbox>
-                    <mat-chip-row *ngFor="let p of form.value.filters" (removed)="onRemoveFilter(p)">
-                        {{ p }}
+            <div class="active-filters-container">
+                <span class="active-filters-title">{{ 'TRANSACTION.FILTER.ACTIVE_FILTERS' | translate }}:</span>
+                <mat-chip-listbox class="active-chips-box">
+                    <mat-chip-row *ngFor="let p of form.value.filters" (removed)="onRemoveFilter(p)"
+                        class="filter-chip-item">
+                        <mat-icon matChipAvatar class="chip-avatar-icon">filter_list</mat-icon>
+                        <span class="chip-filter-label">{{ formatFilterChip(p) }}</span>
                         <button matChipRemove>
                             <mat-icon>cancel</mat-icon>
                         </button>
                     </mat-chip-row>
                 </mat-chip-listbox>
+                <button mat-button color="warn" class="btn-clear-all" (click)="onClearAllFilters()">
+                    <mat-icon>clear_all</mat-icon>
+                    {{ 'TRANSACTION.FILTER.CLEAR_ALL' | translate }}
+                </button>
             </div>
             }
         </mat-card-content>

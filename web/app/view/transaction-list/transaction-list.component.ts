@@ -41,6 +41,7 @@ import {MatExpansionModule} from '@angular/material/expansion';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import {TimeFormatPipe} from 'app/pipes/format_time.pipe';
 import {TransactionRAWDialogComponent} from 'app/components/transaction-raw-dialog/transaction-raw-dialog.component';
+import {TransactionFilterDialogComponent} from 'app/components/transaction-filter-dialog/transaction-filter-dialog.component';
 import {MatRipple} from "@angular/material/core";
 import {RuleDetailsDialogComponent} from "../../components/rule-details-dialog/rule-details-dialog.component";
 import {RuleService} from "../../services/sensor.service";
@@ -48,7 +49,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
 import {HighlightModule} from 'ngx-highlightjs';
 import {HighlightLineNumbers} from 'ngx-highlightjs/line-numbers';
-import {DatetimeFieldComponent} from '../../components/datetime-field/datetime-field.component';
+import {DateRangeDialogComponent} from 'app/components/date-range-dialog/date-range-dialog.component';
 
 @Component({
     selector: 'app-transaction-list',
@@ -71,15 +72,12 @@ import {DatetimeFieldComponent} from '../../components/datetime-field/datetime-f
         MatTableModule, MatMenuModule, MatSortModule, MatExpansionModule,
         MatTooltipModule, MatSelectModule, MatPaginatorModule, MatSlideToggleModule,
         MatFormFieldModule, MatChipsModule, MatRipple, FormsModule, MatSnackBarModule,
-        DatetimeFieldComponent],
+        TransactionFilterDialogComponent, DateRangeDialogComponent],
     templateUrl: './transaction-list.component.html',
     styleUrl: './transaction-list.component.css',
 })
 
 export class TransactionListComponent implements OnInit {
-    @ViewChild('startField') startField: any;
-    @ViewChild('endField') endField: any;
-
     readonly panelOpenState = signal(false);
     input_regex: string = "";
     logtime_start: Date = moment().subtract(1, 'day').toDate();
@@ -89,6 +87,19 @@ export class TransactionListComponent implements OnInit {
         end: new FormControl<Date>(moment().toDate()),
         filters: new FormControl<Array<string>>([]),
     });
+
+    get formattedDateRange(): string {
+        const start = this.form.get('start')?.value;
+        const end = this.form.get('end')?.value;
+        if (!start || !end) return 'Select Date Range';
+        const startM = moment(start);
+        const endM = moment(end);
+        
+        if (startM.isSame(endM, 'day')) {
+            return `${startM.format('DD/MM/YYYY HH:mm')} - ${endM.format('HH:mm')}`;
+        }
+        return `${startM.format('DD/MM/YY HH:mm')} - ${endM.format('DD/MM/YY HH:mm')}`;
+    }
 
     transactionDC: string[] = ['expand', 'logtime', 'score', 'source', 'service', 'request_line', 'duration'];
     transactionDS: MatTableDataSource<TransactionLog>;
@@ -240,11 +251,37 @@ export class TransactionListComponent implements OnInit {
 
     onRefresh(): void {
         const now = moment().toDate();
-        this.form.get('end')?.setValue(now);
-        if (this.endField) {
-            this.endField.writeValue(now);
+        const start = this.form.get('start')?.value;
+        const end = this.form.get('end')?.value;
+        if (start && end) {
+            const durationMs = moment(end).diff(moment(start));
+            if (durationMs > 0 && durationMs <= 7 * 24 * 60 * 60 * 1000) {
+                this.form.get('start')?.setValue(moment(now).subtract(durationMs, 'milliseconds').toDate());
+                this.form.get('end')?.setValue(now);
+            } else {
+                this.form.get('end')?.setValue(now);
+            }
         }
         this.onSearch();
+    }
+
+    openDateRangeDialog(): void {
+        const dialogRef = this.confirmDialog.open(DateRangeDialogComponent, {
+            width: '640px',
+            maxWidth: '95vw',
+            data: {
+                start: this.form.get('start')?.value,
+                end: this.form.get('end')?.value,
+            }
+        });
+
+        dialogRef.afterClosed().subscribe((result: { start: Date; end: Date } | undefined) => {
+            if (result) {
+                this.form.get('start')?.setValue(result.start);
+                this.form.get('end')?.setValue(result.end);
+                this.onSearch();
+            }
+        });
     }
 
     onSearch() {
@@ -330,14 +367,6 @@ export class TransactionListComponent implements OnInit {
     }
 
     ngAfterViewInit(): void {
-        setTimeout(() => {
-            if (this.startField) {
-                this.startField.writeValue(this.form.get('start')?.value);
-            }
-            if (this.endField) {
-                this.endField.writeValue(this.form.get('end')?.value);
-            }
-        });
         this.responsive.observe([Breakpoints.Small])
             .subscribe(result => {
                 if (this.chart) {
@@ -349,55 +378,98 @@ export class TransactionListComponent implements OnInit {
             });
     }
 
+    openFilterDialog(): void {
+        const dialogRef = this.confirmDialog.open(TransactionFilterDialogComponent, {
+            width: '620px',
+            maxWidth: '95vw',
+        });
+
+        dialogRef.afterClosed().subscribe((result: string | undefined) => {
+            if (result) {
+                this.addFilterString(result);
+            }
+        });
+    }
+
+    addFilterString(filterStr: string): void {
+        try {
+            const filter = JSON.parse(filterStr);
+            if (typeof filter !== 'object' || filter === null) {
+                throw new Error('Filter must be a JSON object');
+            }
+            if (this.form.value.filters == null) {
+                this.form.value.filters = [];
+            }
+            const existingFilters = this.form.value.filters.map((f: string) => {
+                try {
+                    return JSON.parse(f);
+                } catch {
+                    return {};
+                }
+            });
+            const newKeys = Object.keys(filter);
+
+            for (const existingFilter of existingFilters) {
+                const existingKeys = Object.keys(existingFilter);
+                const duplicates = newKeys.filter((key) => existingKeys.includes(key));
+                if (duplicates.length > 0) {
+                    throw new Error(`Filter already exists for: ${duplicates.join(', ')}`);
+                }
+            }
+
+            this.form.value.filters.push(JSON.stringify(filter));
+            this.onSearch();
+        } catch (error: unknown) {
+            const errorMessage =
+                error instanceof Error
+                    ? error.message
+                    : 'Invalid filter format. Please enter a valid JSON object.';
+            this.snackBar.open(errorMessage, 'Close', {
+                duration: 5000,
+                horizontalPosition: 'center',
+                verticalPosition: 'bottom',
+            });
+        }
+    }
+
     onAddFilter(): void {
         if (!this.input_regex.trim()) {
             return;
         }
-        try {
-            const filter = JSON.parse(this.input_regex);
-            if (typeof filter !== 'object' || filter === null) {
-                throw new Error('Filter must be a JSON object');
-            }
-            if (this.form.value.filters != null) {
-                const existingFilters = this.form.value.filters.map(f => JSON.parse(f));
-                const newKeys = Object.keys(filter);
-                
-                for (const existingFilter of existingFilters) {
-                    const existingKeys = Object.keys(existingFilter);
-                    const duplicates = newKeys.filter(key => existingKeys.includes(key));
-                    
-                    if (duplicates.length > 0) {
-                        throw new Error(`Duplicate keys found: ${duplicates.join(', ')}`);
-                    }
-                }
-
-                this.form.value.filters.push(JSON.stringify(filter));
-            }
-            this.input_regex = "";
-        } catch (error: unknown) {
-            const errorMessage = error instanceof Error ? error.message : 'Invalid filter format. Please enter a valid JSON object.';
-            this.snackBar.open(
-                errorMessage,
-                'Close', 
-                {
-                    duration: 5000,
-                    horizontalPosition: 'center',
-                    verticalPosition: 'bottom',
-                }
-            );
-        }
+        this.addFilterString(this.input_regex);
+        this.input_regex = '';
     }
 
     onRemoveFilter(keyword: any): void {
         if (this.form.value.filters != null) {
-            let index = this.form.value.filters.indexOf(keyword);
+            const index = this.form.value.filters.indexOf(keyword);
             if (index >= 0) {
                 this.form.value.filters.splice(index, 1);
+                this.onSearch();
             }
         }
     }
 
-    onDateTimeConfirm(event: any,form_field: string) {
+    onClearAllFilters(): void {
+        this.form.get('filters')?.setValue([]);
+        if (this.form.value.filters) {
+            this.form.value.filters = [];
+        }
+        this.onSearch();
+    }
+
+    formatFilterChip(filterStr: string): string {
+        try {
+            const parsed = JSON.parse(filterStr);
+            const entries = Object.entries(parsed);
+            if (entries.length === 0) return filterStr;
+            return entries.map(([k, v]) => `${k} = ${v}`).join(' & ');
+        } catch {
+            return filterStr;
+        }
+    }
+
+    onDateTimeConfirm(event: any, form_field: string) {
         this.form.get(form_field)?.setValue(event.toDate());
     }
 }

@@ -15,30 +15,133 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
+    justify-content: space-between;
     gap: 12px;
-    margin-top: 8px;
-    margin-bottom: 8px;
+    margin-top: 4px;
+    margin-bottom: 12px;
 }
 
-.filter-field {
-    flex: 2;
-    min-width: 260px;
+.filter-left-group {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
 }
 
-.date-field {
-    flex: 1;
-    min-width: 180px;
+.filter-dialog-btn {
+    height: 42px;
+    border-radius: 8px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.date-range-btn {
+    height: 42px !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    font-size: 0.85rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding: 0 14px !important;
+    border: 1px solid rgba(0, 0, 0, 0.15) !important;
+    background: #ffffff !important;
+    color: #1e293b !important;
+    transition: all 0.2s ease;
+}
+
+.date-range-btn:hover {
+    border-color: #0284c7 !important;
+    background: rgba(2, 132, 199, 0.05) !important;
+}
+
+.date-range-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: #0284c7;
+}
+
+.date-range-label {
+    font-family: 'JetBrains Mono', Consolas, monospace;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.date-range-arrow {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    color: #64748b;
+    margin-left: -2px;
 }
 
 .search-btn {
-    height: 48px;
+    height: 42px;
     border-radius: 8px;
     font-weight: 600;
-    margin-bottom: 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
 }
 
-.active-filters {
+.active-filters-container {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
     margin-bottom: 12px;
+    padding: 8px 14px;
+    background: rgba(2, 132, 199, 0.05);
+    border: 1px solid rgba(2, 132, 199, 0.18);
+    border-radius: 8px;
+}
+
+.active-filters-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.active-chips-box {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    flex: 1;
+}
+
+.filter-chip-item {
+    font-size: 0.82rem !important;
+    font-weight: 500;
+    border-color: rgba(56, 189, 248, 0.3) !important;
+    background: rgba(15, 23, 42, 0.7) !important;
+}
+
+.chip-avatar-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+    color: #38bdf8;
+}
+
+.chip-filter-label {
+    font-family: 'JetBrains Mono', Consolas, monospace;
+    color: #f1f5f9;
+}
+
+.btn-clear-all {
+    font-size: 0.76rem !important;
+    font-weight: 600 !important;
+    height: 32px !important;
+    line-height: 32px !important;
+    margin-left: auto;
 }
 
 /* Chart Container */

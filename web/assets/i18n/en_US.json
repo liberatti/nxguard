@@ -1,99 +1,117 @@
 {
-  "nav": {
-    "about": "About",
-    "account": "Account",
-    "logout": "Log Out"
+  "ACTIONS": {
+    "CREATE": "Create",
+    "EDIT": "Edit",
+    "REMOVE": "Remove",
+    "DELETE": "Delete",
+    "SEARCH": "Search",
+    "FILTER": "Filter",
+    "EXPORT": "Export",
+    "SAVE": "Save",
+    "IMPORT": "Import",
+    "REFRESH": "Refresh",
+    "CLOSE": "Close",
+    "CANCEL": "Cancel",
+    "CONFIRM": "Confirm",
+    "NEXT": "Next",
+    "BACK": "Back",
+    "ADD": "Add",
+    "APPLY": "Apply",
+    "BACKUP": "Backup",
+    "RESTORE": "Restore"
   },
-  "actions": {
-    "edit": "Edit",
-    "remove": "Remove",
-    "create": "Create",
-    "save": "Save",
-    "refresh": "Refresh",
-    "close": "Close",
-    "cancel": "Cancel",
-    "confirm": "Confirm",
-    "next": "Next",
-    "back": "Back",
-    "add": "Add",
-    "delete": "Delete",
-    "apply": "Apply",
-    "backup": "Backup",
-    "restore": "Restore"
+  "ABOUT": {
+    "TITLE": "About NXGuard",
+    "SUBTITLE": "High-Performance API Gateway & Security Engine",
+    "TAB_ABOUT": "About",
+    "TAB_RESTORE": "Restore Config",
+    "CHOOSE_FILE": "Choose ZIP file to restore",
+    "SELECTED_FILE": "Selected File",
+    "POWERED_BY": "Powered by OpenResty & ModSecurity"
   },
-  "about": {
-    "title": "About NXGuard",
-    "subtitle": "High-Performance API Gateway & Security Engine",
-    "tab_about": "About",
-    "tab_restore": "Restore Config",
-    "choose_file": "Choose ZIP file to restore",
-    "selected_file": "Selected File",
-    "powered_by": "Powered by OpenResty & ModSecurity"
-  },
-  "attr": {
-    "active": "Active",
-    "name": "Name",
-    "domains": "Domains",
-    "routes": "Routes"
-  },
-  "content": {
-    "copy": "&copy; 2025 nxguard. All rights reserved. This solution is built on top of OpenResty.",
-    "about": "This is a proxy server built on OpenResty with ModSecurity for advanced protection.",
-    "restore_notice": "Configuration Restore Notice: All existing data will be overwritten by the restored configuration."
-  },
-  "view": {
-    "backup": {
-      "link": "backup"
-    },
-    "dashboard": {
-      "link": "Dashboard",
-      "title": "Dashboard"
-    },
-    "transaction": {
-      "link": "Network Activity",
-      "title": "Transactions",
-      "subtitle": "List all transactions"
-    },
-    "service": {
-      "link": "Service",
-      "title": "Services",
-      "subtitle": "Describe all services"
-    },
-    "upstream": {
-      "link": "Upstream",
-      "title": "Upstream",
-      "subtitle": "List of all upstreams"
-    },
-    "hostname": {
-      "link": "Hostname",
-      "title": "Hostname",
-      "subtitle": "List of all Hostnames"
-    },
-    "certificate": {
-      "link": "Certificate",
-      "title": "Certificate",
-      "subtitle": "List of all certificate"
-    },
-    "sensor": {
-      "link": "Sensor",
-      "title": "Sensor",
-      "subtitle": "List of all sensors"
-    },
-    "user": {
-      "link": "Users",
-      "title": "Users",
-      "subtitle": "List of all users"
-    },
-    "config": {
-      "link": "Config",
-      "title": "Config",
-      "subtitle": "List of all configs"
-    },
-    "system": {
-      "link": "System"
+  "ATTR": {
+    "ACTIVE": "Active",
+    "NAME": "Name",
+    "DOMAINS": "Domains",
+    "ROUTES": "Routes",
+    "LOGIN": {
+      "USERNAME": "Enter your username",
+      "PASSWORD": "Password here"
     }
   },
-  "aboutMessage": "Thanks",
+  "CONTENT": {
+    "COPY": "&copy; 2025 nxguard. All rights reserved. This solution is built on top of OpenResty.",
+    "ABOUT": "This is a proxy server built on OpenResty with ModSecurity for advanced protection.",
+    "RESTORE_NOTICE": "Configuration Restore Notice: All existing data will be overwritten by the restored configuration."
+  },
+  "NAV": {
+    "SERVICES": "Services",
+    "UPSTREAMS": "Upstreams",
+    "SENSORS": "Sensors",
+    "ABOUT": "About",
+    "DASHBOARD": "Dashboard",
+    "SYSTEM": "System",
+    "HOSTNAMES": "Hostnames",
+    "CERTIFICATES": "Certificates",
+    "DICTIONARIES": "Dictionaries",
+    "GATEWAY": "Gateway",
+    "TRANSACTIONS": "Transactions",
+    "ACCOUNT": "Account",
+    "LOGOUT": "Log Out"
+  },
+  "VIEW": {
+    "BACKUP": {
+      "LINK": "backup",
+      "TITLE": "Backup"
+    },
+    "DASHBOARD": {
+      "LINK": "Dashboard",
+      "TITLE": "Dashboard"
+    },
+    "TRANSACTION": {
+      "LINK": "Network Activity",
+      "TITLE": "Transactions",
+      "SUBTITLE": "List all transactions"
+    },
+    "SERVICE": {
+      "LINK": "Service",
+      "TITLE": "Services",
+      "SUBTITLE": "Describe all services"
+    },
+    "UPSTREAM": {
+      "LINK": "Upstream",
+      "TITLE": "Upstream",
+      "SUBTITLE": "List of all upstreams"
+    },
+    "HOSTNAME": {
+      "LINK": "Hostname",
+      "TITLE": "Hostname",
+      "SUBTITLE": "List of all Hostnames"
+    },
+    "CERTIFICATE": {
+      "LINK": "Certificate",
+      "TITLE": "Certificate",
+      "SUBTITLE": "List of all certificates"
+    },
+    "SENSOR": {
+      "LINK": "Sensor",
+      "TITLE": "Sensor",
+      "SUBTITLE": "List of all sensors"
+    },
+    "USER": {
+      "LINK": "Users",
+      "TITLE": "Users",
+      "SUBTITLE": "List of all users"
+    },
+    "CONFIG": {
+      "LINK": "Config",
+      "TITLE": "Config",
+      "SUBTITLE": "List of all configs"
+    },
+    "SYSTEM": {
+      "LINK": "System"
+    }
+  },
   "ROUTE": {
     "ALLOWED_METHODS": "Allowed HTTP Methods",
     "ALLOWED_CONTENT_TYPE": "Allowed Content Types",
@@ -211,6 +229,182 @@
     "PURGE_DESC": "Automatically delete outdated transactional records from the local DuckDB database to preserve high performance and disk storage.",
     "PURGE_AFTER": "Maximum Data Age (days)"
   },
+  "TRANSACTION": {
+    "FILTER": {
+      "ADD_FILTER": "Add Filter",
+      "CLEAR_ALL": "Clear All",
+      "ACTIVE_FILTERS": "Active Filters",
+      "DIALOG_TITLE": "Add Transaction Filter",
+      "DIALOG_SUBTITLE": "Select a transaction attribute and value to filter network traffic",
+      "CATEGORY_LABEL": "Category",
+      "FIELD_LABEL": "Field",
+      "OPERATOR_LABEL": "Operator",
+      "VALUE_LABEL": "Value",
+      "VALUE_PLACEHOLDER": "Enter filter value...",
+      "PREVIEW_LABEL": "Filter JSON Preview",
+      "PRESETS": "Presets / Quick Values",
+      "CANCEL": "Cancel",
+      "APPLY": "Apply Filter",
+      "CATEGORIES": {
+        "GENERAL": "General & Status",
+        "ROUTING": "Services & Routing",
+        "NETWORK": "Network & Geolocation",
+        "HTTP": "HTTP Request & Response",
+        "SECURITY": "Security & WAF",
+        "SYSTEM": "System & Node"
+      },
+      "FIELDS": {
+        "ACTION": "Security Action (action)",
+        "SERVICE_ID": "Service (service._id)",
+        "ROUTE_NAME": "Route Name (route_name)",
+        "UPSTREAM_ID": "Upstream (upstream._id)",
+        "SOURCE_IP": "Source IP (source.ip)",
+        "SOURCE_PORT": "Source Port (source.port)",
+        "GEOIP_COUNTRY": "Source Country (geoip.country_code)",
+        "DESTINATION_HOST": "Destination Host (destination.host)",
+        "DESTINATION_IP": "Destination IP (destination.ip)",
+        "DESTINATION_PORT": "Destination Port (destination.port)",
+        "HTTP_METHOD": "HTTP Method (http.request.method)",
+        "HTTP_URI": "HTTP Request URI (http.request.uri)",
+        "STATUS_CODE": "HTTP Status Code (http.response.status_code)",
+        "DURATION": "Duration seconds (http.duration)",
+        "SCORE": "Anomaly Score (score)",
+        "RATE_LIMIT_ACTION": "Rate Limit Action (rate_limit.action)",
+        "LIMIT_REQ_STATUS": "Limit Req Status (limit_req_status)",
+        "GEOIP_STATUS": "GeoIP Status (geoip_status)",
+        "RBL_STATUS": "RBL Status (rbl_status)",
+        "IPXA": "IPXA Status (ipxa)",
+        "MTLS_ENABLED": "mTLS Enabled (mtls.enabled)",
+        "MTLS_VERIFIED": "mTLS Verified (mtls.verified)",
+        "AUDIT_RULE_CODE": "WAF Rule ID / Code (rule_code)",
+        "USER_AGENT": "User Agent Family (user_agent.family)",
+        "SERVER_ID": "Node / Server ID (server_id)",
+        "UNIQUE_ID": "Unique Transaction ID (unique_id)",
+        "ARCHIVED": "Archived Status (archived)"
+      }
+    },
+    "DATE_RANGE": {
+      "TITLE": "Select Time Range",
+      "SUBTITLE": "Filter telemetry and metrics by specific time window",
+      "TOOLTIP": "Select date and time range",
+      "PRESETS": "Quick Presets",
+      "PRESET_15M": "Last 15m",
+      "PRESET_1H": "Last 1h",
+      "PRESET_6H": "Last 6h",
+      "PRESET_24H": "Last 24h",
+      "PRESET_7D": "Last 7d",
+      "PRESET_TODAY": "Today",
+      "PRESET_YESTERDAY": "Yesterday",
+      "CUSTOM_RANGE": "Custom Date & Time",
+      "START_DATE": "Start Date & Time",
+      "END_DATE": "End Date & Time",
+      "APPLY": "Apply Range",
+      "CANCEL": "Cancel"
+    }
+  },
+  "FORMAT": {
+    "DISPLAY": {
+      "DATETIME": "DD/MM/YYYY HH:mm:ss",
+      "MONTH_YEAR_LABEL": "MMM YYYY",
+      "DATE_A11Y_LABEL": "LL",
+      "MONTH_YEAR_A11Y_LABEL": "MMMM YYYY"
+    }
+  },
+  "actions": {
+    "edit": "Edit",
+    "remove": "Remove",
+    "create": "Create",
+    "save": "Save",
+    "refresh": "Refresh",
+    "close": "Close",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "next": "Next",
+    "back": "Back",
+    "add": "Add",
+    "delete": "Delete",
+    "apply": "Apply",
+    "backup": "Backup",
+    "restore": "Restore"
+  },
+  "about": {
+    "title": "About NXGuard",
+    "subtitle": "High-Performance API Gateway & Security Engine",
+    "tab_about": "About",
+    "tab_restore": "Restore Config",
+    "choose_file": "Choose ZIP file to restore",
+    "selected_file": "Selected File",
+    "powered_by": "Powered by OpenResty & ModSecurity"
+  },
+  "attr": {
+    "active": "Active",
+    "name": "Name",
+    "domains": "Domains",
+    "routes": "Routes"
+  },
+  "content": {
+    "copy": "&copy; 2025 nxguard. All rights reserved. This solution is built on top of OpenResty.",
+    "about": "This is a proxy server built on OpenResty with ModSecurity for advanced protection.",
+    "restore_notice": "Configuration Restore Notice: All existing data will be overwritten by the restored configuration."
+  },
+  "nav": {
+    "about": "About",
+    "account": "Account",
+    "logout": "Log Out"
+  },
+  "view": {
+    "backup": {
+      "link": "backup"
+    },
+    "dashboard": {
+      "link": "Dashboard",
+      "title": "Dashboard"
+    },
+    "transaction": {
+      "link": "Network Activity",
+      "title": "Transactions",
+      "subtitle": "List all transactions"
+    },
+    "service": {
+      "link": "Service",
+      "title": "Services",
+      "subtitle": "Describe all services"
+    },
+    "upstream": {
+      "link": "Upstream",
+      "title": "Upstream",
+      "subtitle": "List of all upstreams"
+    },
+    "hostname": {
+      "link": "Hostname",
+      "title": "Hostname",
+      "subtitle": "List of all Hostnames"
+    },
+    "certificate": {
+      "link": "Certificate",
+      "title": "Certificate",
+      "subtitle": "List of all certificate"
+    },
+    "sensor": {
+      "link": "Sensor",
+      "title": "Sensor",
+      "subtitle": "List of all sensors"
+    },
+    "user": {
+      "link": "Users",
+      "title": "Users",
+      "subtitle": "List of all users"
+    },
+    "config": {
+      "link": "Config",
+      "title": "Config",
+      "subtitle": "List of all configs"
+    },
+    "system": {
+      "link": "System"
+    }
+  },
+  "aboutMessage": "Thanks",
   "format": {
     "display": {
       "datetime": "DD/MM/YYYY HH:mm:ss",

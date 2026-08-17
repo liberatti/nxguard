@@ -19,7 +19,6 @@ ACTIVE_WATCHERS = {}
 
 def sync_watchers(conf):
     """Synchronizes log watchers for all configured services."""
-    global ACTIVE_WATCHERS
     if not conf or "services" not in conf:
         return
 
@@ -50,7 +49,6 @@ def sync_watchers(conf):
 
 def stop_watchers():
     """Stops all running log watchers."""
-    global ACTIVE_WATCHERS
     for svc_name, watcher in list(ACTIVE_WATCHERS.items()):
         try:
             watcher.stop()
@@ -196,4 +194,3 @@ def restart():
             _, retry_err = retry.communicate()
             if retry.returncode != 0:
                 logger.error("Retry start Nginx failed: %s", retry_err.decode().strip())
-

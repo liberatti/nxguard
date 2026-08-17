@@ -4,7 +4,7 @@
             <mat-card-title>{{ 'view.upstream.title'|translate }}</mat-card-title>
             <mat-card-subtitle>{{ 'view.upstream.subtitle'|translate }}</mat-card-subtitle>
             <mat-card-actions class="align-right">
-                <button id="add-upstream-btn" mat-button color="primary" [routerLink]="['add']"
+                <button id="add-upstream-btn" mat-flat-button color="primary" [routerLink]="['add']"
                         *ngIf="oauth.isRole('superuser')">
                     <mat-icon>add</mat-icon>
                     {{ 'actions.create'|translate }}

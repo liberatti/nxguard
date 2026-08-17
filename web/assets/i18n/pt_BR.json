@@ -1,59 +1,116 @@
 {
-  "aboutMessage": "Obrigado",
-  "actions": {
-    "create": "Adicionar",
-    "edit": "Editar",
-    "remove": "Remover",
-    "delete": "Excluir",
-    "search": "Buscar",
-    "filter": "Filtrar",
-    "export": "Exportar",
-    "save": "Salvar",
-    "import": "Importar",
-    "refresh": "Atualizar",
-    "close": "Fechar",
-    "cancel": "Cancelar",
-    "confirm": "Confirmar",
-    "next": "Próximo",
-    "back": "Voltar",
-    "add": "Adicionar",
-    "apply": "Aplicar",
-    "backup": "Backup",
-    "restore": "Restaurar"
+  "ACTIONS": {
+    "CREATE": "Adicionar",
+    "EDIT": "Editar",
+    "REMOVE": "Remover",
+    "DELETE": "Excluir",
+    "SEARCH": "Buscar",
+    "FILTER": "Filtrar",
+    "EXPORT": "Exportar",
+    "SAVE": "Salvar",
+    "IMPORT": "Importar",
+    "REFRESH": "Atualizar",
+    "CLOSE": "Fechar",
+    "CANCEL": "Cancelar",
+    "CONFIRM": "Confirmar",
+    "NEXT": "Próximo",
+    "BACK": "Voltar",
+    "ADD": "Adicionar",
+    "APPLY": "Aplicar",
+    "BACKUP": "Backup",
+    "RESTORE": "Restaurar"
   },
-  "about": {
-    "title": "Sobre o NXGuard",
-    "subtitle": "API Gateway de Alta Performance & Motor de Segurança",
-    "tab_about": "Sobre",
-    "tab_restore": "Restaurar Config",
-    "choose_file": "Escolher arquivo ZIP para restauração",
-    "selected_file": "Arquivo Selecionado",
-    "powered_by": "Desenvolvido com OpenResty & ModSecurity"
+  "ABOUT": {
+    "TITLE": "Sobre o NXGuard",
+    "SUBTITLE": "API Gateway de Alta Performance & Motor de Segurança",
+    "TAB_ABOUT": "Sobre",
+    "TAB_RESTORE": "Restaurar Config",
+    "CHOOSE_FILE": "Escolher arquivo ZIP para restauração",
+    "SELECTED_FILE": "Arquivo Selecionado",
+    "POWERED_BY": "Desenvolvido com OpenResty & ModSecurity"
   },
-  "attr": {
-    "name": "Nome",
-    "domains": "Dominios",
-    "routes": "Rotas",
-    "active": "Ativo",
-    "login": {
-      "username": "Enter your user name",
-      "password": "Password here"
+  "ATTR": {
+    "ACTIVE": "Ativo",
+    "NAME": "Nome",
+    "DOMAINS": "Domínios",
+    "ROUTES": "Rotas",
+    "LOGIN": {
+      "USERNAME": "Informe seu usuário",
+      "PASSWORD": "Sua senha aqui"
+    }
+  },
+  "CONTENT": {
+    "COPY": "&copy; 2025 nxguard. Todos os direitos reservados. Esta solução é desenvolvida sobre o OpenResty.",
+    "ABOUT": "Este é um servidor proxy construído sobre o OpenResty com ModSecurity para proteção avançada.",
+    "RESTORE_NOTICE": "Aviso de Restauração de Configuração: Todos os dados existentes serão sobrescritos pela configuração restaurada."
+  },
+  "NAV": {
+    "SERVICES": "Serviços",
+    "UPSTREAMS": "Upstreams",
+    "SENSORS": "Sensores",
+    "ABOUT": "Sobre",
+    "DASHBOARD": "Painéis",
+    "SYSTEM": "Sistema",
+    "HOSTNAMES": "Hostnames",
+    "CERTIFICATES": "Certificados",
+    "DICTIONARIES": "Dicionários",
+    "GATEWAY": "Gateway",
+    "TRANSACTIONS": "Transações",
+    "ACCOUNT": "Conta",
+    "LOGOUT": "Sair"
+  },
+  "VIEW": {
+    "BACKUP": {
+      "LINK": "Backup",
+      "TITLE": "Backup"
     },
-    "service": {},
-    "upstream": {}
-  },
-  "nav": {
-    "services": "Serviços",
-    "upstreams": "Upstreams",
-    "sensors": "Sensors",
-    "about": "Sobre",
-    "dashboard": "Paineis",
-    "system": "Sistema",
-    "hostnames": "Hostnames",
-    "certificates": "Certificados",
-    "dictionaries": "Dicionarios",
-    "gateway": "Gateway",
-    "transactions": "Transações"
+    "DASHBOARD": {
+      "LINK": "Painel",
+      "TITLE": "Painel de Controle"
+    },
+    "TRANSACTION": {
+      "LINK": "Atividade de Rede",
+      "TITLE": "Transações",
+      "SUBTITLE": "Listar todas as transações"
+    },
+    "SERVICE": {
+      "LINK": "Serviço",
+      "TITLE": "Serviços",
+      "SUBTITLE": "Descrever todos os serviços"
+    },
+    "UPSTREAM": {
+      "LINK": "Upstream",
+      "TITLE": "Upstream",
+      "SUBTITLE": "Lista de todos os upstreams"
+    },
+    "HOSTNAME": {
+      "LINK": "Hostname",
+      "TITLE": "Hostname",
+      "SUBTITLE": "Lista de todos os Hostnames"
+    },
+    "CERTIFICATE": {
+      "LINK": "Certificado",
+      "TITLE": "Certificado",
+      "SUBTITLE": "Lista de todos os certificados"
+    },
+    "SENSOR": {
+      "LINK": "Sensor",
+      "TITLE": "Sensor",
+      "SUBTITLE": "Lista de todos os sensores"
+    },
+    "USER": {
+      "LINK": "Usuários",
+      "TITLE": "Usuários",
+      "SUBTITLE": "Lista de todos os usuários"
+    },
+    "CONFIG": {
+      "LINK": "Configuração",
+      "TITLE": "Configuração",
+      "SUBTITLE": "Lista de todas as configurações"
+    },
+    "SYSTEM": {
+      "LINK": "Sistema"
+    }
   },
   "ROUTE": {
     "ALLOWED_METHODS": "Métodos HTTP Permitidos",
@@ -172,12 +229,205 @@
     "PURGE_DESC": "Remova automaticamente registros antigos do banco local DuckDB para manter alta performance e economizar armazenamento.",
     "PURGE_AFTER": "Idade Máxima dos Dados (dias)"
   },
+  "TRANSACTION": {
+    "FILTER": {
+      "ADD_FILTER": "Adicionar Filtro",
+      "CLEAR_ALL": "Limpar Filtros",
+      "ACTIVE_FILTERS": "Filtros Ativos",
+      "DIALOG_TITLE": "Adicionar Filtro de Transação",
+      "DIALOG_SUBTITLE": "Selecione um atributo e valor para filtrar o tráfego de rede",
+      "CATEGORY_LABEL": "Categoria",
+      "FIELD_LABEL": "Campo",
+      "OPERATOR_LABEL": "Operador",
+      "VALUE_LABEL": "Valor",
+      "VALUE_PLACEHOLDER": "Informe o valor do filtro...",
+      "PREVIEW_LABEL": "Pré-visualização do Filtro JSON",
+      "PRESETS": "Valores Rápidos / Predefinições",
+      "CANCEL": "Cancelar",
+      "APPLY": "Aplicar Filtro",
+      "CATEGORIES": {
+        "GENERAL": "Geral e Status",
+        "ROUTING": "Serviços e Rotas",
+        "NETWORK": "Rede e Geolocalização",
+        "HTTP": "Requisição e Resposta HTTP",
+        "SECURITY": "Segurança e WAF",
+        "SYSTEM": "Sistema e Nós"
+      },
+      "FIELDS": {
+        "ACTION": "Ação de Segurança (action)",
+        "SERVICE_ID": "Serviço (service._id)",
+        "ROUTE_NAME": "Nome da Rota (route_name)",
+        "UPSTREAM_ID": "Upstream (upstream._id)",
+        "SOURCE_IP": "IP de Origem (source.ip)",
+        "SOURCE_PORT": "Porta de Origem (source.port)",
+        "GEOIP_COUNTRY": "País de Origem (geoip.country_code)",
+        "DESTINATION_HOST": "Host de Destino (destination.host)",
+        "DESTINATION_IP": "IP de Destino (destination.ip)",
+        "DESTINATION_PORT": "Porta de Destino (destination.port)",
+        "HTTP_METHOD": "Método HTTP (http.request.method)",
+        "HTTP_URI": "URI da Requisição (http.request.uri)",
+        "STATUS_CODE": "Código de Status HTTP (http.response.status_code)",
+        "DURATION": "Duração em segundos (http.duration)",
+        "SCORE": "Score de Anomalia (score)",
+        "RATE_LIMIT_ACTION": "Ação de Limite de Taxa (rate_limit.action)",
+        "LIMIT_REQ_STATUS": "Status de Limite de Requisições (limit_req_status)",
+        "GEOIP_STATUS": "Status GeoIP (geoip_status)",
+        "RBL_STATUS": "Status RBL (rbl_status)",
+        "IPXA": "Status IPXA (ipxa)",
+        "MTLS_ENABLED": "mTLS Ativo (mtls.enabled)",
+        "MTLS_VERIFIED": "mTLS Verificado (mtls.verified)",
+        "AUDIT_RULE_CODE": "Código / ID da Regra WAF (rule_code)",
+        "USER_AGENT": "Família User Agent (user_agent.family)",
+        "SERVER_ID": "ID do Nó / Servidor (server_id)",
+        "UNIQUE_ID": "ID Único da Transação (unique_id)",
+        "ARCHIVED": "Status de Arquivamento (archived)"
+      }
+    },
+    "DATE_RANGE": {
+      "TITLE": "Selecionar Intervalo de Tempo",
+      "SUBTITLE": "Filtrar telemetria e métricas por janela de tempo específica",
+      "TOOLTIP": "Selecionar intervalo de data e hora",
+      "PRESETS": "Predefinições Rápidas",
+      "PRESET_15M": "Últimos 15m",
+      "PRESET_1H": "Última 1h",
+      "PRESET_6H": "Últimas 6h",
+      "PRESET_24H": "Últimas 24h",
+      "PRESET_7D": "Últimos 7d",
+      "PRESET_TODAY": "Hoje",
+      "PRESET_YESTERDAY": "Ontem",
+      "CUSTOM_RANGE": "Data e Hora Personalizadas",
+      "START_DATE": "Data e Hora Inicial",
+      "END_DATE": "Data e Hora Final",
+      "APPLY": "Aplicar Intervalo",
+      "CANCEL": "Cancelar"
+    }
+  },
+  "FORMAT": {
+    "PARSE": {
+      "DATE_INPUT": "YYYY-MM-DDTHH:mm:ss.SSSZ"
+    },
+    "DISPLAY": {
+      "TIME": "HH:mm:ss",
+      "DATETIME": "DD/MM/YYYY HH:mm:ss",
+      "MONTH_YEAR_LABEL": "MMM YYYY",
+      "DATE_A11Y_LABEL": "LL",
+      "MONTH_YEAR_A11Y_LABEL": "MMMM YYYY"
+    }
+  },
+  "aboutMessage": "Obrigado",
+  "actions": {
+    "create": "Adicionar",
+    "edit": "Editar",
+    "remove": "Remover",
+    "delete": "Excluir",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "export": "Exportar",
+    "save": "Salvar",
+    "import": "Importar",
+    "refresh": "Atualizar",
+    "close": "Fechar",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "next": "Próximo",
+    "back": "Voltar",
+    "add": "Adicionar",
+    "apply": "Aplicar",
+    "backup": "Backup",
+    "restore": "Restaurar"
+  },
+  "about": {
+    "title": "Sobre o NXGuard",
+    "subtitle": "API Gateway de Alta Performance & Motor de Segurança",
+    "tab_about": "Sobre",
+    "tab_restore": "Restaurar Config",
+    "choose_file": "Escolher arquivo ZIP para restauração",
+    "selected_file": "Arquivo Selecionado",
+    "powered_by": "Desenvolvido com OpenResty & ModSecurity"
+  },
+  "attr": {
+    "name": "Nome",
+    "domains": "Dominios",
+    "routes": "Rotas",
+    "active": "Ativo",
+    "login": {
+      "username": "Enter your user name",
+      "password": "Password here"
+    },
+    "service": {},
+    "upstream": {}
+  },
+  "nav": {
+    "services": "Serviços",
+    "upstreams": "Upstreams",
+    "sensors": "Sensors",
+    "about": "Sobre",
+    "dashboard": "Paineis",
+    "system": "Sistema",
+    "hostnames": "Hostnames",
+    "certificates": "Certificados",
+    "dictionaries": "Dicionarios",
+    "gateway": "Gateway",
+    "transactions": "Transações"
+  },
+  "view": {
+    "backup": {
+      "link": "backup"
+    },
+    "dashboard": {
+      "link": "Painel",
+      "title": "Painel"
+    },
+    "transaction": {
+      "link": "Atividade de Rede",
+      "title": "Transações",
+      "subtitle": "Listar todas as transações"
+    },
+    "service": {
+      "link": "Serviço",
+      "title": "Serviços",
+      "subtitle": "Descrever todos os serviços"
+    },
+    "upstream": {
+      "link": "Upstream",
+      "title": "Upstream",
+      "subtitle": "Lista de todos os upstreams"
+    },
+    "hostname": {
+      "link": "Hostname",
+      "title": "Hostname",
+      "subtitle": "Lista de todos os Hostnames"
+    },
+    "certificate": {
+      "link": "Certificado",
+      "title": "Certificado",
+      "subtitle": "Lista de todos os certificados"
+    },
+    "sensor": {
+      "link": "Sensor",
+      "title": "Sensor",
+      "subtitle": "Lista de todos os sensores"
+    },
+    "user": {
+      "link": "Usuários",
+      "title": "Usuários",
+      "subtitle": "Lista de todos os usuários"
+    },
+    "config": {
+      "link": "Configuração",
+      "title": "Configuração",
+      "subtitle": "Lista de todas as configurações"
+    },
+    "system": {
+      "link": "Sistema"
+    }
+  },
   "format": {
     "parse": {
       "dateInput": "YYYY-MM-DDTHH:mm:ss.SSSZ"
     },
     "display": {
-      "time":"HH:mm:ss",
+      "time": "HH:mm:ss",
       "datetime": "DD/MM/YYYY HH:mm:ss",
       "monthYearLabel": "MMM YYYY",
       "dateA11yLabel": "LL",

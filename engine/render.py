@@ -5,7 +5,6 @@ import re
 from jinja2 import Environment, FileSystemLoader
 from nxcore.middleware.logging_manager import logger
 
-from engine.seclang.seclang_indexer import get_default_vars
 import config
 from api.model.seclang_model import RuleCategoryDao
 from api.model.route_model import RouteType
@@ -135,7 +134,7 @@ def _generate_sensors(
         exclusion_lists = [
             ",".join(
                 f"ctl:ruleRemoveById={str(x).strip()}"
-                for x in exclusions[i : i + chunk_size]
+                for x in exclusions[i:i + chunk_size]
             )
             for i in range(0, len(exclusions), chunk_size)
         ]

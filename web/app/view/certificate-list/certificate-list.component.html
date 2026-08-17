@@ -4,7 +4,7 @@
             <mat-card-title>{{ 'view.certificate.title'|translate }}</mat-card-title>
             <mat-card-subtitle>{{ 'view.certificate.subtitle'|translate }}</mat-card-subtitle>
             <mat-card-actions class="align-right">
-                <button mat-button color="primary" id="add-certificate-btn" [routerLink]="['add']" *ngIf="oauth.isRole('superuser')">
+                <button mat-flat-button color="primary" id="add-certificate-btn" [routerLink]="['add']" *ngIf="oauth.isRole('superuser')">
                     <mat-icon>add</mat-icon>
                     {{ 'actions.create'|translate }}
                 </button>

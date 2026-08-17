@@ -8,7 +8,6 @@ from nxcore.controllers.base_controller import (
     get_pagination,
     has_any_authority,
     response_data_removed,
-    response_error_500,
 )
 
 
