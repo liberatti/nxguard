@@ -138,7 +138,6 @@ export class SensorFormComponent implements OnInit {
 
         if (!this.oauth.isRole('superuser')) {
             this.form.disable();
-            if (!this.isAddMode) return;
         }
 
         if (!this.isAddMode) {

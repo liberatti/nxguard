@@ -17,12 +17,14 @@ import {Language} from 'app/models/shared';
 import {LocalStorageService} from 'app/services/localstorage.service';
 import {NotificationService} from 'app/services/notification.service';
 import {OAuthService} from 'app/services/oauth.service';
-import {NgOptimizedImage} from "@angular/common";
+import {CommonModule, NgOptimizedImage} from "@angular/common";
+import {TranslatePipe, TranslateService} from "@ngx-translate/core";
+import {environment} from "environments/environment";
 
 @Component({
     selector: 'app-sign-in',
     standalone: true,
-    imports: [RouterModule, FormsModule, ReactiveFormsModule,
+    imports: [RouterModule, CommonModule, FormsModule, ReactiveFormsModule, TranslatePipe,
         MatIconModule, MatButtonModule, MatFormFieldModule,
         MatCardModule, MatProgressBarModule, MatInputModule,
         MatTooltipModule, MatSelectModule, MatOptionModule, MatGridListModule
@@ -33,6 +35,8 @@ import {NgOptimizedImage} from "@angular/common";
 })
 export class SignInComponent implements OnInit {
     locales = [] as Array<Language>;
+    hidePassword = true;
+    version: string = environment.version;
 
     form = new FormGroup({
         email: new FormControl<string>('', {

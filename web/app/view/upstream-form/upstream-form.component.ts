@@ -97,8 +97,6 @@ export class UpstreamFormComponent implements OnInit {
         // Disable form if user is not a superuser
         if (!this.oauth.isRole('superuser')) {
             this.form.disable();
-            // No need to fetch data if form is disabled and not in add mode
-            if (!this.isAddMode) return;
         }
 
         // If editing, fetch upstream and patch form values

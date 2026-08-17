@@ -20,6 +20,18 @@
     "BACKUP": "Backup",
     "RESTORE": "Restore"
   },
+  "AUTH": {
+    "TITLE": "NXGUARD",
+    "SUBTITLE": "Enterprise Proxy & Security Gateway",
+    "HOST_CLIENT": "Host Management Client",
+    "SIGN_IN": "Sign In",
+    "SIGN_IN_BTN": "Log in",
+    "EMAIL": "User name / Email",
+    "PASSWORD": "Password",
+    "FOOTER_NOTICE": "Authorized access only. All activities are monitored and logged.",
+    "VERSION": "Version",
+    "COPYRIGHT": "Copyright © NXGUARD Engine"
+  },
   "ABOUT": {
     "TITLE": "About NXGuard",
     "SUBTITLE": "High-Performance API Gateway & Security Engine",
