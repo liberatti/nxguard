@@ -55,6 +55,8 @@ def index(
                         "logdata": rule.get("logdata"),
                         "phase": rule.get("phase"),
                         "seq": s,
+                        "severity": rule.get("severity"),
+                        "comment": rule.get("comment"),
                     }
                     rule_dao.persist(rule_doc)
                     s += 1

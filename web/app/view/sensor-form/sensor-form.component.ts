@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatIconModule } from '@angular/material/icon';
@@ -11,12 +12,12 @@ import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
 import { MatMenuModule } from '@angular/material/menu';
 
-import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { MatSortModule } from '@angular/material/sort';
+import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -34,20 +35,22 @@ import { FormaterService } from "app/services/formater.service";
 import { MatMomentDateModule } from "@angular/material-moment-adapter";
 
 import { MatExpansionModule } from '@angular/material/expansion';
+import { RuleDetailsDialogComponent } from 'app/components/rule-details-dialog/rule-details-dialog.component';
 
 @Component({
     selector: 'app-sensor-form',
     standalone: true,
-    imports: [RouterModule, CommonModule,
+    imports: [RouterModule, CommonModule, FormsModule,
         ReactiveFormsModule, TranslatePipe,
         MatMomentDateModule, MatSidenavModule, MatIconModule, MatButtonModule,
         MatListModule, MatCardModule, MatProgressBarModule, MatInputModule,
         MatTableModule, MatMenuModule, MatSortModule, MatTabsModule, MatGridListModule,
         MatTooltipModule, MatSelectModule, MatPaginatorModule, MatSlideToggleModule, MatCheckboxModule,
-        MatFormFieldModule, MatChipsModule, MatExpansionModule],
-    templateUrl: './sensor-form.component.html'
+        MatFormFieldModule, MatChipsModule, MatExpansionModule, MatDialogModule],
+    templateUrl: './sensor-form.component.html',
+    styleUrl: './sensor-form.component.css'
 })
-export class SensorFormComponent implements OnInit {
+export class SensorFormComponent implements OnInit, AfterViewInit {
     isAddMode: boolean;
     submitted = false;
     selectedTabIndex = 0;
@@ -74,6 +77,12 @@ export class SensorFormComponent implements OnInit {
     ruleDC: string[] = ['code', 'severity', 'msg', 'actionSummary', 'action'];
     ruleDS: MatTableDataSource<SecRule>;
     ruleCH: number[] = [];
+    selectedCategory: string | null = null;
+    ruleSearchQuery: string = '';
+    pageSizeOptions: number[] = [10, 15, 25, 50, 100];
+
+    @ViewChild(MatPaginator) paginator!: MatPaginator;
+    @ViewChild(MatSort) sort!: MatSort;
 
     form = new FormGroup({
         _id: new FormControl<string>(''),
@@ -124,6 +133,7 @@ export class SensorFormComponent implements OnInit {
         private sensorService: SensorService,
         private ruleCatService: RuleCategoryService,
         private feedService: FeedService,
+        private dialog: MatDialog,
         protected oauth: OAuthService,
         protected formater: FormaterService
     ) {
@@ -143,11 +153,19 @@ export class SensorFormComponent implements OnInit {
         if (!this.isAddMode) {
             this.sensorService.getById(id).subscribe((data: Sensor) => {
                 this.form.patchValue(data);
+                if (data.categories && data.categories.length > 0) {
+                    this.onSelectCategory(data.categories[0]);
+                }
             });
         }
 
         this.getCategories(null);
         this.getFeeds(null);
+    }
+
+    ngAfterViewInit(): void {
+        this.ruleDS.paginator = this.paginator;
+        this.ruleDS.sort = this.sort;
     }
 
     getGeoCodes(): string[] {
@@ -338,22 +356,142 @@ export class SensorFormComponent implements OnInit {
     }
 
     onAddCategory(event: any): void {
-        let data = event.value as RuleCategory;
+        let val = event.value;
+        if (typeof val === 'object' && val) val = val.name || val._id;
         let cats = this.form.value.categories || [];
-        if (data && data.name && !cats.includes(data.name)) {
-            cats.push(data.name);
+        if (val && !cats.includes(val)) {
+            cats.push(val);
             this.form.patchValue({ categories: cats });
+            if (!this.selectedCategory) {
+                this.onSelectCategory(val);
+            }
         }
     }
 
+    normalizeRule(rule: any): SecRule {
+        const raw = rule.raw || '';
+
+        // Extract Severity
+        if (!rule.severity && raw) {
+            const match = raw.match(/severity:\s*(?:'([^']*)'|"([^"]*)"|([A-Za-z0-9_]+))/i);
+            if (match) {
+                rule.severity = (match[1] || match[2] || match[3] || '').toUpperCase();
+            }
+        }
+
+        // Extract Description / Message
+        if (!rule.msg && raw) {
+            const match = raw.match(/msg:\s*(?:'([^']*)'|"([^"]*)")/i);
+            if (match) {
+                rule.msg = match[1] || match[2];
+            }
+        }
+
+        // Fallback description for control/gate rules (e.g. skipAfter gate rules)
+        if (!rule.msg) {
+            if (raw.includes('skipAfter:')) {
+                rule.msg = 'Paranoia level skip gate / Rule engine flow control';
+            } else if (rule.comment) {
+                rule.msg = rule.comment;
+            }
+        }
+
+        // Extract Tags
+        if ((!rule.tags || !rule.tags.length) && raw) {
+            const tagMatches = [...raw.matchAll(/tag:\s*(?:'([^']*)'|"([^"]*)")/gi)];
+            rule.tags = tagMatches.map(m => m[1] || m[2]).filter(Boolean);
+        }
+
+        // Standardize severity case
+        if (rule.severity) {
+            rule.severity = rule.severity.toUpperCase();
+        }
+
+        return rule;
+    }
+
     onSelectCategory(cat_name: string): void {
+        this.selectedCategory = cat_name;
         this.ruleCatService.getBySingleName(cat_name).subscribe((data: any) => {
             if (!data) return;
             const categoryData = data.data || data;
-            const ruleList = Array.isArray(categoryData) ? categoryData : (categoryData.rules || []);
-            this.ruleDS.data = ruleList;
+            const rawRuleList = Array.isArray(categoryData) ? categoryData : (categoryData.rules || []);
+            const normalizedList = rawRuleList.map((r: any) => this.normalizeRule({ ...r }));
+            this.ruleDS.data = normalizedList;
+            if (this.paginator) {
+                this.ruleDS.paginator = this.paginator;
+            }
+            if (this.sort) {
+                this.ruleDS.sort = this.sort;
+            }
+            this.setupRuleFilterPredicate();
+            if (this.ruleSearchQuery) {
+                this.applyRuleFilter();
+            }
             this.ruleCH = [];
         });
+    }
+
+    setupRuleFilterPredicate(): void {
+        this.ruleDS.filterPredicate = (data: SecRule, filter: string) => {
+            const term = (filter || '').trim().toLowerCase();
+            if (!term) return true;
+            const codeStr = String(data.code || '');
+            const msgStr = (data.msg || '').toLowerCase();
+            const sevStr = (data.severity || '').toLowerCase();
+            const actionStr = (data.action || '').toLowerCase();
+            const tagsStr = (data.tags || []).join(' ').toLowerCase();
+            return (
+                codeStr.includes(term) ||
+                msgStr.includes(term) ||
+                sevStr.includes(term) ||
+                actionStr.includes(term) ||
+                tagsStr.includes(term)
+            );
+        };
+    }
+
+    applyRuleFilter(): void {
+        this.setupRuleFilterPredicate();
+        this.ruleDS.filter = (this.ruleSearchQuery || '').trim().toLowerCase();
+        if (this.ruleDS.paginator) {
+            this.ruleDS.paginator.firstPage();
+        }
+    }
+
+    clearRuleFilter(): void {
+        this.ruleSearchQuery = '';
+        this.applyRuleFilter();
+    }
+
+    openRuleDetails(rule: SecRule): void {
+        this.dialog.open(RuleDetailsDialogComponent, {
+            data: rule,
+            width: '820px',
+            maxWidth: '92vw'
+        });
+    }
+
+    getSeverityClass(severity?: string): string {
+        switch ((severity || '').toUpperCase()) {
+            case 'CRITICAL':
+            case 'EMERGENCY':
+            case 'ALERT':
+                return 'critical';
+            case 'ERROR':
+            case 'HIGH':
+                return 'high';
+            case 'WARNING':
+            case 'MEDIUM':
+                return 'medium';
+            case 'NOTICE':
+            case 'LOW':
+                return 'low';
+            case 'INFO':
+            case 'DEBUG':
+            default:
+                return 'info';
+        }
     }
 
     onRemoveCategory(keyword: any): void {
@@ -361,6 +499,15 @@ export class SensorFormComponent implements OnInit {
             let index = this.form.value.categories.indexOf(keyword);
             if (index >= 0) {
                 this.form.value.categories.splice(index, 1);
+                if (this.selectedCategory === keyword) {
+                    const remaining = this.form.value.categories;
+                    if (remaining && remaining.length > 0) {
+                        this.onSelectCategory(remaining[0]);
+                    } else {
+                        this.selectedCategory = null;
+                        this.ruleDS.data = [];
+                    }
+                }
             }
         }
     }

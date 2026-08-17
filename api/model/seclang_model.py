@@ -41,7 +41,9 @@ class RuleDao(DuckDAO):
                 attachment TEXT,
                 phase INTEGER,
                 seq INTEGER,
-                tags_json JSON
+                tags_json JSON,
+                severity TEXT,
+                comment TEXT
             );
         """
         )

@@ -113,6 +113,27 @@ class RuleSetParser:
                 for token in re.split(",(?=(?:[^']*'[^']*')*[^']*$)", rule_content):
                     self._process_rule_token(rule, token, line, rule_content)
 
+        # Fallback regex extraction if token parsing missed fields due to nested quotes
+        if not rule.get("code"):
+            id_match = re.search(r"\bid:(\d+)", line)
+            if id_match:
+                rule["code"] = int(id_match.group(1))
+
+        if not rule.get("msg"):
+            msg_match = re.search(r"\bmsg:\s*(?:'([^']*)'|\"([^\"]*)\")", line)
+            if msg_match:
+                rule["msg"] = msg_match.group(1) or msg_match.group(2)
+
+        if not rule.get("severity"):
+            sev_match = re.search(r"\bseverity:\s*(?:'([^']*)'|\"([^\"]*)\"|([A-Za-z0-9_]+))", line)
+            if sev_match:
+                rule["severity"] = sev_match.group(1) or sev_match.group(2) or sev_match.group(3)
+
+        if not rule.get("tags"):
+            tag_matches = re.findall(r"\btag:\s*(?:'([^']*)'|\"([^\"]*)\")", line)
+            if tag_matches:
+                rule["tags"] = [m[0] or m[1] for m in tag_matches]
+
         self.line_index += 1
         logger.debug(rule)
 
