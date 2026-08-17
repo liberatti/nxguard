@@ -5,9 +5,11 @@ from marshmallow import ValidationError
 
 from api.model.config_model import ChangeDao
 from api.model.upstream_model import UpstreamDao
+from api.model.service_model import ServiceDao
 from nxcore.controllers.base_controller import (
     response_data,
     response_error_404,
+    response_error_500,
     response_error_parse,
     response_data_removed,
     get_pagination,
@@ -104,15 +106,14 @@ def update(upstream_id):
 @routes.route("/<upstream_id>", methods=["DELETE"])
 @has_any_authority(authorities=["superuser"])
 def delete(upstream_id):
-    with UpstreamDao() as dao:
-        #    service_dao = ServiceDao()
-        #    service_list = service_dao.get_all()
-        #    if "data" in service_list:
-        #        for service in service_list["data"]:
-        #            if "routes" in service:
-        #                for route in service["routes"]:
-        #                    if upstream_id in route["upstream"]["_id"]:
-        #                        return response_error_500("Upstream in use")
+    with UpstreamDao() as dao, ServiceDao() as service_dao:
+        service_list = service_dao.get_all()
+        if service_list and "data" in service_list and service_list["data"]:
+            for service in service_list["data"]:
+                for route in service.get("routes") or []:
+                    ups = route.get("upstream")
+                    if ups and str(ups.get("_id")) == str(upstream_id):
+                        return response_error_500("Upstream in use")
         r = dao.delete_by_id(upstream_id)
         if r:
             return response_data_removed(upstream_id)

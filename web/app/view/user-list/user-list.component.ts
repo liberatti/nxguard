@@ -38,7 +38,8 @@ import { OAuthService, UserService } from "../../services/oauth.service";
         MatTableModule, MatMenuModule, MatSortModule,
         MatTooltipModule, MatSelectModule, MatPaginatorModule,
         MatFormFieldModule, MatChipsModule, MatDialogModule],
-    templateUrl: './user-list.component.html'
+    templateUrl: './user-list.component.html',
+    styleUrl: './user-list.component.css'
 })
 export class UserListComponent implements OnInit {
 

@@ -32,14 +32,17 @@ import {OAuthService, UserService} from "../../services/oauth.service";
         MatMomentDateModule,
         MatSidenavModule, MatIconModule, MatButtonModule,
         MatListModule, MatCardModule, MatProgressBarModule, MatInputModule,
-        MatTableModule, MatMenuModule, MatSortModule, ScrollingModule, MatListModule,
+        MatTableModule, MatMenuModule, MatSortModule, ScrollingModule,
         MatTooltipModule, MatSelectModule, MatPaginatorModule,
         MatFormFieldModule, MatChipsModule],
-    templateUrl: './user-form.component.html'
+    templateUrl: './user-form.component.html',
+    styleUrl: './user-form.component.css'
 })
 export class UserFormComponent implements OnInit {
     isAddMode: boolean;
     submitted = false;
+    hidePassword = true;
+    hideCPassword = true;
     _supportedRoles = ['viewer', 'superuser'];
 
     form = new FormGroup({

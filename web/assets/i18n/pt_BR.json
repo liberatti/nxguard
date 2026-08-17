@@ -315,6 +315,19 @@
     "SUCCESS": "Perfil atualizado com sucesso",
     "SAVE": "Salvar Alterações"
   },
+  "USER_MGMT": {
+    "NAME": "Nome Completo",
+    "EMAIL": "Endereço de E-mail",
+    "ROLE": "Perfil de Acesso",
+    "PASSWORD": "Senha",
+    "CONFIRM_PASSWORD": "Confirmar Senha",
+    "ROLES": {
+      "SUPERUSER": "Superusuário",
+      "VIEWER": "Visualizador"
+    },
+    "ACTIONS": "Ações",
+    "NO_USERS": "Nenhum usuário encontrado"
+  },
   "FORMAT": {
     "PARSE": {
       "DATE_INPUT": "YYYY-MM-DDTHH:mm:ss.SSSZ"
@@ -397,27 +410,27 @@
       "subtitle": "Listar todas as transações"
     },
     "service": {
-      "link": "Serviço",
+      "link": "Serviços",
       "title": "Serviços",
       "subtitle": "Descrever todos os serviços"
     },
     "upstream": {
-      "link": "Upstream",
+      "link": "Upstreams",
       "title": "Upstream",
       "subtitle": "Lista de todos os upstreams"
     },
     "hostname": {
-      "link": "Hostname",
+      "link": "Hostnames",
       "title": "Hostname",
       "subtitle": "Lista de todos os Hostnames"
     },
     "certificate": {
-      "link": "Certificado",
+      "link": "Certificados",
       "title": "Certificado",
       "subtitle": "Lista de todos os certificados"
     },
     "sensor": {
-      "link": "Sensor",
+      "link": "Sensores",
       "title": "Sensor",
       "subtitle": "Lista de todos os sensores"
     },
@@ -427,7 +440,7 @@
       "subtitle": "Lista de todos os usuários"
     },
     "config": {
-      "link": "Configuração",
+      "link": "Configurações",
       "title": "Configuração",
       "subtitle": "Lista de todas as configurações"
     },

@@ -315,6 +315,19 @@
     "SUCCESS": "Profile updated successfully",
     "SAVE": "Save Changes"
   },
+  "USER_MGMT": {
+    "NAME": "Full Name",
+    "EMAIL": "Email Address",
+    "ROLE": "Access Role",
+    "PASSWORD": "Password",
+    "CONFIRM_PASSWORD": "Confirm Password",
+    "ROLES": {
+      "SUPERUSER": "Superuser",
+      "VIEWER": "Viewer"
+    },
+    "ACTIONS": "Actions",
+    "NO_USERS": "No users found"
+  },
   "FORMAT": {
     "DISPLAY": {
       "DATETIME": "DD/MM/YYYY HH:mm:ss",
@@ -379,28 +392,28 @@
       "subtitle": "List all transactions"
     },
     "service": {
-      "link": "Service",
+      "link": "Services",
       "title": "Services",
       "subtitle": "Describe all services"
     },
     "upstream": {
-      "link": "Upstream",
-      "title": "Upstream",
+      "link": "Upstreams",
+      "title": "Upstreams",
       "subtitle": "List of all upstreams"
     },
     "hostname": {
-      "link": "Hostname",
-      "title": "Hostname",
-      "subtitle": "List of all Hostnames"
+      "link": "Hostnames",
+      "title": "Hostnames",
+      "subtitle": "List of all hostnames"
     },
     "certificate": {
-      "link": "Certificate",
-      "title": "Certificate",
-      "subtitle": "List of all certificate"
+      "link": "Certificates",
+      "title": "Certificates",
+      "subtitle": "List of all certificates"
     },
     "sensor": {
-      "link": "Sensor",
-      "title": "Sensor",
+      "link": "Sensors",
+      "title": "Sensors",
       "subtitle": "List of all sensors"
     },
     "user": {
@@ -409,8 +422,8 @@
       "subtitle": "List of all users"
     },
     "config": {
-      "link": "Config",
-      "title": "Config",
+      "link": "Configuration",
+      "title": "Configuration",
       "subtitle": "List of all configs"
     },
     "system": {

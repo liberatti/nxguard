@@ -1,0 +1,120 @@
+.user-card {
+    margin-bottom: 24px;
+}
+
+.create-btn {
+    height: 40px !important;
+    padding: 0 18px !important;
+    font-weight: 600 !important;
+    border-radius: 10px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+}
+
+.user-table-container {
+    padding: 0 !important;
+    overflow-x: auto;
+}
+
+.user-table-row {
+    transition: background-color 0.2s ease;
+}
+
+.user-table-row:hover {
+    background-color: rgba(37, 99, 235, 0.02) !important;
+}
+
+.user-cell-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.user-avatar-circle {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--primary, #2563eb);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.avatar-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+}
+
+.user-name-text {
+    font-weight: 600;
+    color: var(--text-main, #0f172a);
+}
+
+.email-cell-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-dim, #475569);
+    font-size: 0.88rem;
+}
+
+.email-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: var(--text-muted, #94a3b8);
+}
+
+.role-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 16px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.role-superuser {
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--primary, #2563eb);
+    border: 1px solid rgba(37, 99, 235, 0.2);
+}
+
+.role-viewer {
+    background: rgba(100, 116, 139, 0.1);
+    color: #64748b;
+    border: 1px solid rgba(100, 116, 139, 0.2);
+}
+
+.role-chip-icon {
+    font-size: 14px !important;
+    width: 14px !important;
+    height: 14px !important;
+}
+
+.action-menu-btn {
+    color: var(--text-muted, #94a3b8);
+}
+
+.action-menu-btn:hover {
+    color: var(--text-main, #0f172a);
+}
+
+.delete-menu-item mat-icon {
+    color: var(--error, #ef4444) !important;
+}
+
+.delete-menu-item .text-warn {
+    color: var(--error, #ef4444) !important;
+}
+
+.user-paginator {
+    border-top: 1px solid var(--border-dim, #e2e8f0);
+}

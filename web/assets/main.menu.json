@@ -2,17 +2,17 @@
   {
     "label": "view.dashboard.link",
     "route": "/dashboard",
-    "icon": "dashboard"
+    "icon": "space_dashboard"
   },
   {
     "label": "view.transaction.link",
     "route": "/trn",
-    "icon": "list_alt"
+    "icon": "timeline"
   },
   {
     "label": "view.service.link",
     "route": "/service",
-    "icon": "analytics"
+    "icon": "layers"
   },
   {
     "label": "view.upstream.link",
@@ -22,21 +22,21 @@
   {
     "label": "view.sensor.link",
     "route": "/sensor",
-    "icon": "sensors"
+    "icon": "security"
   },
   {
     "label": "view.system.link",
-    "icon": "build_circle",
+    "icon": "tune",
     "menu": [
       {
         "label": "view.certificate.link",
         "route": "/certificate",
-        "icon": "browser_updated"
+        "icon": "verified_user"
       },
       {
         "label": "view.user.link",
         "route": "/users",
-        "icon": "supervised_user_circle"
+        "icon": "group"
       },
       {
         "label": "view.config.link",
