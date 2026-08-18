@@ -41,9 +41,14 @@ def register(app, bp):
 
     @bp.route("/<path:path>")
     def catch_all(path: str):
-        if "." in path and not path.endswith("/"):
+        context_prefix = config.APP_CONTEXT.strip("/")
+        rel_path = path
+        if context_prefix and (rel_path == context_prefix or rel_path.startswith(f"{context_prefix}/")):
+            rel_path = rel_path[len(context_prefix):].lstrip("/")
+
+        if "." in rel_path and not rel_path.endswith("/"):
             try:
-                return current_app.send_static_file(path)
+                return current_app.send_static_file(rel_path)
             except Exception:
                 pass
         return render_template("index.html")
