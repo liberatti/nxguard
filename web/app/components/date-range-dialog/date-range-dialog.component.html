@@ -1,0 +1,117 @@
+<div class="date-range-dialog-container">
+    <!-- Header -->
+    <div mat-dialog-title class="dialog-header">
+        <div class="header-icon-box">
+            <mat-icon>calendar_month</mat-icon>
+        </div>
+        <div class="header-titles">
+            <h2 class="dialog-title">{{ 'TRANSACTION.DATE_RANGE.TITLE' | translate }}</h2>
+            <p class="dialog-subtitle">{{ 'TRANSACTION.DATE_RANGE.SUBTITLE' | translate }}</p>
+        </div>
+        <button mat-icon-button (click)="onCancel()" class="close-btn" [matTooltip]="'actions.close' | translate">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+
+    <mat-dialog-content class="dialog-content">
+        <form [formGroup]="rangeForm" class="date-range-form">
+            <!-- Quick Presets -->
+            <div class="presets-section">
+                <span class="presets-section-title">{{ 'TRANSACTION.DATE_RANGE.PRESETS' | translate }}:</span>
+                <div class="presets-grid">
+                    <button type="button" mat-stroked-button class="preset-btn"
+                        *ngFor="let preset of presets"
+                        (click)="applyPreset(preset)">
+                        <mat-icon class="preset-icon">{{ preset.icon }}</mat-icon>
+                        <span>{{ preset.labelKey | translate }}</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="custom-range-divider">
+                <span>{{ 'TRANSACTION.DATE_RANGE.CUSTOM_RANGE' | translate }}</span>
+            </div>
+
+            <!-- Custom Date & Time Controls -->
+            <div class="range-pickers-grid">
+                <!-- Start Date & Time Column -->
+                <div class="picker-column">
+                    <div class="column-header">
+                        <div class="column-icon-box">
+                            <mat-icon class="column-icon">start</mat-icon>
+                        </div>
+                        <span class="column-title">{{ 'TRANSACTION.DATE_RANGE.START_DATE' | translate }}</span>
+                    </div>
+
+                    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="full-width">
+                        <mat-label>{{ 'TRANSACTION.DATE_RANGE.START_DATE' | translate }}</mat-label>
+                        <input matInput [matDatepicker]="startPicker" formControlName="startDate" readonly>
+                        <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
+                        <mat-datepicker #startPicker></mat-datepicker>
+                    </mat-form-field>
+
+                    <div class="time-picker-row">
+                        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="time-select">
+                            <mat-label>HH</mat-label>
+                            <mat-select formControlName="startHour">
+                                <mat-option *ngFor="let h of hours" [value]="h">{{ h }}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <span class="time-sep">:</span>
+                        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="time-select">
+                            <mat-label>MM</mat-label>
+                            <mat-select formControlName="startMinute">
+                                <mat-option *ngFor="let m of minutes" [value]="m">{{ m }}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+
+                <!-- End Date & Time Column -->
+                <div class="picker-column">
+                    <div class="column-header">
+                        <div class="column-icon-box">
+                            <mat-icon class="column-icon">flag</mat-icon>
+                        </div>
+                        <span class="column-title">{{ 'TRANSACTION.DATE_RANGE.END_DATE' | translate }}</span>
+                    </div>
+
+                    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="full-width">
+                        <mat-label>{{ 'TRANSACTION.DATE_RANGE.END_DATE' | translate }}</mat-label>
+                        <input matInput [matDatepicker]="endPicker" formControlName="endDate" readonly>
+                        <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
+                        <mat-datepicker #endPicker></mat-datepicker>
+                    </mat-form-field>
+
+                    <div class="time-picker-row">
+                        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="time-select">
+                            <mat-label>HH</mat-label>
+                            <mat-select formControlName="endHour">
+                                <mat-option *ngFor="let h of hours" [value]="h">{{ h }}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <span class="time-sep">:</span>
+                        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="time-select">
+                            <mat-label>MM</mat-label>
+                            <mat-select formControlName="endMinute">
+                                <mat-option *ngFor="let m of minutes" [value]="m">{{ m }}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </mat-dialog-content>
+
+    <!-- Dialog Actions (Left Aligned) -->
+    <mat-dialog-actions align="start" class="dialog-actions">
+        <button mat-flat-button color="primary" (click)="onApply()" [disabled]="rangeForm.invalid" class="action-btn">
+            <mat-icon>check</mat-icon>
+            {{ 'TRANSACTION.DATE_RANGE.APPLY' | translate }}
+        </button>
+        <button mat-stroked-button (click)="onCancel()" class="action-btn">
+            <mat-icon>keyboard_return</mat-icon>
+            {{ 'TRANSACTION.DATE_RANGE.CANCEL' | translate }}
+        </button>
+    </mat-dialog-actions>
+</div>

@@ -1,0 +1,237 @@
+{
+  "variables": {
+    "paranoia_level": 3,
+    "inbound_anomaly_score_threshold": 15,
+    "outbound_anomaly_score_threshold": 15,
+    "allowed_http_versions": "HTTP/1.0 HTTP/1.1 HTTP/2 HTTP/2.0",
+    "max_file_size": 1048576,
+    "allowed_methods": "GET HEAD POST OPTIONS PUT PATCH DELETE",
+    "allowed_content_type": "|application/x-www-form-urlencoded| |multipart/form-data| |text/xml| |application/xml| |application/soap+xml| |application/json|",
+    "restricted_extensions": ".asa/ .asax/ .ascx/ .axd/ .backup/ .bak/ .bat/ .cdx/ .cer/ .cfg/ .cmd/ .com/ .config/ .conf/ .cs/ .csproj/ .csr/ .dat/ .db/ .dbf/ .dll/ .dos/ .htr/ .htw/ .ida/ .idc/ .idq/ .inc/ .ini/ .key/ .licx/ .lnk/ .log/ .mdb/ .old/ .pass/ .pdb/ .pol/ .printer/ .pwd/ .rdb/ .resources/ .resx/ .sql/ .swp/ .sys/ .vb/ .vbs/ .vbproj/ .vsdisco/ .webinfo/ .xsd/ .xsx/",
+    "max_num_args": 1024,
+    "arg_name_length": 1024,
+    "arg_length": 1024
+  },
+  "categories": [
+    {
+      "_id": "900",
+      "phase": 1,
+      "scope": "request",
+      "name": "900-EXCLUSION-RULES-BEFORE-CRS",
+      "file": "REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf.example",
+      "seq": 1,
+      "system": true
+    },
+    {
+      "_id": "905",
+      "phase": 1,
+      "scope": "request",
+      "name": "905-COMMON-EXCEPTIONS",
+      "file": "REQUEST-905-COMMON-EXCEPTIONS.conf",
+      "seq": 3
+    },
+    {
+      "_id": "911",
+      "phase": 1,
+      "scope": "request",
+      "name": "911-METHOD-ENFORCEMENT",
+      "file": "REQUEST-911-METHOD-ENFORCEMENT.conf",
+      "seq": 4
+    },
+    {
+      "_id": "913",
+      "phase": 2,
+      "scope": "request",
+      "name": "913-SCANNER-DETECTION",
+      "file": "REQUEST-913-SCANNER-DETECTION.conf",
+      "seq": 5
+    },
+    {
+      "_id": "920",
+      "phase": 2,
+      "scope": "request",
+      "name": "920-PROTOCOL-ENFORCEMENT",
+      "file": "REQUEST-920-PROTOCOL-ENFORCEMENT.conf",
+      "seq": 6
+    },
+    {
+      "_id": "921",
+      "phase": 2,
+      "scope": "request",
+      "name": "921-PROTOCOL-ATTACK",
+      "file": "REQUEST-921-PROTOCOL-ATTACK.conf",
+      "seq": 7
+    },
+    {
+      "_id": "922",
+      "phase": 2,
+      "scope": "request",
+      "name": "922-MULTIPART-ATTACK",
+      "file": "REQUEST-922-MULTIPART-ATTACK.conf",
+      "seq": 8
+    },
+    {
+      "_id": "930",
+      "phase": 2,
+      "scope": "request",
+      "name": "930-APPLICATION-ATTACK-LFI",
+      "file": "REQUEST-930-APPLICATION-ATTACK-LFI.conf",
+      "seq": 9
+    },
+    {
+      "_id": "931",
+      "phase": 2,
+      "scope": "request",
+      "name": "931-APPLICATION-ATTACK-RFI",
+      "file": "REQUEST-931-APPLICATION-ATTACK-RFI.conf",
+      "seq": 10
+    },
+    {
+      "_id": "932",
+      "phase": 2,
+      "scope": "request",
+      "name": "932-APPLICATION-ATTACK-RCE",
+      "file": "REQUEST-932-APPLICATION-ATTACK-RCE.conf",
+      "seq": 11
+    },
+    {
+      "_id": "933",
+      "phase": 2,
+      "scope": "request",
+      "name": "933-APPLICATION-ATTACK-PHP",
+      "file": "REQUEST-933-APPLICATION-ATTACK-PHP.conf",
+      "seq": 12
+    },
+    {
+      "_id": "934",
+      "phase": 2,
+      "scope": "request",
+      "name": "934-APPLICATION-ATTACK-GENERIC",
+      "file": "REQUEST-934-APPLICATION-ATTACK-GENERIC.conf",
+      "seq": 13
+    },
+    {
+      "_id": "941",
+      "phase": 2,
+      "scope": "request",
+      "name": "941-APPLICATION-ATTACK-XSS",
+      "file": "REQUEST-941-APPLICATION-ATTACK-XSS.conf",
+      "seq": 14
+    },
+    {
+      "_id": "942",
+      "phase": 2,
+      "scope": "request",
+      "name": "942-APPLICATION-ATTACK-SQLI",
+      "file": "REQUEST-942-APPLICATION-ATTACK-SQLI.conf",
+      "seq": 15
+    },
+    {
+      "_id": "943",
+      "phase": 2,
+      "scope": "request",
+      "name": "943-APPLICATION-ATTACK-SESSION-FIXATION",
+      "file": "REQUEST-943-APPLICATION-ATTACK-SESSION-FIXATION.conf",
+      "seq": 16
+    },
+    {
+      "_id": "944",
+      "phase": 2,
+      "scope": "request",
+      "name": "944-APPLICATION-ATTACK-JAVA",
+      "file": "REQUEST-944-APPLICATION-ATTACK-JAVA.conf",
+      "seq": 17
+    },
+    {
+      "_id": "949",
+      "phase": 3,
+      "scope": "request",
+      "name": "949-BLOCKING-EVALUATION",
+      "file": "REQUEST-949-BLOCKING-EVALUATION.conf",
+      "seq": 18,
+      "system": true
+    },
+    {
+      "_id": "999",
+      "phase": 3,
+      "scope": "request",
+      "name": "999-COMMON-EXCEPTIONS-AFTER",
+      "file": "REQUEST-999-COMMON-EXCEPTIONS-AFTER.conf",
+      "seq": 19
+    },
+    {
+      "_id": "950",
+      "phase": 4,
+      "scope": "response",
+      "name": "950-DATA-LEAKAGES",
+      "file": "RESPONSE-950-DATA-LEAKAGES.conf",
+      "seq": 20
+    },
+    {
+      "_id": "951",
+      "phase": 4,
+      "scope": "response",
+      "name": "951-DATA-LEAKAGES-SQL",
+      "file": "RESPONSE-951-DATA-LEAKAGES-SQL.conf",
+      "seq": 21
+    },
+    {
+      "_id": "952",
+      "phase": 4,
+      "scope": "response",
+      "name": "952-DATA-LEAKAGES-JAVA",
+      "file": "RESPONSE-952-DATA-LEAKAGES-JAVA.conf",
+      "seq": 22
+    },
+    {
+      "_id": "953",
+      "phase": 4,
+      "scope": "response",
+      "name": "953-DATA-LEAKAGES-PHP",
+      "file": "RESPONSE-953-DATA-LEAKAGES-PHP.conf",
+      "seq": 23
+    },
+    {
+      "_id": "954",
+      "phase": 4,
+      "scope": "response",
+      "name": "954-DATA-LEAKAGES-IIS",
+      "file": "RESPONSE-954-DATA-LEAKAGES-IIS.conf",
+      "seq": 24
+    },
+    {
+      "_id": "955",
+      "phase": 4,
+      "scope": "response",
+      "name": "955-WEB-SHELLS",
+      "file": "RESPONSE-955-WEB-SHELLS.conf",
+      "seq": 25
+    },
+    {
+      "_id": "956",
+      "phase": 4,
+      "scope": "response",
+      "name": "956-DATA-LEAKAGES-RUBY",
+      "file": "RESPONSE-956-DATA-LEAKAGES-RUBY.conf",
+      "seq": 26
+    },
+    {
+      "_id": "959",
+      "phase": 5,
+      "scope": "response",
+      "name": "959-BLOCKING-EVALUATION",
+      "file": "RESPONSE-959-BLOCKING-EVALUATION.conf",
+      "seq": 27,
+      "system": true
+    },
+    {
+      "_id": "980",
+      "phase": 6,
+      "scope": "response",
+      "name": "980-CORRELATION",
+      "file": "RESPONSE-980-CORRELATION.conf",
+      "seq": 28,
+      "system": true
+    }
+  ]
+}

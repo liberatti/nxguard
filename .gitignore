@@ -1,0 +1,28 @@
+# Python
+**/__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+logs
+# IDE & OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Frontend
+web/node_modules/
+web/dist/
+web/.angular/
+web/npm-debug.log*
+
+# Database & runtime files
+data/
+README-dev.md
+

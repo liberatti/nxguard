@@ -1,0 +1,210 @@
+:root {
+    /* -------------------------------------------------------------------------- */
+    /* 1. Modern Light Color Palette                                              */
+    /* -------------------------------------------------------------------------- */
+    --primary: #2563eb;         /* Modern Blue */
+    --primary-alt: #3b82f6;
+    --secondary: #7c3aed;       /* Modern Purple */
+    --secondary-alt: #8b5cf6;
+    
+    /* Semantic Colors */
+    --success: #10b981;
+    --warning: #f59e0b;
+    --error: #ef4444;
+    --info: #0ea5e9;
+    --critical: #dc2626;
+
+    /* -------------------------------------------------------------------------- */
+    /* 2. Clean Light Backgrounds                                                 */
+    /* -------------------------------------------------------------------------- */
+    --bg-main: #f8fafc;
+    --bg-darker: #f1f5f9;
+    --surface: rgba(255, 255, 255, 0.8);
+    
+    /* Borders & Interaction */
+    --border-dim: #e2e8f0;
+    --border-bright: #cbd5e1;
+    --shadow-premium: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+    
+    /* -------------------------------------------------------------------------- */
+    /* 3. Typography                                                              */
+    /* -------------------------------------------------------------------------- */
+    --text-main: #0f172a;       /* Slate 900 */
+    --text-dim: #475569;        /* Slate 600 */
+    --text-muted: #94a3b8;      /* Slate 400 */
+    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+    /* -------------------------------------------------------------------------- */
+    /* 4. Component Tokens                                                        */
+    /* -------------------------------------------------------------------------- */
+    --card-radius: 16px;
+    --btn-radius: 10px;
+    --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Backward Compatibility Aliases */
+    --primary-color: var(--primary);
+    --accent-color: var(--secondary);
+    --background-color: var(--bg-main);
+    --sidebar-background: #ffffff;
+    --surface-color: #ffffff;
+    --surface-border: var(--border-dim);
+    --glass-border: var(--border-dim);
+    --text-color: var(--text-main);
+    --text-secondary-color: var(--text-dim);
+    --warn-color: var(--error);
+    --warning-color: var(--warning);
+    --passed-color: var(--success);
+    --critical-color: var(--critical);
+}
+
+/* Base Reset */
+html, body {
+    background-color: var(--bg-main) !important;
+    color: var(--text-main) !important;
+    font-family: var(--font-family);
+    margin: 0; padding: 0; height: 100%;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Material Component Overrides */
+.mat-toolbar.mat-primary {
+    background: #ffffff !important;
+    border-bottom: 1px solid var(--border-dim);
+    color: var(--text-main) !important;
+    backdrop-filter: blur(10px);
+}
+
+.mat-sidenav {
+    background-color: #ffffff !important;
+    border-right: 1px solid var(--border-dim) !important;
+}
+
+.mat-mdc-card {
+    background: #ffffff !important;
+    border: 1px solid var(--border-dim) !important;
+    border-radius: var(--card-radius) !important;
+    box-shadow: var(--shadow-premium) !important;
+}
+
+.mat-mdc-card-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+}
+
+.mat-mdc-card-header-text {
+    flex: 1 1 auto !important;
+}
+
+.mat-mdc-card-header .align-right,
+.mat-mdc-card-header mat-card-actions {
+    margin-left: auto !important;
+}
+
+/* Premium Buttons */
+.mat-mdc-button, .mat-mdc-raised-button, .mat-mdc-flat-button {
+    border-radius: var(--btn-radius) !important;
+    font-weight: 600 !important;
+    text-transform: none !important; /* Modern look */
+    letter-spacing: 0.2px !important;
+}
+
+.mat-mdc-flat-button.mat-primary {
+    background: var(--primary) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2) !important;
+}
+
+.mat-mdc-flat-button.mat-primary:hover {
+    background: var(--primary-alt) !important;
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3) !important;
+    transform: translateY(-1px);
+}
+
+/* Modern Mini FAB & Action Buttons */
+.mat-mdc-mini-fab, .mat-mdc-fab {
+    background-color: #f1f5f9 !important;
+    color: var(--text-dim) !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
+}
+
+.mat-mdc-mini-fab:hover, .mat-mdc-fab:hover {
+    background-color: #e2e8f0 !important;
+    color: var(--text-main) !important;
+}
+
+.mat-mdc-mini-fab.mat-primary, .mat-mdc-fab.mat-primary {
+    background-color: var(--primary) !important;
+    color: #ffffff !important;
+}
+
+.mat-mdc-mini-fab.mat-warn, .mat-mdc-fab.mat-warn {
+    background-color: var(--error) !important;
+    color: #ffffff !important;
+}
+
+.bottom-actions, .align-right, mat-card-actions[align="end"] {
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding: 16px 24px !important;
+}
+
+th.mat-mdc-header-cell.text-right, 
+td.mat-mdc-cell.text-right, 
+th.text-right, 
+td.text-right {
+    text-align: right !important;
+}
+
+td.mat-mdc-cell.text-right {
+    display: table-cell !important;
+    text-align: right !important;
+}
+
+td.mat-mdc-cell.text-right .table-cell-actions, 
+td.mat-mdc-cell.text-right .toggle-container {
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+}
+
+/* Form Elements */
+.mat-mdc-text-field-wrapper {
+    background-color: #f1f5f9 !important;
+    border-radius: 8px !important;
+}
+
+.mat-mdc-form-field.mat-focused .mdc-notched-outline__leading,
+.mat-mdc-form-field.mat-focused .mdc-notched-outline__notch,
+.mat-mdc-form-field.mat-focused .mdc-notched-outline__trailing {
+    border-color: var(--primary) !important;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* Slide Toggle Modern Standardization */
+.mat-mdc-slide-toggle {
+    display: inline-flex !important;
+    align-items: center !important;
+    cursor: pointer !important;
+}
+
+.mat-mdc-slide-toggle .mdc-label {
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    color: var(--text-dim) !important;
+    cursor: pointer !important;
+    padding-left: 8px !important;
+}
+
+.mat-mdc-slide-toggle.mat-checked .mdc-label {
+    color: var(--text-main) !important;
+}
+

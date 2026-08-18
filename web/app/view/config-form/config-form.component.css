@@ -1,0 +1,180 @@
+.config-card {
+    border-radius: var(--card-radius);
+    border: 1px solid var(--border-dim);
+    box-shadow: var(--shadow-premium);
+    overflow: hidden;
+}
+
+.form-content-container {
+    padding: 16px 0;
+}
+
+.config-accordion {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.custom-panel {
+    border-radius: 12px !important;
+    border: 1px solid var(--border-dim) !important;
+    background: var(--bg-main) !important;
+    overflow: hidden;
+    box-shadow: none !important;
+}
+
+.panel-title-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--text-main);
+}
+
+.panel-icon {
+    color: var(--primary);
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+}
+
+.panel-desc {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+.panel-content-body {
+    padding: 8px 0 16px 0;
+}
+
+.fields-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    width: 100%;
+}
+
+.fields-grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 16px;
+    width: 100%;
+}
+
+.span-2 {
+    grid-column: span 1;
+}
+
+.fields-grid-single {
+    display: flex;
+    width: 100%;
+}
+
+.max-w-md {
+    width: 100%;
+    max-width: 320px;
+}
+
+.pem-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    width: 100%;
+}
+
+@media (max-width: 840px) {
+    .fields-grid,
+    .fields-grid-3,
+    .pem-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.field-icon {
+    color: var(--text-muted);
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+}
+
+.pem-textarea {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace !important;
+    font-size: 0.825rem !important;
+    line-height: 1.4 !important;
+    letter-spacing: 0.2px;
+}
+
+.policy-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.policy-card {
+    border-radius: 10px !important;
+    border: 1px solid var(--border-dim) !important;
+    background: var(--surface-color, #ffffff) !important;
+    overflow: hidden;
+}
+
+.policy-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 14px 18px 10px 18px !important;
+    border-bottom: 1px solid var(--border-dim);
+}
+
+.policy-title-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.policy-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    color: var(--primary);
+}
+
+.policy-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.policy-body {
+    padding: 16px 18px !important;
+}
+
+.policy-desc {
+    font-size: 0.85rem;
+    line-height: 1.55;
+    color: var(--text-dim);
+    margin: 0 0 16px 0;
+}
+
+.policy-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-dim);
+}
+
+.bottom-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 16px 24px;
+    border-top: 1px solid var(--border-dim);
+}
+
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+}

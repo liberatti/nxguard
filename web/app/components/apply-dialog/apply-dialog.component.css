@@ -1,0 +1,139 @@
+.dialog-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0;
+    padding: 16px 24px;
+}
+
+.title-icon {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+    color: var(--primary);
+}
+
+.dialog-content {
+    padding: 8px 24px 16px 24px;
+    min-width: 380px;
+    max-height: 420px;
+}
+
+.section-description {
+    font-size: 0.875rem;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+}
+
+.changes-list {
+    border: 1px solid var(--border-dim);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--bg-main);
+}
+
+.change-item {
+    border-bottom: 1px solid var(--border-dim);
+}
+
+.change-item:last-child {
+    border-bottom: none;
+}
+
+.change-icon {
+    color: var(--primary);
+}
+
+.change-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: capitalize;
+}
+
+.change-subtitle {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+    color: var(--text-muted);
+}
+
+.empty-icon {
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+    margin-bottom: 8px;
+    color: var(--success);
+}
+
+.empty-text {
+    font-size: 0.875rem;
+    color: var(--text-dim);
+    margin: 0;
+}
+
+.state-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+}
+
+.state-text {
+    margin-top: 16px;
+    font-size: 0.875rem;
+    color: var(--text-dim);
+}
+
+.spinner {
+    width: 44px;
+    height: 44px;
+    border: 4px solid var(--bg-darker);
+    border-top: 4px solid var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.result-message {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+}
+
+.result-message p {
+    margin: 4px 0 0 0;
+}
+
+.success-message {
+    background-color: #ecfdf5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+}
+
+.error-message {
+    background-color: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+.dialog-actions {
+    padding: 12px 24px 16px 24px;
+    gap: 8px;
+}

@@ -1,0 +1,68 @@
+<div class="vmware-login-viewport">
+    <div class="vmware-bg-glow"></div>
+    <div class="vmware-bg-grid"></div>
+
+    <div class="vmware-login-box" id="sign-in-card">
+        <!-- Left Brand Pane (VMware Clarity Dark Blue Panel) -->
+        <div class="vmware-brand-pane">
+            <div class="brand-top-content">
+                <div class="brand-icon-wrapper">
+                    <mat-icon class="brand-shield-icon">shield</mat-icon>
+                </div>
+                <h1 class="brand-title">{{ 'AUTH.TITLE' | translate }}</h1>
+                <p class="brand-subtitle">{{ 'AUTH.SUBTITLE' | translate }}</p>
+            </div>
+
+            <div class="brand-bottom-status">
+                <div class="engine-version">{{ 'AUTH.VERSION' | translate }} {{ version }}</div>
+            </div>
+        </div>
+
+        <!-- Right Login Form Pane (VMware Clarity Clean Form Panel) -->
+        <div class="vmware-form-pane">
+            <div class="form-header">
+                <h2 class="form-title">{{ 'AUTH.SIGN_IN' | translate }}</h2>
+                <p class="form-subtitle">Enter your credentials to access the console</p>
+            </div>
+
+            <form [formGroup]="form" id="sign-in-form" class="login-form">
+                <!-- Username / Email -->
+                <mat-form-field appearance="outline" class="full-width form-field-custom">
+                    <mat-label>{{ 'AUTH.EMAIL' | translate }}</mat-label>
+                    <input id="sign-in-email" matInput formControlName="email" autocomplete="username email"
+                        type="email" placeholder="admin@nxguard.local">
+                    <mat-icon matSuffix class="input-icon">person</mat-icon>
+                </mat-form-field>
+
+                <!-- Password -->
+                <mat-form-field appearance="outline" class="full-width form-field-custom">
+                    <mat-label>{{ 'AUTH.PASSWORD' | translate }}</mat-label>
+                    <input id="sign-in-password" matInput formControlName="password"
+                        [type]="hidePassword ? 'password' : 'text'" autocomplete="current-password"
+                        placeholder="••••••••">
+                    <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" type="button"
+                        class="password-toggle-btn" [attr.aria-label]="'Hide password'">
+                        <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+                    </button>
+                </mat-form-field>
+
+                <!-- Action Button -->
+                <button mat-flat-button id="sign-in-button" color="primary" class="vmware-submit-btn" (click)="login()"
+                    [disabled]="form.invalid">
+                    <mat-icon class="btn-icon">login</mat-icon>
+                    <span>{{ 'AUTH.SIGN_IN_BTN' | translate }}</span>
+                </button>
+            </form>
+
+            <div class="form-footer-notice">
+                <mat-icon class="notice-icon">lock_outline</mat-icon>
+                <span>{{ 'AUTH.FOOTER_NOTICE' | translate }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Global Footer -->
+    <div class="vmware-global-footer">
+        <span>{{ 'AUTH.LICENSE_NOTICE' | translate }} <a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener noreferrer" class="license-link">{{ 'AUTH.LICENSE_NAME' | translate }}</a></span>
+    </div>
+</div>

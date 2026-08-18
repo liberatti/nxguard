@@ -1,0 +1,53 @@
+<div class="raw-dialog-container">
+    <div class="raw-dialog-header">
+        <div class="header-title-group">
+            <mat-icon class="header-icon">code</mat-icon>
+            <div>
+                <h2 class="dialog-title" mat-dialog-title>Transaction Raw JSON</h2>
+                <div class="meta-row">
+                    @if (data.unique_id) {
+                        <span class="meta-badge uid" [matTooltip]="data.unique_id">
+                            ID: {{ data.unique_id }}
+                        </span>
+                    }
+                    @if (data.http && data.http.request && data.http.request.method) {
+                        <span class="meta-badge method">{{ data.http.request.method }}</span>
+                    }
+                    @if (data.http && data.http.response && data.http.response.status_code) {
+                        <span class="meta-badge status-{{ (data.http.response.status_code || 200) < 400 ? 'ok' : 'err' }}">
+                            {{ data.http.response.status_code }}
+                        </span>
+                    }
+                    @if (data.action) {
+                        <span class="meta-badge action-{{ data.action | lowercase }}">{{ data.action }}</span>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="header-actions">
+            <button mat-icon-button (click)="copyToClipboard()" matTooltip="Copy JSON to clipboard">
+                <mat-icon>{{ copied ? 'check' : 'content_copy' }}</mat-icon>
+            </button>
+            <button mat-icon-button (click)="onDismiss()" matTooltip="Close dialog">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+    </div>
+
+    <mat-dialog-content class="raw-dialog-content">
+        <div class="code-wrapper">
+            <pre><code [highlight]="jsonData" language="json" id="transaction-raw-content"></code></pre>
+        </div>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end" class="raw-dialog-actions">
+        <button mat-stroked-button (click)="copyToClipboard()">
+            <mat-icon>{{ copied ? 'check' : 'content_copy' }}</mat-icon>
+            {{ copied ? 'Copied' : 'Copy JSON' }}
+        </button>
+        <button mat-flat-button color="primary" (click)="onDismiss()" id="close-transaction-raw-btn">
+            Close
+        </button>
+    </mat-dialog-actions>
+</div>

@@ -1,0 +1,122 @@
+.dialog-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+    color: var(--error, #dc2626);
+}
+
+.dialog-header mat-icon {
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+}
+
+.dialog-content {
+    padding-top: 10px !important;
+    max-height: 70vh;
+}
+
+.error-meta-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background-color: #f8fafc;
+    border: 1px solid var(--border-dim, #e2e8f0);
+    border-radius: 8px;
+}
+
+.method-badge {
+    font-weight: 700;
+    font-size: 0.75rem;
+    padding: 3px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    color: #ffffff;
+    background-color: var(--primary, #2563eb);
+}
+
+.method-badge.put, .method-badge.post {
+    background-color: var(--warning, #f59e0b);
+}
+
+.method-badge.delete {
+    background-color: var(--error, #ef4444);
+}
+
+.url-text {
+    font-family: monospace;
+    font-size: 0.85rem;
+    color: var(--text-dim, #475569);
+    word-break: break-all;
+}
+
+.validation-errors-section {
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+    padding: 16px;
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #991b1b;
+    margin-bottom: 12px;
+}
+
+.field-error-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.field-error-card {
+    background: #ffffff;
+    border-left: 4px solid #ef4444;
+    border-radius: 6px;
+    padding: 10px 14px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.field-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.field-name-badge {
+    font-family: monospace;
+    font-weight: 700;
+    font-size: 0.85rem;
+    background-color: #fee2e2;
+    color: #991b1b;
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+
+.error-msg-list {
+    margin: 4px 0 0 18px;
+    padding: 0;
+    color: #b91c1c;
+    font-size: 0.88rem;
+}
+
+.json-panel {
+    margin-top: 12px;
+}
+
+.json-code {
+    background: #0f172a;
+    color: #f8fafc;
+    padding: 14px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    line-height: 1.4;
+    overflow-x: auto;
+    max-height: 300px;
+}

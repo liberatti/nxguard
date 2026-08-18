@@ -1,0 +1,177 @@
+<ng-container>
+    <mat-card class="config-card">
+        <mat-card-header>
+            <mat-card-title>{{ 'CONFIG_PAGE.TITLE' | translate }}</mat-card-title>
+            <mat-card-subtitle>{{ 'CONFIG_PAGE.SUBTITLE' | translate }}</mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content class="form-content-container">
+            <form [formGroup]="form">
+                <mat-accordion multi="true" class="config-accordion">
+                    <!-- Panel 1: General configuration -->
+                    <mat-expansion-panel [expanded]="true" id="general-config-panel" class="custom-panel">
+                        <mat-expansion-panel-header>
+                            <mat-panel-title class="panel-title-group">
+                                <mat-icon class="panel-icon">tune</mat-icon>
+                                <span>{{ 'CONFIG_PAGE.PANEL_GENERAL' | translate }}</span>
+                            </mat-panel-title>
+                            <mat-panel-description class="panel-desc">
+                                {{ 'CONFIG_PAGE.PANEL_GENERAL_DESC' | translate }}
+                            </mat-panel-description>
+                        </mat-expansion-panel-header>
+
+                        <div class="panel-content-body">
+                            <div class="fields-grid">
+                                <mat-form-field class="full-width">
+                                    <mat-label>{{ 'CONFIG_PAGE.MAXMIND_KEY' | translate }}</mat-label>
+                                    <input matInput formControlName="maxmind_key" id="maxmind-key-input">
+                                    <mat-icon matSuffix class="field-icon">vpn_key</mat-icon>
+                                    <mat-hint>{{ 'CONFIG_PAGE.MAXMIND_HINT' | translate }}</mat-hint>
+                                </mat-form-field>
+
+                                <mat-form-field class="full-width">
+                                    <mat-label>{{ 'CONFIG_PAGE.ACME_URL' | translate }}</mat-label>
+                                    <input matInput formControlName="acme_directory_url" id="acme-directory-url-input">
+                                    <mat-icon matSuffix class="field-icon">link</mat-icon>
+                                    <mat-hint>{{ 'CONFIG_PAGE.ACME_HINT' | translate }}</mat-hint>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </mat-expansion-panel>
+
+                    <!-- Panel 2: Certification Authority -->
+                    <mat-expansion-panel id="ca-config-panel" class="custom-panel">
+                        <mat-expansion-panel-header>
+                            <mat-panel-title class="panel-title-group">
+                                <mat-icon class="panel-icon">verified_user</mat-icon>
+                                <span>{{ 'CONFIG_PAGE.PANEL_CA' | translate }}</span>
+                            </mat-panel-title>
+                            <mat-panel-description class="panel-desc">
+                                {{ 'CONFIG_PAGE.PANEL_CA_DESC' | translate }}
+                            </mat-panel-description>
+                        </mat-expansion-panel-header>
+
+                        <div class="panel-content-body">
+                            <div class="pem-grid">
+                                <mat-form-field class="full-width">
+                                    <mat-label>{{ 'CONFIG_PAGE.CA_CERT' | translate }}</mat-label>
+                                    <textarea matInput cdkTextareaAutosize #autosize="cdkTextareaAutosize"
+                                              cdkAutosizeMinRows="6" cdkAutosizeMaxRows="14"
+                                              class="pem-textarea"
+                                              formControlName="ca_certificate" id="ca-cert-textarea"
+                                              placeholder="-----BEGIN CERTIFICATE-----&#10;...&#10;-----END CERTIFICATE-----"></textarea>
+                                </mat-form-field>
+
+                                <mat-form-field class="full-width">
+                                    <mat-label>{{ 'CONFIG_PAGE.CA_KEY' | translate }}</mat-label>
+                                    <textarea matInput cdkTextareaAutosize #autosize="cdkTextareaAutosize"
+                                              cdkAutosizeMinRows="6" cdkAutosizeMaxRows="14"
+                                              class="pem-textarea"
+                                              formControlName="ca_private" id="ca-key-textarea"
+                                              placeholder="-----BEGIN PRIVATE KEY-----&#10;...&#10;-----END PRIVATE KEY-----"></textarea>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </mat-expansion-panel>
+
+                    <!-- Panel 3: Transaction Policy -->
+                    <mat-expansion-panel [expanded]="true" id="transaction-policy-panel" class="custom-panel">
+                        <mat-expansion-panel-header>
+                            <mat-panel-title class="panel-title-group">
+                                <mat-icon class="panel-icon">policy</mat-icon>
+                                <span>{{ 'CONFIG_PAGE.PANEL_POLICY' | translate }}</span>
+                            </mat-panel-title>
+                            <mat-panel-description class="panel-desc">
+                                {{ 'CONFIG_PAGE.PANEL_POLICY_DESC' | translate }}
+                            </mat-panel-description>
+                        </mat-expansion-panel-header>
+
+                        <div class="panel-content-body policy-stack">
+                            <!-- Archiving Card -->
+                            <mat-card appearance="outlined" formGroupName="archive" class="policy-card">
+                                <mat-card-header class="policy-header">
+                                    <div class="policy-title-group">
+                                        <mat-icon class="policy-icon">archive</mat-icon>
+                                        <span class="policy-title">{{ 'CONFIG_PAGE.ARCHIVE_TITLE' | translate }}</span>
+                                    </div>
+                                    <mat-slide-toggle labelPosition="before" formControlName="enabled" id="archive-toggle" color="primary">
+                                        {{ 'CONFIG_PAGE.ARCHIVE_TOGGLE' | translate }}
+                                    </mat-slide-toggle>
+                                </mat-card-header>
+
+                                <mat-card-content class="policy-body">
+                                    <p class="policy-desc">{{ 'CONFIG_PAGE.ARCHIVE_DESC' | translate }}</p>
+
+                                    <div class="policy-fields" *ngIf="form.get('archive.enabled')?.value">
+                                        <div class="fields-grid-3">
+                                            <mat-form-field class="full-width">
+                                                <mat-label>{{ 'CONFIG_PAGE.ARCHIVE_AFTER' | translate }}</mat-label>
+                                                <input matInput type="number" formControlName="archive_after" id="archive-after-input">
+                                                <mat-icon matSuffix class="field-icon">timer</mat-icon>
+                                            </mat-form-field>
+
+                                            <mat-form-field class="full-width span-2">
+                                                <mat-label>{{ 'CONFIG_PAGE.CLUSTER_URL' | translate }}</mat-label>
+                                                <input matInput formControlName="url" id="elasticsearch-url-input" placeholder="http://elasticsearch:9200">
+                                                <mat-icon matSuffix class="field-icon">dns</mat-icon>
+                                            </mat-form-field>
+                                        </div>
+
+                                        <div class="fields-grid">
+                                            <mat-form-field class="full-width">
+                                                <mat-label>{{ 'CONFIG_PAGE.CLUSTER_USER' | translate }}</mat-label>
+                                                <input matInput formControlName="username" id="elasticsearch-username-input">
+                                                <mat-icon matSuffix class="field-icon">person</mat-icon>
+                                            </mat-form-field>
+
+                                            <mat-form-field class="full-width">
+                                                <mat-label>{{ 'CONFIG_PAGE.CLUSTER_PASS' | translate }}</mat-label>
+                                                <input matInput type="password" formControlName="password" id="elasticsearch-password-input">
+                                                <mat-icon matSuffix class="field-icon">lock</mat-icon>
+                                            </mat-form-field>
+                                        </div>
+                                    </div>
+                                </mat-card-content>
+                            </mat-card>
+
+                            <!-- Purging Card -->
+                            <mat-card appearance="outlined" formGroupName="purge" class="policy-card">
+                                <mat-card-header class="policy-header">
+                                    <div class="policy-title-group">
+                                        <mat-icon class="policy-icon">auto_delete</mat-icon>
+                                        <span class="policy-title">{{ 'CONFIG_PAGE.PURGE_TITLE' | translate }}</span>
+                                    </div>
+                                    <mat-slide-toggle labelPosition="before" formControlName="enabled" id="purge-toggle" color="primary">
+                                        {{ 'CONFIG_PAGE.PURGE_TOGGLE' | translate }}
+                                    </mat-slide-toggle>
+                                </mat-card-header>
+
+                                <mat-card-content class="policy-body">
+                                    <p class="policy-desc">{{ 'CONFIG_PAGE.PURGE_DESC' | translate }}</p>
+
+                                    <div class="policy-fields" *ngIf="form.get('purge.enabled')?.value">
+                                        <div class="fields-grid-single">
+                                            <mat-form-field class="max-w-md">
+                                                <mat-label>{{ 'CONFIG_PAGE.PURGE_AFTER' | translate }}</mat-label>
+                                                <input matInput type="number" formControlName="purge_after" id="purge-after-input">
+                                                <mat-icon matSuffix class="field-icon">calendar_today</mat-icon>
+                                            </mat-form-field>
+                                        </div>
+                                    </div>
+                                </mat-card-content>
+                            </mat-card>
+                        </div>
+                    </mat-expansion-panel>
+                </mat-accordion>
+            </form>
+        </mat-card-content>
+
+        <mat-card-actions align="end" class="bottom-actions">
+            <button id="save-btn" type="button" (click)="onSubmit()" mat-flat-button color="primary"
+                *ngIf="oauth.isRole('superuser')" class="action-btn">
+                <mat-icon>save</mat-icon>
+                <span>{{ 'actions.save' | translate }}</span>
+            </button>
+        </mat-card-actions>
+    </mat-card>
+</ng-container>

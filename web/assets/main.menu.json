@@ -1,0 +1,48 @@
+[
+  {
+    "label": "view.dashboard.link",
+    "route": "/dashboard",
+    "icon": "space_dashboard"
+  },
+  {
+    "label": "view.transaction.link",
+    "route": "/trn",
+    "icon": "timeline"
+  },
+  {
+    "label": "view.service.link",
+    "route": "/service",
+    "icon": "layers"
+  },
+  {
+    "label": "view.upstream.link",
+    "route": "/ups",
+    "icon": "alt_route"
+  },
+  {
+    "label": "view.sensor.link",
+    "route": "/sensor",
+    "icon": "security"
+  },
+  {
+    "label": "view.system.link",
+    "icon": "tune",
+    "menu": [
+      {
+        "label": "view.certificate.link",
+        "route": "/certificate",
+        "icon": "verified_user"
+      },
+      {
+        "label": "view.user.link",
+        "route": "/users",
+        "icon": "group"
+      },
+      {
+        "label": "view.config.link",
+        "route": "/config",
+        "icon": "settings"
+      }
+    ]
+  }
+]
