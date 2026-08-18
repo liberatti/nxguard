@@ -17,6 +17,6 @@ setuptools~=75.8.2
 josepy~=1.15.0
 Jinja2~=3.1.4
 requests
-nxcore[web] @ git+https://github.com/liberatti/nxcore@v1.0.8-rc
+nxcore[web] @ git+https://github.com/liberatti/nxcore@v1.0.6-rc
 duckdb
 bson
