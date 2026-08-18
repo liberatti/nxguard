@@ -40,7 +40,8 @@
                     </div>
 
                     <div class="links-container">
-                        <a href="https://github.com/liberatti/nxguard" target="_blank" class="link-card" id="about-github-link">
+                        <a href="https://github.com/liberatti/nxguard" target="_blank" class="link-card"
+                            id="about-github-link">
                             <img class="link-icon github-icon" src="assets/github-mark.png" alt="GitHub" />
                             <div class="link-info">
                                 <span class="link-title">GitHub</span>
@@ -51,10 +52,6 @@
                         <a [href]="_REST_API_URL + '/api-docs'" target="_blank" class="link-card" id="about-api-link">
                             <div class="api-icon-wrapper">
                                 <mat-icon class="link-icon">menu_book</mat-icon>
-                            </div>
-                            <div class="link-info">
-                                <span class="link-title">API Docs</span>
-                                <span class="link-sub">Swagger / OpenAPI</span>
                             </div>
                             <mat-icon class="link-arrow">open_in_new</mat-icon>
                         </a>
@@ -77,10 +74,11 @@
 
                     <form *ngIf="restoreReady" class="restore-form" id="restore-form">
                         <div class="file-dropzone" [class.has-file]="selectedFile">
-                            <input class="file-input" type="file" id="uploadConfig"
-                                   accept="application/zip, .zip" (change)="onFileSelected($event)">
-                            
-                            <label for="uploadConfig" class="dropzone-label" id="upload-config-label" *ngIf="!selectedFile">
+                            <input class="file-input" type="file" id="uploadConfig" accept="application/zip, .zip"
+                                (change)="onFileSelected($event)">
+
+                            <label for="uploadConfig" class="dropzone-label" id="upload-config-label"
+                                *ngIf="!selectedFile">
                                 <div class="dropzone-icon-wrapper">
                                     <mat-icon class="dropzone-icon">cloud_upload</mat-icon>
                                 </div>
@@ -98,7 +96,8 @@
                                         <span class="file-size">{{ formatFileSize(selectedFile.size) }}</span>
                                     </div>
                                 </div>
-                                <button type="button" mat-icon-button (click)="clearSelectedFile($event)" matTooltip="Remove file" id="clear-selected-file-btn">
+                                <button type="button" mat-icon-button (click)="clearSelectedFile($event)"
+                                    matTooltip="Remove file" id="clear-selected-file-btn">
                                     <mat-icon>close</mat-icon>
                                 </button>
                             </div>
@@ -112,7 +111,8 @@
     <!-- Actions -->
     <mat-dialog-actions align="end" class="dialog-actions">
         <ng-container *ngIf="currentTab === 0">
-            <button mat-flat-button color="primary" (click)="downloadConfig()" class="action-btn" id="download-config-btn">
+            <button mat-flat-button color="primary" (click)="downloadConfig()" class="action-btn"
+                id="download-config-btn">
                 <mat-icon>file_download</mat-icon>
                 <span>{{ 'actions.backup' | translate }}</span>
             </button>
@@ -127,7 +127,8 @@
                 <mat-icon>close</mat-icon>
                 <span>{{ 'actions.cancel' | translate }}</span>
             </button>
-            <button mat-flat-button color="warn" (click)="onSubmit()" [disabled]="!selectedFile || !restoreReady" class="action-btn" id="restore-config-btn">
+            <button mat-flat-button color="warn" (click)="onSubmit()" [disabled]="!selectedFile || !restoreReady"
+                class="action-btn" id="restore-config-btn">
                 <mat-icon>restore</mat-icon>
                 <span>{{ 'actions.restore' | translate }}</span>
             </button>

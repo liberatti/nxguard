@@ -117,15 +117,26 @@ def _generate_sensors(
     prefix = "test-" if test else ""
 
     for sensor in data["sensors"]:
-        sensor.update(
-            {
-                "ipxa_url": data["config"]["ipxa"]["url"],
-                "ipxa_key": data["config"]["ipxa"]["key"],
-                "blq_geo": ",".join(sensor["security"]["geo_codes"]),
-                "blq_rbl": ",".join(sensor["security"]["reputation"]),
-                "trusted": ",".join(sensor["security"]["trusted"]),
-            }
-        )
+        if "url" in data["config"]["ipxa"]:
+            sensor.update(
+                {
+                    "ipxa_enabled": True,
+                    "ipxa_url": data["config"]["ipxa"]["url"],
+                    "ipxa_key": data["config"]["ipxa"]["key"],
+                    "blq_geo": ",".join(sensor["security"]["geo_codes"]),
+                    "blq_rbl": ",".join(sensor["security"]["reputation"]),
+                    "trusted": ",".join(sensor["security"]["trusted"]),
+                }
+            )
+            # TODO create test step for lua sensor
+            _render_template_to_file(
+                env,
+                "lua/sensor.lua",
+                f"{config.LUA_LIBS_PATH}/nxguard/sensors/{sensor['name']}.lua",
+                sensor,
+            )
+        else:
+            sensor["ipxa_enabled"] = False
 
         exclusions = sensor.get("exclusion") or sensor.get("exclusions") or []
         if isinstance(exclusions, str):
@@ -134,10 +145,11 @@ def _generate_sensors(
         exclusion_lists = [
             ",".join(
                 f"ctl:ruleRemoveById={str(x).strip()}"
-                for x in exclusions[i:i + chunk_size]
+                for x in exclusions[i : i + chunk_size]
             )
             for i in range(0, len(exclusions), chunk_size)
         ]
+
         trusted_ipsets = []
         for t in sensor["security"]["trusted"]:
             if os.path.exists(f"{output_dir}/modsec/coreruleset/IPSET-{t}.data"):
@@ -162,14 +174,6 @@ def _generate_sensors(
             }
         )
         os.makedirs(f"{config.LUA_LIBS_PATH}/nxguard/sensors", exist_ok=True)
-
-        # TODO create test step for lua sensor
-        _render_template_to_file(
-            env,
-            "lua/sensor.lua",
-            f"{config.LUA_LIBS_PATH}/nxguard/sensors/{sensor['name']}.lua",
-            sensor,
-        )
 
         with RuleCategoryDao() as dao:
             ordered_cats = dao.get_all(order_by="seq")
@@ -340,7 +344,8 @@ def generate(data, output_dir=config.BASE_PATH, test=False):
         _generate_certificates(env, output_dir, prefix, data["certificates"])
 
     if "sensors" in data:
-        _generate_trusted_ips(f"{config.BASE_PATH}/modsec/coreruleset")
+        if "ipxa" in data["config"] and data["config"]["ipxa"].get("url"):
+            _generate_trusted_ips(f"{config.BASE_PATH}/modsec/coreruleset")
         _generate_sensors(env, output_dir, data, test)
 
     if "services" in data:

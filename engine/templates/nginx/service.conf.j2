@@ -104,7 +104,7 @@ server {
     set $upstream '-';
     {%- endif %}
 
-    {% if r.sensor and r.sensor.name %}
+    {% if r.sensor and r.sensor.name and r.sensor.ipxa_enabled %}
     access_by_lua_file {{BASE_PATH}}/luajit/share/lua/5.1/nxguard/sensors/{{r.sensor.name }}.lua;
     {% endif %}
 

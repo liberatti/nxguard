@@ -49,8 +49,12 @@ def post_fork(server, worker):
     if is_main:
         if not os.path.exists(f"{_config.DB_PATH}/app.duckdb"):
             install()
-            if os.path.exists(f"{_config.DB_PATH}/init-data.json"):
-                c_builder.init_from_data()
+            init_path = (
+                _config.DB_PATH
+                if os.path.exists(f"{_config.DB_PATH}/init-data.json")
+                else "engine"
+            )
+            c_builder.init_from_data(data_dir=init_path)
         conf = c_builder.get_config()
         val = c_admin.validate(conf)
         if val and val.get("status") == "ok":

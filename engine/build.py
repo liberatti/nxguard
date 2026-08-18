@@ -53,7 +53,7 @@ def export_config_json(data, json_file):
         json.dump(data, f, indent=4)
 
 
-def read_from_json(json_file, data_dir=config.DB_PATH):
+def read_from_json(data_dir, json_file):
     """Reads and parses a JSON file from the data directory."""
     path = os.path.join(data_dir, json_file)
     if os.path.exists(path):
@@ -103,12 +103,12 @@ def create_db():
         dao.create_schema()
 
 
-def init_from_data(data_file="init-data.json"):
+def init_from_data(data_dir, data_file="init-data.json"):
     """Populates database tables from an initial dataset dictionary."""
 
-    logger.info(f"Initialize from {data_file}")
+    logger.info(f"Initialize from {data_dir}/{data_file}")
 
-    data = read_from_json(data_file)
+    data = read_from_json(data_dir, data_file)
     with ConfigDao() as dao:
         dao.delete_all()
         data["config"].update(
