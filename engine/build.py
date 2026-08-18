@@ -109,45 +109,53 @@ def init_from_data(data_dir, data_file="init-data.json"):
     logger.info(f"Initialize from {data_dir}/{data_file}")
 
     data = read_from_json(data_dir, data_file)
-    with ConfigDao() as dao:
-        dao.delete_all()
-        data["config"].update(
-            {"cluster_id": gen_random_string(8), "active_scn": gen_random_string(16)}
-        )
-        dao.persist(data["config"])
-        logger.info(f"Config: {data['config']['cluster_id']}")
+    if "config" in data:
+        with ConfigDao() as dao:
+            dao.delete_all()
+            data["config"].update(
+                {"cluster_id": gen_random_string(8), "active_scn": gen_random_string(16)}
+            )
+            dao.persist(data["config"])
+            logger.info(f"Config: {data['config']['cluster_id']}")
 
-    with UserDao() as dao:
-        dao.delete_all()
-        encrypted_pass = bcrypt.hashpw(
-            data["user"]["unencrypted_password"].encode("utf8"), bcrypt.gensalt()
-        )
-        user = {
-            "name": data["user"]["name"],
-            "password": encrypted_pass.decode("utf8"),
-            "email": data["user"]["email"],
-            "role": data["user"]["role"],
-        }
-        dao.persist(user)
-        logger.info(f"User: {data['user']['name']}")
+    if "user" in data:
+        with UserDao() as dao:
+            dao.delete_all()
+            encrypted_pass = bcrypt.hashpw(
+                data["user"]["unencrypted_password"].encode("utf8"), bcrypt.gensalt()
+            )
+            user = {
+                "name": data["user"]["name"],
+                "password": encrypted_pass.decode("utf8"),
+                "email": data["user"]["email"],
+                "role": data["user"]["role"],
+            }
+            dao.persist(user)
+            logger.info(f"User: {data['user']['name']}")
 
-    with UpstreamDao() as dao:
-        dao.delete_all()
-        dao.persist_many(data["upstreams"])
-        logger.info(f"Upstreams: {len(data['upstreams'])}")
+    if "upstreams" in data:
+        with UpstreamDao() as dao:
+            dao.delete_all()
+            dao.persist_many(data["upstreams"])
+            logger.info(f"Upstreams: {len(data['upstreams'])}")
 
-    with CertificateDao() as dao:
-        dao.delete_all()
-        dao.persist_many(data["certificates"])
-        logger.info(f"Certificates: {len(data['certificates'])}")
-    with SensorDao() as dao:
-        dao.delete_all()
-        dao.persist_many(data["sensors"])
-        logger.info(f"Sensors: {len(data['sensors'])}")
-    with ServiceDao() as dao:
-        dao.delete_all()
-        dao.persist_many(data["services"])
-        logger.info(f"Services: {len(data['services'])}")
+    if "certificates" in data:
+        with CertificateDao() as dao:
+            dao.delete_all()
+            dao.persist_many(data["certificates"])
+            logger.info(f"Certificates: {len(data['certificates'])}")
+
+    if "sensors" in data:
+        with SensorDao() as dao:
+            dao.delete_all()
+            dao.persist_many(data["sensors"])
+            logger.info(f"Sensors: {len(data['sensors'])}")
+
+    if "services" in data:
+        with ServiceDao() as dao:
+            dao.delete_all()
+            dao.persist_many(data["services"])
+            logger.info(f"Services: {len(data['services'])}")
 
 
 def validate(data):

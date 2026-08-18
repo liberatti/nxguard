@@ -19,7 +19,8 @@
       "scope": "request",
       "name": "900-EXCLUSION-RULES-BEFORE-CRS",
       "file": "REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf.example",
-      "seq": 1
+      "seq": 1,
+      "system": true
     },
     {
       "_id": "905",
