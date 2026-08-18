@@ -28,6 +28,12 @@
     text-decoration: none;
 }
 
+.brand-logo-img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+}
+
 .brand-icon {
     color: var(--primary-color, #2563eb);
     font-size: 28px;

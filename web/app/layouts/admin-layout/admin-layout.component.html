@@ -6,7 +6,7 @@
         </button>
 
         <div class="navbar-brand" [routerLink]="['/']">
-            <mat-icon class="brand-icon">shield</mat-icon>
+            <img class="brand-logo-img" src="assets/logo.png" alt="NXGuard Logo">
             <span class="gradient-text brand-title">NXGUARD</span>
         </div>
 
@@ -93,7 +93,8 @@
                     <a mat-list-item (click)="showAbout()"
                         style="border-radius: 8px; background: rgba(37, 99, 235, 0.05);">
                         <mat-icon matListItemIcon style="color: var(--primary-color)">info</mat-icon>
-                        <span matListItemTitle style="font-weight: 600; color: var(--primary-color)">{{ 'nav.about' | translate }} NXGUARD</span>
+                        <span matListItemTitle style="font-weight: 600; color: var(--primary-color)">{{ 'nav.about' |
+                            translate }} NXGUARD</span>
                     </a>
                 </div>
             </mat-nav-list>
@@ -108,7 +109,7 @@
             <footer
                 style="padding: 20px; text-align: center; color: var(--text-muted); border-top: 1px solid var(--surface-border); font-size: 0.8rem;">
                 <div [innerHTML]="'content.copy' |translate"></div>
-                <div style="margin-top: 4px;">NXGUARD Engine v{{ version }} </div>
+                <div style="margin-top: 4px;">NXGUARD Engine {{ version }} </div>
             </footer>
         </mat-sidenav-content>
     </mat-sidenav-container>

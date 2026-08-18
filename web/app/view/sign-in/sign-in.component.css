@@ -100,6 +100,12 @@
     box-shadow: 0 8px 20px rgba(0, 145, 218, 0.2);
 }
 
+.brand-logo-img {
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
+}
+
 .brand-shield-icon {
     font-size: 34px !important;
     width: 34px !important;
