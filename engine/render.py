@@ -27,6 +27,7 @@ def _render_template_to_file(
     template_content = env.get_template(template_name).render(context)
     # Collapse multiple consecutive blank lines into a single blank line while preserving indentation
     template_content = re.sub(r"\n[ \t]*\n([ \t]*\n)+", "\n\n", template_content)
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
     with open(output_path, "w") as f:
         f.write(template_content)
 
@@ -35,6 +36,7 @@ def _generate_trusted_ips(output_dir):
     with FeedService() as ipxa_feed:
         try:
             ipsets = ipxa_feed.get_by_type("bypass")
+            os.makedirs(output_dir, exist_ok=True)
             for ipset in ipsets:
                 with open(f"{output_dir}/IPSET-{ipset['name']}.data", "w") as f:
                     f.write(ipset["data"])
