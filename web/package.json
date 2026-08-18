@@ -5,7 +5,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve --serve-path /nxg/",
-    "container": "ng serve --configuration production --serve-path /nxg/",
+    "container": "ng serve --host 0.0.0.0 --configuration production --serve-path /nxg/",
     "build": "ng build --configuration production"
   },
   "private": true,

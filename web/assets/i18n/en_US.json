@@ -243,8 +243,6 @@
     "SUBTITLE": "Manage global engine settings, PKI certificates, and transaction policies",
     "PANEL_GENERAL": "General & Integrations",
     "PANEL_GENERAL_DESC": "Third-party API keys and external directory endpoints",
-    "MAXMIND_KEY": "MaxMind Geolocation License Key",
-    "MAXMIND_HINT": "Used for IP geolocation and country-based security blocking",
     "ACME_URL": "ACME Directory URL",
     "ACME_HINT": "Let's Encrypt / ACME directory endpoint (e.g. https://acme-v02.api.letsencrypt.org/directory)",
     "PANEL_CA": "Certification Authority (Internal CA)",
@@ -263,7 +261,13 @@
     "PURGE_TITLE": "Transaction Purging",
     "PURGE_TOGGLE": "Enable Database Purging",
     "PURGE_DESC": "Automatically delete outdated transactional records from the local DuckDB database to preserve high performance and disk storage.",
-    "PURGE_AFTER": "Maximum Data Age (days)"
+    "PURGE_AFTER": "Maximum Data Age (days)",
+    "PANEL_IPXA": "IPXA Integration",
+    "PANEL_IPXA_DESC": "Configure IPXA threat intelligence and IP reputation service endpoint",
+    "IPXA_URL": "IPXA Service URL",
+    "IPXA_URL_HINT": "Endpoint URL of the IPXA threat intelligence service (e.g. http://ipxa:5000)",
+    "IPXA_KEY": "IPXA API Key",
+    "IPXA_KEY_HINT": "Secret API key for authenticating with IPXA service"
   },
   "TRANSACTION": {
     "FILTER": {

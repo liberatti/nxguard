@@ -47,7 +47,7 @@ services:
   web:
     image: node:lts
     working_dir: /app
-    command: npm run container
+    command: sh -c "npm install --legacy-peer-deps && npm run container"
     ports:
       - "4200:4200"
     volumes:

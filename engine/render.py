@@ -118,13 +118,17 @@ def _generate_sensors(
     logger.info(f"[{output_dir}] - Generate sensor")
     prefix = "test-" if test else ""
 
+    conf = data.get("config") or {}
+    ipxa = conf.get("ipxa") if isinstance(conf, dict) else {}
+    ipxa = ipxa or {}
+
     for sensor in data["sensors"]:
-        if "url" in data["config"]["ipxa"]:
+        if isinstance(ipxa, dict) and ipxa.get("url"):
             sensor.update(
                 {
                     "ipxa_enabled": True,
-                    "ipxa_url": data["config"]["ipxa"]["url"],
-                    "ipxa_key": data["config"]["ipxa"]["key"],
+                    "ipxa_url": ipxa.get("url"),
+                    "ipxa_key": ipxa.get("key"),
                     "blq_geo": ",".join(sensor["security"]["geo_codes"]),
                     "blq_rbl": ",".join(sensor["security"]["reputation"]),
                     "trusted": ",".join(sensor["security"]["trusted"]),
@@ -346,7 +350,9 @@ def generate(data, output_dir=config.BASE_PATH, test=False):
         _generate_certificates(env, output_dir, prefix, data["certificates"])
 
     if "sensors" in data:
-        if "ipxa" in data["config"] and data["config"]["ipxa"].get("url"):
+        conf = data.get("config") or {}
+        ipxa = conf.get("ipxa") if isinstance(conf, dict) else {}
+        if isinstance(ipxa, dict) and ipxa.get("url"):
             _generate_trusted_ips(f"{config.BASE_PATH}/modsec/coreruleset")
         _generate_sensors(env, output_dir, data, test)
 

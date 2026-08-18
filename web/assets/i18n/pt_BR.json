@@ -243,8 +243,6 @@
     "SUBTITLE": "Gerencie configurações globais do motor, certificados PKI e políticas de transações",
     "PANEL_GENERAL": "Geral & Integrações",
     "PANEL_GENERAL_DESC": "Chaves de API de terceiros e endpoints de diretório externo",
-    "MAXMIND_KEY": "Chave de Licença MaxMind Geolocation",
-    "MAXMIND_HINT": "Utilizada para geolocalização de IP e bloqueio por país",
     "ACME_URL": "URL do Diretório ACME",
     "ACME_HINT": "Endpoint do diretório Let's Encrypt / ACME (ex.: https://acme-v02.api.letsencrypt.org/directory)",
     "PANEL_CA": "Autoridade Certificadora (CA Interna)",
@@ -263,7 +261,13 @@
     "PURGE_TITLE": "Expurgo de Transações",
     "PURGE_TOGGLE": "Ativar Expurgo do Banco de Dados",
     "PURGE_DESC": "Remova automaticamente registros antigos do banco local DuckDB para manter alta performance e economizar armazenamento.",
-    "PURGE_AFTER": "Idade Máxima dos Dados (dias)"
+    "PURGE_AFTER": "Idade Máxima dos Dados (dias)",
+    "PANEL_IPXA": "Integração IPXA",
+    "PANEL_IPXA_DESC": "Configure o endpoint do serviço de inteligência de ameaças e reputação IPXA",
+    "IPXA_URL": "URL do Serviço IPXA",
+    "IPXA_URL_HINT": "URL do endpoint do serviço IPXA (ex.: http://ipxa:5000)",
+    "IPXA_KEY": "Chave de API IPXA",
+    "IPXA_KEY_HINT": "Chave de API secreta para autenticação com o serviço IPXA"
   },
   "TRANSACTION": {
     "FILTER": {

@@ -1,9 +1,21 @@
-{
     "config": {
         "dns_resolver": "127.0.0.11 8.8.8.8 1.1.1.1",
+        "acme_directory_url": "https://acme-v02.api.letsencrypt.org/directory",
         "ipxa": {
             "url": "http://ipxa:5000",
             "key": "tZzDBUSnoy76LLSvu1Vg3e9vdFJINMT2"
+        },
+        "archive": {
+            "enabled": false,
+            "archive_after": 1800,
+            "type": "opensearch",
+            "url": "",
+            "username": "",
+            "password": ""
+        },
+        "purge": {
+            "enabled": false,
+            "purge_after": 30
         }
     },
     "user": {

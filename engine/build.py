@@ -109,14 +109,44 @@ def init_from_data(data_dir, data_file="init-data.json"):
     logger.info(f"Initialize from {data_dir}/{data_file}")
 
     data = read_from_json(data_dir, data_file)
+    if not data:
+        return
+
     if "config" in data:
         with ConfigDao() as dao:
             dao.delete_all()
-            data["config"].update(
-                {"cluster_id": gen_random_string(8), "active_scn": gen_random_string(16)}
+            conf = data["config"]
+            conf.update(
+                {
+                    "cluster_id": gen_random_string(8),
+                    "active_scn": gen_random_string(16),
+                }
             )
-            dao.persist(data["config"])
-            logger.info(f"Config: {data['config']['cluster_id']}")
+            if not conf.get("ca_certificate") or not conf.get("ca_private"):
+                try:
+                    from api.tools.ssl_tool import SSLTool
+
+                    ca_dict = SSLTool.gen_ca("nxguard-CA")
+                    conf["ca_certificate"] = SSLTool.crt_to_pem(ca_dict["certificate"])
+                    conf["ca_private"] = SSLTool.private_to_pem(ca_dict["private_key"])
+                except Exception as e:
+                    logger.error(f"Error generating default CA during init: {e}")
+            if "archive" not in conf or conf.get("archive") is None:
+                conf["archive"] = {
+                    "enabled": False,
+                    "archive_after": 1800,
+                    "type": "opensearch",
+                    "url": "",
+                    "username": "",
+                    "password": "",
+                }
+            if "purge" not in conf or conf.get("purge") is None:
+                conf["purge"] = {
+                    "enabled": False,
+                    "purge_after": 30,
+                }
+            dao.persist(conf)
+            logger.info(f"Config: {conf['cluster_id']}")
 
     if "user" in data:
         with UserDao() as dao:

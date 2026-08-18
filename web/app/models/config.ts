@@ -13,14 +13,19 @@ export interface ConfigPurge {
     purge_after: number;
 }
 
+export interface ConfigIpxa {
+    url?: string;
+    key?: string;
+}
+
 export interface Config {
     _id: string;
-    maxmind_key: string;
     ca_certificate: string;
     ca_private: string;
     acme_directory_url: string;
     archive: ConfigArchive;
     purge: ConfigPurge;
+    ipxa?: ConfigIpxa;
 }
 export interface EngineNode {
     _id: string;

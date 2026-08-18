@@ -93,7 +93,12 @@ def apply(scn):
     """Tests the new configuration, and if valid, cleans old files, generates new ones, and reloads Nginx."""
     with ConfigBackupDao() as backup_dao:
         backup = backup_dao.get_by_scn(scn)
-        conf = json.loads(backup["data"]) if backup else None
+        if backup and "data" in backup:
+            conf = backup["data"]
+            if isinstance(conf, str):
+                conf = json.loads(conf)
+        else:
+            conf = None
 
     if not conf:
         logger.error(f"Configuration with SCN {scn} not found in ConfigBackupDao.")

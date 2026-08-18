@@ -1,17 +1,40 @@
-from flask import Blueprint, Response
+import json
+from flask import Blueprint, Response, request
+from marshmallow import ValidationError
 from nxcore.controllers.base_controller import (
     response_data,
     response_error,
+    response_error_parse,
     has_any_authority,
 )
 from nxcore.middleware.socket_manager import emit_event
 
 import engine.admin as c_admin
 import engine.build as c_builder
-from api.model.config_model import ChangeDao, ConfigBackupDao
+from api.model.config_model import ChangeDao, ConfigBackupDao, ConfigDao
 from api.model.upstream_model import NodeStatusDao
 
 routes = Blueprint("config", __name__)
+
+
+@routes.after_request
+def after(response: Response) -> Response:
+    if (
+        request.method
+        in [
+            "PUT",
+            "POST",
+            "DELETE",
+            "PATCH",
+        ]
+        and response.status_code in [200, 201]
+        and not request.path.endswith("/apply")
+    ):
+        with ChangeDao() as dao:
+            if not dao.get_by_name("config"):
+                dao.persist({"name": "config"})
+            emit_event("tracking_evt")
+    return response
 
 
 @routes.route("/health", methods=["GET"])
@@ -67,7 +90,20 @@ def apply_config() -> Response:
 @routes.route("", methods=["GET"])
 @has_any_authority(authorities=["viewer", "superuser"])
 def config() -> Response:
-    with ConfigBackupDao() as backup_dao:
-        latest = backup_dao.get_latest()
-        r = latest["data"] if latest else None
-    return response_data(r)
+    with ConfigDao() as dao:
+        return response_data(dao.get_active(), dao.schema)
+
+
+@routes.route("", methods=["PUT"])
+@routes.route("/<_id>", methods=["PUT"])
+@has_any_authority(authorities=["superuser"])
+def update(_id=None) -> Response:
+    try:
+        with ConfigDao() as dao:
+            active = dao.get_active()
+            conf_id = _id or (active["_id"] if active else 1)
+            config_dict = dao.json_load(request.json)
+            dao.update_by_id(conf_id, config_dict)
+            return response_data(dao.get_active(), dao.schema)
+    except ValidationError as err:
+        return response_error_parse(err)
