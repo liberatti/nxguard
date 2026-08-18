@@ -1,0 +1,351 @@
+<!-- Navigation Header -->
+<mat-toolbar class="header-toolbar">
+  <div class="toolbar-content">
+    <a href="#" class="brand-group">
+      <img src="assets/logo.png" alt="NXGuard Logo" class="brand-logo">
+      <span class="brand-title">{{ title }}</span>
+    </a>
+
+    <span class="toolbar-spacer"></span>
+
+    <nav class="nav-links">
+      <a mat-button href="#features" class="nav-link-item">Features</a>
+      <a mat-button href="#screenshots" class="nav-link-item">Screenshots</a>
+      <a mat-button href="#architecture" class="nav-link-item">Architecture</a>
+      <a mat-button href="#benchmarks" class="nav-link-item">Benchmarks</a>
+      <a mat-button href="#quickstart" class="nav-link-item">Quick Start</a>
+
+      <div class="nav-divider"></div>
+
+      <a mat-button href="https://github.com/sponsors/liberatti" target="_blank" rel="noopener" class="sponsor-btn">
+        <mat-icon class="heart-icon-sm">favorite</mat-icon> Sponsor
+      </a>
+      <a mat-flat-button href="https://github.com/liberatti/nxguard" target="_blank" rel="noopener" class="github-btn">
+        <mat-icon>star</mat-icon> GitHub
+      </a>
+    </nav>
+  </div>
+</mat-toolbar>
+
+<!-- Main Presentation Page Container -->
+<main class="page-content">
+
+  <!-- Hero Presentation Section -->
+  <section class="hero-section">
+    <div class="hero-tag-wrapper">
+      <span class="hero-tag">
+        <mat-icon inline>verified_user</mat-icon>
+        High-Performance API Gateway & Security Reverse Proxy
+      </span>
+    </div>
+
+    <h1 class="hero-title">
+      Next-Generation Layer 7 Defense with <br>
+      <span class="gradient-title">OpenResty & ModSecurity v3</span>
+    </h1>
+
+    <p class="hero-subtitle">
+      <strong>NXGuard</strong> provides sub-millisecond request inspection via LuaJIT, live threat intelligence
+      synchronized with <strong>IPXA</strong>, embedded <strong>DuckDB</strong> telemetry analytics, and zero-touch ACME
+      SSL automation.
+    </p>
+
+    <!-- Meta Chips -->
+    <div class="hero-chips">
+      <mat-chip class="meta-chip">
+        <mat-icon>policy</mat-icon> Apache 2.0
+      </mat-chip>
+      <mat-chip class="meta-chip">
+        <mat-icon>layers</mat-icon> Docker Ready
+      </mat-chip>
+      <mat-chip class="meta-chip">
+        <mat-icon>speed</mat-icon> Sub-0.4ms Latency
+      </mat-chip>
+      <mat-chip class="meta-chip">
+        <mat-icon>security</mat-icon> OWASP CRS 4.25+
+      </mat-chip>
+    </div>
+
+    <!-- Hero Action Buttons -->
+    <div class="hero-actions">
+      <a mat-flat-button color="primary" class="cta-primary-btn" href="#quickstart">
+        <mat-icon>rocket_launch</mat-icon> Quick Start
+      </a>
+      <a mat-stroked-button class="cta-secondary-btn" href="#screenshots">
+        <mat-icon>visibility</mat-icon> View UI Preview
+      </a>
+      <a mat-stroked-button class="cta-secondary-btn" href="https://github.com/liberatti/nxguard" target="_blank"
+        rel="noopener">
+        <mat-icon>star</mat-icon> Star on GitHub
+      </a>
+    </div>
+
+    <!-- Quick Metric Cards -->
+    <div class="metrics-grid">
+      <mat-card *ngFor="let m of metrics" class="minimal-card metric-card">
+        <mat-card-content>
+          <div class="metric-value">{{ m.value }}</div>
+          <div class="metric-label">{{ m.label }}</div>
+          <div class="metric-caption">{{ m.caption }}</div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </section>
+
+  <!-- Screenshots & UI Preview Section -->
+  <section class="section-wrapper" id="screenshots">
+    <div class="section-header">
+      <span class="section-badge">UI & Observability</span>
+      <h2>Intuitive Management & Inspection Interface</h2>
+      <p>Clean, enterprise-grade dashboard designed for complete visibility and rapid policy management.</p>
+    </div>
+
+    <mat-card class="minimal-card gallery-card">
+      <mat-tab-group animationDuration="200ms" mat-stretch-tabs="false">
+        <mat-tab *ngFor="let s of screenshots">
+          <ng-template mat-tab-label>
+            <mat-icon class="tab-icon">photo_camera</mat-icon>
+            {{ s.title }}
+          </ng-template>
+
+          <div class="tab-content-panel">
+            <div class="tab-meta">
+              <h3>{{ s.title }}</h3>
+              <p class="tab-subtitle">{{ s.subtitle }}</p>
+              <p class="tab-description">{{ s.description }}</p>
+            </div>
+
+            <div class="image-frame">
+              <img [src]="s.image" [alt]="s.title" class="screenshot-img" loading="lazy">
+            </div>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </mat-card>
+  </section>
+
+  <!-- Architecture Section -->
+  <section class="section-wrapper" id="architecture">
+    <div class="section-header">
+      <span class="section-badge">Architecture</span>
+      <h2>Processing Pipeline & Security Flow</h2>
+      <p>Modular pipeline linking network ingress, policy evaluation, and telemetry storage.</p>
+    </div>
+
+    <div class="architecture-grid">
+      <mat-card class="minimal-card diagram-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar color="primary">account_tree</mat-icon>
+          <mat-card-title>Pipeline Diagram</mat-card-title>
+          <mat-card-subtitle>Ingress, Inspection, and Telemetry Flow</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content class="diagram-container">
+          <img src="assets/architecture_diagram.png" alt="NXGuard Architecture Diagram" class="diagram-img">
+        </mat-card-content>
+      </mat-card>
+
+      <div class="architecture-steps">
+        <mat-card class="minimal-card step-card">
+          <mat-card-header>
+            <div mat-card-avatar class="step-badge">1</div>
+            <mat-card-title>Ingress & LuaJIT Pre-flight</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <p>Traffic arrives on OpenResty worker threads. Custom Lua sensors perform rapid dynamic bypass,
+              geo-filtering, and initial validation before invoking inspection.</p>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="minimal-card step-card">
+          <mat-card-header>
+            <div mat-card-avatar class="step-badge">2</div>
+            <mat-card-title>ModSecurity v3 & CRS Rules</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <p>Comprehensive payload parsing and regex evaluation against OWASP Core Rule Set 4.25+. Granular per-route
+              sensor policies enable dynamic rule tailoring without reloads.</p>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="minimal-card step-card">
+          <mat-card-header>
+            <div mat-card-avatar class="step-badge">3</div>
+            <mat-card-title>IPXA Feeds & DuckDB Telemetry</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <p>Continuous threat intelligence synchronized with IPXA. All audit logs and blocked transactions are saved
+              in embedded DuckDB for instant analytics and reporting.</p>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+  </section>
+
+  <!-- Core Features Grid -->
+  <section class="section-wrapper" id="features">
+    <div class="section-header">
+      <span class="section-badge">Capabilities</span>
+      <h2>Core Engine Features</h2>
+      <p>Engineered for high-throughput APIs and enterprise security compliance.</p>
+    </div>
+
+    <div class="features-grid">
+      <mat-card *ngFor="let f of features" class="minimal-card feature-card">
+        <mat-card-header>
+          <div mat-card-avatar class="feature-icon-wrapper">
+            <mat-icon color="primary">{{ f.icon }}</mat-icon>
+          </div>
+          <mat-card-title>{{ f.title }}</mat-card-title>
+          <mat-card-subtitle>
+            <mat-chip class="feature-badge">{{ f.badge }}</mat-chip>
+          </mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <p>{{ f.description }}</p>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </section>
+
+  <!-- GoTestWAF Validation & Benchmarks -->
+  <section class="section-wrapper" id="benchmarks">
+    <div class="section-header">
+      <span class="section-badge">Security Testing</span>
+      <h2>Security Validation with GoTestWAF</h2>
+      <p>Continuous automated verification against modern attack payloads and OWASP categories.</p>
+    </div>
+
+    <div class="benchmarks-grid-layout">
+      <mat-card class="minimal-card benchmark-report-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar color="accent">assessment</mat-icon>
+          <mat-card-title>GoTestWAF Evaluation</mat-card-title>
+          <mat-card-subtitle>Verification of Block & Alerting Efficacy</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content class="bench-image-wrapper">
+          <img src="assets/benchmarks.png" alt="GoTestWAF Evaluation Report" class="benchmark-img">
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="minimal-card benchmark-runner-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar color="primary">terminal</mat-icon>
+          <mat-card-title>Run Security Validation</mat-card-title>
+          <mat-card-subtitle>Validate your local instance</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <p class="runner-desc">Execute the official GoTestWAF container to simulate multi-vector exploits against your
+            ruleset:</p>
+          <pre class="terminal-block"><code>{{ gotestwafCode }}</code></pre>
+        </mat-card-content>
+        <mat-card-actions align="end">
+          <button mat-flat-button color="primary" (click)="copyGotestwaf()">
+            <mat-icon>{{ copiedGotestwaf ? 'check' : 'content_copy' }}</mat-icon>
+            {{ copiedGotestwaf ? 'Copied' : 'Copy GoTestWAF Command' }}
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+  </section>
+
+
+  <!-- Quick Start & Compose Section -->
+  <section class="section-wrapper" id="quickstart">
+    <div class="section-header">
+      <span class="section-badge">Deployment</span>
+      <h2>Quick Start with Docker Compose</h2>
+      <p>Deploy the full stack (NXGuard + IPXA Threat Feed) in seconds.</p>
+    </div>
+
+    <div class="quickstart-grid">
+      <mat-card class="minimal-card compose-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar color="primary">docker</mat-icon>
+          <mat-card-title>docker-compose.yml</mat-card-title>
+          <mat-card-subtitle>Full stack service definition</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <pre class="terminal-block compose-pre"><code>{{ composeCode }}</code></pre>
+        </mat-card-content>
+        <mat-card-actions align="end">
+          <button mat-flat-button color="primary" (click)="copyCompose()">
+            <mat-icon>{{ copiedCompose ? 'check' : 'content_copy' }}</mat-icon>
+            {{ copiedCompose ? 'Copied' : 'Copy docker-compose.yml' }}
+          </button>
+        </mat-card-actions>
+      </mat-card>
+
+      <div class="sidebar-cards">
+        <mat-card class="minimal-card access-card">
+          <mat-card-header>
+            <mat-icon mat-card-avatar color="accent">lock_open</mat-icon>
+            <mat-card-title>Default Credentials</mat-card-title>
+          </mat-card-header>
+          <mat-card-content class="creds-list">
+            <div class="cred-row">
+              <span class="cred-name">Dashboard URL</span>
+              <code class="cred-code">http://localhost:5000</code>
+            </div>
+            <mat-divider></mat-divider>
+            <div class="cred-row">
+              <span class="cred-name">Username</span>
+              <code class="cred-code">admin&#64;nxguard.local</code>
+            </div>
+            <mat-divider></mat-divider>
+            <div class="cred-row">
+              <span class="cred-name">Password</span>
+              <code class="cred-code">admin</code>
+            </div>
+            <mat-divider></mat-divider>
+            <div class="cred-row">
+              <span class="cred-name">Ingress Ports</span>
+              <code class="cred-code">80 (HTTP) / 443 (HTTPS)</code>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="minimal-card privacy-card">
+          <mat-card-header>
+            <mat-icon mat-card-avatar color="primary">privacy_tip</mat-icon>
+            <mat-card-title>Telemetry & Privacy</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <p>NXGuard collects anonymous, aggregated traffic statistics over 24-hour cycles to optimize threat
+              detection models. <strong>No sensitive, personal, or request-specific payloads are ever
+                collected.</strong></p>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- Footer -->
+<footer class="page-footer">
+  <div class="footer-inner">
+    <div class="footer-brand-side">
+      <div class="footer-logo">
+        <img src="assets/logo.png" alt="NXGuard" class="footer-brand-logo">
+        <span class="footer-title">NXGuard</span>
+      </div>
+      <p class="footer-desc">High-performance API Gateway & Web Application Firewall. Licensed under Apache 2.0.</p>
+    </div>
+
+    <div class="footer-author-side">
+      <p>Developed with <span class="heart-icon">❤️</span> by <strong>Gustavo Liberatti</strong></p>
+    </div>
+
+    <div class="footer-actions">
+      <a mat-button href="https://github.com/liberatti/nxguard" target="_blank" rel="noopener">
+        <mat-icon>code</mat-icon> GitHub
+      </a>
+      <a mat-button href="https://github.com/liberatti/ipxa" target="_blank" rel="noopener">
+        <mat-icon>hub</mat-icon> IPXA
+      </a>
+      <a mat-button color="warn" href="https://github.com/sponsors/liberatti" target="_blank" rel="noopener">
+        <mat-icon>favorite</mat-icon> Sponsor
+      </a>
+    </div>
+  </div>
+</footer>
