@@ -44,12 +44,8 @@
             "exclusions": [],
             "security": {
                 "geo_codes": [],
-                "reputation": [
-                    "firehol_level1"
-                ],
-                "trusted": [
-                    "lan_bypass"
-                ]
+                "reputation": [],
+                "trusted": []
             },
             "inspection": {
                 "score": {
