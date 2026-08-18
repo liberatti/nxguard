@@ -146,6 +146,6 @@ server {
   }
 
   access_log off;
-  error_log /opt/nxguard/logs/error.log warn;
+  error_log /opt/nxguard/logs/error-{{name}}.log warn;
   log_by_lua_file {{BASE_PATH}}/luajit/share/lua/5.1/nxguard/log_by_custom.lua;
 }

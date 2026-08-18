@@ -40,7 +40,7 @@ class ServiceWatcher:
         access_log = threading.Thread(
             target=LogParserTool.follow_file,
             args=(
-                f"{BASE_PATH}/logs/access.json",
+                f"{BASE_PATH}/logs/access-{service_name}.log",
                 "ACCESS",
                 cache,
             ),
@@ -51,7 +51,7 @@ class ServiceWatcher:
         error_log = threading.Thread(
             target=LogParserTool.follow_file,
             args=(
-                f"{BASE_PATH}/logs/error.log",
+                f"{BASE_PATH}/logs/error-{service_name}.log",
                 "ERROR",
                 cache,
             ),
@@ -62,7 +62,7 @@ class ServiceWatcher:
         audit_log = threading.Thread(
             target=LogParserTool.follow_file,
             args=(
-                f"{BASE_PATH}/logs/audit_log-{service_name}.log",
+                f"{BASE_PATH}/logs/audit-{service_name}.log",
                 "AUDIT",
                 cache,
             ),

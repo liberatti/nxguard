@@ -25,7 +25,7 @@ SecAction "id:900320,phase:1,pass,nolog,noauditlog,t:none,setvar:tx.crs_setup_ve
 
 # Service
 
-SecAuditLog /opt/nxguard/logs/audit_log-{{ name }}.log
+SecAuditLog /opt/nxguard/logs/audit-{{ name }}.log
 
 SecRule TX:/^MSC_/ "!@streq 0" "id:50,phase:1,deny,nolog,t:none,msg:'ModSecurity internal error flagged: %{MATCHED_VAR_NAME}'"
 SecRule MULTIPART_UNMATCHED_BOUNDARY "!@eq 0" "id:51,phase:1,deny,log,t:none,msg:'Multipart parser detected a possible unmatched boundary.'"

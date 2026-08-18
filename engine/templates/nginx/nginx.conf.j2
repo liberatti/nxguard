@@ -18,7 +18,7 @@ http {
 
   init_worker_by_lua_block {
     local flush = require "nxguard.log_flush"
-    flush.start("{{BASE_PATH}}/logs/access.json", 2)  -- flush by 2s
+    flush.start("{{BASE_PATH}}", 2)  -- flush by 2s
   }
 
   client_body_temp_path {{BASE_PATH}}/temp/client_body;
