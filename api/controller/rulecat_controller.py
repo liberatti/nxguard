@@ -8,6 +8,7 @@ from nxcore.controllers.base_controller import (
 
 
 from api.model.seclang_model import RuleCategoryDao
+from engine.seclang.seclang_schema import RuleCategorySchema
 
 routes = Blueprint("rulecat", __name__)
 
@@ -59,13 +60,22 @@ def search() -> Response:
     Returns:
         Response: JSON response containing the matching rule categories
     """
-    name = request.args.get("name", type=str)
-    phases_str = request.args.get("phases", type=str)
-    phases = [int(phase) for phase in phases_str.split(",")] if phases_str else []
+    name = request.args.get("name", type=str, default=None)
+    phases_raw = request.args.getlist("phases")
+    phases = []
+    for p in phases_raw:
+        for item in str(p).split(","):
+            item = item.strip()
+            if item.isdigit():
+                phases.append(int(item))
 
     with RuleCategoryDao() as dao:
         if name and phases:
             result = dao.get_by_name_and_phases(name, phases)
+        elif name:
+            result = dao.get_by_name_and_phases(name, [])
+        elif phases:
+            result = dao.get_by_phases(phases)
         else:
-            result = dao.get_all()
-        return response_data(result, dao.schema)
+            result = dao.get_by_phases([])
+        return response_data(result, RuleCategorySchema(many=True))
