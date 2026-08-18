@@ -1,0 +1,37 @@
+from flask import Blueprint, Response
+
+from nxcore.controllers.base_controller import (
+    response_data,
+    response_error_404,
+    has_any_authority
+)
+
+from api.model.seclang_model import RuleDao
+
+routes = Blueprint("rulesec", __name__)
+
+
+@routes.route("/by_code/<int:rule_code>", methods=["GET"])
+@has_any_authority(authorities=["viewer", "superuser"])
+def get(rule_code: int) -> Response:
+    """
+    Retrieve a security rule by its code.
+
+    Args:
+        rule_code: The unique code identifier of the security rule
+
+    Returns:
+        Response: JSON response containing the security rule data or 404 error
+    """
+    match rule_code:
+        case 12:
+            return response_data({
+                "code": 12,
+                "phase": 1,
+                "action": "DENY",
+                "msg": "'Method is not allowed by route'"
+            },)
+        case _:
+            with RuleDao() as dao:
+                vo = dao.get_by_code(rule_code)
+                return response_data(vo) if vo else response_error_404()

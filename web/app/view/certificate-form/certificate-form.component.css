@@ -1,0 +1,159 @@
+.certificate-form-card {
+    border-radius: var(--card-radius);
+    border: 1px solid var(--border-dim);
+    box-shadow: var(--shadow-premium);
+    overflow: hidden;
+}
+
+.form-content-container {
+    padding: 16px 0;
+}
+
+.form-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.section-card {
+    border-radius: 12px !important;
+    border: 1px solid var(--border-dim) !important;
+    background: var(--bg-main) !important;
+    overflow: hidden;
+}
+
+.card-title-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.card-title-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    color: var(--primary);
+}
+
+.section-card mat-card-content {
+    padding: 16px 20px 20px 20px !important;
+}
+
+.fields-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .fields-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.provider-option-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.provider-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: var(--primary);
+}
+
+/* Managed Notice Card */
+.managed-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 16px 20px;
+    border-radius: 12px;
+    background: rgba(37, 99, 235, 0.06);
+    border: 1px solid rgba(37, 99, 235, 0.2);
+}
+
+.managed-icon-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: rgba(37, 99, 235, 0.12);
+    color: var(--primary);
+    flex-shrink: 0;
+}
+
+.managed-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.managed-title-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.managed-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-main);
+    margin: 0;
+}
+
+.managed-badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 12px;
+    background: rgba(16, 185, 129, 0.12);
+    color: var(--success);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.managed-description {
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--text-dim);
+    margin: 0;
+}
+
+/* External PEM Textareas */
+.pem-textarea {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace !important;
+    font-size: 0.825rem !important;
+    line-height: 1.4 !important;
+    letter-spacing: 0.2px;
+}
+
+.section-hint {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    margin: 0 0 16px 0;
+    line-height: 1.5;
+}
+
+.bottom-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 24px;
+    border-top: 1px solid var(--border-dim);
+}
+
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+}

@@ -1,0 +1,312 @@
+<ng-container>
+    <mat-card class="trn-card">
+        <mat-card-header>
+            <mat-card-title>{{ 'view.transaction.title' | translate }}</mat-card-title>
+            <mat-card-subtitle>{{ 'view.transaction.subtitle' | translate }}</mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content>
+            <div class="filter-toolbar">
+                <div class="filter-left-group">
+                    <button mat-flat-button color="primary" class="filter-dialog-btn" (click)="openFilterDialog()"
+                        [matTooltip]="'TRANSACTION.FILTER.DIALOG_TITLE' | translate">
+                        <mat-icon>filter_alt</mat-icon>
+                        {{ 'TRANSACTION.FILTER.ADD_FILTER' | translate }}
+                    </button>
+
+                    <button mat-stroked-button class="date-range-btn" (click)="openDateRangeDialog()"
+                        [matTooltip]="'TRANSACTION.DATE_RANGE.TOOLTIP' | translate">
+                        <mat-icon class="date-range-icon">calendar_month</mat-icon>
+                        <span class="date-range-label">{{ formattedDateRange }}</span>
+                        <mat-icon class="date-range-arrow">arrow_drop_down</mat-icon>
+                    </button>
+                </div>
+
+                <button mat-flat-button color="primary" class="search-btn" (click)="onRefresh()"
+                    [matTooltip]="'actions.refresh' | translate">
+                    <mat-icon>refresh</mat-icon>
+                    <span>Refresh</span>
+                </button>
+            </div>
+
+            @if (form.value.filters && form.value.filters.length > 0) {
+            <div class="active-filters-container">
+                <span class="active-filters-title">{{ 'TRANSACTION.FILTER.ACTIVE_FILTERS' | translate }}:</span>
+                <mat-chip-listbox class="active-chips-box">
+                    <mat-chip-row *ngFor="let p of form.value.filters" (removed)="onRemoveFilter(p)"
+                        class="filter-chip-item">
+                        <mat-icon matChipAvatar class="chip-avatar-icon">filter_list</mat-icon>
+                        <span class="chip-filter-label">{{ formatFilterChip(p) }}</span>
+                        <button matChipRemove>
+                            <mat-icon>cancel</mat-icon>
+                        </button>
+                    </mat-chip-row>
+                </mat-chip-listbox>
+                <button mat-button color="warn" class="btn-clear-all" (click)="onClearAllFilters()">
+                    <mat-icon>clear_all</mat-icon>
+                    {{ 'TRANSACTION.FILTER.CLEAR_ALL' | translate }}
+                </button>
+            </div>
+            }
+        </mat-card-content>
+
+        <div class="chart-container">
+            <canvas id="trn-chart">{{ chart }}</canvas>
+        </div>
+
+        <table mat-table [dataSource]="transactionDS" multiTemplateDataRows=true class="trn-table">
+            <!-- Expand & Actions Column -->
+            <ng-container matColumnDef="expand">
+                <mat-header-cell *matHeaderCellDef class="col-expand"></mat-header-cell>
+                <mat-cell *matCellDef="let element" class="col-expand">
+                    <button mat-icon-button (click)="expandCollapse(element); $event.stopPropagation()">
+                        @if (isRowExpanded(element)) {
+                        <mat-icon>keyboard_arrow_up</mat-icon>
+                        } @else {
+                        <mat-icon>keyboard_arrow_down</mat-icon>
+                        }
+                    </button>
+                    <button mat-icon-button (click)="onShowRAW(element); $event.stopPropagation()"
+                        matTooltip="View Raw JSON">
+                        <mat-icon>code</mat-icon>
+                    </button>
+                </mat-cell>
+            </ng-container>
+
+            <!-- Time Column -->
+            <ng-container matColumnDef="logtime">
+                <mat-header-cell *matHeaderCellDef> Time </mat-header-cell>
+                <mat-cell *matCellDef="let element">
+                    <span class="time-text">{{ element.logtime | dateFormat }}</span>
+                </mat-cell>
+            </ng-container>
+
+            <!-- Score Column -->
+            <ng-container matColumnDef="score">
+                <mat-header-cell *matHeaderCellDef> Score </mat-header-cell>
+                <mat-cell *matCellDef="let element">
+                    <span class="score_chip {{ element.action | lowercase }}">
+                        {{ element.score || 0 }}
+                    </span>
+                </mat-cell>
+            </ng-container>
+
+            <!-- Source Column -->
+            <ng-container matColumnDef="source">
+                <mat-header-cell *matHeaderCellDef> Source </mat-header-cell>
+                <mat-cell *matCellDef="let element">
+                    @if (element.source) {
+                    <span class="source-ip">{{ element.source.ip }}</span>
+                    @if (element.source.geo?.country && element.source.geo.country !== '--') {
+                    <span class="fi fi-{{ element.source.geo.country | lowercase }}"
+                        [matTooltip]="element.source.geo.country" matTooltipPosition="below" matTooltipHideDelay="2000">
+                    </span>
+                    }
+                    }
+                </mat-cell>
+            </ng-container>
+
+            <!-- Service Column -->
+            <ng-container matColumnDef="service">
+                <mat-header-cell *matHeaderCellDef> Service </mat-header-cell>
+                <mat-cell *matCellDef="let element">
+                    @if (element.service) {
+                    <span class="service-badge" [matTooltip]="'Node: ' + (element.server_id || '-')"
+                        matTooltipPosition="below">
+                        {{ element.service.name || element.service._id }}
+                    </span>
+                    }
+                </mat-cell>
+            </ng-container>
+
+            <!-- Request Column -->
+            <ng-container matColumnDef="request_line">
+                <mat-header-cell *matHeaderCellDef> Request </mat-header-cell>
+                <mat-cell *matCellDef="let element">
+                    @if (element.http) {
+                    <span class="request-text">{{ element.http.request_line || (element.http.request?.method + ' ' +
+                        (element.http.request?.uri || '/')) }}</span>
+                    }
+                </mat-cell>
+            </ng-container>
+
+            <!-- Duration Column -->
+            <ng-container matColumnDef="duration">
+                <mat-header-cell *matHeaderCellDef> Duration </mat-header-cell>
+                <mat-cell *matCellDef="let element">
+                    <span class="duration-text">{{ (element.http?.duration || 0) | timeFormat }}</span>
+                </mat-cell>
+            </ng-container>
+
+            <!-- Expanded Detail Container -->
+            <ng-container matColumnDef="expandedDetail">
+                <mat-cell *matCellDef="let element" class="exp-panel-cell" [attr.colspan]="transactionDC.length">
+                    @if (isRowExpanded(element)) {
+                    <div class="exp-panel {{ element.action | lowercase }}">
+                        <mat-accordion multi="true">
+                            <!-- Request Details Panel -->
+                            <mat-expansion-panel [expanded]="true">
+                                <mat-expansion-panel-header>
+                                    <mat-panel-title>
+                                        <mat-icon class="panel-icon">arrow_upward</mat-icon>
+                                        <b>Request Information</b>
+                                    </mat-panel-title>
+                                    <mat-panel-description>
+                                        @if (element.http && element.http.request) {
+                                        <span class="exp-panel-token"><b>Size:</b> {{ (element.http.request.bytes || 0)
+                                            | byteFormat }}</span>
+                                        <span class="exp-panel-token"><b>Duration:</b> {{ (element.http.duration || 0) |
+                                            timeFormat }}</span>
+                                        <span class="exp-panel-token"><b>Action:</b> {{ element.action }}</span>
+                                        <span class="exp-panel-token"><b>DoS:</b> {{ element.limit_req_status ||
+                                            element.rate_limit?.action || '-' }}</span>
+                                        <span class="exp-panel-token"><b>GeoIP:</b> {{ element.geoip_status ||
+                                            element.geoip?.action || '-' }}</span>
+                                        <span class="exp-panel-token"><b>RBL:</b> {{ element.rbl_status ||
+                                            element.reputation?.action || '-' }}</span>
+                                        }
+                                    </mat-panel-description>
+                                </mat-expansion-panel-header>
+
+                                <div class="detail-grid">
+                                    @if (element.user_agent) {
+                                    <div class="detail-item">
+                                        <label>User Agent</label>
+                                        <span>{{ element.user_agent.family }} {{ element.user_agent.major ? 'v' +
+                                            element.user_agent.major : '' }}</span>
+                                    </div>
+                                    }
+                                    @if (element.source) {
+                                    <div class="detail-item">
+                                        <label>Source IP & Port</label>
+                                        <span>{{ element.source.ip }}{{ element.source.port ? ':' + element.source.port
+                                            : '' }}</span>
+                                    </div>
+                                    }
+                                    @if (element.destination) {
+                                    <div class="detail-item">
+                                        <label>Destination Host</label>
+                                        <span>{{ element.destination.host || element.destination.ip }}{{
+                                            element.destination.port ? ':' + element.destination.port : '' }}</span>
+                                    </div>
+                                    }
+                                    @if (element.upstream) {
+                                    <div class="detail-item">
+                                        <label>Upstream Target</label>
+                                        <span>{{ element.upstream.name || element.upstream._id }} {{
+                                            element.upstream.target ? '(' + element.upstream.target + ')' : '' }}</span>
+                                    </div>
+                                    }
+                                    @if (element.route_name && element.route_name !== '-') {
+                                    <div class="detail-item">
+                                        <label>Route</label>
+                                        <span>{{ element.route_name }}</span>
+                                    </div>
+                                    }
+                                </div>
+
+                                @if (element.http?.request?.headers && element.http.request.headers.length > 0) {
+                                <div class="headers-section">
+                                    <label class="section-label">Request Headers</label>
+                                    <div class="headers-chips">
+                                        <div class="header-chip" *ngFor="let p of element.http.request.headers"
+                                            [matTooltip]="p.content">
+                                            <span class="h-name">{{ p.name }}:</span>
+                                            <span class="h-val">{{ p.content }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                }
+                            </mat-expansion-panel>
+
+                            <!-- Response Details Panel -->
+                            @if (element.http && element.http.response) {
+                            <mat-expansion-panel>
+                                <mat-expansion-panel-header>
+                                    <mat-panel-title>
+                                        <mat-icon class="panel-icon">arrow_downward</mat-icon>
+                                        <b>Response Information</b>
+                                    </mat-panel-title>
+                                    <mat-panel-description>
+                                        <span class="exp-panel-token"><b>Code:</b> {{ element.http.response.status_code
+                                            }}</span>
+                                        <span class="exp-panel-token"><b>Size:</b> {{ (element.http.response.bytes || 0)
+                                            | byteFormat }}</span>
+                                    </mat-panel-description>
+                                </mat-expansion-panel-header>
+
+                                @if (element.http.response.headers && element.http.response.headers.length > 0) {
+                                <div class="headers-section">
+                                    <label class="section-label">Response Headers</label>
+                                    <div class="headers-chips">
+                                        <div class="header-chip" *ngFor="let p of element.http.response.headers"
+                                            [matTooltip]="p.content">
+                                            <span class="h-name">{{ p.name }}:</span>
+                                            <span class="h-val">{{ p.content }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                }
+                            </mat-expansion-panel>
+                            }
+
+                            <!-- Inspection / WAF Panel -->
+                            @if (element.audit) {
+                            <mat-expansion-panel>
+                                <mat-expansion-panel-header>
+                                    <mat-panel-title>
+                                        <mat-icon class="panel-icon">security</mat-icon>
+                                        <b>WAF Inspection Details</b>
+                                    </mat-panel-title>
+                                    <mat-panel-description>
+                                        <span>{{ element.audit.engine || 'ModSecurity' }}</span>
+                                    </mat-panel-description>
+                                </mat-expansion-panel-header>
+
+                                @if (element.audit.messages && element.audit.messages.length > 0) {
+                                <table mat-table [dataSource]="element.audit.messages" class="audit-table">
+                                    <ng-container matColumnDef="code">
+                                        <th mat-header-cell *matHeaderCellDef class="audit-col-code"> Rule ID </th>
+                                        <td mat-cell *matCellDef="let e1" class="audit-col-code">
+                                            <button mat-stroked-button class="rule-btn"
+                                                (click)="onShowRuleDetails(e1.rule_code || e1.ruleId)">
+                                                {{ e1.rule_code || e1.ruleId }}
+                                            </button>
+                                        </td>
+                                    </ng-container>
+
+                                    <ng-container matColumnDef="text">
+                                        <th mat-header-cell *matHeaderCellDef> Matched Rule Message </th>
+                                        <td mat-cell *matCellDef="let e1" class="audit-msg-text">
+                                            {{ e1.text || e1.message }}
+                                        </td>
+                                    </ng-container>
+
+                                    <tr mat-header-row *matHeaderRowDef="['code','text']"></tr>
+                                    <tr mat-row *matRowDef="let row; columns: ['code','text'];"></tr>
+                                </table>
+                                } @else {
+                                <p class="no-anomalies">No security anomalies detected for this transaction.</p>
+                                }
+                            </mat-expansion-panel>
+                            }
+                        </mat-accordion>
+                    </div>
+                    }
+                </mat-cell>
+            </ng-container>
+
+            <!-- Table Rows Definition -->
+            <mat-header-row *matHeaderRowDef="transactionDC"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: transactionDC;" matRipple class="element-row"
+                [class.expanded]="isRowExpanded(row)" (click)="expandCollapse(row)"></mat-row>
+            <mat-row *matRowDef="let row; columns: ['expandedDetail'];" class="detail-row"
+                [class.collapsed-row]="!isRowExpanded(row)"
+                [@detailExpand]="isRowExpanded(row) ? 'expanded' : 'collapsed'">
+            </mat-row>
+        </table>
+
+        <mat-paginator [pageSizeOptions]="[10, 25, 50, 100]" [pageSize]="transactionPA.per_page"
+            [length]="transactionPA.total_elements" (page)="nextPage($event)"></mat-paginator>
+    </mat-card>
+</ng-container>

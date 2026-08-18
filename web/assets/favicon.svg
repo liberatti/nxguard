@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="nxGuardShieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366f1" />
+      <stop offset="50%" stop-color="#3b82f6" />
+      <stop offset="100%" stop-color="#06b6d4" />
+    </linearGradient>
+    <linearGradient id="nxGuardHighlight" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.25" />
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.0" />
+    </linearGradient>
+    <filter id="nxGuardGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#3b82f6" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+  <g>
+    <!-- Shield Outer Body (Transparent background around shield) -->
+    <path d="M 256 40 C 370 40 430 70 430 70 C 430 70 440 240 256 472 C 72 240 82 70 82 70 C 82 70 142 40 256 40 Z" fill="url(#nxGuardShieldGrad)" filter="url(#nxGuardGlow)" />
+    <!-- Inner Highlight Overlay -->
+    <path d="M 256 62 C 352 62 406 87 406 87 C 406 87 414 230 256 440 C 98 230 106 87 106 87 C 106 87 160 62 256 62 Z" fill="url(#nxGuardHighlight)" />
+    <!-- Center Emblem (Security Check Shield) -->
+    <path d="M 230 310 L 170 250 L 195 225 L 230 260 L 317 173 L 342 198 Z" fill="#ffffff" />
+  </g>
+</svg>

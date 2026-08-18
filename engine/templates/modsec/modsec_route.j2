@@ -1,0 +1,28 @@
+# ROUTE CONFIGURATION
+{%- if monitor_only %}
+SecAction "id:600100,phase:1,pass,nolog,noauditlog,t:none,ctl:ruleEngine=DetectionOnly"
+{%- else %}
+SecAction "id:600100,phase:1,pass,nolog,noauditlog,t:none,ctl:ruleEngine=On"
+{%- endif %}
+
+SecAction "id:900300,phase:1,pass,nolog,noauditlog,t:none,setvar:tx.max_num_args={{ sensor.inspection.variables.max_num_args }}"
+SecAction "id:900310,phase:1,pass,nolog,noauditlog,t:none,setvar:tx.arg_name_length={{ sensor.inspection.variables.arg_name_length }}"
+SecAction "id:900320,phase:1,pass,nolog,noauditlog,t:none,setvar:tx.arg_length={{ sensor.inspection.variables.arg_length }}"
+
+{% if allowed_methods is defined and allowed_methods %}
+SecAction "id:900330,phase:1,pass,nolog,noauditlog,t:none,setvar:'tx.allowed_methods={{ allowed_methods if allowed_methods is string else allowed_methods|join(' ') }}'"
+{%- else %}
+SecAction "id:900330,phase:1,pass,nolog,noauditlog,t:none,setvar:'tx.allowed_methods=GET HEAD POST OPTIONS PUT PATCH DELETE'"
+{% endif %}
+
+{% if restricted_extensions is defined and restricted_extensions %}
+SecAction "id:900350,phase:1,pass,nolog,noauditlog,t:none,setvar:'tx.restricted_extensions={{ sensor.inspection.variables.restricted_extensions if sensor.inspection.variables.restricted_extensions is string else sensor.inspection.variables.restricted_extensions|join(' ') }}'"
+{%-else%}
+SecAction "id:900350,phase:1,pass,nolog,noauditlog,t:none,setvar:'tx.restricted_extensions=.asa/ .asax/ .ascx/ .axd/ .backup/ .bak/ .bat/ .cdx/ .cer/ .cfg/ .cmd/ .com/ .config/ .conf/ .cs/ .csproj/ .csr/ .dat/ .db/ .dbf/ .dll/ .dos/ .htr/ .htw/ .ida/ .idc/ .idq/ .inc/ .ini/ .key/ .licx/ .lnk/ .log/ .mdb/ .old/ .pass/ .pdb/ .pol/ .printer/ .pwd/ .rdb/ .resources/ .resx/ .sql/ .swp/ .sys/ .vb/ .vbs/ .vbproj/ .vsdisco/ .webinfo/ .xsd/ .xsx/'"
+{% endif %}
+{% if allowed_content_type is defined and allowed_content_type %}
+{%- if allowed_content_type is string %}{% set act_list = allowed_content_type.split(' ') %}{%- else %}{% set act_list = allowed_content_type %}{%- endif %}
+SecAction "id:900360,phase:1,pass,nolog,noauditlog,t:none,setvar:'tx.allowed_request_content_type={% for act in act_list %}|{{ act.strip('|') }}|{% if not loop.last %} {% endif %}{% endfor %}'"
+{%- else %}
+SecAction "id:900360,phase:1,pass,nolog,noauditlog,t:none,setvar:'tx.allowed_request_content_type='application/x-www-form-urlencoded|multipart/form-data|text/xml|application/xml|application/soap+xml|application/json'"
+{% endif %}

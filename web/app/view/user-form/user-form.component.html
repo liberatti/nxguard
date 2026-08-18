@@ -1,0 +1,98 @@
+<ng-container>
+    <mat-card class="user-form-card">
+        <!-- Header -->
+        <mat-card-header>
+            <mat-card-title>{{ 'view.user.title' | translate }}</mat-card-title>
+            <mat-card-subtitle>{{ (isAddMode ? 'actions.create' : 'actions.edit') | translate }}</mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content class="user-form-content">
+            <!-- User Live Preview Banner -->
+            <div class="user-preview-card">
+                <div class="preview-avatar">
+                    <mat-icon class="avatar-large-icon">person</mat-icon>
+                </div>
+                <div class="preview-info">
+                    <h3 class="preview-name">{{ form.get('name')?.value || ('USER_MGMT.NAME' | translate) }}</h3>
+                    <p class="preview-email">{{ form.get('email')?.value || ('USER_MGMT.EMAIL' | translate) }}</p>
+                    <span class="preview-role-chip" [ngClass]="'role-' + ((form.get('role')?.value || 'viewer') | lowercase)">
+                        <mat-icon class="preview-role-icon">{{ form.get('role')?.value === 'superuser' ? 'verified_user' : 'visibility' }}</mat-icon>
+                        {{ form.get('role')?.value || 'viewer' }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Form -->
+            <form [formGroup]="form" class="user-form">
+                <div class="mat-row">
+                    <!-- Name -->
+                    <div class="mat-col-8">
+                        <mat-form-field appearance="outline" class="full-width">
+                            <mat-label>{{ 'USER_MGMT.NAME' | translate }}</mat-label>
+                            <input matInput formControlName="name" id="user-name-input">
+                            <mat-icon matSuffix class="field-icon">badge</mat-icon>
+                        </mat-form-field>
+                    </div>
+
+                    <!-- Role -->
+                    <div class="mat-col-4">
+                        <mat-form-field appearance="outline" class="full-width">
+                            <mat-label>{{ 'USER_MGMT.ROLE' | translate }}</mat-label>
+                            <mat-select id="user-role-select" formControlName="role">
+                                <mat-option id="role-option-{{i}}" *ngFor="let ut of _supportedRoles; let i = index" [value]="ut">
+                                    <div class="role-option-item">
+                                        <mat-icon class="role-opt-icon">{{ ut === 'superuser' ? 'verified_user' : 'visibility' }}</mat-icon>
+                                        <span>{{ ut }}</span>
+                                    </div>
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="mat-col-12">
+                        <mat-form-field appearance="outline" class="full-width">
+                            <mat-label>{{ 'USER_MGMT.EMAIL' | translate }}</mat-label>
+                            <input matInput formControlName="email" [readonly]="!isAddMode" id="user-email-input" type="email">
+                            <mat-icon matSuffix class="field-icon">email</mat-icon>
+                        </mat-form-field>
+                    </div>
+
+                    <!-- Password -->
+                    <div class="mat-col-6">
+                        <mat-form-field appearance="outline" class="full-width">
+                            <mat-label>{{ 'USER_MGMT.PASSWORD' | translate }}</mat-label>
+                            <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" id="user-password-input" autocomplete="new-password">
+                            <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" type="button" class="password-toggle-btn">
+                                <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+                            </button>
+                        </mat-form-field>
+                    </div>
+
+                    <!-- Confirm Password -->
+                    <div class="mat-col-6">
+                        <mat-form-field appearance="outline" class="full-width">
+                            <mat-label>{{ 'USER_MGMT.CONFIRM_PASSWORD' | translate }}</mat-label>
+                            <input matInput [type]="hideCPassword ? 'password' : 'text'" formControlName="cpassword" id="user-confirm-password-input" autocomplete="new-password">
+                            <button mat-icon-button matSuffix (click)="hideCPassword = !hideCPassword" type="button" class="password-toggle-btn">
+                                <mat-icon>{{hideCPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+                            </button>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </form>
+        </mat-card-content>
+
+        <!-- Actions -->
+        <mat-card-actions align="end" class="mat-mdc-card-actions bottom-actions">
+            <button type="button" mat-flat-button color="primary" *ngIf="form.enabled" id="save-user-btn" (click)="onSubmit()" class="action-btn-save">
+                <mat-icon>save</mat-icon>
+                <span>{{ 'actions.save' | translate }}</span>
+            </button>
+            <button type="button" mat-stroked-button [routerLink]="['/users']" id="back-user-btn" class="action-btn-back">
+                <mat-icon>arrow_back</mat-icon>
+                <span>{{ 'actions.cancel' | translate }}</span>
+            </button>
+        </mat-card-actions>
+    </mat-card>
+</ng-container>

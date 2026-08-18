@@ -1,0 +1,244 @@
+Name:		nxguard-engine
+Version:	1.29.2
+Release:	4%{?dist}
+Summary:	nxguard engine powered by openresty
+
+License:	Apache-2.0
+Source0:	%{name}-%{version}.tar.gz    
+
+BuildRequires: openldap-devel luarocks openssl-devel gcc gcc-c++ zlib-devel openssl-devel make automake libtool readline-devel libinput libcurl-devel pcre2-devel libxml2-devel libxslt-devel libgcrypt-devel gd-devel perl-ExtUtils-Embed
+Requires: bash, lua, ssdeep = 2.14.1, shadow-utils, util-linux, sudo
+
+%undefine __brp_mangle_shebangs 
+
+%description
+%prep
+
+cd /root/rpmbuild/BUILD
+
+install -d openresty-1.29.2.5/modules
+mv ModSecurity-nginx-v1.0.4 openresty-1.29.2.5/modules/modsecurity-nginx-v1.0.4
+mv nginx-sticky-module-ng-1.2.7 openresty-1.29.2.5/modules/
+mv nginx_upstream_check_module-0.4.2 openresty-1.29.2.5/modules/
+mv nginx_ajp_module-1.0.0 openresty-1.29.2.5/modules/
+
+
+%build
+cd /root/rpmbuild/BUILD/lua-5.1.5
+make -j$(nproc) linux
+
+cd /root/rpmbuild/BUILD/modsecurity-v3.0.14
+./configure --prefix=/opt/nxguard/modsec --with-yajl --with-pcre2 --with-ssdeep --with-lua
+make -j 4
+make install
+
+cd /root/rpmbuild/BUILD/openresty-1.29.2.5
+./configure --with-compat\
+    --with-http_ssl_module\
+    --with-stream \
+    --with-stream_ssl_module \
+    --with-stream_ssl_preread_module \
+    --with-http_stub_status_module\
+	--with-http_v2_module\
+	--without-lua_resty_mysql\
+	--with-debug\
+	--with-cc-opt='-D FD_SETSIZE=32768'\
+    --add-dynamic-module=modules/nginx_ajp_module-1.0.0\
+    --add-dynamic-module=modules/nginx_upstream_check_module-0.4.2\
+    --add-dynamic-module=modules/nginx-sticky-module-ng-1.2.7\
+    --add-dynamic-module=modules/modsecurity-nginx-v1.0.4\
+    --prefix=/opt/nxguard
+make -j 4
+
+%install
+install -d %{buildroot}/opt/nxguard/html
+install -d %{buildroot}/opt/nxguard/logs
+install -d %{buildroot}/opt/nxguard/run
+install -d %{buildroot}/opt/nxguard/cache
+install -d %{buildroot}/opt/nxguard/data
+
+install -d %{buildroot}/opt/nxguard/nginx/conf
+install -d %{buildroot}/opt/nxguard/nginx/sbin
+install -d %{buildroot}/opt/nxguard/nginx/modules
+
+install -d %{buildroot}/opt/nxguard/luajit/bin
+install -d %{buildroot}/opt/nxguard/luajit/lib
+install -d %{buildroot}/opt/nxguard/luajit/include/luajit-2.1
+install -d %{buildroot}/opt/nxguard/luajit/share/luajit-2.1/jit
+install -d %{buildroot}/opt/nxguard/luajit/share/lua/5.1
+install -d %{buildroot}/opt/nxguard/luajit/lib/lua/5.1
+install -d %{buildroot}/opt/nxguard/lualib/cjson
+
+install -d %{buildroot}/opt/nxguard/luajit/include/lua-5.1
+
+cd /root/rpmbuild/BUILD/lua-5.1.5/src
+install -p -m 0755 lua luac %{buildroot}/opt/nxguard/luajit/bin
+install -p -m 0644 lua.h luaconf.h lualib.h lauxlib.h ../etc/lua.hpp %{buildroot}/opt/nxguard/luajit/include/lua-5.1
+install -p -m 0644 liblua.a %{buildroot}/opt/nxguard/luajit/lib/lua/5.1
+
+install /root/rpmbuild/BUILD/openresty-1.29.2.5/COPYRIGHT %{buildroot}/opt/nxguard/
+
+cd /root/rpmbuild/BUILD/openresty-1.29.2.5/build/LuaJIT-2.1-*/src
+install -m 0755 luajit %{buildroot}/opt/nxguard/luajit/bin/luajit-2.1.ROLLING
+install -m 0644 libluajit.a %{buildroot}/opt/nxguard/luajit/lib/libluajit-5.1.a || :
+install -m 0755 libluajit.so %{buildroot}/opt/nxguard/luajit/lib/libluajit-5.1.so.2.1.ROLLING
+install -m 0644 lua.h lualib.h lauxlib.h luaconf.h lua.hpp luajit.h  %{buildroot}/opt/nxguard/luajit/include/luajit-2.1
+
+cd /root/rpmbuild/BUILD/openresty-1.29.2.5/build/LuaJIT-2.1-*/src/jit
+install -m 0644 bc.lua bcsave.lua dump.lua p.lua v.lua zone.lua dis_x86.lua dis_x64.lua dis_arm.lua dis_arm64.lua dis_arm64be.lua dis_ppc.lua dis_mips.lua dis_mipsel.lua dis_mips64.lua dis_mips64el.lua dis_mips64r6.lua dis_mips64r6el.lua vmdef.lua %{buildroot}/opt/nxguard/luajit/share/luajit-2.1/jit
+
+cd /root/rpmbuild/BUILD/openresty-1.29.2.5/build/lua-cjson-*
+install -m 0644 cjson.so %{buildroot}/opt/nxguard/lualib/cjson.so
+install -m 0644 lua/*.lua %{buildroot}/opt/nxguard/lualib/
+install -m 0644 lua/cjson/*.lua %{buildroot}/opt/nxguard/lualib/cjson/
+
+cd /root/rpmbuild/BUILD/openresty-1.29.2.5/build/lua-resty-signal-*
+install -d %{buildroot}/opt/nxguard/lualib/resty
+install lib/resty/*.lua %{buildroot}/opt/nxguard/lualib/resty
+install librestysignal.so %{buildroot}/opt/nxguard/lualib/
+
+cd /root/rpmbuild/BUILD/openresty-1.29.2.5/build/lua-rds-parser-*
+install -d %{buildroot}/opt/nxguard/lualib/rds
+install parser.so %{buildroot}/opt/nxguard/lualib/rds
+
+cd /root/rpmbuild/BUILD/openresty-1.29.2.5/build/lua-resty-dns-*
+install -d %{buildroot}/opt/nxguard/lualib/resty/dns/
+install lib/resty/dns/*.lua %{buildroot}/opt/nxguard/lualib/resty/dns/
+
+cd /root/rpmbuild/BUILD/openresty-1.29.2.5/build/lua-resty-memcached-*
+install -d %{buildroot}/opt/nxguard/lualib/resty
+install lib/resty/*.lua %{buildroot}/opt/nxguard/lualib/resty
+
+cd /root/rpmbuild/BUILD/openresty-1.29.2.5/build/lua-resty-string-*
+install -d %{buildroot}/opt/nxguard/lualib/resty
+install lib/resty/*.lua %{buildroot}/opt/nxguard/lualib/resty
+
+cd /root/rpmbuild/BUILD/openresty-1.29.2.5/build/lua-resty-upload-*
+install -d %{buildroot}/opt/nxguard/lualib/resty
+install lib/resty/*.lua %{buildroot}/opt/nxguard/lualib/resty
+
+cd /root/rpmbuild/BUILD/openresty-1.29.2.5/build/lua-resty-websocket-*
+install -d %{buildroot}/opt/nxguard/lualib/resty/websocket
+install lib/resty/websocket/*.lua %{buildroot}/opt/nxguard/lualib/resty/websocket/
+
+cd /root/rpmbuild/BUILD/openresty-1.29.2.5/build/lua-resty-lock-*
+install -d %{buildroot}/opt/nxguard/lualib/resty/
+install lib/resty/*.lua %{buildroot}/opt/nxguard/lualib/resty/
+
+cd /root/rpmbuild/BUILD/openresty-1.29.2.5/build/lua-resty-lrucache-*
+install -d %{buildroot}/opt/nxguard/lualib/resty/lrucache
+install lib/resty/*.lua %{buildroot}/opt/nxguard/lualib/resty/
+install lib/resty/lrucache/*.lua %{buildroot}/opt/nxguard/lualib/resty/lrucache/
+
+cd /root/rpmbuild/BUILD/openresty-1.29.2.5/build/lua-resty-core-*
+install -d %{buildroot}/opt/nxguard/lualib/resty/core/
+install -d %{buildroot}/opt/nxguard/lualib/ngx/
+install -d %{buildroot}/opt/nxguard/lualib/ngx/ssl
+install lib/resty/*.lua %{buildroot}/opt/nxguard/lualib/resty/
+install lib/resty/core/*.lua %{buildroot}/opt/nxguard/lualib/resty/core/
+install lib/ngx/*.lua %{buildroot}/opt/nxguard/lualib/ngx/
+install lib/ngx/ssl/*.lua %{buildroot}/opt/nxguard/lualib/ngx/ssl/
+
+cd /root/rpmbuild/BUILD/openresty-1.29.2.5/build/lua-resty-upstream-healthcheck-*
+install -d %{buildroot}/opt/nxguard/lualib/resty/upstream/
+install lib/resty/upstream/*.lua %{buildroot}/opt/nxguard/lualib/resty/upstream/
+
+cd /root/rpmbuild/BUILD/openresty-1.29.2.5/build/lua-resty-limit-traffic-*
+install -d %{buildroot}/opt/nxguard/lualib/resty/limit/
+install lib/resty/limit/*.lua %{buildroot}/opt/nxguard/lualib/resty/limit/
+
+cd /root/rpmbuild/BUILD/openresty-1.29.2.5/build/lua-resty-shell-*
+install -d %{buildroot}/opt/nxguard/lualib/resty/
+install lib/resty/*.lua %{buildroot}/opt/nxguard/lualib/resty/
+
+cd /root/rpmbuild/BUILD/openresty-1.29.2.5/build/lua-tablepool-*
+install lib/*.lua %{buildroot}/opt/nxguard/lualib/
+
+cd /root/rpmbuild/BUILD/openresty-1.29.2.5/build/opm-*
+install -d %{buildroot}/opt/nxguard/bin
+install bin/* %{buildroot}/opt/nxguard/bin/
+
+cd /root/rpmbuild/BUILD/openresty-1.29.2.5/build/resty-cli-*
+install bin/* %{buildroot}/opt/nxguard/bin/
+
+cp /root/rpmbuild/BUILD/openresty-1.29.2.5/build/resty.index  %{buildroot}/opt/nxguard/
+cp -r /root/rpmbuild/BUILD/openresty-1.29.2.5/build/pod %{buildroot}/opt/nxguard/
+
+#export LUA_INCDIR=/root/rpmbuild/BUILD/openresty-1.29.2.5/LuaJIT-2.1-20260311/src/
+luarocks config lua_dir %{buildroot}/opt/nxguard/luajit
+luarocks install --tree=/root/rpmbuild/BUILD/lualib lualdap --lua-version=5.1
+
+luarocks install --tree=/root/rpmbuild/BUILD/lualib base64 --lua-version=5.1
+install /root/rpmbuild/BUILD/lualib/share/lua/5.1/*.lua %{buildroot}/opt/nxguard/lualib/
+
+luarocks install --tree=/root/rpmbuild/BUILD/lualib lua-resty-http --lua-version=5.1
+luarocks install --tree=/root/rpmbuild/BUILD/lualib lua-resty-redis --lua-version=5.1
+luarocks install --tree=/root/rpmbuild/BUILD/lualib lua-resty-openssl --lua-version=5.1
+luarocks install --tree=/root/rpmbuild/BUILD/lualib lua-resty-jwt --lua-version=5.1
+cp -r /root/rpmbuild/BUILD/lualib/share/lua/5.1/resty/* %{buildroot}/opt/nxguard/lualib/resty/
+
+install /root/rpmbuild/BUILD/lualib/lib64/lua/5.1/* %{buildroot}/opt/nxguard/lualib/
+
+cd /root/rpmbuild/BUILD/openresty-1.29.2.5/build/nginx-1.29.2
+install -c objs/nginx %{buildroot}/opt/nxguard/nginx/sbin/nginx
+install -c objs/*_module.so %{buildroot}/opt/nxguard/nginx/modules/
+
+cd /root/rpmbuild/BUILD/modsecurity-v3.0.14
+install -d %{buildroot}/opt/nxguard/modsec/bin
+install -d %{buildroot}/opt/nxguard/modsec/conf
+install -d %{buildroot}/opt/nxguard/modsec/lib/pkgconfig
+install -d %{buildroot}/opt/nxguard/modsec/include/modsecurity/actions
+install -d %{buildroot}/opt/nxguard/modsec/include/modsecurity/collection
+
+install -c tools/rules-check/modsec-rules-check %{buildroot}/opt/nxguard/modsec/bin/modsec-rules-check
+install -c src/.libs/* %{buildroot}/opt/nxguard/modsec/lib/
+install -c -m 644 headers/modsecurity/actions/*.h %{buildroot}/opt/nxguard/modsec/include/modsecurity/actions/
+install -c -m 644 headers/modsecurity/collection/*.h %{buildroot}/opt/nxguard/modsec/include/modsecurity/collection/
+install -c -m 644 headers/modsecurity/*.h %{buildroot}/opt/nxguard/modsec/include/modsecurity/
+install -c -m 644 examples/reading_logs_via_rule_message/reading_logs_via_rule_message.h %{buildroot}/opt/nxguard/modsec/include/modsecurity/
+install -c -m 644 modsecurity.pc %{buildroot}/opt/nxguard/modsec/lib/pkgconfig/
+
+%files
+%attr(0744, nxguard, nxguard) /opt/nxguard/modsec
+%attr(0744, nxguard, nxguard) /opt/nxguard/bin
+%attr(0744, nxguard, nxguard) /opt/nxguard/luajit
+%attr(0744, nxguard, nxguard) /opt/nxguard/lualib
+%attr(0744, nxguard, nxguard) /opt/nxguard/nginx
+%attr(0744, nxguard, nxguard) /opt/nxguard/pod
+%attr(0744, nxguard, nxguard) /opt/nxguard/resty.index
+%attr(0744, nxguard, nxguard) /opt/nxguard/COPYRIGHT
+%attr(0744, nxguard, nxguard) /opt/nxguard/html
+%attr(0744, nxguard, nxguard) /opt/nxguard/logs
+%attr(0744, nxguard, nxguard) /opt/nxguard/run
+%attr(0744, nxguard, nxguard) /opt/nxguard/cache
+
+%post
+PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/sbin"
+
+rm -f /opt/nxguard/modsec/lib/libmodsecurity.so.3 /opt/nxguard/modsec/lib/libmodsecurity.so
+ln -s /opt/nxguard/modsec/lib/libmodsecurity.so.3.0.14 /opt/nxguard/modsec/lib/libmodsecurity.so.3
+ln -s /opt/nxguard/modsec/lib/libmodsecurity.so.3.0.14 /opt/nxguard/modsec/lib/libmodsecurity.so
+ln -s /opt/nxguard/logs /opt/nxguard/nginx/logs
+ldconfig -n /opt/nxguard/modsec/lib
+
+cd /opt/nxguard/luajit/lib
+ln -sf libluajit-5.1.so.2.1.ROLLING /opt/nxguard/luajit/lib/libluajit-5.1.so && \
+ln -sf libluajit-5.1.so.2.1.ROLLING /opt/nxguard/luajit/lib/libluajit-5.1.so.2 || :
+ln -sf luajit-2.1.ROLLING /opt/nxguard/luajit/bin/luajit
+ldconfig -n 2>/dev/null /opt/nxguard/luajit/lib
+
+if [ `grep -c nxguard /etc/passwd` = "0" ]; then
+	useradd -r -d /opt/nxguard -s /bin/false nxguard
+	echo 'nxguard ALL=(ALL:ALL) NOPASSWD: ALL' > /etc/sudoers.d/nxguard
+fi
+chown -R nxguard:nxguard /opt/nxguard
+
+%changelog
+* Thu Aug 06 2026 Gustavo Liberatti <gustavo@liberatti.com.br> - 1.29.2-4
+- Fix ModSecurity-nginx module path and LuaJIT build paths in %%prep and %%install
+
+* Fri Apr 24 2026 Gustavo Liberatti <gustavo@liberatti.com.br> - 1.29.2-4
+- Update project license to Apache 2.0 and improve documentation
+
+* Tue Feb 04 2025 Gustavo Liberatti <gustavo@liberatti.com.br> - 1.29.2-3
+- Create nxguard openresty with modsecurity 3x

@@ -1,0 +1,126 @@
+{
+    "config": {
+        "dns_resolver": "127.0.0.11 8.8.8.8 1.1.1.1",
+        "ipxa": {
+            "url": "http://ipxa:5000",
+            "key": "tZzDBUSnoy76LLSvu1Vg3e9vdFJINMT2"
+        }
+    },
+    "user": {
+        "name": "Default admin user",
+        "unencrypted_password": "admin",
+        "email": "admin@nxguard.local",
+        "role": "superuser"
+    },
+    "sensors": [
+        {
+            "name": "Default",
+            "description": "Default sensor for web application",
+            "categories": [
+                "905-COMMON-EXCEPTIONS",
+                "911-METHOD-ENFORCEMENT",
+                "913-SCANNER-DETECTION",
+                "920-PROTOCOL-ENFORCEMENT",
+                "921-PROTOCOL-ATTACK",
+                "922-MULTIPART-ATTACK",
+                "930-APPLICATION-ATTACK-LFI",
+                "931-APPLICATION-ATTACK-RFI",
+                "932-APPLICATION-ATTACK-RCE",
+                "933-APPLICATION-ATTACK-PHP",
+                "934-APPLICATION-ATTACK-GENERIC",
+                "941-APPLICATION-ATTACK-XSS",
+                "942-APPLICATION-ATTACK-SQLI",
+                "943-APPLICATION-ATTACK-SESSION-FIXATION",
+                "944-APPLICATION-ATTACK-JAVA",
+                "999-COMMON-EXCEPTIONS-AFTER",
+                "950-DATA-LEAKAGES",
+                "951-DATA-LEAKAGES-SQL",
+                "952-DATA-LEAKAGES-JAVA",
+                "953-DATA-LEAKAGES-PHP",
+                "954-DATA-LEAKAGES-IIS",
+                "955-WEB-SHELLS",
+                "956-DATA-LEAKAGES-RUBY"
+            ],
+            "exclusions": [],
+            "security": {
+                "geo_codes": [],
+                "reputation": [],
+                "trusted": []
+            },
+            "inspection": {
+                "score": {
+                    "inbound": 5,
+                    "outbound": 10
+                },
+                "variables": {
+                    "allowed_http_versions": [
+                        "HTTP/1.0",
+                        "HTTP/1.1",
+                        "HTTP/2",
+                        "HTTP/2.0"
+                    ],
+                    "max_file_size": 26214400,
+                    "restricted_extensions": [
+                        ".asa/",
+                        ".asax/",
+                        ".ascx/",
+                        ".axd/",
+                        ".backup/",
+                        ".bak/",
+                        ".bat/",
+                        ".cdx/",
+                        ".cer/",
+                        ".cfg/",
+                        ".cmd/",
+                        ".com/",
+                        ".config/",
+                        ".conf/",
+                        ".cs/",
+                        ".csproj/",
+                        ".csr/",
+                        ".dat/",
+                        ".db/",
+                        ".dbf/",
+                        ".dll/",
+                        ".dos/",
+                        ".htr/",
+                        ".htw/",
+                        ".ida/",
+                        ".idc/",
+                        ".idq/",
+                        ".inc/",
+                        ".ini/",
+                        ".key/",
+                        ".licx/",
+                        ".lnk/",
+                        ".log/",
+                        ".mdb/",
+                        ".old/",
+                        ".pass/",
+                        ".pdb/",
+                        ".pol/",
+                        ".printer/",
+                        ".pwd/",
+                        ".rdb/",
+                        ".resources/",
+                        ".resx/",
+                        ".sql/",
+                        ".swp/",
+                        ".sys/",
+                        ".vb/",
+                        ".vbs/",
+                        ".vbproj/",
+                        ".vsdisco/",
+                        ".webinfo/",
+                        ".xsd/",
+                        ".xsx/"
+                    ],
+                    "max_num_args": 500,
+                    "arg_name_length": 100,
+                    "arg_length": 2000
+                },
+                "level": 3
+            }
+        }
+    ]
+}

@@ -1,0 +1,21 @@
+Flask-CORS~=5.0.1
+Flask-Marshmallow~=1.4.0
+Flask-RESTful~=0.3.10
+psutil~=7.0.0
+gunicorn[gevent]~=25.0.1
+bcrypt~=4.3.0
+cryptography~=46.0.4
+multidict
+schedule~=1.2.2
+acme~=3.2.0
+pyOpenSSL<26.2.0
+ua-parser~=0.18.0
+elasticsearch~=9.3.0
+cuttlepool
+setuptools_rust
+setuptools~=75.8.2
+josepy~=1.15.0
+Jinja2~=3.1.4
+nxcore[web] @ git+https://github.com/liberatti/nxcore@v1.0.6-rc
+duckdb
+bson

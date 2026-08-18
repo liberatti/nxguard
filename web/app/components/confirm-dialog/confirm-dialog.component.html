@@ -1,0 +1,23 @@
+<div class="confirm-dialog-container">
+    <div class="confirm-dialog-header">
+        <div class="header-icon-badge">
+            <mat-icon class="dialog-icon">help_outline</mat-icon>
+        </div>
+        <h2 mat-dialog-title class="dialog-title">{{ title }}</h2>
+    </div>
+
+    <mat-dialog-content class="dialog-content">
+        <p class="dialog-message">{{ message }}</p>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end" class="dialog-actions">
+        <button mat-stroked-button (click)="onDismiss()" class="action-btn" id="confirm-dialog-cancel-btn">
+            <mat-icon>close</mat-icon>
+            <span>{{ 'actions.cancel' | translate }}</span>
+        </button>
+        <button mat-flat-button color="warn" (click)="onConfirm()" cdkFocusInitial class="action-btn" id="confirm-dialog-confirm-btn">
+            <mat-icon>check</mat-icon>
+            <span>{{ 'actions.confirm' | translate }}</span>
+        </button>
+    </mat-dialog-actions>
+</div>

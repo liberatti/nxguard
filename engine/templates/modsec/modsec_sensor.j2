@@ -1,0 +1,61 @@
+##################################################
+# SENSOR {{ name }}
+##################################################
+SecRuleEngine On
+SecRule &TX:inbound_anomaly_score_threshold "@eq 0" "id:901100,phase:1,pass,nolog,ver:'OWASP_CRS/4.25.1',setvar:'tx.inbound_anomaly_score_threshold={{ inbound_anomaly_score_threshold }}'"
+SecRule &TX:outbound_anomaly_score_threshold "@eq 0" "id:901110,phase:1,pass,nolog,ver:'OWASP_CRS/4.25.1',setvar:'tx.outbound_anomaly_score_threshold={{ outbound_anomaly_score_threshold }}'"
+SecRule &TX:blocking_paranoia_level "@eq 0" "id:901120,phase:1,pass,nolog,ver:'OWASP_CRS/4.25.1',setvar:'tx.blocking_paranoia_level={{ paranoia_level }}'"
+SecRule &TX:detection_paranoia_level "@eq 0" "id:901125,phase:1,pass,nolog,ver:'OWASP_CRS/4.25.1',setvar:'tx.detection_paranoia_level={{ paranoia_level }}'"
+SecRule &TX:executing_paranoia_level "@eq 0" "id:901126,phase:1,pass,nolog,ver:'OWASP_CRS/4.25.1',setvar:'tx.executing_paranoia_level={{ paranoia_level }}'"
+SecRule &TX:allowed_http_versions "@eq 0" "id:901163,phase:1,pass,nolog,ver:'OWASP_CRS/4.25.1',setvar:'tx.allowed_http_versions={{ inspection.variables.allowed_http_versions if inspection.variables.allowed_http_versions is string else inspection.variables.allowed_http_versions|join(' ') }}'"
+SecAction "id:900340,phase:1,pass,nolog,noauditlog,t:none,setvar:tx.max_file_size={{ inspection.variables.max_file_size }}"
+
+# REQUEST-901-INITIALIZATION    
+SecRule &TX:sampling_percentage "@eq 0" "id:901130,phase:1,pass,nolog,ver:'OWASP_CRS/4.25.1',setvar:'tx.sampling_percentage=100'"
+SecRule &TX:critical_anomaly_score "@eq 0" "id:901140,phase:1,pass,nolog,ver:'OWASP_CRS/4.25.1',setvar:'tx.critical_anomaly_score=5'"
+SecRule &TX:error_anomaly_score "@eq 0" "id:901141,phase:1,pass,nolog,ver:'OWASP_CRS/4.25.1',setvar:'tx.error_anomaly_score=4'"
+SecRule &TX:warning_anomaly_score "@eq 0" "id:901142,phase:1,pass,nolog,ver:'OWASP_CRS/4.25.1',setvar:'tx.warning_anomaly_score=3'"
+SecRule &TX:notice_anomaly_score "@eq 0" "id:901143,phase:1,pass,nolog,ver:'OWASP_CRS/4.25.1',setvar:'tx.notice_anomaly_score=2'"
+SecRule &TX:do_reput_block "@eq 0" "id:901150,phase:1,pass,nolog,ver:'OWASP_CRS/4.25.1',setvar:'tx.do_reput_block=0'"
+SecRule &TX:reput_block_duration "@eq 0" "id:901152,phase:1,pass,nolog,ver:'OWASP_CRS/4.25.1',setvar:'tx.reput_block_duration=300'"
+SecRule &TX:allowed_request_content_type_charset "@eq 0" "id:901168,phase:1,pass,nolog,ver:'OWASP_CRS/4.25.1',setvar:'tx.allowed_request_content_type_charset=utf-8|iso-8859-1|iso-8859-15|windows-1252'"
+SecRule &TX:restricted_headers "@eq 0" "id:901165,phase:1,pass,nolog,ver:'OWASP_CRS/4.25.1',setvar:'tx.restricted_headers=/accept-charset/ /content-encoding/ /proxy/ /lock-token/ /content-range/ /if/'"
+SecRule &TX:static_extensions "@eq 0" "id:901166,phase:1,pass,nolog,ver:'OWASP_CRS/4.25.1',setvar:'tx.static_extensions=/.jpg/ /.jpeg/ /.png/ /.gif/ /.js/ /.css/ /.ico/ /.svg/ /.webp/'"
+SecRule &TX:enforce_bodyproc_urlencoded "@eq 0" "id:901167,phase:1,pass,nolog,ver:'OWASP_CRS/4.25.1',setvar:'tx.enforce_bodyproc_urlencoded=0'"
+SecRule &TX:crs_validate_utf8_encoding "@eq 0" "id:901169,phase:1,pass,nolog,ver:'OWASP_CRS/4.25.1',setvar:'tx.crs_validate_utf8_encoding=1'"
+SecRule &TX:monitor_anomaly_score "@eq 0" "id:901170,phase:1,pass,nolog,ver:'OWASP_CRS/4.25.1',setvar:'tx.monitor_anomaly_score=0'"
+SecAction "id:901200,phase:1,pass,t:none,nolog,ver:'OWASP_CRS/4.25.1',setvar:'tx.blocking_inbound_anomaly_score=0',setvar:'tx.detection_inbound_anomaly_score=0',setvar:'tx.inbound_anomaly_score_pl1=0',setvar:'tx.inbound_anomaly_score_pl2=0',setvar:'tx.inbound_anomaly_score_pl3=0',setvar:'tx.inbound_anomaly_score_pl4=0',setvar:'tx.sql_injection_score=0',setvar:'tx.xss_score=0',setvar:'tx.rfi_score=0',setvar:'tx.lfi_score=0',setvar:'tx.rce_score=0',setvar:'tx.php_injection_score=0',setvar:'tx.http_violation_score=0',setvar:'tx.session_fixation_score=0',setvar:'tx.blocking_outbound_anomaly_score=0',setvar:'tx.detection_outbound_anomaly_score=0',setvar:'tx.outbound_anomaly_score_pl1=0',setvar:'tx.outbound_anomaly_score_pl2=0',setvar:'tx.outbound_anomaly_score_pl3=0',setvar:'tx.outbound_anomaly_score_pl4=0',setvar:'tx.sql_error_match=0',setvar:'tx.anomaly_score=0'"
+SecRule REQUEST_HEADERS:User-Agent "@rx ^.*$" "id:901318,phase:1,pass,t:none,t:sha1,t:hexEncode,nolog,ver:'OWASP_CRS/4.25.1',setvar:'tx.ua_hash=%{MATCHED_VAR}'"
+SecAction "id:901321,phase:1,pass,t:none,nolog,ver:'OWASP_CRS/4.25.1',initcol:global=global,initcol:ip=%{remote_addr}_%{tx.ua_hash},setvar:'tx.real_ip=%{remote_addr}'"
+SecRule REQBODY_PROCESSOR "!@rx (?:URLENCODED|MULTIPART|XML|JSON)" "id:901340,phase:1,pass,nolog,noauditlog,msg:'Enabling body inspection',ctl:forceRequestBodyVariable=On,ver:'OWASP_CRS/4.25.1'"
+SecRule TX:enforce_bodyproc_urlencoded "@eq 1" "id:901350,phase:1,pass,t:none,t:urlDecodeUni,nolog,noauditlog,msg:'Enabling forced body inspection for ASCII content',ver:'OWASP_CRS/4.25.1',chain"
+SecRule REQBODY_PROCESSOR "!@rx (?:URLENCODED|MULTIPART|XML|JSON)" "ctl:requestBodyProcessor=URLENCODED"
+SecRule TX:executing_paranoia_level "@lt %{tx.blocking_paranoia_level}" "id:901500,phase:1,deny,status:500,t:none,log,msg:'Executing paranoia level configured is lower than the paranoia level itself. This is illegal. Blocking request. Aborting',ver:'OWASP_CRS/4.25.1'"
+
+#### TRUSTED IPS
+{% for ipset in trusted_ipsets %}
+SecRule REMOTE_ADDR "@ipMatchFromFile IPSET-{{ ipset }}.data" \
+    "id:91{{"%02d"|format(loop.index)}}, \
+    phase:1,\
+    pass,\
+    nolog,\
+    ctl:ruleEngine=Off"
+{% endfor %}
+
+#### RULE EXCLUSION
+{%for el in exclusion_lists %}
+SecRule REQUEST_URI "@unconditionalMatch" \
+            "id:90{{"%02d"|format(loop.index)}}, \
+            phase:1, \
+            nolog, \
+            pass, \
+            {{ el }}"
+{% endfor %}
+
+####################################################################################
+# Categories
+####################################################################################
+{%- for c in categories %}
+#### {{ c.name }} ##################################################################
+{{ c.rules }}
+{%- endfor %}

@@ -1,0 +1,499 @@
+{
+  "ACTIONS": {
+    "CREATE": "Adicionar",
+    "EDIT": "Editar",
+    "REMOVE": "Remover",
+    "DELETE": "Excluir",
+    "SEARCH": "Buscar",
+    "FILTER": "Filtrar",
+    "EXPORT": "Exportar",
+    "SAVE": "Salvar",
+    "IMPORT": "Importar",
+    "REFRESH": "Atualizar",
+    "CLOSE": "Fechar",
+    "CANCEL": "Cancelar",
+    "CONFIRM": "Confirmar",
+    "NEXT": "Próximo",
+    "BACK": "Voltar",
+    "ADD": "Adicionar",
+    "APPLY": "Aplicar",
+    "BACKUP": "Backup",
+    "RESTORE": "Restaurar"
+  },
+  "AUTH": {
+    "TITLE": "NXGUARD",
+    "SUBTITLE": "Gateway Corporativo de Proxy e Segurança",
+    "HOST_CLIENT": "Cliente de Gerenciamento de Host",
+    "SIGN_IN": "Entrar",
+    "SIGN_IN_BTN": "Fazer Login",
+    "EMAIL": "Nome de usuário / E-mail",
+    "PASSWORD": "Senha",
+    "FOOTER_NOTICE": "Acesso autorizado apenas. Todas as atividades são monitoradas.",
+    "VERSION": "Versão",
+    "LICENSE_NOTICE": "Licenciado sob a",
+    "LICENSE_NAME": "Apache License 2.0"
+  },
+  "ABOUT": {
+    "TITLE": "Sobre o NXGuard",
+    "SUBTITLE": "API Gateway de Alta Performance & Motor de Segurança",
+    "TAB_ABOUT": "Sobre",
+    "TAB_RESTORE": "Restaurar Config",
+    "CHOOSE_FILE": "Escolher arquivo ZIP para restauração",
+    "SELECTED_FILE": "Arquivo Selecionado",
+    "POWERED_BY": "Desenvolvido com OpenResty & ModSecurity"
+  },
+  "ATTR": {
+    "ACTIVE": "Ativo",
+    "NAME": "Nome",
+    "DOMAINS": "Domínios",
+    "ROUTES": "Rotas",
+    "LOGIN": {
+      "USERNAME": "Informe seu usuário",
+      "PASSWORD": "Sua senha aqui"
+    }
+  },
+  "CONTENT": {
+    "COPY": "&copy; 2025 nxguard. Todos os direitos reservados. Esta solução é desenvolvida sobre o OpenResty.",
+    "ABOUT": "Este é um servidor proxy construído sobre o OpenResty com ModSecurity para proteção avançada.",
+    "RESTORE_NOTICE": "Aviso de Restauração de Configuração: Todos os dados existentes serão sobrescritos pela configuração restaurada."
+  },
+  "NAV": {
+    "SERVICES": "Serviços",
+    "UPSTREAMS": "Upstreams",
+    "SENSORS": "Sensores",
+    "ABOUT": "Sobre",
+    "DASHBOARD": "Painéis",
+    "SYSTEM": "Sistema",
+    "HOSTNAMES": "Hostnames",
+    "CERTIFICATES": "Certificados",
+    "DICTIONARIES": "Dicionários",
+    "GATEWAY": "Gateway",
+    "TRANSACTIONS": "Transações",
+    "ACCOUNT": "Conta",
+    "LOGOUT": "Sair"
+  },
+  "VIEW": {
+    "BACKUP": {
+      "LINK": "Backup",
+      "TITLE": "Backup"
+    },
+    "DASHBOARD": {
+      "LINK": "Painel",
+      "TITLE": "Painel de Controle"
+    },
+    "TRANSACTION": {
+      "LINK": "Atividade de Rede",
+      "TITLE": "Transações",
+      "SUBTITLE": "Listar todas as transações"
+    },
+    "SERVICE": {
+      "LINK": "Serviço",
+      "TITLE": "Serviços",
+      "SUBTITLE": "Descrever todos os serviços"
+    },
+    "UPSTREAM": {
+      "LINK": "Upstream",
+      "TITLE": "Upstream",
+      "SUBTITLE": "Lista de todos os upstreams"
+    },
+    "HOSTNAME": {
+      "LINK": "Hostname",
+      "TITLE": "Hostname",
+      "SUBTITLE": "Lista de todos os Hostnames"
+    },
+    "CERTIFICATE": {
+      "LINK": "Certificado",
+      "TITLE": "Certificado",
+      "SUBTITLE": "Lista de todos os certificados"
+    },
+    "SENSOR": {
+      "LINK": "Sensor",
+      "TITLE": "Sensor",
+      "SUBTITLE": "Lista de todos os sensores"
+    },
+    "USER": {
+      "LINK": "Usuários",
+      "TITLE": "Usuários",
+      "SUBTITLE": "Lista de todos os usuários"
+    },
+    "CONFIG": {
+      "LINK": "Configuração",
+      "TITLE": "Configuração",
+      "SUBTITLE": "Lista de todas as configurações"
+    },
+    "SYSTEM": {
+      "LINK": "Sistema"
+    }
+  },
+  "ROUTE": {
+    "ALLOWED_METHODS": "Métodos HTTP Permitidos",
+    "ALLOWED_CONTENT_TYPE": "Content Types Permitidos",
+    "NAME": "Nome",
+    "TYPE": "Tipo",
+    "REQUEST_PATH": "Caminho da Requisição",
+    "UPSTREAM": "Upstream",
+    "SECURITY_SENSOR": "Sensor de Segurança",
+    "MONITOR_ONLY": "Apenas Monitorar",
+    "REQUEST_METHODS": "Métodos de Requisição",
+    "CACHE_METHODS": "Métodos de Cache"
+  },
+  "SENSOR": {
+    "CONFIG": "Configuração",
+    "IP_REPUTATION": "Reputação de IP",
+    "SECURITY_INSPECTION": "Inspeção de Segurança",
+    "INSPECT_LEVEL": "Nível de Inspeção",
+    "INBOUND_SCORE": "Score Entrante",
+    "OUTBOUND_SCORE": "Score Saindo",
+    "VARIABLES_TITLE": "Variáveis de Inspeção",
+    "ALLOWED_HTTP_VERSIONS": "Versões HTTP Permitidas",
+    "MAX_FILE_SIZE": "Tamanho Máx. de Arquivo (bytes)",
+    "ALLOWED_METHODS": "Métodos HTTP Permitidos",
+    "ALLOWED_CONTENT_TYPE": "Content Types Permitidos",
+    "RESTRICTED_EXTENSIONS": "Extensões Restritas",
+    "MAX_NUM_ARGS": "Qtd. Máxima de Argumentos",
+    "ARG_NAME_LENGTH": "Tamanho do Nome do Argumento",
+    "ARG_LENGTH": "Tamanho do Argumento",
+    "NAME": "Nome",
+    "DESCRIPTION": "Descrição",
+    "GEO_BLOCKED": "Países Bloqueados por GeoIP",
+    "RBL_BLOCK": "Feed de Bloqueio RBL",
+    "RBL_BYPASS": "Lista de Liberação RBL (ByPass)",
+    "CATEGORY": "Categoria",
+    "CATEGORIES": "Categorias de Regras",
+    "CATEGORY_SELECT_PLACEHOLDER": "Selecione uma categoria para adicionar",
+    "SELECT_CATEGORY_HINT": "Selecione uma categoria acima para visualizar e configurar suas regras de segurança",
+    "FILTER_RULES_PLACEHOLDER": "Filtrar regras por código, descrição, tag ou severidade...",
+    "RULE_CODE": "Código",
+    "SEVERITY": "Severidade",
+    "RULE_DESCRIPTION": "Descrição",
+    "ACTION": "Ação",
+    "ACTIVE": "Ativo",
+    "ALL_RULES": "Todas as Regras",
+    "NO_RULES_FOUND": "Nenhuma regra encontrada para o filtro",
+    "TOTAL_RULES": "Regras",
+    "CONTROL_RULE": "Controle do Motor / Gate de Paranoia",
+    "VIEW_DETAILS": "Ver detalhes da regra",
+    "NO_CATEGORIES_SELECTED": "Nenhuma categoria adicionada a este sensor ainda",
+    "SAVED_SUCCESS": "Sensor salvo com sucesso",
+    "UPDATED_SUCCESS": "Sensor atualizado com sucesso"
+  },
+  "SERVICE": {
+    "DETAILS": "Detalhes",
+    "OVERRIDES": "Sobrescritas",
+    "ROUTES": "Rotas",
+    "GENERAL_INFO": "Informações Gerais",
+    "NAME": "Nome",
+    "NAME_HINT": "Identificador único para este serviço",
+    "BUFFER": "Buffer (KB)",
+    "BODY_LIMIT": "Limite do Corpo da Requisição (MB)",
+    "TIMEOUT": "Timeout da Requisição (segundos)",
+    "DOMAINS": "Domínios (SANs)",
+    "DOMAIN_INPUT": "Nome do domínio",
+    "DOMAIN_HINT": "Adicione nomes de domínio (ex: exemplo.com, *.exemplo.com)",
+    "RATE_LIMIT_TITLE": "Limite de Requisições",
+    "RATE_LIMIT": "Requisições por segundo (0 para desativar)",
+    "COMPRESSION_TITLE": "Compressão",
+    "COMPRESSION_ADD": "Adicionar Tipo MIME",
+    "PORT_BINDINGS": "Portas de Serviço",
+    "PORT": "Porta",
+    "PROTOCOL": "Protocolo",
+    "FORCE_SSL": "Forçar SSL",
+    "SSL_CONFIG": "Configuração SSL / TLS",
+    "CERTIFICATE": "Certificado",
+    "SSL_CLIENT_AUTH": "Exigir Certificado do Cliente (mTLS)",
+    "SSL_CA": "Autoridade Certificadora (CA)",
+    "SSL_PROTOCOLS": "Protocolos SSL / TLS",
+    "PROTOCOL_INPUT": "Versão do protocolo",
+    "HEADERS_TITLE": "Cabeçalhos HTTP Personalizados",
+    "HEADER_NAME": "Nome do Cabeçalho",
+    "HEADER_VALUE": "Valor do Cabeçalho",
+    "ROUTES_TITLE": "Configuração de Rotas",
+    "ROUTES_SUBTITLE": "Arraste e solte para reordenar rotas. A prioridade é avaliada de cima para baixo.",
+    "NO_BINDINGS": "Nenhuma porta configurada ainda.",
+    "NO_DOMAINS": "Nenhum domínio adicionado ainda.",
+    "NO_HEADERS": "Nenhum cabeçalho personalizado configurado.",
+    "NO_ROUTES": "Nenhuma rota configurada ainda."
+  },
+  "APPLY_DIALOG": {
+    "TITLE": "Aplicar Configurações",
+    "DESCRIPTION": "Os seguintes itens possuem alterações pendentes para serem aplicadas no proxy:",
+    "LOADING": "Carregando alterações pendentes...",
+    "APPLYING": "Aplicando configurações e recarregando o motor...",
+    "SUCCESS_TITLE": "Configuração Aplicada",
+    "SUCCESS_MSG": "Todas as alterações foram compiladas e aplicadas com sucesso no Nginx.",
+    "ERROR_TITLE": "Falha ao Aplicar Configurações",
+    "NO_CHANGES": "Nenhuma alteração pendente detectada. A configuração está atualizada.",
+    "PENDING_CHANGE": "Modificado — recarga pendente"
+  },
+  "CERT_FORM": {
+    "NAME": "Nome do Certificado",
+    "NAME_HINT": "Identificador alfanumérico exclusivo para este certificado",
+    "PROVIDER": "Provedor do Certificado",
+    "GENERAL_INFO": "Configurações Gerais",
+    "CREDENTIALS_TITLE": "Dados do Certificado e Chave",
+    "MANAGED_TITLE": "Certificado ACME Automatizado",
+    "MANAGED_NOTICE": "Certificados gerenciados são automaticamente requisitados, provisionados e renovados via Let's Encrypt / ACME.",
+    "EXTERNAL_NOTICE": "Cole seu certificado X.509 codificado em PEM, chave privada e cadeia intermediária de AC abaixo.",
+    "CERTIFICATE_LABEL": "Certificado (PEM / CRT)",
+    "KEY_LABEL": "Chave Privada (PEM / KEY)",
+    "CHAIN_LABEL": "Cadeia da Autoridade Certificadora (PEM / Opcional)"
+  },
+  "CONFIG_PAGE": {
+    "TITLE": "Configuração Global",
+    "SUBTITLE": "Gerencie configurações globais do motor, certificados PKI e políticas de transações",
+    "PANEL_GENERAL": "Geral & Integrações",
+    "PANEL_GENERAL_DESC": "Chaves de API de terceiros e endpoints de diretório externo",
+    "MAXMIND_KEY": "Chave de Licença MaxMind Geolocation",
+    "MAXMIND_HINT": "Utilizada para geolocalização de IP e bloqueio por país",
+    "ACME_URL": "URL do Diretório ACME",
+    "ACME_HINT": "Endpoint do diretório Let's Encrypt / ACME (ex.: https://acme-v02.api.letsencrypt.org/directory)",
+    "PANEL_CA": "Autoridade Certificadora (CA Interna)",
+    "PANEL_CA_DESC": "Gerencie o certificado CA raiz e chave privada para certificados de cliente e inspeção TLS",
+    "CA_CERT": "Certificado CA Raiz (PEM)",
+    "CA_KEY": "Chave Privada CA Raiz (PEM)",
+    "PANEL_POLICY": "Políticas de Transações",
+    "PANEL_POLICY_DESC": "Configure arquivamento automatizado e expurgo de retenção de banco de dados",
+    "ARCHIVE_TITLE": "Arquivamento de Transações",
+    "ARCHIVE_TOGGLE": "Ativar Arquivamento",
+    "ARCHIVE_DESC": "Transfira e arquive automaticamente a telemetria de transações para um cluster Elasticsearch / OpenSearch externo.",
+    "ARCHIVE_AFTER": "Arquivar após (minutos)",
+    "CLUSTER_URL": "URL do Cluster",
+    "CLUSTER_USER": "Usuário",
+    "CLUSTER_PASS": "Senha",
+    "PURGE_TITLE": "Expurgo de Transações",
+    "PURGE_TOGGLE": "Ativar Expurgo do Banco de Dados",
+    "PURGE_DESC": "Remova automaticamente registros antigos do banco local DuckDB para manter alta performance e economizar armazenamento.",
+    "PURGE_AFTER": "Idade Máxima dos Dados (dias)"
+  },
+  "TRANSACTION": {
+    "FILTER": {
+      "ADD_FILTER": "Adicionar Filtro",
+      "CLEAR_ALL": "Limpar Filtros",
+      "ACTIVE_FILTERS": "Filtros Ativos",
+      "DIALOG_TITLE": "Adicionar Filtro de Transação",
+      "DIALOG_SUBTITLE": "Selecione um atributo e valor para filtrar o tráfego de rede",
+      "CATEGORY_LABEL": "Categoria",
+      "FIELD_LABEL": "Campo",
+      "OPERATOR_LABEL": "Operador",
+      "VALUE_LABEL": "Valor",
+      "VALUE_PLACEHOLDER": "Informe o valor do filtro...",
+      "PREVIEW_LABEL": "Pré-visualização do Filtro JSON",
+      "PRESETS": "Valores Rápidos / Predefinições",
+      "CANCEL": "Cancelar",
+      "APPLY": "Aplicar Filtro",
+      "CATEGORIES": {
+        "GENERAL": "Geral e Status",
+        "ROUTING": "Serviços e Rotas",
+        "NETWORK": "Rede e Geolocalização",
+        "HTTP": "Requisição e Resposta HTTP",
+        "SECURITY": "Segurança e WAF",
+        "SYSTEM": "Sistema e Nós"
+      },
+      "FIELDS": {
+        "ACTION": "Ação de Segurança (action)",
+        "SERVICE_ID": "Serviço (service._id)",
+        "ROUTE_NAME": "Nome da Rota (route_name)",
+        "UPSTREAM_ID": "Upstream (upstream._id)",
+        "SOURCE_IP": "IP de Origem (source.ip)",
+        "SOURCE_PORT": "Porta de Origem (source.port)",
+        "GEOIP_COUNTRY": "País de Origem (geoip.country_code)",
+        "DESTINATION_HOST": "Host de Destino (destination.host)",
+        "DESTINATION_IP": "IP de Destino (destination.ip)",
+        "DESTINATION_PORT": "Porta de Destino (destination.port)",
+        "HTTP_METHOD": "Método HTTP (http.request.method)",
+        "HTTP_URI": "URI da Requisição (http.request.uri)",
+        "STATUS_CODE": "Código de Status HTTP (http.response.status_code)",
+        "DURATION": "Duração em segundos (http.duration)",
+        "SCORE": "Score de Anomalia (score)",
+        "RATE_LIMIT_ACTION": "Ação de Limite de Taxa (rate_limit.action)",
+        "LIMIT_REQ_STATUS": "Status de Limite de Requisições (limit_req_status)",
+        "GEOIP_STATUS": "Status GeoIP (geoip_status)",
+        "RBL_STATUS": "Status RBL (rbl_status)",
+        "IPXA": "Status IPXA (ipxa)",
+        "MTLS_ENABLED": "mTLS Ativo (mtls.enabled)",
+        "MTLS_VERIFIED": "mTLS Verificado (mtls.verified)",
+        "AUDIT_RULE_CODE": "Código / ID da Regra WAF (rule_code)",
+        "USER_AGENT": "Família User Agent (user_agent.family)",
+        "SERVER_ID": "ID do Nó / Servidor (server_id)",
+        "UNIQUE_ID": "ID Único da Transação (unique_id)",
+        "ARCHIVED": "Status de Arquivamento (archived)"
+      }
+    },
+    "DATE_RANGE": {
+      "TITLE": "Selecionar Intervalo de Tempo",
+      "SUBTITLE": "Filtrar telemetria e métricas por janela de tempo específica",
+      "TOOLTIP": "Selecionar intervalo de data e hora",
+      "PRESETS": "Predefinições Rápidas",
+      "PRESET_15M": "Últimos 15m",
+      "PRESET_1H": "Última 1h",
+      "PRESET_6H": "Últimas 6h",
+      "PRESET_24H": "Últimas 24h",
+      "PRESET_7D": "Últimos 7d",
+      "PRESET_TODAY": "Hoje",
+      "PRESET_YESTERDAY": "Ontem",
+      "CUSTOM_RANGE": "Data e Hora Personalizadas",
+      "START_DATE": "Data e Hora Inicial",
+      "END_DATE": "Data e Hora Final",
+      "APPLY": "Aplicar Intervalo",
+      "CANCEL": "Cancelar"
+    }
+  },
+  "ACCOUNT": {
+    "TITLE": "Configurações da Conta",
+    "SUBTITLE": "Gerencie suas informações de perfil e credenciais de segurança",
+    "TAB_PROFILE": "Informações do Perfil",
+    "TAB_SECURITY": "Segurança e Senha",
+    "NAME": "Nome de Exibição",
+    "EMAIL": "Endereço de E-mail",
+    "PASSWORD": "Nova Senha",
+    "PASSWORD_HINT": "Deixe em branco para manter a senha atual",
+    "ROLE": "Função",
+    "SUCCESS": "Perfil atualizado com sucesso",
+    "SAVE": "Salvar Alterações"
+  },
+  "USER_MGMT": {
+    "NAME": "Nome Completo",
+    "EMAIL": "Endereço de E-mail",
+    "ROLE": "Perfil de Acesso",
+    "PASSWORD": "Senha",
+    "CONFIRM_PASSWORD": "Confirmar Senha",
+    "ROLES": {
+      "SUPERUSER": "Superusuário",
+      "VIEWER": "Visualizador"
+    },
+    "ACTIONS": "Ações",
+    "NO_USERS": "Nenhum usuário encontrado"
+  },
+  "FORMAT": {
+    "PARSE": {
+      "DATE_INPUT": "YYYY-MM-DDTHH:mm:ss.SSSZ"
+    },
+    "DISPLAY": {
+      "TIME": "HH:mm:ss",
+      "DATETIME": "DD/MM/YYYY HH:mm:ss",
+      "MONTH_YEAR_LABEL": "MMM YYYY",
+      "DATE_A11Y_LABEL": "LL",
+      "MONTH_YEAR_A11Y_LABEL": "MMMM YYYY"
+    }
+  },
+  "aboutMessage": "Obrigado",
+  "actions": {
+    "create": "Adicionar",
+    "edit": "Editar",
+    "remove": "Remover",
+    "delete": "Excluir",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "export": "Exportar",
+    "save": "Salvar",
+    "import": "Importar",
+    "refresh": "Atualizar",
+    "close": "Fechar",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "next": "Próximo",
+    "back": "Voltar",
+    "add": "Adicionar",
+    "apply": "Aplicar",
+    "backup": "Backup",
+    "restore": "Restaurar"
+  },
+  "about": {
+    "title": "Sobre o NXGuard",
+    "subtitle": "API Gateway de Alta Performance & Motor de Segurança",
+    "tab_about": "Sobre",
+    "tab_restore": "Restaurar Config",
+    "choose_file": "Escolher arquivo ZIP para restauração",
+    "selected_file": "Arquivo Selecionado",
+    "powered_by": "Desenvolvido com OpenResty & ModSecurity"
+  },
+  "attr": {
+    "name": "Nome",
+    "domains": "Dominios",
+    "routes": "Rotas",
+    "active": "Ativo",
+    "login": {
+      "username": "Enter your user name",
+      "password": "Password here"
+    },
+    "service": {},
+    "upstream": {}
+  },
+  "nav": {
+    "services": "Serviços",
+    "upstreams": "Upstreams",
+    "sensors": "Sensors",
+    "about": "Sobre",
+    "dashboard": "Paineis",
+    "system": "Sistema",
+    "hostnames": "Hostnames",
+    "certificates": "Certificados",
+    "dictionaries": "Dicionarios",
+    "gateway": "Gateway",
+    "transactions": "Transações"
+  },
+  "view": {
+    "backup": {
+      "link": "backup"
+    },
+    "dashboard": {
+      "link": "Painel",
+      "title": "Painel"
+    },
+    "transaction": {
+      "link": "Atividade de Rede",
+      "title": "Transações",
+      "subtitle": "Listar todas as transações"
+    },
+    "service": {
+      "link": "Serviços",
+      "title": "Serviços",
+      "subtitle": "Descrever todos os serviços"
+    },
+    "upstream": {
+      "link": "Upstreams",
+      "title": "Upstream",
+      "subtitle": "Lista de todos os upstreams"
+    },
+    "hostname": {
+      "link": "Hostnames",
+      "title": "Hostname",
+      "subtitle": "Lista de todos os Hostnames"
+    },
+    "certificate": {
+      "link": "Certificados",
+      "title": "Certificado",
+      "subtitle": "Lista de todos os certificados"
+    },
+    "sensor": {
+      "link": "Sensores",
+      "title": "Sensor",
+      "subtitle": "Lista de todos os sensores"
+    },
+    "user": {
+      "link": "Usuários",
+      "title": "Usuários",
+      "subtitle": "Lista de todos os usuários"
+    },
+    "config": {
+      "link": "Configurações",
+      "title": "Configuração",
+      "subtitle": "Lista de todas as configurações"
+    },
+    "system": {
+      "link": "Sistema"
+    }
+  },
+  "format": {
+    "parse": {
+      "dateInput": "YYYY-MM-DDTHH:mm:ss.SSSZ"
+    },
+    "display": {
+      "time": "HH:mm:ss",
+      "datetime": "DD/MM/YYYY HH:mm:ss",
+      "monthYearLabel": "MMM YYYY",
+      "dateA11yLabel": "LL",
+      "monthYearA11yLabel": "MMMM YYYY"
+    }
+  }
+}

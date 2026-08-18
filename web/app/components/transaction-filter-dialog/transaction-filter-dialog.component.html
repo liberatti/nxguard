@@ -1,0 +1,133 @@
+<div class="filter-dialog-container">
+    <div mat-dialog-title class="dialog-header">
+        <div class="header-icon-box">
+            <mat-icon>filter_alt</mat-icon>
+        </div>
+        <div class="header-titles">
+            <h2 class="dialog-title">{{ 'TRANSACTION.FILTER.DIALOG_TITLE' | translate }}</h2>
+            <p class="dialog-subtitle">{{ 'TRANSACTION.FILTER.DIALOG_SUBTITLE' | translate }}</p>
+        </div>
+        <button mat-icon-button (click)="onCancel()" class="close-btn" [matTooltip]="'actions.close' | translate">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+
+    <mat-dialog-content class="dialog-content">
+        <form [formGroup]="filterForm" class="filter-form">
+            <!-- Category Chips Selector (Left aligned) -->
+            <div class="category-selector">
+                <mat-chip-listbox [(ngModel)]="selectedCategory" [ngModelOptions]="{standalone: true}">
+                    <mat-chip-option value="ALL" color="primary" [selected]="selectedCategory === 'ALL'">
+                        {{ 'TRANSACTION.FILTER.CATEGORY_LABEL' | translate }}: All
+                    </mat-chip-option>
+                    <mat-chip-option value="GENERAL" color="primary">
+                        <mat-icon matChipAvatar>security</mat-icon>
+                        {{ 'TRANSACTION.FILTER.CATEGORIES.GENERAL' | translate }}
+                    </mat-chip-option>
+                    <mat-chip-option value="ROUTING" color="primary">
+                        <mat-icon matChipAvatar>alt_route</mat-icon>
+                        {{ 'TRANSACTION.FILTER.CATEGORIES.ROUTING' | translate }}
+                    </mat-chip-option>
+                    <mat-chip-option value="NETWORK" color="primary">
+                        <mat-icon matChipAvatar>travel_explore</mat-icon>
+                        {{ 'TRANSACTION.FILTER.CATEGORIES.NETWORK' | translate }}
+                    </mat-chip-option>
+                    <mat-chip-option value="HTTP" color="primary">
+                        <mat-icon matChipAvatar>http</mat-icon>
+                        {{ 'TRANSACTION.FILTER.CATEGORIES.HTTP' | translate }}
+                    </mat-chip-option>
+                    <mat-chip-option value="SECURITY" color="primary">
+                        <mat-icon matChipAvatar>policy</mat-icon>
+                        {{ 'TRANSACTION.FILTER.CATEGORIES.SECURITY' | translate }}
+                    </mat-chip-option>
+                    <mat-chip-option value="SYSTEM" color="primary">
+                        <mat-icon matChipAvatar>dns</mat-icon>
+                        {{ 'TRANSACTION.FILTER.CATEGORIES.SYSTEM' | translate }}
+                    </mat-chip-option>
+                </mat-chip-listbox>
+            </div>
+
+            <!-- Field Selection -->
+            <mat-form-field appearance="outline" class="full-width-field" subscriptSizing="dynamic">
+                <mat-label>{{ 'TRANSACTION.FILTER.FIELD_LABEL' | translate }}</mat-label>
+                <mat-select formControlName="field">
+                    <mat-select-trigger>
+                        <div class="select-trigger-content">
+                            <mat-icon class="field-select-icon">{{ currentField.icon }}</mat-icon>
+                            <span>{{ currentField.labelKey | translate }}</span>
+                            <span class="field-key-badge">({{ currentField.key }})</span>
+                        </div>
+                    </mat-select-trigger>
+                    <mat-option *ngFor="let f of filteredFields" [value]="f.key">
+                        <div class="option-content">
+                            <mat-icon class="option-icon">{{ f.icon }}</mat-icon>
+                            <span class="option-label">{{ f.labelKey | translate }}</span>
+                            <span class="option-key">({{ f.key }})</span>
+                        </div>
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <!-- Value Input (Dynamic based on field type) -->
+            <div class="value-input-section">
+                <!-- 1. Enum select -->
+                @if (currentField.type === 'enum' || currentField.type === 'boolean') {
+                <mat-form-field appearance="outline" class="full-width-field" subscriptSizing="dynamic">
+                    <mat-label>{{ 'TRANSACTION.FILTER.VALUE_LABEL' | translate }}</mat-label>
+                    <mat-select formControlName="value">
+                        <mat-option *ngFor="let opt of currentField.options" [value]="opt">
+                            <span class="enum-badge enum-{{ opt | lowercase }}">{{ opt }}</span>
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                }
+
+                <!-- 2. Text or Number input -->
+                @if (currentField.type === 'text' || currentField.type === 'number') {
+                <mat-form-field appearance="outline" class="full-width-field" subscriptSizing="dynamic">
+                    <mat-label>{{ 'TRANSACTION.FILTER.VALUE_LABEL' | translate }}</mat-label>
+                    <input matInput [type]="currentField.type === 'number' ? 'number' : 'text'"
+                        formControlName="value"
+                        [placeholder]="currentField.placeholder || ('TRANSACTION.FILTER.VALUE_PLACEHOLDER' | translate)">
+                    <mat-icon matSuffix>{{ currentField.icon }}</mat-icon>
+                </mat-form-field>
+                }
+
+                <!-- Quick Presets -->
+                @if (currentField.presets && currentField.presets.length > 0) {
+                <div class="presets-container">
+                    <span class="presets-label">{{ 'TRANSACTION.FILTER.PRESETS' | translate }}:</span>
+                    <div class="presets-chips">
+                        <button type="button" mat-stroked-button color="primary" class="preset-chip"
+                            *ngFor="let preset of currentField.presets"
+                            (click)="onSelectPreset(preset)">
+                            {{ preset }}
+                        </button>
+                    </div>
+                </div>
+                }
+            </div>
+
+            <!-- Live JSON Preview (Left aligned) -->
+            <div class="preview-card">
+                <div class="preview-header">
+                    <mat-icon class="preview-icon">code</mat-icon>
+                    <span>{{ 'TRANSACTION.FILTER.PREVIEW_LABEL' | translate }}</span>
+                </div>
+                <code class="preview-code">{{ previewJson }}</code>
+            </div>
+        </form>
+    </mat-dialog-content>
+
+    <!-- Dialog Actions (Left-aligned & Color Standards) -->
+    <mat-dialog-actions align="start" class="dialog-actions">
+        <button mat-flat-button color="primary" (click)="onApply()" [disabled]="filterForm.invalid" class="action-btn">
+            <mat-icon>check</mat-icon>
+            {{ 'TRANSACTION.FILTER.APPLY' | translate }}
+        </button>
+        <button mat-stroked-button (click)="onCancel()" class="action-btn">
+            <mat-icon>keyboard_return</mat-icon>
+            {{ 'TRANSACTION.FILTER.CANCEL' | translate }}
+        </button>
+    </mat-dialog-actions>
+</div>

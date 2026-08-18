@@ -1,0 +1,478 @@
+{
+  "ACTIONS": {
+    "CREATE": "Create",
+    "EDIT": "Edit",
+    "REMOVE": "Remove",
+    "DELETE": "Delete",
+    "SEARCH": "Search",
+    "FILTER": "Filter",
+    "EXPORT": "Export",
+    "SAVE": "Save",
+    "IMPORT": "Import",
+    "REFRESH": "Refresh",
+    "CLOSE": "Close",
+    "CANCEL": "Cancel",
+    "CONFIRM": "Confirm",
+    "NEXT": "Next",
+    "BACK": "Back",
+    "ADD": "Add",
+    "APPLY": "Apply",
+    "BACKUP": "Backup",
+    "RESTORE": "Restore"
+  },
+  "AUTH": {
+    "TITLE": "NXGUARD",
+    "SUBTITLE": "Enterprise Proxy & Security Gateway",
+    "HOST_CLIENT": "Host Management Client",
+    "SIGN_IN": "Sign In",
+    "SIGN_IN_BTN": "Log in",
+    "EMAIL": "User name / Email",
+    "PASSWORD": "Password",
+    "FOOTER_NOTICE": "Authorized access only. All activities are monitored and logged.",
+    "VERSION": "Version",
+    "LICENSE_NOTICE": "Licensed under the",
+    "LICENSE_NAME": "Apache License 2.0"
+  },
+  "ABOUT": {
+    "TITLE": "About NXGuard",
+    "SUBTITLE": "High-Performance API Gateway & Security Engine",
+    "TAB_ABOUT": "About",
+    "TAB_RESTORE": "Restore Config",
+    "CHOOSE_FILE": "Choose ZIP file to restore",
+    "SELECTED_FILE": "Selected File",
+    "POWERED_BY": "Powered by OpenResty & ModSecurity"
+  },
+  "ATTR": {
+    "ACTIVE": "Active",
+    "NAME": "Name",
+    "DOMAINS": "Domains",
+    "ROUTES": "Routes",
+    "LOGIN": {
+      "USERNAME": "Enter your username",
+      "PASSWORD": "Password here"
+    }
+  },
+  "CONTENT": {
+    "COPY": "&copy; 2025 nxguard. All rights reserved. This solution is built on top of OpenResty.",
+    "ABOUT": "This is a proxy server built on OpenResty with ModSecurity for advanced protection.",
+    "RESTORE_NOTICE": "Configuration Restore Notice: All existing data will be overwritten by the restored configuration."
+  },
+  "NAV": {
+    "SERVICES": "Services",
+    "UPSTREAMS": "Upstreams",
+    "SENSORS": "Sensors",
+    "ABOUT": "About",
+    "DASHBOARD": "Dashboard",
+    "SYSTEM": "System",
+    "HOSTNAMES": "Hostnames",
+    "CERTIFICATES": "Certificates",
+    "DICTIONARIES": "Dictionaries",
+    "GATEWAY": "Gateway",
+    "TRANSACTIONS": "Transactions",
+    "ACCOUNT": "Account",
+    "LOGOUT": "Log Out"
+  },
+  "VIEW": {
+    "BACKUP": {
+      "LINK": "backup",
+      "TITLE": "Backup"
+    },
+    "DASHBOARD": {
+      "LINK": "Dashboard",
+      "TITLE": "Dashboard"
+    },
+    "TRANSACTION": {
+      "LINK": "Network Activity",
+      "TITLE": "Transactions",
+      "SUBTITLE": "List all transactions"
+    },
+    "SERVICE": {
+      "LINK": "Service",
+      "TITLE": "Services",
+      "SUBTITLE": "Describe all services"
+    },
+    "UPSTREAM": {
+      "LINK": "Upstream",
+      "TITLE": "Upstream",
+      "SUBTITLE": "List of all upstreams"
+    },
+    "HOSTNAME": {
+      "LINK": "Hostname",
+      "TITLE": "Hostname",
+      "SUBTITLE": "List of all Hostnames"
+    },
+    "CERTIFICATE": {
+      "LINK": "Certificate",
+      "TITLE": "Certificate",
+      "SUBTITLE": "List of all certificates"
+    },
+    "SENSOR": {
+      "LINK": "Sensor",
+      "TITLE": "Sensor",
+      "SUBTITLE": "List of all sensors"
+    },
+    "USER": {
+      "LINK": "Users",
+      "TITLE": "Users",
+      "SUBTITLE": "List of all users"
+    },
+    "CONFIG": {
+      "LINK": "Config",
+      "TITLE": "Config",
+      "SUBTITLE": "List of all configs"
+    },
+    "SYSTEM": {
+      "LINK": "System"
+    }
+  },
+  "ROUTE": {
+    "ALLOWED_METHODS": "Allowed HTTP Methods",
+    "ALLOWED_CONTENT_TYPE": "Allowed Content Types",
+    "NAME": "Name",
+    "TYPE": "Type",
+    "REQUEST_PATH": "Request Path",
+    "UPSTREAM": "Upstream",
+    "SECURITY_SENSOR": "Security Sensor",
+    "MONITOR_ONLY": "Monitor Only",
+    "REQUEST_METHODS": "Request Methods",
+    "CACHE_METHODS": "Cache Methods"
+  },
+  "SENSOR": {
+    "CONFIG": "Config",
+    "IP_REPUTATION": "IP Reputation",
+    "SECURITY_INSPECTION": "Security Inspection",
+    "INSPECT_LEVEL": "Inspect Level",
+    "INBOUND_SCORE": "Inbound Score",
+    "OUTBOUND_SCORE": "Outbound Score",
+    "VARIABLES_TITLE": "Inspection Variables",
+    "ALLOWED_HTTP_VERSIONS": "Allowed HTTP Versions",
+    "MAX_FILE_SIZE": "Max File Size (bytes)",
+    "ALLOWED_METHODS": "Allowed HTTP Methods",
+    "ALLOWED_CONTENT_TYPE": "Allowed Content Types",
+    "RESTRICTED_EXTENSIONS": "Restricted Extensions",
+    "MAX_NUM_ARGS": "Max Number of Arguments",
+    "ARG_NAME_LENGTH": "Argument Name Length",
+    "ARG_LENGTH": "Argument Length",
+    "NAME": "Name",
+    "DESCRIPTION": "Description",
+    "GEO_BLOCKED": "Geo Blocked Countries",
+    "RBL_BLOCK": "RBL Blocking Feed",
+    "RBL_BYPASS": "RBL ByPass",
+    "CATEGORY": "Category",
+    "CATEGORIES": "Rule Categories",
+    "CATEGORY_SELECT_PLACEHOLDER": "Select category to add",
+    "SELECT_CATEGORY_HINT": "Select a category above to view and configure its security rules",
+    "FILTER_RULES_PLACEHOLDER": "Filter rules by code, description, tag or severity...",
+    "RULE_CODE": "Code",
+    "SEVERITY": "Severity",
+    "RULE_DESCRIPTION": "Description",
+    "ACTION": "Action",
+    "ACTIVE": "Active",
+    "ALL_RULES": "All Rules",
+    "NO_RULES_FOUND": "No rules found matching your filter",
+    "TOTAL_RULES": "Rules",
+    "CONTROL_RULE": "Engine Control / Paranoia Gate",
+    "VIEW_DETAILS": "View rule details",
+    "NO_CATEGORIES_SELECTED": "No categories added to this sensor yet",
+    "SAVED_SUCCESS": "Sensor saved successfully",
+    "UPDATED_SUCCESS": "Sensor updated successfully"
+  },
+  "SERVICE": {
+    "DETAILS": "Details",
+    "OVERRIDES": "Overrides",
+    "ROUTES": "Routes",
+    "GENERAL_INFO": "General Information",
+    "NAME": "Name",
+    "NAME_HINT": "Unique identifier for this service",
+    "BUFFER": "Buffer (KB)",
+    "BODY_LIMIT": "Request Body Limit (MB)",
+    "TIMEOUT": "Request Timeout (seconds)",
+    "DOMAINS": "Domains (SANs)",
+    "DOMAIN_INPUT": "Domain name",
+    "DOMAIN_HINT": "Add domain names (e.g. example.com, *.example.com)",
+    "RATE_LIMIT_TITLE": "Rate Limiting",
+    "RATE_LIMIT": "Requests per second (0 to disable)",
+    "COMPRESSION_TITLE": "Compression",
+    "COMPRESSION_ADD": "Add MIME Type",
+    "PORT_BINDINGS": "Port Bindings",
+    "PORT": "Port",
+    "PROTOCOL": "Protocol",
+    "FORCE_SSL": "Force SSL",
+    "SSL_CONFIG": "SSL / TLS Configuration",
+    "CERTIFICATE": "Certificate",
+    "SSL_CLIENT_AUTH": "Require Client Certificate (mTLS)",
+    "SSL_CA": "Certificate Authority (CA)",
+    "SSL_PROTOCOLS": "SSL / TLS Protocols",
+    "PROTOCOL_INPUT": "Protocol version",
+    "HEADERS_TITLE": "Custom HTTP Headers",
+    "HEADER_NAME": "Header Name",
+    "HEADER_VALUE": "Header Value",
+    "ROUTES_TITLE": "Routes Configuration",
+    "ROUTES_SUBTITLE": "Drag and drop to reorder routes. Priority is evaluated top to bottom.",
+    "NO_BINDINGS": "No port bindings configured yet.",
+    "NO_DOMAINS": "No domains added yet.",
+    "NO_HEADERS": "No custom headers configured.",
+    "NO_ROUTES": "No routes configured yet."
+  },
+  "APPLY_DIALOG": {
+    "TITLE": "Apply Configuration",
+    "DESCRIPTION": "The following items have pending changes that need to be applied to the proxy engine:",
+    "LOADING": "Loading pending changes...",
+    "APPLYING": "Applying configuration and reloading engine...",
+    "SUCCESS_TITLE": "Configuration Applied",
+    "SUCCESS_MSG": "All changes have been successfully compiled and applied to Nginx.",
+    "ERROR_TITLE": "Failed to Apply Configuration",
+    "NO_CHANGES": "No pending changes detected. Configuration is up to date.",
+    "PENDING_CHANGE": "Modified — pending reload"
+  },
+  "CERT_FORM": {
+    "NAME": "Certificate Name",
+    "NAME_HINT": "Unique alphanumeric identifier for this certificate",
+    "PROVIDER": "Certificate Provider",
+    "GENERAL_INFO": "General Configuration",
+    "CREDENTIALS_TITLE": "Certificate & Key Material",
+    "MANAGED_TITLE": "Automated ACME Certificate",
+    "MANAGED_NOTICE": "Managed certificates are automatically requested, provisioned and renewed via Let's Encrypt / ACME.",
+    "EXTERNAL_NOTICE": "Paste your custom PEM-encoded certificate, private key, and intermediate CA chain below.",
+    "CERTIFICATE_LABEL": "Certificate (PEM / CRT)",
+    "KEY_LABEL": "Private Key (PEM / KEY)",
+    "CHAIN_LABEL": "Certificate Authority Chain (PEM / Optional)"
+  },
+  "CONFIG_PAGE": {
+    "TITLE": "Global Configuration",
+    "SUBTITLE": "Manage global engine settings, PKI certificates, and transaction policies",
+    "PANEL_GENERAL": "General & Integrations",
+    "PANEL_GENERAL_DESC": "Third-party API keys and external directory endpoints",
+    "MAXMIND_KEY": "MaxMind Geolocation License Key",
+    "MAXMIND_HINT": "Used for IP geolocation and country-based security blocking",
+    "ACME_URL": "ACME Directory URL",
+    "ACME_HINT": "Let's Encrypt / ACME directory endpoint (e.g. https://acme-v02.api.letsencrypt.org/directory)",
+    "PANEL_CA": "Certification Authority (Internal CA)",
+    "PANEL_CA_DESC": "Manage root CA certificate and private key for client certificates & TLS inspection",
+    "CA_CERT": "Root CA Certificate (PEM)",
+    "CA_KEY": "Root CA Private Key (PEM)",
+    "PANEL_POLICY": "Transaction Policies",
+    "PANEL_POLICY_DESC": "Configure automated data archiving and database retention purging",
+    "ARCHIVE_TITLE": "Transaction Archiving",
+    "ARCHIVE_TOGGLE": "Enable Archiving",
+    "ARCHIVE_DESC": "Automatically stream and archive transaction telemetry to an external Elasticsearch / OpenSearch cluster for audit compliance.",
+    "ARCHIVE_AFTER": "Archive After (minutes)",
+    "CLUSTER_URL": "Cluster URL",
+    "CLUSTER_USER": "Username",
+    "CLUSTER_PASS": "Password",
+    "PURGE_TITLE": "Transaction Purging",
+    "PURGE_TOGGLE": "Enable Database Purging",
+    "PURGE_DESC": "Automatically delete outdated transactional records from the local DuckDB database to preserve high performance and disk storage.",
+    "PURGE_AFTER": "Maximum Data Age (days)"
+  },
+  "TRANSACTION": {
+    "FILTER": {
+      "ADD_FILTER": "Add Filter",
+      "CLEAR_ALL": "Clear All",
+      "ACTIVE_FILTERS": "Active Filters",
+      "DIALOG_TITLE": "Add Transaction Filter",
+      "DIALOG_SUBTITLE": "Select a transaction attribute and value to filter network traffic",
+      "CATEGORY_LABEL": "Category",
+      "FIELD_LABEL": "Field",
+      "OPERATOR_LABEL": "Operator",
+      "VALUE_LABEL": "Value",
+      "VALUE_PLACEHOLDER": "Enter filter value...",
+      "PREVIEW_LABEL": "Filter JSON Preview",
+      "PRESETS": "Presets / Quick Values",
+      "CANCEL": "Cancel",
+      "APPLY": "Apply Filter",
+      "CATEGORIES": {
+        "GENERAL": "General & Status",
+        "ROUTING": "Services & Routing",
+        "NETWORK": "Network & Geolocation",
+        "HTTP": "HTTP Request & Response",
+        "SECURITY": "Security & WAF",
+        "SYSTEM": "System & Node"
+      },
+      "FIELDS": {
+        "ACTION": "Security Action (action)",
+        "SERVICE_ID": "Service (service._id)",
+        "ROUTE_NAME": "Route Name (route_name)",
+        "UPSTREAM_ID": "Upstream (upstream._id)",
+        "SOURCE_IP": "Source IP (source.ip)",
+        "SOURCE_PORT": "Source Port (source.port)",
+        "GEOIP_COUNTRY": "Source Country (geoip.country_code)",
+        "DESTINATION_HOST": "Destination Host (destination.host)",
+        "DESTINATION_IP": "Destination IP (destination.ip)",
+        "DESTINATION_PORT": "Destination Port (destination.port)",
+        "HTTP_METHOD": "HTTP Method (http.request.method)",
+        "HTTP_URI": "HTTP Request URI (http.request.uri)",
+        "STATUS_CODE": "HTTP Status Code (http.response.status_code)",
+        "DURATION": "Duration seconds (http.duration)",
+        "SCORE": "Anomaly Score (score)",
+        "RATE_LIMIT_ACTION": "Rate Limit Action (rate_limit.action)",
+        "LIMIT_REQ_STATUS": "Limit Req Status (limit_req_status)",
+        "GEOIP_STATUS": "GeoIP Status (geoip_status)",
+        "RBL_STATUS": "RBL Status (rbl_status)",
+        "IPXA": "IPXA Status (ipxa)",
+        "MTLS_ENABLED": "mTLS Enabled (mtls.enabled)",
+        "MTLS_VERIFIED": "mTLS Verified (mtls.verified)",
+        "AUDIT_RULE_CODE": "WAF Rule ID / Code (rule_code)",
+        "USER_AGENT": "User Agent Family (user_agent.family)",
+        "SERVER_ID": "Node / Server ID (server_id)",
+        "UNIQUE_ID": "Unique Transaction ID (unique_id)",
+        "ARCHIVED": "Archived Status (archived)"
+      }
+    },
+    "DATE_RANGE": {
+      "TITLE": "Select Time Range",
+      "SUBTITLE": "Filter telemetry and metrics by specific time window",
+      "TOOLTIP": "Select date and time range",
+      "PRESETS": "Quick Presets",
+      "PRESET_15M": "Last 15m",
+      "PRESET_1H": "Last 1h",
+      "PRESET_6H": "Last 6h",
+      "PRESET_24H": "Last 24h",
+      "PRESET_7D": "Last 7d",
+      "PRESET_TODAY": "Today",
+      "PRESET_YESTERDAY": "Yesterday",
+      "CUSTOM_RANGE": "Custom Date & Time",
+      "START_DATE": "Start Date & Time",
+      "END_DATE": "End Date & Time",
+      "APPLY": "Apply Range",
+      "CANCEL": "Cancel"
+    }
+  },
+  "ACCOUNT": {
+    "TITLE": "Account Settings",
+    "SUBTITLE": "Manage your profile details and security credentials",
+    "TAB_PROFILE": "Profile Information",
+    "TAB_SECURITY": "Security & Password",
+    "NAME": "Display Name",
+    "EMAIL": "Email Address",
+    "PASSWORD": "New Password",
+    "PASSWORD_HINT": "Leave blank to keep your current password",
+    "ROLE": "Role",
+    "SUCCESS": "Profile updated successfully",
+    "SAVE": "Save Changes"
+  },
+  "USER_MGMT": {
+    "NAME": "Full Name",
+    "EMAIL": "Email Address",
+    "ROLE": "Access Role",
+    "PASSWORD": "Password",
+    "CONFIRM_PASSWORD": "Confirm Password",
+    "ROLES": {
+      "SUPERUSER": "Superuser",
+      "VIEWER": "Viewer"
+    },
+    "ACTIONS": "Actions",
+    "NO_USERS": "No users found"
+  },
+  "FORMAT": {
+    "DISPLAY": {
+      "DATETIME": "DD/MM/YYYY HH:mm:ss",
+      "MONTH_YEAR_LABEL": "MMM YYYY",
+      "DATE_A11Y_LABEL": "LL",
+      "MONTH_YEAR_A11Y_LABEL": "MMMM YYYY"
+    }
+  },
+  "actions": {
+    "edit": "Edit",
+    "remove": "Remove",
+    "create": "Create",
+    "save": "Save",
+    "refresh": "Refresh",
+    "close": "Close",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "next": "Next",
+    "back": "Back",
+    "add": "Add",
+    "delete": "Delete",
+    "apply": "Apply",
+    "backup": "Backup",
+    "restore": "Restore"
+  },
+  "about": {
+    "title": "About NXGuard",
+    "subtitle": "High-Performance API Gateway & Security Engine",
+    "tab_about": "About",
+    "tab_restore": "Restore Config",
+    "choose_file": "Choose ZIP file to restore",
+    "selected_file": "Selected File",
+    "powered_by": "Powered by OpenResty & ModSecurity"
+  },
+  "attr": {
+    "active": "Active",
+    "name": "Name",
+    "domains": "Domains",
+    "routes": "Routes"
+  },
+  "content": {
+    "copy": "&copy; 2025 nxguard. All rights reserved. This solution is built on top of OpenResty.",
+    "about": "This is a proxy server built on OpenResty with ModSecurity for advanced protection.",
+    "restore_notice": "Configuration Restore Notice: All existing data will be overwritten by the restored configuration."
+  },
+  "nav": {
+    "about": "About",
+    "account": "Account",
+    "logout": "Log Out"
+  },
+  "view": {
+    "backup": {
+      "link": "backup"
+    },
+    "dashboard": {
+      "link": "Dashboard",
+      "title": "Dashboard"
+    },
+    "transaction": {
+      "link": "Network Activity",
+      "title": "Transactions",
+      "subtitle": "List all transactions"
+    },
+    "service": {
+      "link": "Services",
+      "title": "Services",
+      "subtitle": "Describe all services"
+    },
+    "upstream": {
+      "link": "Upstreams",
+      "title": "Upstreams",
+      "subtitle": "List of all upstreams"
+    },
+    "hostname": {
+      "link": "Hostnames",
+      "title": "Hostnames",
+      "subtitle": "List of all hostnames"
+    },
+    "certificate": {
+      "link": "Certificates",
+      "title": "Certificates",
+      "subtitle": "List of all certificates"
+    },
+    "sensor": {
+      "link": "Sensors",
+      "title": "Sensors",
+      "subtitle": "List of all sensors"
+    },
+    "user": {
+      "link": "Users",
+      "title": "Users",
+      "subtitle": "List of all users"
+    },
+    "config": {
+      "link": "Configuration",
+      "title": "Configuration",
+      "subtitle": "List of all configs"
+    },
+    "system": {
+      "link": "System"
+    }
+  },
+  "aboutMessage": "Thanks",
+  "format": {
+    "display": {
+      "datetime": "DD/MM/YYYY HH:mm:ss",
+      "monthYearLabel": "MMM YYYY",
+      "dateA11yLabel": "LL",
+      "monthYearA11yLabel": "MMMM YYYY"
+    }
+  }
+}
