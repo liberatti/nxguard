@@ -129,35 +129,47 @@ export class AppComponent {
   ];
 
   readonly composeCode = `services:
-  nxguard:
+  main:
     image: liberatti/nxguard:latest
-    container_name: nxguard
     environment:
       NXGUARD_ROLE: "main"
-      SERVERID: "nxguard-admin"
+      SERVERID: "nxguard-main"
     ports:
-      - "5000:5000" # Management Dashboard
-      - "80:80"     # HTTP Ingress
-      - "443:443"   # HTTPS Ingress
+      - "8000:5000"     # Management Dashboard
+      - "8001:80"       # HTTP Ingress
+      - "8443:443"      # HTTPS Ingress
     deploy:
       resources:
         limits:
           memory: 256M
     restart: unless-stopped
+    volumes:
+      - nxguard_data:/data
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   ipxa:
     image: liberatti/ipxa:latest
-    container_name: ipxa
+    environment:
+      - API_KEY=xxxxxxxx
+      - IPINFO_TOKEN=xxxxxxxx
+      - LOGLEVEL=INFO
+      - SECURITY_ENABLED=true
+      - IBLOCKLIST_USERNAME=xxxxxxxx
+      - IBLOCKLIST_PASSWORD=xxxxxxxx
+      - MAXMIND_ACCOUNT_ID=xxxxxxxx
+      - MAXMIND_LICENSE_KEY=xxxxxxxx
     volumes:
       - ipxa_data:/opt/ipxa/data
     deploy:
       resources:
         limits:
-          memory: 64M
+          memory: 128M
     restart: unless-stopped
 
 volumes:
-  ipxa_data:`;
+  ipxa_data:
+  nxguard_data:`;
 
   readonly gotestwafCode = `docker run --rm \\
   --shm-size=2g \\

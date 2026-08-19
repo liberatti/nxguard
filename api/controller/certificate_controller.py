@@ -119,7 +119,7 @@ def save() -> Response:
                     {
                         "status": (
                             "EXPIRED"
-                            if dto["not_after"] <= datetime.now(TZ)
+                            if replace_tz(dto["not_after"]) < datetime.now(TZ)
                             else "VALID"
                         ),
                         "force_renew": False,
@@ -174,7 +174,7 @@ def update(certificate_id: str) -> Response:
                     {
                         "status": (
                             "EXPIRED"
-                            if dto["not_after"] <= datetime.now(TZ)
+                            if replace_tz(dto["not_after"]) < datetime.now(TZ)
                             else "VALID"
                         ),
                         "force_renew": True,
