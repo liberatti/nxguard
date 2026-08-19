@@ -61,6 +61,10 @@ jobs:
           tags: |
             type=raw,value=latest
 
+      - name: Pull latest image
+        if: github.event_name == 'push'
+        run: docker pull liberatti/nxguard:latest || true
+
       - name: Build and push Docker image
         if: github.event_name == 'push'
         uses: docker/build-push-action@v6
