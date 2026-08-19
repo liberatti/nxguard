@@ -6,8 +6,8 @@
         </mat-card-header>
         <mat-card-content>
             <form [formGroup]="form">
-                <mat-tab-group [(selectedIndex)]="selectedTabIndex">
-                    <mat-tab [label]="'SENSOR.CONFIG' | translate" id="config-tab">
+                <mat-stepper [linear]="false" class="form-stepper">
+                    <mat-step [label]="'SENSOR.CONFIG' | translate" id="config-tab">
                         <div class="mat-row mt-2">
                             <div class="mat-col-6">
                                 <mat-form-field class="full-width" appearance="outline">
@@ -55,8 +55,8 @@
                                 </mat-chip-listbox>
                             </div>
                         </div>
-                    </mat-tab>
-                    <mat-tab [label]="'SENSOR.IP_REPUTATION' | translate" id="ip-reputation-tab">
+                    </mat-step>
+                    <mat-step [label]="'SENSOR.IP_REPUTATION' | translate" id="ip-reputation-tab">
                         <div class="mat-row mt-2" formGroupName="security">
                             <div class="mat-col-6">
                                 <mat-form-field class="full-width" appearance="outline">
@@ -99,8 +99,8 @@
                                 </mat-chip-listbox>
                             </div>
                         </div>
-                    </mat-tab>
-                    <mat-tab [label]="'SENSOR.SECURITY_INSPECTION' | translate" id="security-inspection-tab">
+                    </mat-step>
+                    <mat-step [label]="'SENSOR.SECURITY_INSPECTION' | translate" id="security-inspection-tab">
                         <div class="mat-row mt-2 mb-2" formGroupName="inspection">
                             <div class="mat-col-4">
                                 <mat-form-field class="full-width" appearance="outline">
@@ -366,8 +366,8 @@
                                 </div>
                             </ng-template>
                         </div>
-                    </mat-tab>
-                </mat-tab-group>
+                    </mat-step>
+                </mat-stepper>
             </form>
         </mat-card-content>
         <mat-card-actions align="end" class="mat-mdc-card-actions bottom-actions">

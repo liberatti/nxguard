@@ -203,6 +203,10 @@ html, body {
     color: #ffffff !important;
 }
 
+.form-stepper, mat-stepper {
+    background: transparent !important;
+}
+
 .bottom-actions {
     display: flex !important;
     justify-content: flex-end !important;

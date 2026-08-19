@@ -71,7 +71,7 @@ class UpstreamSchema(Schema):
             targets = data.get("targets")
             if not targets or len(targets) == 0:
                 raise ValidationError(
-                    "Backend upstream must have at least one target.", "targets"
+                    "Backend upstream requires at least one target.", "targets"
                 )
 
 

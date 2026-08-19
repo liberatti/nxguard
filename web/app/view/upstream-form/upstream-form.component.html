@@ -122,14 +122,14 @@
                                         <span class="targets-header-title">
                                             <mat-icon class="targets-icon">hub</mat-icon>
                                             {{ 'UPSTREAM.TARGETS.TITLE' | translate }}
-                                            <span class="targets-count-badge">{{ targetDS.data.length }}</span>
+                                            <span class="targets-count-badge">{{ targetDS.data ? targetDS.data.length : 0 }}</span>
                                         </span>
                                     </mat-card-title>
 
                                 </mat-card-header>
                                 <mat-card-content class="targets-card-content">
                                     <table mat-table [dataSource]="targetDS" matSort class="targets-table"
-                                        *ngIf="targetDS.data.length > 0; else noTargetsTemplate">
+                                        *ngIf="targetDS.data && targetDS.data.length > 0; else noTargetsTemplate">
                                         <tr mat-header-row *matHeaderRowDef="targetDC"></tr>
                                         <tr mat-row *matRowDef="let row; columns: targetDC;"></tr>
 

@@ -34,6 +34,7 @@ import { CommonModule } from '@angular/common';
 import { FormaterService } from "app/services/formater.service";
 import { MatMomentDateModule } from "@angular/material-moment-adapter";
 
+import { MatStepperModule } from '@angular/material/stepper';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { RuleDetailsDialogComponent } from 'app/components/rule-details-dialog/rule-details-dialog.component';
 
@@ -46,7 +47,7 @@ import { RuleDetailsDialogComponent } from 'app/components/rule-details-dialog/r
         MatListModule, MatCardModule, MatProgressBarModule, MatInputModule,
         MatTableModule, MatMenuModule, MatSortModule, MatTabsModule, MatGridListModule,
         MatTooltipModule, MatSelectModule, MatPaginatorModule, MatSlideToggleModule, MatCheckboxModule,
-        MatFormFieldModule, MatChipsModule, MatExpansionModule, MatDialogModule],
+        MatFormFieldModule, MatChipsModule, MatExpansionModule, MatDialogModule, MatStepperModule],
     templateUrl: './sensor-form.component.html',
     styleUrl: './sensor-form.component.css'
 })

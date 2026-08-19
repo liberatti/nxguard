@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -25,6 +25,7 @@ import { MatSortModule } from '@angular/material/sort';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { UpstreamTargetDialogComponent } from 'app/components/upstream-target-dialog/upstream-target-dialog.component';
+import { ErrorDetailsDialogComponent } from 'app/components/error-details-dialog/error-details-dialog.component';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { OAuthService } from "../../services/oauth.service";
 
@@ -86,8 +87,9 @@ export class UpstreamFormComponent implements OnInit {
         private confirmDialog: MatDialog,
         private translate: TranslateService,
         protected oauth: OAuthService,
+        private cdr: ChangeDetectorRef,
     ) {
-        this.targetDS = new MatTableDataSource<any>;
+        this.targetDS = new MatTableDataSource<TargetEntity>([]);
         this.isAddMode = false;
     }
 
@@ -104,38 +106,37 @@ export class UpstreamFormComponent implements OnInit {
         // If editing, fetch upstream and patch form values
         if (!this.isAddMode) {
             this.upstreamService.getById(id).subscribe(data => {
-                // Patch common fields
+                if (!data) return;
+
+                const isBackend = String(data.type || 'backend').toLowerCase() === 'backend';
+                const targetsList = data.targets || [];
+
+                // Patch form fields
                 this.form.patchValue({
                     _id: data._id,
                     name: data.name,
                     description: data.description,
                     script_path: data.script_path,
-                    type: data.type || 'backend'
+                    type: data.type || 'backend',
+                    retry: data.retry,
+                    retry_timeout: data.retry_timeout,
+                    conn_timeout: data.conn_timeout,
+                    protocol: data.protocol,
+                    persist: data.persist,
+                    index: data.index,
+                    targets: targetsList
                 });
 
-                // Handle backend type specific fields
-                if (this.form.value.type === 'backend') {
-                    this.form.patchValue({
-                        retry: data.retry,
-                        retry_timeout: data.retry_timeout,
-                        conn_timeout: data.conn_timeout,
-                        protocol: data.protocol,
-                        persist: data.persist
-                    });
-
-                    // Update targets data source
-                    this.targetDS.data = data.targets;
+                if (isBackend) {
+                    this.targetDS.data = [...targetsList];
 
                     // Handle persistence
-                    if (typeof data.persist !== 'undefined') {
+                    if (typeof data.persist !== 'undefined' && data.persist) {
                         this.persistEnabledControl.setValue(data.persist.type !== SessionPersistenceType.NONE);
                     }
-                } else {
-                    // Handle non-backend type fields
-                    this.form.patchValue({
-                        index: data.index
-                    });
                 }
+
+                this.cdr.detectChanges();
             });
         }
     }
@@ -152,16 +153,26 @@ export class UpstreamFormComponent implements OnInit {
         this.submitted = true;
 
         if (this.form.status === "INVALID") {
-            let errors = [] as Array<string>;
+            let detailsObj: any = {};
             Object.keys(this.form.controls).forEach(k => {
                 let control = this.form.get(k) as FormControl;
                 if (control && control.status !== "VALID") {
-                    errors.push(" Invalid value on " + k);
+                    detailsObj[k] = ["Invalid value on " + k];
                 }
             });
 
-            if (errors.length > 0) {
-                this.notificationService.openSnackBar(errors);
+            if (Object.keys(detailsObj).length > 0) {
+                this.confirmDialog.open(ErrorDetailsDialogComponent, {
+                    data: {
+                        code: 400,
+                        message: 'Validation Error',
+                        method: this.isAddMode ? 'POST' : 'PUT',
+                        url: '/api/v1/upstream',
+                        details: detailsObj
+                    },
+                    width: '650px',
+                    maxWidth: '90vw'
+                });
             }
             return;
         }
@@ -178,9 +189,22 @@ export class UpstreamFormComponent implements OnInit {
             }
         } else {
             if (!this.targetDS.data || this.targetDS.data.length === 0) {
-                this.notificationService.openSnackBar([
-                    this.translate.instant('UPSTREAM.ERR_TARGET_REQUIRED') || 'Backend upstream requires at least one target.'
-                ]);
+                const targetErrMsg = this.translate.instant('UPSTREAM.ERR_TARGET_REQUIRED') || 'Backend upstream requires at least one target.';
+                this.confirmDialog.open(ErrorDetailsDialogComponent, {
+                    data: {
+                        code: 400,
+                        message: 'Validation Error',
+                        method: this.isAddMode ? 'POST' : 'PUT',
+                        url: '/api/v1/upstream',
+                        details: {
+                            targets: [
+                                targetErrMsg
+                            ]
+                        }
+                    },
+                    width: '650px',
+                    maxWidth: '90vw'
+                });
                 return;
             }
             this.form.get('targets')?.setValue(this.targetDS.data);
@@ -230,9 +254,10 @@ export class UpstreamFormComponent implements OnInit {
 
         dialogRef.afterClosed().subscribe(result => {
             if (result) {
-                const data = this.targetDS.data;
-                data.push(result);
+                const data = [...this.targetDS.data, result];
                 this.targetDS.data = data;
+                this.form.get('targets')?.setValue(data);
+                this.cdr.detectChanges();
             }
         });
     }
@@ -243,6 +268,8 @@ export class UpstreamFormComponent implements OnInit {
         if (index > -1) {
             data.splice(index, 1);
             this.targetDS.data = data;
+            this.form.get('targets')?.setValue(data);
+            this.cdr.detectChanges();
         }
     }
 
