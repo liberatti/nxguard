@@ -21,8 +21,20 @@
         <!-- Right Login Form Pane (VMware Clarity Clean Form Panel) -->
         <div class="vmware-form-pane">
             <div class="form-header">
-                <h2 class="form-title">{{ 'AUTH.SIGN_IN' | translate }}</h2>
-                <p class="form-subtitle">Enter your credentials to access the console</p>
+                <div class="form-header-row">
+                    <div>
+                        <h2 class="form-title">{{ 'AUTH.SIGN_IN' | translate }}</h2>
+                        <p class="form-subtitle">{{ 'AUTH.SUBTITLE_LOGIN' | translate }}</p>
+                    </div>
+                    <mat-form-field appearance="outline" class="language-select-field" subscriptSizing="dynamic">
+                        <mat-icon matPrefix class="lang-icon">language</mat-icon>
+                        <mat-select [formControl]="form.controls.locale" (selectionChange)="onLocaleChange($event.value)" id="sign-in-language-select">
+                            <mat-option *ngFor="let loc of locales" [value]="loc.id" id="lang-option-{{loc.id}}">
+                                {{ loc.name }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
             </div>
 
             <form [formGroup]="form" id="sign-in-form" class="login-form">

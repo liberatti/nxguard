@@ -3,6 +3,15 @@
             <mat-card-title>{{ 'view.service.title'|translate }}</mat-card-title>
             <mat-card-subtitle>{{ 'view.service.subtitle'|translate }}</mat-card-subtitle>
             <mat-card-actions class="align-right">
+                <mat-form-field appearance="outline" subscriptSizing="dynamic" class="search-filter-field">
+                    <mat-icon matPrefix>search</mat-icon>
+                    <input matInput id="service-filter-input" [(ngModel)]="searchQuery"
+                           (keyup.enter)="applyFilter()"
+                           [placeholder]="'view.service.filter_placeholder' | translate">
+                    <button *ngIf="searchQuery" matSuffix mat-icon-button id="service-filter-clear-btn" (click)="clearFilter()">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                </mat-form-field>
                 <button mat-flat-button color="primary" [routerLink]="['add']" *ngIf="oauth.isRole('superuser')" id="add-service-btn">
                     <mat-icon>add</mat-icon>
                     {{ 'actions.create'|translate }}

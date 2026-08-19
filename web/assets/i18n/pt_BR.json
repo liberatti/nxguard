@@ -28,6 +28,8 @@
     "SIGN_IN_BTN": "Fazer Login",
     "EMAIL": "Nome de usuário / E-mail",
     "PASSWORD": "Senha",
+    "LANGUAGE": "Idioma",
+    "SUBTITLE_LOGIN": "Digite suas credenciais para acessar o console",
     "FOOTER_NOTICE": "Acesso autorizado apenas. Todas as atividades são monitoradas.",
     "VERSION": "Versão",
     "LICENSE_NOTICE": "Licenciado sob a",
@@ -96,7 +98,12 @@
       "TITLE": "Upstream",
       "SUBTITLE": "Lista de todos os upstreams",
       "FILTER_PLACEHOLDER": "Filtrar upstreams por nome ou descrição...",
-      "ERR_TARGET_REQUIRED": "Upstream do tipo backend requer pelo menos 1 target."
+      "ERR_TARGET_REQUIRED": "Upstream do tipo backend requer pelo menos 1 target.",
+      "TARGETS": "Destinos",
+      "TARGET_HOST": "Endereço de Rede",
+      "TARGET_PORT": "Porta",
+      "TARGET_WEIGHT": "Peso",
+      "NO_TARGETS": "Nenhum destino configurado. Adicione pelo menos um destino."
     },
     "HOSTNAME": {
       "LINK": "Hostname",
@@ -370,6 +377,19 @@
     "ACTIONS": "Ações",
     "NO_USERS": "Nenhum usuário encontrado"
   },
+  "UPSTREAM": {
+    "ERR_TARGET_REQUIRED": "Upstream do tipo backend requer pelo menos 1 target.",
+    "TARGETS": {
+      "TITLE": "Destinos",
+      "ADD_BTN": "Adicionar Destino",
+      "NETWORK_ADDRESS": "Endereço de Rede",
+      "SERVICE_PORT": "Porta do Serviço",
+      "DISTRIBUTION_WEIGHT": "Peso de Distribuição",
+      "ACTIONS": "Ações",
+      "REMOVE_TOOLTIP": "Remover destino",
+      "EMPTY_MESSAGE": "Nenhum destino configurado. Adicione pelo menos um destino para este upstream."
+    }
+  },
   "FORMAT": {
     "PARSE": {
       "DATE_INPUT": "YYYY-MM-DDTHH:mm:ss.SSSZ"
@@ -458,7 +478,8 @@
     "service": {
       "link": "Serviços",
       "title": "Serviços",
-      "subtitle": "Descrever todos os serviços"
+      "subtitle": "Descrever todos os serviços",
+      "filter_placeholder": "Filtrar por nome ou domínio..."
     },
     "upstream": {
       "link": "Upstreams",
@@ -479,7 +500,8 @@
     "sensor": {
       "link": "Sensores",
       "title": "Sensor",
-      "subtitle": "Lista de todos os sensores"
+      "subtitle": "Lista de todos os sensores",
+      "filter_placeholder": "Filtrar por nome ou descrição..."
     },
     "user": {
       "link": "Usuários",

@@ -28,6 +28,8 @@
     "SIGN_IN_BTN": "Log in",
     "EMAIL": "User name / Email",
     "PASSWORD": "Password",
+    "LANGUAGE": "Language",
+    "SUBTITLE_LOGIN": "Enter your credentials to access the console",
     "FOOTER_NOTICE": "Authorized access only. All activities are monitored and logged.",
     "VERSION": "Version",
     "LICENSE_NOTICE": "Licensed under the",
@@ -96,7 +98,12 @@
       "TITLE": "Upstream",
       "SUBTITLE": "List of all upstreams",
       "FILTER_PLACEHOLDER": "Filter upstreams by name or description...",
-      "ERR_TARGET_REQUIRED": "Backend upstream requires at least one target."
+      "ERR_TARGET_REQUIRED": "Backend upstream requires at least one target.",
+      "TARGETS": "Targets",
+      "TARGET_HOST": "Network Address",
+      "TARGET_PORT": "Service Port",
+      "TARGET_WEIGHT": "Weight",
+      "NO_TARGETS": "No targets configured. Add at least one target for this backend."
     },
     "HOSTNAME": {
       "LINK": "Hostname",
@@ -370,6 +377,19 @@
     "ACTIONS": "Actions",
     "NO_USERS": "No users found"
   },
+  "UPSTREAM": {
+    "ERR_TARGET_REQUIRED": "Backend upstream requires at least one target.",
+    "TARGETS": {
+      "TITLE": "Targets",
+      "ADD_BTN": "Add Target",
+      "NETWORK_ADDRESS": "Network Address",
+      "SERVICE_PORT": "Service Port",
+      "DISTRIBUTION_WEIGHT": "Distribution Weight",
+      "ACTIONS": "Actions",
+      "REMOVE_TOOLTIP": "Remove target",
+      "EMPTY_MESSAGE": "No targets configured. Add at least one target for this backend."
+    }
+  },
   "FORMAT": {
     "DISPLAY": {
       "DATETIME": "DD/MM/YYYY HH:mm:ss",
@@ -440,7 +460,8 @@
     "service": {
       "link": "Services",
       "title": "Services",
-      "subtitle": "Describe all services"
+      "subtitle": "Describe all services",
+      "filter_placeholder": "Search by name or domain..."
     },
     "upstream": {
       "link": "Upstreams",
@@ -461,7 +482,8 @@
     "sensor": {
       "link": "Sensors",
       "title": "Sensors",
-      "subtitle": "List of all sensors"
+      "subtitle": "List of all sensors",
+      "filter_placeholder": "Search by name or description..."
     },
     "user": {
       "link": "Users",

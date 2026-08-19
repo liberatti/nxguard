@@ -40,7 +40,8 @@ import { OAuthService } from "../../services/oauth.service";
         MatTableModule, MatMenuModule, MatSortModule,
         MatTooltipModule, MatSelectModule, MatPaginatorModule, MatSlideToggleModule,
         MatFormFieldModule, MatChipsModule],
-    templateUrl: './upstream-form.component.html'
+    templateUrl: './upstream-form.component.html',
+    styleUrl: './upstream-form.component.css'
 })
 export class UpstreamFormComponent implements OnInit {
     isAddMode: boolean;
@@ -49,7 +50,7 @@ export class UpstreamFormComponent implements OnInit {
     _types: string[] = ['backend', 'static']
     selectedFile: File | null = null;
 
-    targetDC: string[] = ['host', 'port', 'weight', 'action'];
+    targetDC: string[] = ['host', 'port', 'action'];
     targetDS: MatTableDataSource<TargetEntity>;
     persistEnabledControl = new FormControl(false);
     form = new FormGroup({
@@ -224,10 +225,13 @@ export class UpstreamFormComponent implements OnInit {
         });
     }
 
-    onRemove(selectedIndex: number) {
-        const data = this.targetDS.data;
-        data.splice(selectedIndex, 1);
-        this.targetDS.data = data;
+    onRemove(elementOrIndex: TargetEntity | number) {
+        const data = [...this.targetDS.data];
+        const index = typeof elementOrIndex === 'number' ? elementOrIndex : data.indexOf(elementOrIndex);
+        if (index > -1) {
+            data.splice(index, 1);
+            this.targetDS.data = data;
+        }
     }
 
     get f(): { [key: string]: AbstractControl } {

@@ -198,6 +198,27 @@
     margin-bottom: 24px;
 }
 
+.form-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.language-select-field {
+    width: 175px;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+}
+
+.lang-icon {
+    font-size: 18px !important;
+    width: 18px !important;
+    height: 18px !important;
+    color: #64748b;
+    margin-right: 6px;
+}
+
 .form-title {
     margin: 0;
     font-size: 1.5rem;

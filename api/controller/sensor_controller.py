@@ -88,8 +88,14 @@ def search() -> Response:
     Returns:
         Response: JSON response containing paginated sensor list or 404 error
     """
+    query = (
+        request.args.get("query")
+        or request.args.get("q")
+        or request.args.get("name")
+        or request.args.get("search")
+    )
     with SensorDao() as dao:
-        result = dao.get_all(pagination=get_pagination())
+        result = dao.search(query=query, pagination=get_pagination())
         return (
             response_data(result, dao.pageSchema)
             if result["metadata"]["total_elements"] > 0

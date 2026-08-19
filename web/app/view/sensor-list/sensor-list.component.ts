@@ -3,7 +3,7 @@ import {MatTableDataSource, MatTableModule} from '@angular/material/table';
 import {MatPaginatorModule, PageEvent} from '@angular/material/paginator';
 import {MatDialog} from '@angular/material/dialog';
 import {CommonModule} from '@angular/common';
-import {ReactiveFormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatMomentDateModule} from '@angular/material-moment-adapter';
 import {MatButtonModule} from '@angular/material/button';
 import {MatCardModule} from '@angular/material/card';
@@ -31,6 +31,7 @@ import {OAuthService} from "../../services/oauth.service";
     selector: 'app-sensor-list',
     standalone: true,
     imports: [RouterModule, CommonModule,
+        FormsModule,
         ReactiveFormsModule, TranslatePipe,
         MatMomentDateModule,
         MatSidenavModule, MatIconModule, MatButtonModule,
@@ -45,6 +46,7 @@ export class SensorListComponent implements OnInit {
     sensorDC: string[] = ['name', 'description', 'action'];
     sensorDS: MatTableDataSource<Sensor>;
     sensorPA = new DefaultPageMeta();
+    searchQuery: string = '';
 
     constructor(
         private notificationService: NotificationService,
@@ -59,15 +61,36 @@ export class SensorListComponent implements OnInit {
         this.updateGridTable();
     }
 
+    applyFilter(): void {
+        this.sensorPA.page = 1;
+        this.updateGridTable();
+    }
+
+    clearFilter(): void {
+        this.searchQuery = '';
+        this.applyFilter();
+    }
+
     updateGridTable() {
-        this.sensorService.get(this.sensorPA).subscribe(data => {
-            this.sensorDS.data = data.data;
-            this.sensorPA.total_elements = data.metadata.total_elements;
+        this.sensorService.get(this.sensorPA, this.searchQuery).subscribe({
+            next: (data) => {
+                if (data && data.metadata) {
+                    this.sensorDS.data = data.data || [];
+                    this.sensorPA.total_elements = data.metadata.total_elements;
+                } else {
+                    this.sensorDS.data = [];
+                    this.sensorPA.total_elements = 0;
+                }
+            },
+            error: () => {
+                this.sensorDS.data = [];
+                this.sensorPA.total_elements = 0;
+            }
         });
     }
 
     nextPage(event: PageEvent) {
-        this.sensorPA.page = event.pageIndex;
+        this.sensorPA.page = event.pageIndex + 1;
         this.sensorPA.per_page = event.pageSize;
         this.updateGridTable();
     }

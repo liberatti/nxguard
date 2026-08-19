@@ -55,14 +55,26 @@ export class SignInComponent implements OnInit {
     constructor(private router: Router,
                 private auth: OAuthService, private http: HttpClient,
                 private localStorage: LocalStorageService,
-                private notificationService: NotificationService) {
+                private notificationService: NotificationService,
+                private translate: TranslateService) {
     }
 
     ngOnInit() {
         this.logout();
         this.locales = [
-            {id: 'en_US', name: "English (US)"}
+            { id: 'en_US', name: 'English (US)' },
+            { id: 'pt_BR', name: 'Português (BR)' }
         ];
+        const savedLang = this.localStorage.get('lang') || 'en_US';
+        this.translate.use(savedLang);
+        this.form.controls.locale.setValue(savedLang);
+    }
+
+    onLocaleChange(lang: string) {
+        const selectedLang = lang || 'en_US';
+        this.translate.use(selectedLang);
+        this.localStorage.set('lang', selectedLang);
+        this.form.controls.locale.setValue(selectedLang);
     }
 
     login() {

@@ -6,7 +6,7 @@ import {MatSlideToggleChange, MatSlideToggleModule} from '@angular/material/slid
 import {BreakpointObserver} from '@angular/cdk/layout';
 import {DefaultPageMeta} from 'app/models/shared';
 import {CommonModule} from '@angular/common';
-import {ReactiveFormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatMomentDateModule} from '@angular/material-moment-adapter';
 import {MatButtonModule} from '@angular/material/button';
 import {MatCardModule} from '@angular/material/card';
@@ -33,6 +33,7 @@ import {OAuthService} from "../../services/oauth.service";
     selector: 'app-service-list',
     standalone: true,
     imports: [RouterModule, CommonModule,
+        FormsModule,
         ReactiveFormsModule, TranslatePipe,
         MatMomentDateModule,
         MatSidenavModule, MatIconModule, MatButtonModule,
@@ -47,6 +48,7 @@ export class ServiceListComponent implements OnInit {
     serviceDC: string[] = ['name', 'sans', 'routes', 'action'];
     serviceDS: MatTableDataSource<Service>;
     servicePA = new DefaultPageMeta();
+    searchQuery: string = '';
 
     constructor(
         private notificationService: NotificationService,
@@ -62,12 +64,28 @@ export class ServiceListComponent implements OnInit {
         this.updateGridTable();
     }
 
+    applyFilter(): void {
+        this.servicePA.page = 1;
+        this.updateGridTable();
+    }
+
+    clearFilter(): void {
+        this.searchQuery = '';
+        this.applyFilter();
+    }
+
     updateGridTable() {
-        this.serviceService.get(this.servicePA).subscribe(data => {
-            if (data.metadata) {
-                this.serviceDS.data = data.data;
-                this.servicePA.total_elements = data.metadata.total_elements;
-            } else {
+        this.serviceService.get(this.servicePA, this.searchQuery).subscribe({
+            next: (data) => {
+                if (data && data.metadata) {
+                    this.serviceDS.data = data.data || [];
+                    this.servicePA.total_elements = data.metadata.total_elements;
+                } else {
+                    this.serviceDS.data = [];
+                    this.servicePA.total_elements = 0;
+                }
+            },
+            error: () => {
                 this.serviceDS.data = [];
                 this.servicePA.total_elements = 0;
             }
@@ -98,7 +116,7 @@ export class ServiceListComponent implements OnInit {
     }
 
     nextPage(event: PageEvent) {
-        this.servicePA.page = event.pageIndex;
+        this.servicePA.page = event.pageIndex + 1;
         this.servicePA.per_page = event.pageSize;
         this.updateGridTable();
     }
