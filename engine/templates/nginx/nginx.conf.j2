@@ -61,7 +61,7 @@ http {
   include upstreams.conf;
   include monitor.conf;
   {%- for u in services %}
-  include service-{{ u.name }}.conf;
+  include service-{{ u.render_name if u.render_name else u.name }}.conf;
   {%- endfor %}
 
   limit_req_status 429;

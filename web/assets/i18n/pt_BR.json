@@ -94,7 +94,9 @@
     "UPSTREAM": {
       "LINK": "Upstream",
       "TITLE": "Upstream",
-      "SUBTITLE": "Lista de todos os upstreams"
+      "SUBTITLE": "Lista de todos os upstreams",
+      "FILTER_PLACEHOLDER": "Filtrar upstreams por nome ou descrição...",
+      "ERR_TARGET_REQUIRED": "Upstream do tipo backend requer pelo menos 1 target."
     },
     "HOSTNAME": {
       "LINK": "Hostname",
@@ -413,9 +415,13 @@
   },
   "attr": {
     "name": "Nome",
-    "domains": "Dominios",
+    "domains": "Domínios",
     "routes": "Rotas",
     "active": "Ativo",
+    "description": "Descrição",
+    "protocol": "Protocolo",
+    "targets": "Destinos",
+    "actions": "Ações",
     "login": {
       "username": "Enter your user name",
       "password": "Password here"
@@ -457,7 +463,8 @@
     "upstream": {
       "link": "Upstreams",
       "title": "Upstream",
-      "subtitle": "Lista de todos os upstreams"
+      "subtitle": "Lista de todos os upstreams",
+      "filter_placeholder": "Filtrar por nome ou descrição..."
     },
     "hostname": {
       "link": "Hostnames",

@@ -33,8 +33,9 @@ def after(response):
 @routes.route("", methods=["GET"])
 @has_any_authority(authorities=["viewer", "superuser"])
 def search():
+    query = request.args.get("query") or request.args.get("q") or request.args.get("name") or request.args.get("search")
     with UpstreamDao() as dao:
-        result = dao.get_all(pagination=get_pagination())
+        result = dao.search(query=query, pagination=get_pagination())
         if result["metadata"]["total_elements"] > 0:
             for e in result['data']:
                 if 'content' in e:

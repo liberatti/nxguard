@@ -16,6 +16,7 @@ import { HealthService } from '../../services/config.service';
 import { RouteService } from '../../services/route.service';
 import { ServiceService } from '../../services/service.service';
 import { TransactionService } from '../../services/transaction.service';
+import { UpstreamService } from '../../services/upstream.service';
 import { EngineNode, Health } from '../../models/config';
 import { TransactionLog } from '../../models/transaction';
 import { DateFormatPipe } from '../../pipes/date_format.pipe';
@@ -46,6 +47,7 @@ import { TransactionRAWDialogComponent } from '../../components/transaction-raw-
 export class DashboardHomeComponent implements OnInit, AfterViewInit, OnDestroy {
     health: Health = {} as Health;
     totalThreats: number = 0;
+    totalUpstreams: number = 0;
     totalRequests: number = 0;
     blockedRequests: number = 0;
     warnRequests: number = 0;
@@ -69,6 +71,7 @@ export class DashboardHomeComponent implements OnInit, AfterViewInit, OnDestroy 
         private routeService: RouteService,
         private serviceService: ServiceService,
         private transactionService: TransactionService,
+        private upstreamService: UpstreamService,
         private cdr: ChangeDetectorRef
     ) { }
 
@@ -133,10 +136,30 @@ export class DashboardHomeComponent implements OnInit, AfterViewInit, OnDestroy 
 
     refresh(): void {
         this.loadHealth();
+        this.loadUpstreams();
         this.loadProtectedAssets();
         this.loadRequestStats();
         this.loadThreatLogs();
         this.loadTrafficChart();
+    }
+
+    loadUpstreams(): void {
+        this.upstreamService.get().subscribe({
+            next: (res: any) => {
+                this.totalUpstreams =
+                    res?.metadata?.total_elements ??
+                    (Array.isArray(res?.data)
+                        ? res.data.length
+                        : Array.isArray(res)
+                            ? res.length
+                            : 0);
+                this.cdr.markForCheck();
+            },
+            error: () => {
+                this.totalUpstreams = 0;
+                this.cdr.markForCheck();
+            },
+        });
     }
 
     loadHealth(): void {

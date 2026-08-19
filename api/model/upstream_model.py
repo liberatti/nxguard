@@ -2,7 +2,7 @@ import json
 from typing import Dict, Any, List
 import datetime
 
-from marshmallow import EXCLUDE, Schema, fields, pre_load
+from marshmallow import EXCLUDE, Schema, fields, pre_load, validates_schema, ValidationError
 
 import config as config
 from nxcore.middleware.logging_manager import logger
@@ -55,6 +55,14 @@ class UpstreamSchema(Schema):
                 data.pop("_id", None)
         return data
 
+    @validates_schema
+    def validate_backend_targets(self, data, **kwargs):
+        upstream_type = (data.get("type") or "backend").lower()
+        if upstream_type == "backend":
+            targets = data.get("targets")
+            if not targets or len(targets) == 0:
+                raise ValidationError("Backend upstream must have at least one target.", "targets")
+
 
 class UpstreamDao(DuckDAO):
 
@@ -97,6 +105,37 @@ class UpstreamDao(DuckDAO):
         except Exception as e:
             logger.error(f"Error retrieving upstreams by type: {str(e)}")
             raise
+
+    def search(self, query: str = None, pagination: dict = None, order_by: str = None) -> dict:
+        if not query or not query.strip():
+            return self.get_all(pagination=pagination, order_by=order_by)
+
+        term = f"%{query.strip().lower()}%"
+        where_clause = "WHERE LOWER(name) LIKE ? OR LOWER(description) LIKE ?"
+        params = (term, term)
+
+        count_sql = f"SELECT COUNT(*) AS total FROM {self.table_name} {where_clause}"
+        total = self._query(count_sql, params, fetch=True)[0]["total"]
+
+        sql = f"SELECT * FROM {self.table_name} {where_clause}"
+        if order_by:
+            sql += f" ORDER BY {order_by}"
+
+        if pagination:
+            page = pagination.get("page", 1)
+            per_page = pagination.get("per_page", 10)
+            offset = (page - 1) * per_page
+            sql += f" LIMIT {per_page} OFFSET {offset}"
+            pagination["total_elements"] = total
+        else:
+            pagination = {"total_elements": total, "page": 1, "per_page": total}
+
+        rs = self._query(sql, params, fetch=True)
+        rows = [self.to_dict(row) for row in rs] if rs else []
+        return {
+            "metadata": pagination,
+            "data": rows,
+        }
 
     def from_dict(self, vo: Dict[str, Any]) -> Dict[str, Any]:
         if "type" not in vo:

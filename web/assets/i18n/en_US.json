@@ -94,7 +94,9 @@
     "UPSTREAM": {
       "LINK": "Upstream",
       "TITLE": "Upstream",
-      "SUBTITLE": "List of all upstreams"
+      "SUBTITLE": "List of all upstreams",
+      "FILTER_PLACEHOLDER": "Filter upstreams by name or description...",
+      "ERR_TARGET_REQUIRED": "Backend upstream requires at least one target."
     },
     "HOSTNAME": {
       "LINK": "Hostname",
@@ -406,7 +408,11 @@
     "active": "Active",
     "name": "Name",
     "domains": "Domains",
-    "routes": "Routes"
+    "routes": "Routes",
+    "description": "Description",
+    "protocol": "Protocol",
+    "targets": "Targets",
+    "actions": "Actions"
   },
   "content": {
     "copy": "&copy; 2025 nxguard. All rights reserved. This solution is built on top of OpenResty.",
@@ -439,7 +445,8 @@
     "upstream": {
       "link": "Upstreams",
       "title": "Upstreams",
-      "subtitle": "List of all upstreams"
+      "subtitle": "List of all upstreams",
+      "filter_placeholder": "Search by name or description..."
     },
     "hostname": {
       "link": "Hostnames",

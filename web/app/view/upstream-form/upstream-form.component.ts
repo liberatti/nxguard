@@ -23,7 +23,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { UpstreamTargetDialogComponent } from 'app/components/upstream-target-dialog/upstream-target-dialog.component';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { OAuthService } from "../../services/oauth.service";
@@ -83,6 +83,7 @@ export class UpstreamFormComponent implements OnInit {
         private router: Router,
         private upstreamService: UpstreamService,
         private confirmDialog: MatDialog,
+        private translate: TranslateService,
         protected oauth: OAuthService,
     ) {
         this.targetDS = new MatTableDataSource<any>;
@@ -163,6 +164,12 @@ export class UpstreamFormComponent implements OnInit {
                 formData.append('zipfile', this.selectedFile);
             }
         } else {
+            if (!this.targetDS.data || this.targetDS.data.length === 0) {
+                this.notificationService.openSnackBar(
+                    this.translate.instant('UPSTREAM.ERR_TARGET_REQUIRED')
+                );
+                return;
+            }
             this.form.get('targets')?.setValue(this.targetDS.data);
             formData = this.form.value as Upstream;
             Reflect.deleteProperty(formData, 'script_path');
