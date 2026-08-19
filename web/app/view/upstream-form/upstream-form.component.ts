@@ -169,7 +169,7 @@ export class UpstreamFormComponent implements OnInit {
         }
 
         if (this.isAddMode) {
-            Reflect.deleteProperty(formData, 'id');
+            Reflect.deleteProperty(formData, '_id');
             this.upstreamService.save(formData).subscribe(() => {
                 this.notificationService.openSnackBar('Upstream saved');
                 this.router.navigate(['/ups']);

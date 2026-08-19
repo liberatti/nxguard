@@ -9,6 +9,7 @@ on:
 
 permissions:
   contents: write
+  issues: write
 
 jobs:
   publish-tag:
@@ -35,23 +36,6 @@ jobs:
             echo "Branch $BRANCH_NAME does not match v*-rc or v*-fix pattern"
             exit 1
           fi
-
-      - name: Create and push tag
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git tag ${{ steps.get_version.outputs.version }}
-          git push origin ${{ steps.get_version.outputs.version }}
-
-      - name: Create GitHub Release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release create ${{ steps.get_version.outputs.version }} --title "${{ steps.get_version.outputs.version }}" --generate-notes
-
-      - name: Delete source branch
-        run: |
-          git push origin --delete ${{ steps.get_version.outputs.branch }}
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
@@ -83,3 +67,30 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha,scope=main
           cache-to: type=gha,mode=max,scope=main
+
+      - name: Create and push tag
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git tag ${{ steps.get_version.outputs.version }}
+          git push origin ${{ steps.get_version.outputs.version }}
+
+      - name: Create GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create ${{ steps.get_version.outputs.version }} --title "${{ steps.get_version.outputs.version }}" --generate-notes
+
+      - name: Delete source branch
+        run: |
+          git push origin --delete ${{ steps.get_version.outputs.branch }}
+
+      - name: Close Milestone
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="${{ steps.get_version.outputs.version }}"
+          MILESTONE_NUMBER=$(gh api repos/${{ github.repository }}/milestones --jq ".[] | select(.title | startswith(\"$VERSION\")) | .number")
+          if [ -n "$MILESTONE_NUMBER" ]; then
+            gh api -X PATCH repos/${{ github.repository }}/milestones/$MILESTONE_NUMBER -f state=closed
+          fi

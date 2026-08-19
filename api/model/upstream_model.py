@@ -2,7 +2,7 @@ import json
 from typing import Dict, Any, List
 import datetime
 
-from marshmallow import EXCLUDE, Schema, fields
+from marshmallow import EXCLUDE, Schema, fields, pre_load
 
 import config as config
 from nxcore.middleware.logging_manager import logger
@@ -34,7 +34,7 @@ class UpstreamSchema(Schema):
     class Meta:
         unknown = EXCLUDE
 
-    _id = fields.Integer()
+    _id = fields.Integer(required=False, allow_none=True)
     name = fields.String()
     description = fields.String()
     retry = fields.Integer()
@@ -47,6 +47,13 @@ class UpstreamSchema(Schema):
     persist = fields.Nested(UpstreamPersistSchema)
     target_index = fields.String()
     target_content = fields.Raw()
+
+    @pre_load
+    def process_id(self, data, **kwargs):
+        if isinstance(data, dict):
+            if data.get("_id") == "" or data.get("_id") is None:
+                data.pop("_id", None)
+        return data
 
 
 class UpstreamDao(DuckDAO):
