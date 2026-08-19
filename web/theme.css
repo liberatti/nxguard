@@ -203,7 +203,17 @@ html, body {
     color: #ffffff !important;
 }
 
-.bottom-actions, .align-right, mat-card-actions[align="end"] {
+.bottom-actions {
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    gap: 10px !important;
+    padding: 16px 24px !important;
+    background: #f8fafc !important;
+    border-top: 1px solid #e2e8f0 !important;
+}
+
+.align-right, mat-card-actions[align="end"] {
     display: flex !important;
     justify-content: flex-end !important;
     align-items: center !important;

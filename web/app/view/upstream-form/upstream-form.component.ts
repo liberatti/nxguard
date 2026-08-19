@@ -150,14 +150,26 @@ export class UpstreamFormComponent implements OnInit {
 
     onSubmit() {
         this.submitted = true;
-        let formData = {} as any;
 
         if (this.form.status === "INVALID") {
+            let errors = [] as Array<string>;
+            Object.keys(this.form.controls).forEach(k => {
+                let control = this.form.get(k) as FormControl;
+                if (control && control.status !== "VALID") {
+                    errors.push(" Invalid value on " + k);
+                }
+            });
+
+            if (errors.length > 0) {
+                this.notificationService.openSnackBar(errors);
+            }
             return;
         }
 
+        let formData = {} as any;
+
         if (this.form.value.type == 'static') {
-            formData = new FormData()
+            formData = new FormData();
             let upstream = this.form.value as Upstream;
             const jsonBlob = new Blob([JSON.stringify(upstream)], { type: 'application/json' });
             formData.append('metadata', jsonBlob, 'metadata.json');
@@ -166,9 +178,9 @@ export class UpstreamFormComponent implements OnInit {
             }
         } else {
             if (!this.targetDS.data || this.targetDS.data.length === 0) {
-                this.notificationService.openSnackBar(
-                    this.translate.instant('UPSTREAM.ERR_TARGET_REQUIRED')
-                );
+                this.notificationService.openSnackBar([
+                    this.translate.instant('UPSTREAM.ERR_TARGET_REQUIRED') || 'Backend upstream requires at least one target.'
+                ]);
                 return;
             }
             this.form.get('targets')?.setValue(this.targetDS.data);

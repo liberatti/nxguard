@@ -1,14 +1,14 @@
 <ng-container>
     <mat-card class="service-form-card">
-        <mat-card-header>
+        <mat-card-header class="mb-2">
             <mat-card-title>{{ 'view.service.title' | translate }}</mat-card-title>
             <mat-card-subtitle>{{ (isAddMode ? 'actions.create' : 'actions.edit') | translate }}</mat-card-subtitle>
         </mat-card-header>
         <mat-card-content>
             <form [formGroup]="form">
-                <mat-stepper [linear]="false" #stepper class="service-stepper">
-                    <!-- Step 1: Details -->
-                    <mat-step [label]="'SERVICE.DETAILS' | translate">
+                <mat-tab-group [(selectedIndex)]="selectedTabIndex">
+                    <!-- Tab 1: Details -->
+                    <mat-tab [label]="'SERVICE.DETAILS' | translate" id="details-tab">
                         <div class="step-content-container">
                             <div class="details-layout">
                                 <!-- Left Column: Service Configuration -->
@@ -279,25 +279,11 @@
                                     </mat-card>
                                 </div>
                             </div>
-
-                            <!-- Details Step Actions -->
-                            <div class="step-actions">
-                                <button type="button" mat-stroked-button [routerLink]="['/service']"
-                                    id="service-form-back-btn">
-                                    <mat-icon>close</mat-icon>
-                                    {{ 'actions.cancel' | translate }}
-                                </button>
-                                <button type="button" mat-flat-button color="primary" (click)="onNextDetails(stepper)"
-                                    id="stepper-details-next-button">
-                                    {{ 'actions.next' | translate }}
-                                    <mat-icon>arrow_forward</mat-icon>
-                                </button>
-                            </div>
                         </div>
-                    </mat-step>
+                    </mat-tab>
 
-                    <!-- Step 2: Overrides -->
-                    <mat-step [label]="'SERVICE.OVERRIDES' | translate">
+                    <!-- Tab 2: Overrides -->
+                    <mat-tab [label]="'SERVICE.OVERRIDES' | translate" id="overrides-tab">
                         <div class="step-content-container">
                             <mat-card appearance="outlined" class="section-card">
                                 <mat-card-header>
@@ -359,25 +345,11 @@
                                     </button>
                                 </mat-card-actions>
                             </mat-card>
-
-                            <!-- Overrides Step Actions -->
-                            <div class="step-actions">
-                                <button type="button" mat-stroked-button matStepperPrevious
-                                    id="stepper-overrides-back-button">
-                                    <mat-icon>arrow_back</mat-icon>
-                                    {{ 'actions.back' | translate }}
-                                </button>
-                                <button type="button" mat-flat-button color="primary" matStepperNext
-                                    id="stepper-overrides-next-button">
-                                    {{ 'actions.next' | translate }}
-                                    <mat-icon>arrow_forward</mat-icon>
-                                </button>
-                            </div>
                         </div>
-                    </mat-step>
+                    </mat-tab>
 
-                    <!-- Step 3: Routes -->
-                    <mat-step [label]="'SERVICE.ROUTES' | translate">
+                    <!-- Tab 3: Routes -->
+                    <mat-tab [label]="'SERVICE.ROUTES' | translate" id="routes-tab">
                         <div class="step-content-container">
                             <mat-card appearance="outlined" class="section-card">
                                 <mat-card-header>
@@ -390,7 +362,7 @@
                                     </mat-card-subtitle>
                                 </mat-card-header>
                                 <mat-card-content>
-                                    <table class="custom-table cdk-drop-list-table">
+                                    <table class="custom-table cdk-drop-list-table" *ngIf="routeDS.data && routeDS.data.length">
                                         <thead>
                                             <tr>
                                                 <th class="drag-handle-cell"></th>
@@ -400,9 +372,9 @@
                                                 <th class="text-right"></th>
                                             </tr>
                                         </thead>
-                                        <tbody cdkDropList [cdkDropListData]="form.value.routes"
+                                        <tbody cdkDropList [cdkDropListData]="routeDS.data"
                                             (cdkDropListDropped)="moveRoute($event)">
-                                            <tr cdkDrag *ngFor="let r of form.value.routes; let i = index;">
+                                            <tr cdkDrag *ngFor="let r of routeDS.data; let i = index;">
                                                 <td cdkDragHandle class="drag-handle-cell">
                                                     <mat-icon>drag_indicator</mat-icon>
                                                 </td>
@@ -452,42 +424,34 @@
                                         </tbody>
                                     </table>
 
-                                    <div class="empty-state" *ngIf="!form.value.routes?.length">
+                                    <div class="empty-state" *ngIf="!routeDS.data || !routeDS.data.length">
                                         <mat-icon class="empty-state-icon">alt_route</mat-icon>
                                         <span class="empty-state-text">{{ 'SERVICE.NO_ROUTES' | translate }}</span>
                                     </div>
-                                    <mat-card-actions class="align-right">
-                                        <button mat-flat-button color="primary" type="button" *ngIf="form.enabled"
-                                            (click)="onAddRoute()" id="add-route-button">
-                                            <mat-icon>add</mat-icon>
-                                            {{ 'actions.create' | translate }}
-                                        </button>
-                                    </mat-card-actions>
                                 </mat-card-content>
+                                <mat-card-actions class="align-right">
+                                    <button mat-flat-button color="primary" type="button" *ngIf="form.enabled"
+                                        (click)="onAddRoute()" id="add-route-button">
+                                        <mat-icon>add</mat-icon>
+                                        {{ 'actions.create' | translate }}
+                                    </button>
+                                </mat-card-actions>
                             </mat-card>
-
-                            <!-- Routes Step Actions -->
-                            <div class="step-actions">
-                                <button type="button" mat-stroked-button [routerLink]="['/service']"
-                                    id="stepper-routes-cancel-button">
-                                    <mat-icon>close</mat-icon>
-                                    {{ 'actions.cancel' | translate }}
-                                </button>
-                                <button type="button" mat-stroked-button matStepperPrevious
-                                    id="stepper-routes-back-button">
-                                    <mat-icon>arrow_back</mat-icon>
-                                    {{ 'actions.back' | translate }}
-                                </button>
-                                <button type="button" mat-flat-button color="primary" *ngIf="form.enabled"
-                                    (click)="onSubmit()" id="stepper-routes-save-button">
-                                    <mat-icon>save</mat-icon>
-                                    {{ 'actions.save' | translate }}
-                                </button>
-                            </div>
                         </div>
-                    </mat-step>
-                </mat-stepper>
+                    </mat-tab>
+                </mat-tab-group>
             </form>
         </mat-card-content>
+        <mat-card-actions align="end" class="mat-mdc-card-actions bottom-actions">
+            <button type="button" mat-flat-button color="primary" *ngIf="form.enabled" (click)="onSubmit()"
+                id="save-service-button">
+                <mat-icon>save</mat-icon>
+                {{ 'ACTIONS.SAVE' | translate }}
+            </button>
+            <button type="button" mat-stroked-button [routerLink]="['/service']" id="return-service-button">
+                <mat-icon>arrow_back</mat-icon>
+                {{ 'ACTIONS.CANCEL' | translate }}
+            </button>
+        </mat-card-actions>
     </mat-card>
 </ng-container>

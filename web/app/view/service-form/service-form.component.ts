@@ -62,6 +62,7 @@ import { minArrayLength } from '../../validators/min-array-length.validator';
 })
 export class ServiceFormComponent implements OnInit {
 
+    selectedTabIndex: number = 0;
     _certificates: Certificate[];
     basicHeaders = [
         <Header>{ name: "X-Powered-By", content: "NXGuard" },
@@ -214,7 +215,7 @@ export class ServiceFormComponent implements OnInit {
     }
 
     moveRoute(event: any) {
-        const currentRoutes = (this.form.get('routes')?.value || []).slice();
+        const currentRoutes = (this.routeDS.data || []).slice();
         const element = currentRoutes[event.previousIndex];
         currentRoutes.splice(event.previousIndex, 1);
         currentRoutes.splice(event.currentIndex, 0, element);
@@ -244,6 +245,7 @@ export class ServiceFormComponent implements OnInit {
             return;
         }
         let _data: Service = JSON.parse(JSON.stringify(this.form.value));
+        _data.routes = JSON.parse(JSON.stringify(this.routeDS.data || []));
 
         if (_data._id === "") {
             Reflect.deleteProperty(_data, '_id');
@@ -358,29 +360,20 @@ export class ServiceFormComponent implements OnInit {
     }
 
     onRemoveRoute(index: number) {
-        const currentRoutes = (this.form.get('routes')?.value || []).slice();
+        const currentRoutes = (this.routeDS.data || []).slice();
         currentRoutes.splice(index, 1);
         this.form.get('routes')?.setValue(currentRoutes);
         this.routeDS.data = currentRoutes;
     }
 
     onAddRoute() {
-        const dialogRef = this.confirmDialog.open(ServiceRouteFormDialogComponent,
-            {
-                maxWidth: undefined
-            });
+        const dialogRef = this.confirmDialog.open(ServiceRouteFormDialogComponent, {
+            maxWidth: undefined
+        });
 
         dialogRef.afterClosed().subscribe(result => {
             if (result) {
-                if (result.upstream && result.upstream._id) {
-                    result.upstream = <Upstream>{ _id: result.upstream._id };
-                }
-                if (result.sensor && result.sensor._id) {
-                    result.sensor = <Sensor>{ _id: result.sensor._id };
-                } else {
-                    Reflect.deleteProperty(result, 'sensor');
-                }
-                const currentRoutes = this.form.get('routes')?.value || [];
+                const currentRoutes = (this.routeDS.data || []).slice();
                 const newRoutes = [...currentRoutes, result];
                 this.form.get('routes')?.setValue(newRoutes);
                 this.routeDS.data = newRoutes;
@@ -390,26 +383,17 @@ export class ServiceFormComponent implements OnInit {
 
     onEditRoute(index: number) {
         const targetRoute = this.routeDS.data[index];
-        const dialogRef = this.confirmDialog.open(ServiceRouteFormDialogComponent,
-            {
-                maxWidth: undefined,
-                data: targetRoute
-            });
+        const dialogRef = this.confirmDialog.open(ServiceRouteFormDialogComponent, {
+            maxWidth: undefined,
+            data: targetRoute
+        });
 
         dialogRef.afterClosed().subscribe(result => {
             if (result) {
-                if (result.upstream && result.upstream._id) {
-                    result.upstream = <Upstream>{ _id: result.upstream._id };
-                }
-                if (result.sensor && result.sensor._id) {
-                    result.sensor = <Sensor>{ _id: result.sensor._id };
-                } else {
-                    Reflect.deleteProperty(result, 'sensor');
-                }
                 if (targetRoute && targetRoute._id) {
                     result._id = targetRoute._id;
                 }
-                const currentRoutes = (this.form.get('routes')?.value || []).slice();
+                const currentRoutes = (this.routeDS.data || []).slice();
                 currentRoutes[index] = result;
                 this.form.get('routes')?.setValue(currentRoutes);
                 this.routeDS.data = currentRoutes;

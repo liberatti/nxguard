@@ -86,16 +86,15 @@
             </form>
         </mat-card-content>
 
-        <mat-card-actions align="end" class="bottom-actions">
-            <button type="button" mat-stroked-button [routerLink]="['/certificate']" id="back-certificate-btn" class="action-btn">
-                <mat-icon>arrow_back</mat-icon>
-                <span>{{ 'actions.cancel' | translate }}</span>
-            </button>
-            <button type="button" mat-flat-button color="primary"
-                    *ngIf="form.enabled" id="save-certificate-btn"
-                    (click)="onSubmit()" class="action-btn">
+        <mat-card-actions align="end" class="mat-mdc-card-actions bottom-actions">
+            <button type="button" mat-flat-button color="primary" *ngIf="form.enabled" (click)="onSubmit()"
+                id="save-certificate-btn">
                 <mat-icon>save</mat-icon>
-                <span>{{ 'actions.save' | translate }}</span>
+                {{ 'ACTIONS.SAVE' | translate }}
+            </button>
+            <button type="button" mat-stroked-button [routerLink]="['/certificate']" id="back-certificate-btn">
+                <mat-icon>arrow_back</mat-icon>
+                {{ 'ACTIONS.CANCEL' | translate }}
             </button>
         </mat-card-actions>
     </mat-card>

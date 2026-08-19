@@ -2,7 +2,14 @@ import json
 from typing import Dict, Any, List
 import datetime
 
-from marshmallow import EXCLUDE, Schema, fields, pre_load, validates_schema, ValidationError
+from marshmallow import (
+    EXCLUDE,
+    Schema,
+    fields,
+    pre_load,
+    validates_schema,
+    ValidationError,
+)
 
 import config as config
 from nxcore.middleware.logging_manager import logger
@@ -59,9 +66,13 @@ class UpstreamSchema(Schema):
     def validate_backend_targets(self, data, **kwargs):
         upstream_type = (data.get("type") or "backend").lower()
         if upstream_type == "backend":
+            if data.get("_id") and "targets" not in data:
+                return
             targets = data.get("targets")
             if not targets or len(targets) == 0:
-                raise ValidationError("Backend upstream must have at least one target.", "targets")
+                raise ValidationError(
+                    "Backend upstream must have at least one target.", "targets"
+                )
 
 
 class UpstreamDao(DuckDAO):
@@ -106,7 +117,9 @@ class UpstreamDao(DuckDAO):
             logger.error(f"Error retrieving upstreams by type: {str(e)}")
             raise
 
-    def search(self, query: str = None, pagination: dict = None, order_by: str = None) -> dict:
+    def search(
+        self, query: str = None, pagination: dict = None, order_by: str = None
+    ) -> dict:
         if not query or not query.strip():
             return self.get_all(pagination=pagination, order_by=order_by)
 

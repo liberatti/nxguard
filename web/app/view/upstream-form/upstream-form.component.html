@@ -185,11 +185,11 @@
             <button id="save-upstream-btn" type="button" mat-flat-button color="primary" *ngIf="form.enabled"
                 (click)="onSubmit()">
                 <mat-icon>save</mat-icon>
-                {{ 'actions.save' | translate }}
+                {{ 'ACTIONS.SAVE' | translate }}
             </button>
             <button type="button" mat-stroked-button [routerLink]="['/ups']" id="upstream-form-back-btn">
                 <mat-icon>arrow_back</mat-icon>
-                Cancel
+                {{ 'ACTIONS.CANCEL' | translate }}
             </button>
         </mat-card-actions>
     </mat-card>

@@ -85,13 +85,14 @@
 
         <!-- Actions -->
         <mat-card-actions align="end" class="mat-mdc-card-actions bottom-actions">
-            <button type="button" mat-flat-button color="primary" *ngIf="form.enabled" id="save-user-btn" (click)="onSubmit()" class="action-btn-save">
+            <button type="button" mat-flat-button color="primary" *ngIf="form.enabled" (click)="onSubmit()"
+                id="save-user-btn">
                 <mat-icon>save</mat-icon>
-                <span>{{ 'actions.save' | translate }}</span>
+                {{ 'ACTIONS.SAVE' | translate }}
             </button>
-            <button type="button" mat-stroked-button [routerLink]="['/users']" id="back-user-btn" class="action-btn-back">
+            <button type="button" mat-stroked-button [routerLink]="['/users']" id="back-user-btn">
                 <mat-icon>arrow_back</mat-icon>
-                <span>{{ 'actions.cancel' | translate }}</span>
+                {{ 'ACTIONS.CANCEL' | translate }}
             </button>
         </mat-card-actions>
     </mat-card>

@@ -89,10 +89,10 @@
 
         <!-- Actions -->
         <mat-card-actions align="end" class="mat-mdc-card-actions bottom-actions">
-            <button mat-flat-button color="primary" id="save-account-btn" (click)="onSubmit()"
-                    [disabled]="form.invalid" class="save-btn">
+            <button type="button" mat-flat-button color="primary" [disabled]="form.invalid" (click)="onSubmit()"
+                id="save-account-btn">
                 <mat-icon>save</mat-icon>
-                <span>{{ 'ACCOUNT.SAVE' | translate }}</span>
+                {{ 'ACTIONS.SAVE' | translate }}
             </button>
         </mat-card-actions>
     </mat-card>
