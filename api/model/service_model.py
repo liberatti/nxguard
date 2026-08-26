@@ -120,7 +120,6 @@ class ServiceDao(DuckDAO):
                         vo["certificate_id"] = crt["_id"]
             else:
                 vo["certificate_id"] = None
-
         return super().from_dict(vo)
 
     def to_dict(self, vo: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
@@ -206,7 +205,9 @@ class ServiceDao(DuckDAO):
         try:
             if not sans:
                 return None
-            conditions = " OR ".join([f"CAST(sans AS TEXT) LIKE '%{s}%'" for s in sans if s])
+            conditions = " OR ".join(
+                [f"CAST(sans AS TEXT) LIKE '%{s}%'" for s in sans if s]
+            )
             if not conditions:
                 return None
             query = f"SELECT * from {self.table_name} WHERE ({conditions})"
@@ -235,7 +236,9 @@ class ServiceDao(DuckDAO):
             logger.error(f"Error retrieving services by certificate: {str(e)}")
             raise
 
-    def search(self, query: str = None, pagination: dict = None, order_by: str = None) -> dict:
+    def search(
+        self, query: str = None, pagination: dict = None, order_by: str = None
+    ) -> dict:
         if not query or not query.strip():
             return self.get_all(pagination=pagination, order_by=order_by)
 
