@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -141,6 +141,7 @@ export class ServiceFormComponent implements OnInit {
         private serviceService: ServiceService,
         private certificateService: CertificateService,
         protected oauth: OAuthService,
+        private cdr: ChangeDetectorRef,
     ) {
         this.headerDS = new MatTableDataSource<Header>;
         this.routeDS = new MatTableDataSource<Route>;
@@ -221,6 +222,7 @@ export class ServiceFormComponent implements OnInit {
         currentRoutes.splice(event.currentIndex, 0, element);
         this.form.get('routes')?.setValue(currentRoutes);
         this.routeDS.data = currentRoutes;
+        this.cdr.detectChanges();
     }
 
     onNextDetails(stepper: MatStepper) {
@@ -292,9 +294,11 @@ export class ServiceFormComponent implements OnInit {
     }
 
     onBindRemove(index: number) {
-        const data = this.bindingDS.data;
+        const data = (this.bindingDS.data || []).slice();
         data.splice(index, 1);
         this.bindingDS.data = data;
+        this.form.get('bindings')?.setValue(data);
+        this.cdr.detectChanges();
     }
 
     onAddBind() {
@@ -312,10 +316,10 @@ export class ServiceFormComponent implements OnInit {
 
         dialogRef.afterClosed().subscribe(result => {
             if (result) {
-                const data = this.bindingDS.data;
-                data.push(result);
+                const data = [...(this.bindingDS.data || []), result];
                 this.bindingDS.data = data;
                 this.form.get('bindings')?.setValue(data);
+                this.cdr.detectChanges();
             }
         });
     }
@@ -330,18 +334,20 @@ export class ServiceFormComponent implements OnInit {
         dialogRef.afterClosed().subscribe(result => {
             if (result) {
                 this.onBindRemove(index);
-                const data = this.bindingDS.data;
-                data.push(result);
+                const data = [...(this.bindingDS.data || []), result];
                 this.bindingDS.data = data;
                 this.form.get('bindings')?.setValue(data);
+                this.cdr.detectChanges();
             }
         });
     }
 
     onRemoveHeader(selectedIndex: number) {
-        const data = this.headerDS.data;
+        const data = (this.headerDS.data || []).slice();
         data.splice(selectedIndex, 1);
         this.headerDS.data = data;
+        this.form.get('headers')?.setValue(data);
+        this.cdr.detectChanges();
     }
 
     onAddHeader() {
@@ -351,10 +357,10 @@ export class ServiceFormComponent implements OnInit {
 
         dialogRef.afterClosed().subscribe(result => {
             if (result) {
-                const data = this.headerDS.data;
-                data.push(result);
+                const data = [...(this.headerDS.data || []), result];
                 this.headerDS.data = data;
                 this.form.get('headers')?.reset(data);
+                this.cdr.detectChanges();
             }
         });
     }
@@ -364,6 +370,7 @@ export class ServiceFormComponent implements OnInit {
         currentRoutes.splice(index, 1);
         this.form.get('routes')?.setValue(currentRoutes);
         this.routeDS.data = currentRoutes;
+        this.cdr.detectChanges();
     }
 
     onAddRoute() {
@@ -377,6 +384,7 @@ export class ServiceFormComponent implements OnInit {
                 const newRoutes = [...currentRoutes, result];
                 this.form.get('routes')?.setValue(newRoutes);
                 this.routeDS.data = newRoutes;
+                this.cdr.detectChanges();
             }
         });
     }
@@ -397,6 +405,7 @@ export class ServiceFormComponent implements OnInit {
                 currentRoutes[index] = result;
                 this.form.get('routes')?.setValue(currentRoutes);
                 this.routeDS.data = currentRoutes;
+                this.cdr.detectChanges();
             }
         });
     }

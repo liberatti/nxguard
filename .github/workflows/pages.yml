@@ -2,7 +2,7 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: ["v*-rc", "v*-fix"]
+    branches: ["main"]
   workflow_dispatch:
 
 permissions:

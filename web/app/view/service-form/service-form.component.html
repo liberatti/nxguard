@@ -279,6 +279,13 @@
                                     </mat-card>
                                 </div>
                             </div>
+                            <div class="step-actions">
+                                <button mat-flat-button color="primary" matStepperNext type="button"
+                                    id="next-details-button">
+                                    {{ 'ACTIONS.NEXT' | translate }}
+                                    <mat-icon iconPositionEnd>navigate_next</mat-icon>
+                                </button>
+                            </div>
                         </div>
                     </mat-step>
 
@@ -345,6 +352,17 @@
                                     </button>
                                 </mat-card-actions>
                             </mat-card>
+                            <div class="step-actions">
+                                <button mat-stroked-button matStepperPrevious type="button" id="back-overrides-button">
+                                    <mat-icon>navigate_before</mat-icon>
+                                    {{ 'ACTIONS.BACK' | translate }}
+                                </button>
+                                <button mat-flat-button color="primary" matStepperNext type="button"
+                                    id="next-overrides-button">
+                                    {{ 'ACTIONS.NEXT' | translate }}
+                                    <mat-icon iconPositionEnd>navigate_next</mat-icon>
+                                </button>
+                            </div>
                         </div>
                     </mat-step>
 
@@ -362,7 +380,8 @@
                                     </mat-card-subtitle>
                                 </mat-card-header>
                                 <mat-card-content>
-                                    <table class="custom-table cdk-drop-list-table" *ngIf="routeDS.data && routeDS.data.length">
+                                    <table class="custom-table cdk-drop-list-table"
+                                        *ngIf="routeDS.data && routeDS.data.length">
                                         <thead>
                                             <tr>
                                                 <th class="drag-handle-cell"></th>
@@ -437,6 +456,12 @@
                                     </button>
                                 </mat-card-actions>
                             </mat-card>
+                            <div class="step-actions">
+                                <button mat-stroked-button matStepperPrevious type="button" id="back-routes-button">
+                                    <mat-icon>navigate_before</mat-icon>
+                                    {{ 'ACTIONS.BACK' | translate }}
+                                </button>
+                            </div>
                         </div>
                     </mat-step>
                 </mat-stepper>

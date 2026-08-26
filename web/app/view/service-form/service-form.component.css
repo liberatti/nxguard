@@ -262,6 +262,17 @@
     transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
 
+/* Step Actions */
+.step-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-dim, #e2e8f0);
+}
+
 /* Bottom Actions */
 .bottom-actions {
     padding: 16px 24px !important;

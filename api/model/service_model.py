@@ -204,12 +204,20 @@ class ServiceDao(DuckDAO):
         self, sans: List[str], active: Optional[bool] = None
     ) -> Optional[Dict[str, Any]]:
         try:
-            query = f"SELECT * from {self.table_name} WHERE sans LIKE '%{sans[0]}%'"
+            if not sans:
+                return None
+            conditions = " OR ".join([f"CAST(sans AS TEXT) LIKE '%{s}%'" for s in sans if s])
+            if not conditions:
+                return None
+            query = f"SELECT * from {self.table_name} WHERE ({conditions})"
             if active is not None:
-                query += f" AND active = {active}"
+                query += f" AND active = {1 if active else 0}"
 
             logger.debug(query)
-            vo = self._query(query, fetch=True)[0]
+            rows = self._query(query, fetch=True)
+            if not rows:
+                return None
+            vo = rows[0]
             return self.to_dict(vo) if vo else None
         except Exception as e:
             logger.error(f"Error retrieving service by SANs: {str(e)}")
