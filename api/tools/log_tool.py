@@ -163,6 +163,9 @@ class LogParserTool:
 
                 now = time.time()
                 merged_records = []
+                logger.info(
+                    f"\n\n{ service_name} Access records: {len(access_records)}, Audit records: {len(audit_records)}"
+                )
 
                 # Correlate incoming access records
                 for acc in access_records:
@@ -225,6 +228,10 @@ class LogParserTool:
                                 logger.error(
                                     f"Error persisting merged transaction: {e}"
                                 )
+                    logger.info(
+                        f"Merged {len(merged_records)} transactions for {service_name}"
+                    )
+
             except Exception as e:
                 logger.error(
                     f"Error merging transactions for {service_name}: {e} {traceback.format_exc()}"

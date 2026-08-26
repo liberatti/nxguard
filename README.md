@@ -97,7 +97,7 @@ docker run --rm \
   --shm-size=2g \
   --add-host nxguard.local:host-gateway \
   -v ${PWD}/.docs/reports:/app/reports \
-  wallarm/gotestwaf --url=http://nxguard.local:8080/nxg/ --blockStatusCodes=403,404,400 --reportFormat=html --noEmailReport
+  wallarm/gotestwaf --url=https://nxguard.local:8443/nxg/ --blockStatusCodes=403,404,400 --reportFormat=html --noEmailReport
 ```
 
 ![Waf Evaluation Report](.docs/benchmarks.png)

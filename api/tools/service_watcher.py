@@ -21,7 +21,11 @@ class ServiceWatcher:
     def stop(self):
         if not self.w_threads:
             return
-        service_name = self.service.get("name") or self.service.get("_id")
+        service_name = self.service.get("render_name") or (
+            f"{self.service.get('name')}_{self.service.get('_id')}"
+            if self.service.get("_id")
+            else self.service.get("name")
+        )
         logger.info(f"[stop watcher] {service_name}")
         for t in self.w_threads:
             setattr(t, "active", False)
@@ -32,7 +36,11 @@ class ServiceWatcher:
         self.w_threads = []
 
     def start(self):
-        service_name = self.service.get("name") or self.service.get("_id")
+        service_name = self.service.get("render_name") or (
+            f"{self.service.get('name')}_{self.service.get('_id')}"
+            if self.service.get("_id")
+            else self.service.get("name")
+        )
         logger.info(f"[start watcher] {service_name}")
         self.stop()
         cache = self.cache
