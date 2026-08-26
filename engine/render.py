@@ -152,7 +152,7 @@ def _generate_sensors(
         exclusion_lists = [
             ",".join(
                 f"ctl:ruleRemoveById={str(x).strip()}"
-                for x in exclusions[i:i + chunk_size]
+                for x in exclusions[i : i + chunk_size]
             )
             for i in range(0, len(exclusions), chunk_size)
         ]
@@ -395,14 +395,6 @@ def generate(data, output_dir=config.BASE_PATH, test=False):
         env,
         "nginx/scgi_params.j2",
         f"{conf_dir}/scgi_params",
-        data,
-    )
-
-    logger.info(f"[{output_dir}] - Generate {conf_dir}/monitor.conf")
-    _render_template_to_file(
-        env,
-        "nginx/monitor.conf.j2",
-        f"{conf_dir}/monitor.conf",
         data,
     )
 

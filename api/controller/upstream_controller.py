@@ -93,7 +93,7 @@ def save():
 @has_any_authority(authorities=["superuser"])
 def update(upstream_id):
     try:
-        with UpstreamDao() as dao:
+        with UpstreamDao() as dao, UpstreamStatesDao() as states_dao:
             if request.content_type and request.content_type.startswith('multipart/form-data'):
                 metadata = request.files.get('metadata')
                 raw_upstream = json.load(metadata.stream) if metadata else {}
@@ -104,6 +104,7 @@ def update(upstream_id):
             else:
                 upstream = dao.json_load(request.json)
             dao.update_by_id(upstream_id, upstream)
+            states_dao.delete_by_upstream_id(int(upstream_id))
             updated = dao.get_by_id(upstream_id) or upstream
             if 'content' in updated:
                 updated.pop("content")
@@ -132,6 +133,8 @@ def delete(upstream_id):
                         )
         r = dao.delete_by_id(upstream_id)
         if r:
+            with UpstreamStatesDao() as states_dao:
+                states_dao.delete_by_upstream_id(int(upstream_id))
             return response_data_removed(upstream_id)
         else:
             return response_error_404()

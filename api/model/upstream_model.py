@@ -402,6 +402,13 @@ class UpstreamStatesDao(DuckDAO):
         rs = self._query(sql, (upstream_id,), fetch=True)
         return [self.to_dict(row) for row in rs] if rs else []
 
+    def delete_by_upstream_id(self, upstream_id: int):
+        self.connect()
+        sql = f"DELETE FROM {self.table_name} WHERE upstream_id = ?"
+        self._query(sql, (int(upstream_id),))
+        if self.auto_commit:
+            self.commit()
+
     def from_dict(self, vo: Dict[str, Any]) -> Dict[str, Any]:
         vo = dict(vo)
         if "targets" in vo and isinstance(vo["targets"], list):
