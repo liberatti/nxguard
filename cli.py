@@ -1,6 +1,7 @@
 """CLI entrypoint for managing NXGuard installation, configuration apply, and SecLanguage indexing."""
 
 import sys
+from urllib.request import urlopen
 
 import engine.seclang.seclang_indexer as indexer
 from api.tasks import install, update_main_config

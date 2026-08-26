@@ -1,4 +1,3 @@
-import json
 from flask import Blueprint, Response, request
 from marshmallow import ValidationError
 from nxcore.controllers.base_controller import (
@@ -11,7 +10,7 @@ from nxcore.middleware.socket_manager import emit_event
 
 import engine.admin as c_admin
 import engine.build as c_builder
-from api.model.config_model import ChangeDao, ConfigBackupDao, ConfigDao
+from api.model.config_model import ChangeDao, ConfigDao
 from api.model.upstream_model import NodeStatusDao
 
 routes = Blueprint("config", __name__)

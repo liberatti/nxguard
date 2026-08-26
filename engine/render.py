@@ -249,7 +249,8 @@ def __resolve_sensor_by_name(sensor_name, data):
                 s.get("name") == name_str
                 or s.get("render_name") == name_str
                 or str(s.get("name", "")).lower() == name_str.lower()
-                or s.get("render_name") == _normalize_name_for_render({"name": name_str, "_id": s.get("_id")})
+                or s.get("render_name")
+                == _normalize_name_for_render({"name": name_str, "_id": s.get("_id")})
             ):
                 return s
     logger.warning(
@@ -279,7 +280,8 @@ def __resolve_upstream_by_name(upstream_name, data):
                 u.get("name") == name_str
                 or u.get("render_name") == name_str
                 or str(u.get("name", "")).lower() == name_str.lower()
-                or u.get("render_name") == _normalize_name_for_render({"name": name_str, "_id": u.get("_id")})
+                or u.get("render_name")
+                == _normalize_name_for_render({"name": name_str, "_id": u.get("_id")})
             ):
                 return u
     logger.warning(
@@ -312,9 +314,7 @@ def _generate_services(
 
         for r in service.get("routes", []):
             if r["type"] == RouteType.UPSTREAM:
-                r["upstream"] = __resolve_upstream_by_name(
-                    r.get("upstream"), data
-                )
+                r["upstream"] = __resolve_upstream_by_name(r.get("upstream"), data)
             if r["type"] == RouteType.STATIC:
                 r.update({"upstream": None})
             if r["type"] == RouteType.REDIRECT:
@@ -322,7 +322,15 @@ def _generate_services(
 
             if "sensor" in r and r.get("sensor"):
                 sensor = __resolve_sensor_by_name(r["sensor"], data)
-                sensor_name = (sensor.get("render_name") or sensor.get("name")) if sensor else (r["sensor"].get("name") if isinstance(r["sensor"], dict) else r["sensor"])
+                sensor_name = (
+                    (sensor.get("render_name") or sensor.get("name"))
+                    if sensor
+                    else (
+                        r["sensor"].get("name")
+                        if isinstance(r["sensor"], dict)
+                        else r["sensor"]
+                    )
+                )
                 service.update(
                     {
                         "service_policy_file": f"{output_dir}/modsec/conf/{prefix}SERVICE-{svc_name}.policy",
