@@ -11,7 +11,7 @@ import os
 import threading
 import time
 import traceback
-
+import subprocess
 import schedule
 from nxcore.middleware.logging_manager import logger, LoggingManager
 
@@ -23,6 +23,7 @@ from api.tasks import (
     update_node_status,
     update_node_config,
     update_main_config,
+    renew_certificates,
     install,
 )
 
@@ -47,7 +48,6 @@ def post_fork(server, worker):
     is_main = os.environ.get("NXGUARD_ROLE") == "main"
     logger.info("NXGuard instance is main: %s", is_main)
     try:
-        import subprocess
         subprocess.run(f"sudo chmod -R 777 {_config.DB_PATH}", shell=True)
     except Exception:
         pass
@@ -67,6 +67,7 @@ def post_fork(server, worker):
         else:
             logger.error(f"Failed to apply config: {val['message']}")
         schedule.every(10).seconds.do(update_main_config)
+        schedule.every(10).seconds.do(renew_certificates)
     else:
         update_node_config()
         schedule.every(60).seconds.do(update_node_config)

@@ -134,6 +134,12 @@
       "LINK": "Sistema"
     }
   },
+  "CERTIFICATE": {
+    "FORCE_RENEW": "Pendente de Renovação",
+    "RENEW_PENDING": "Renovação pendente",
+    "RENEW_SCHEDULED": "Renovação agendada",
+    "RENEW_NOT_SCHEDULED": "Sem renovação agendada"
+  },
   "ROUTE": {
     "ALLOWED_METHODS": "Métodos HTTP Permitidos",
     "ALLOWED_CONTENT_TYPE": "Content Types Permitidos",

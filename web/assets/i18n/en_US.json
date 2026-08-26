@@ -134,6 +134,12 @@
       "LINK": "System"
     }
   },
+  "CERTIFICATE": {
+    "FORCE_RENEW": "Pending Renewal",
+    "RENEW_PENDING": "Pending renewal",
+    "RENEW_SCHEDULED": "Renewal scheduled",
+    "RENEW_NOT_SCHEDULED": "No renewal scheduled"
+  },
   "ROUTE": {
     "ALLOWED_METHODS": "Allowed HTTP Methods",
     "ALLOWED_CONTENT_TYPE": "Allowed Content Types",

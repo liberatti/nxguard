@@ -49,6 +49,17 @@
                     </td>
                 </ng-container>
 
+                <ng-container matColumnDef="force_renew">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'CERTIFICATE.FORCE_RENEW' | translate }}</th>
+                    <td mat-cell *matCellDef="let element">
+                        @if (element.force_renew) {
+                            <mat-icon color="warn" [matTooltip]="'CERTIFICATE.RENEW_PENDING' | translate">autorenew</mat-icon>
+                        } @else {
+                            <mat-icon style="color: var(--text-muted);" [matTooltip]="'CERTIFICATE.RENEW_NOT_SCHEDULED' | translate">sync_disabled</mat-icon>
+                        }
+                    </td>
+                </ng-container>
+
                 <ng-container matColumnDef="action">
                     <th mat-header-cell *matHeaderCellDef class="text-right">Actions</th>
                     <td mat-cell *matCellDef="let element;let i = index;" class="text-right">

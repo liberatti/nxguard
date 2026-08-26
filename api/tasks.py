@@ -14,6 +14,7 @@ import engine.build as c_builder
 import engine.seclang.seclang_indexer as seclang_indexer
 from api.model.config_model import ConfigBackupDao, ConfigDao
 from api.model.upstream_model import NodeStatusDao
+from api.model.certificate_model import CertificateDao
 
 
 def update_node_config() -> None:
@@ -112,3 +113,15 @@ def install():
             subprocess.run(f"sudo rm -f {config.DB_PATH}/app.duckdb", shell=True)
     c_builder.create_db()
     seclang_indexer.index()
+
+
+def renew_certificates():
+    with CertificateDao() as certificate_dao:
+        certificates = certificate_dao.get_all()["data"]
+        for certificate in certificates:
+            if certificate["force_renew"] or (certificate["status"] == "EXPIRED"):
+                logger.info(f"Renewing certificate for {certificate['subjects']}")
+                certificate_dao.update_by_id(
+                    certificate["_id"], {"force_renew": False, "status": "VALID"}
+                )
+    update_main_config()
