@@ -62,7 +62,6 @@ def clean(data, output_dir=config.BASE_PATH, test=False):
             f"{conf_dir}/fastcgi_params",
             f"{conf_dir}/scgi_params",
             f"{conf_dir}/upstreams.conf",
-            f"{conf_dir}/monitor.conf",
             f"{conf_dir}/fastcgi.conf",
             f"{conf_dir}/nginx.conf",
         ]
