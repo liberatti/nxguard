@@ -1,6 +1,6 @@
 <h1 mat-dialog-title>Upstream Target</h1>
 <div mat-dialog-content>
-    <form [formGroup]="form" id="upstream-target-form">
+    <form [formGroup]="form" id="upstream-target-form mt-2">
         <div class="row">
             <div class="col">
                 <mat-form-field class='full-width'>
@@ -26,7 +26,8 @@
     </form>
 </div>
 <div mat-dialog-actions align="end" class="dialog-actions">
-    <button id="save-upstream-target-btn" type="button" (click)="onSubmit()" mat-raised-button color="primary" cdkFocusInitial>
+    <button id="save-upstream-target-btn" type="button" (click)="onSubmit()" mat-raised-button color="primary"
+        cdkFocusInitial>
         <mat-icon>save</mat-icon> Save
     </button>
     <button id="cancel-upstream-target-btn" mat-mini-fab type="button" color="primary" (click)="cancel()">
