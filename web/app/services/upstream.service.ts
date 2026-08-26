@@ -12,4 +12,8 @@ export class UpstreamService extends APIService<Upstream, string> {
     ) {
         super(injector, 'upstream')
     }
+
+    getStates(id: string) {
+        return this.httpClient.get<any[]>(`${this.END_POINT}/${id}/states`);
+    }
 }

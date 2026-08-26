@@ -19,8 +19,10 @@ import config as _config
 
 import engine.admin as c_admin
 import engine.build as c_builder
+from api.model.upstream_model import UpstreamStatesDao
 from api.tasks import (
     update_node_status,
+    update_upstream_states,
     update_node_config,
     update_main_config,
     renew_certificates,
@@ -51,6 +53,7 @@ def post_fork(server, worker):
         subprocess.run(f"sudo chmod -R 777 {_config.DB_PATH}", shell=True)
     except Exception:
         pass
+
     if is_main:
         if not os.path.exists(f"{_config.DB_PATH}/app.duckdb"):
             install()
@@ -68,10 +71,13 @@ def post_fork(server, worker):
             logger.error(f"Failed to apply config: {val['message']}")
         schedule.every(10).seconds.do(update_main_config)
         schedule.every(10).seconds.do(renew_certificates)
+        with UpstreamStatesDao() as states_dao:
+            states_dao.delete_all()
     else:
         update_node_config()
         schedule.every(60).seconds.do(update_node_config)
     schedule.every(30).seconds.do(update_node_status)
+    schedule.every(30).seconds.do(update_upstream_states)
     threading.Thread(target=_scheduler, daemon=True).start()
 
 

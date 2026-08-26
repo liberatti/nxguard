@@ -10,7 +10,6 @@ from nxcore.controllers.base_controller import (
     response_error,
     get_pagination,
     has_any_authority,
-    response_error_500,
     response_data_removed,
 )
 from nxcore.middleware.socket_manager import emit_event
@@ -246,7 +245,14 @@ def delete(certificate_id: str) -> Response:
         if service_list and "data" in service_list and service_list["data"]:
             for service in service_list["data"]:
                 cert = service.get("certificate")
-                if cert and str(cert.get("_id")) == str(certificate_id):
-                    return response_error_500("Certificate in use")
+                cert_id = cert.get("_id") if isinstance(cert, dict) else cert
+                if cert and str(cert_id) == str(certificate_id):
+                    service_name = service.get("name", "Unknown")
+                    service_id = service.get("_id")
+                    return response_error(
+                        f"Certificate in use by service: {service_name} (ID: {service_id})",
+                        code=406,
+                        details={"service_id": service_id, "service_name": service_name},
+                    )
         result = dao.delete_by_id(certificate_id)
         return response_data_removed(certificate_id) if result else response_error_404()

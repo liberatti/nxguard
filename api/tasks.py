@@ -1,5 +1,6 @@
 import datetime
 import os
+import socket
 import subprocess
 import time
 import traceback
@@ -13,7 +14,7 @@ import engine.admin as c_admin
 import engine.build as c_builder
 import engine.seclang.seclang_indexer as seclang_indexer
 from api.model.config_model import ConfigBackupDao, ConfigDao
-from api.model.upstream_model import NodeStatusDao
+from api.model.upstream_model import NodeStatusDao, UpstreamDao, UpstreamStatesDao
 from api.model.certificate_model import CertificateDao
 
 
@@ -79,6 +80,89 @@ def update_node_status() -> None:
 
     with NodeStatusDao() as node_dao:
         node_dao.register_node(k, node)
+
+
+def update_upstream_states() -> None:
+    """Performs health checks on backend upstream targets and records state for the local node."""
+    node_id = get_server_id()
+    now_iso = datetime.datetime.now(config.TZ).isoformat()
+
+    with UpstreamDao() as upstream_dao, UpstreamStatesDao() as states_dao:
+        upstreams_resp = upstream_dao.get_all()
+        upstreams = (
+            upstreams_resp.get("data", [])
+            if isinstance(upstreams_resp, dict)
+            else (upstreams_resp or [])
+        )
+
+        for u in upstreams:
+            if not isinstance(u, dict):
+                continue
+            u_type = (u.get("type") or "backend").lower()
+            if u_type != "backend":
+                continue
+
+            u_id = u.get("_id")
+            if not u_id:
+                continue
+
+            targets = u.get("targets") or []
+            targets_status = []
+            conn_timeout = u.get("conn_timeout") or 2
+
+            for t in targets:
+                if not isinstance(t, dict):
+                    continue
+                host = t.get("host")
+                port = t.get("port")
+                if not host or not port:
+                    continue
+
+                endpoint = f"{host}:{port}"
+                start_time = time.time()
+                is_healthy = False
+                error_msg = None
+
+                try:
+                    with socket.create_connection(
+                        (host, int(port)), timeout=float(conn_timeout)
+                    ):
+                        is_healthy = True
+                except Exception as e:
+                    is_healthy = False
+                    error_msg = str(e)
+
+                latency_ms = round((time.time() - start_time) * 1000, 2)
+                targets_status.append(
+                    {
+                        "host": host,
+                        "port": port,
+                        "endpoint": endpoint,
+                        "healthy": is_healthy,
+                        "latency_ms": latency_ms,
+                        "error": error_msg,
+                    }
+                )
+
+            total_targets = len(targets_status)
+            healthy_targets = sum(1 for t in targets_status if t.get("healthy"))
+            if total_targets == 0:
+                node_healthy = "invalid"
+            elif healthy_targets == total_targets:
+                node_healthy = "healthy"
+            elif healthy_targets == 0:
+                node_healthy = "unhealthy"
+            else:
+                node_healthy = "partially_healthy"
+
+            state_record = {
+                "node_id": node_id,
+                "upstream_id": int(u_id),
+                "healthy": node_healthy,
+                "last_check": now_iso,
+                "targets": targets_status,
+            }
+            states_dao.register_state(node_id, int(u_id), state_record)
 
 
 def update_main_config():

@@ -21,6 +21,7 @@ import {MatTooltipModule} from '@angular/material/tooltip';
 import {RouterModule} from '@angular/router';
 import {TranslatePipe} from '@ngx-translate/core';
 import {ConfirmDialogComponent} from 'app/components/confirm-dialog/confirm-dialog.component';
+import {UpstreamStatesDialogComponent} from 'app/components/upstream-states-dialog/upstream-states-dialog.component';
 import {Upstream} from 'app/models/upstream';
 import {UpstreamService} from 'app/services/upstream.service';
 import {NotificationService} from 'app/services/notification.service';
@@ -93,6 +94,13 @@ export class UpstreamListComponent implements OnInit {
         this.upstreamPA.page = event.pageIndex + 1;
         this.upstreamPA.per_page = event.pageSize;
         this.updateGridTable();
+    }
+
+    openStatesDialog(element: Upstream): void {
+        this.confirmDialog.open(UpstreamStatesDialogComponent, {
+            data: { upstream: element },
+            width: '600px'
+        });
     }
 
     onRemove(dto: Upstream) {

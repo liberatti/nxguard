@@ -394,6 +394,19 @@
       "ACTIONS": "Ações",
       "REMOVE_TOOLTIP": "Remover destino",
       "EMPTY_MESSAGE": "Nenhum destino configurado. Adicione pelo menos um destino para este upstream."
+    },
+    "STATES": {
+      "TITLE": "Status de Saúde do Upstream",
+      "NODE": "Nó",
+      "STATUS": "Status",
+      "LAST_CHECK": "Última Checagem",
+      "LATENCY": "Latência",
+      "HEALTHY": "Saudável",
+      "PARTIALLY_HEALTHY": "Parcialmente Saudável",
+      "UNHEALTHY": "Com falha",
+      "INVALID": "Não verificado",
+      "NO_STATES": "Nenhum estado de checagem registrado ainda para este upstream.",
+      "WARNING_TOOLTIP": "Um ou mais destinos estão em estado de falha"
     }
   },
   "FORMAT": {

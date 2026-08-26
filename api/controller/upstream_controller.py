@@ -4,16 +4,16 @@ from flask import Blueprint, request
 from marshmallow import ValidationError
 
 from api.model.config_model import ChangeDao
-from api.model.upstream_model import UpstreamDao
+from api.model.upstream_model import UpstreamDao, UpstreamStatesDao
 from api.model.service_model import ServiceDao
 from nxcore.controllers.base_controller import (
     response_data,
+    response_error,
     response_error_404,
-    response_error_500,
     response_error_parse,
     response_data_removed,
     get_pagination,
-    has_any_authority
+    has_any_authority,
 )
 from nxcore.middleware.socket_manager import emit_event
 
@@ -58,25 +58,33 @@ def get(upstream_id):
             return response_error_404()
 
 
+@routes.route("/<upstream_id>/states", methods=["GET"])
+@has_any_authority(authorities=["viewer", "superuser"])
+def get_states(upstream_id):
+    with UpstreamStatesDao() as dao:
+        states = dao.get_states_by_upstream_id(int(upstream_id))
+        return response_data(states)
+
+
 @routes.route("", methods=["POST"])
 @has_any_authority(authorities=["superuser"])
 def save():
     try:
         with UpstreamDao() as dao:
-            if request.content_type.startswith('multipart/form-data'):
+            if request.content_type and request.content_type.startswith('multipart/form-data'):
                 metadata = request.files.get('metadata')
-                upstream = json.load(metadata.stream)
+                raw_upstream = json.load(metadata.stream) if metadata else {}
+                upstream = dao.json_load(raw_upstream)
                 file = request.files.get('zipfile')
                 if file:
-                    upstream.update({
-                        "content": file.read()
-                    })
+                    upstream["content"] = file.read()
             else:
                 upstream = dao.json_load(request.json)
-            dao.persist(upstream)
-            if 'content' in upstream:
-                upstream.pop("content")
-            return response_data(upstream, dao.schema)
+            pk = dao.persist(upstream)
+            saved = dao.get_by_id(pk) or upstream
+            if 'content' in saved:
+                saved.pop("content")
+            return response_data(saved, dao.schema)
     except ValidationError as err:
         return response_error_parse(err)
 
@@ -86,20 +94,20 @@ def save():
 def update(upstream_id):
     try:
         with UpstreamDao() as dao:
-            if request.content_type.startswith('multipart/form-data'):
+            if request.content_type and request.content_type.startswith('multipart/form-data'):
                 metadata = request.files.get('metadata')
-                upstream = json.load(metadata.stream)
+                raw_upstream = json.load(metadata.stream) if metadata else {}
+                upstream = dao.json_load(raw_upstream)
                 file = request.files.get('zipfile')
                 if file:
-                    upstream.update({
-                        "content": file.read()
-                    })
+                    upstream["content"] = file.read()
             else:
                 upstream = dao.json_load(request.json)
             dao.update_by_id(upstream_id, upstream)
-            if 'content' in upstream:
-                upstream.pop("content")
-            return response_data(upstream, dao.schema)
+            updated = dao.get_by_id(upstream_id) or upstream
+            if 'content' in updated:
+                updated.pop("content")
+            return response_data(updated, dao.schema)
     except ValidationError as err:
         return response_error_parse(err)
 
@@ -113,8 +121,15 @@ def delete(upstream_id):
             for service in service_list["data"]:
                 for route in service.get("routes") or []:
                     ups = route.get("upstream")
-                    if ups and str(ups.get("_id")) == str(upstream_id):
-                        return response_error_500("Upstream in use")
+                    ups_id = ups.get("_id") if isinstance(ups, dict) else ups
+                    if ups and str(ups_id) == str(upstream_id):
+                        service_name = service.get("name", "Unknown")
+                        service_id = service.get("_id")
+                        return response_error(
+                            f"Upstream in use by service: {service_name} (ID: {service_id})",
+                            code=406,
+                            details={"service_id": service_id, "service_name": service_name},
+                        )
         r = dao.delete_by_id(upstream_id)
         if r:
             return response_data_removed(upstream_id)

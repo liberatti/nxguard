@@ -152,7 +152,7 @@ def _generate_sensors(
         exclusion_lists = [
             ",".join(
                 f"ctl:ruleRemoveById={str(x).strip()}"
-                for x in exclusions[i : i + chunk_size]
+                for x in exclusions[i:i + chunk_size]
             )
             for i in range(0, len(exclusions), chunk_size)
         ]

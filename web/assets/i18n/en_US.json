@@ -394,6 +394,19 @@
       "ACTIONS": "Actions",
       "REMOVE_TOOLTIP": "Remove target",
       "EMPTY_MESSAGE": "No targets configured. Add at least one target for this backend."
+    },
+    "STATES": {
+      "TITLE": "Upstream Health Status",
+      "NODE": "Node",
+      "STATUS": "Status",
+      "LAST_CHECK": "Last Check",
+      "LATENCY": "Latency",
+      "HEALTHY": "Healthy",
+      "PARTIALLY_HEALTHY": "Partially Healthy",
+      "UNHEALTHY": "Unhealthy",
+      "INVALID": "Unverified",
+      "NO_STATES": "No health check states recorded yet for this upstream.",
+      "WARNING_TOOLTIP": "One or more targets are in failure state"
     }
   },
   "FORMAT": {

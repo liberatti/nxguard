@@ -3,6 +3,7 @@ from marshmallow import ValidationError
 
 from nxcore.controllers.base_controller import (
     response_data,
+    response_error,
     response_error_404,
     response_error_parse,
     get_pagination,
@@ -14,6 +15,7 @@ from nxcore.controllers.base_controller import (
 from nxcore.middleware.socket_manager import emit_event
 from api.model.config_model import ChangeDao
 from api.model.sensor_model import SensorDao
+from api.model.service_model import ServiceDao
 from api.services.ipxa_services import IPXAService
 
 routes = Blueprint("sensor", __name__)
@@ -136,7 +138,21 @@ def delete(sensor_id: str) -> Response:
     Returns:
         Response: Success message or error response
     """
-    with SensorDao() as dao:
+    with SensorDao() as dao, ServiceDao() as service_dao:
+        service_list = service_dao.get_all()
+        if service_list and "data" in service_list and service_list["data"]:
+            for service in service_list["data"]:
+                for route in service.get("routes") or []:
+                    sns = route.get("sensor")
+                    sns_id = sns.get("_id") if isinstance(sns, dict) else sns
+                    if sns and str(sns_id) == str(sensor_id):
+                        service_name = service.get("name", "Unknown")
+                        service_id = service.get("_id")
+                        return response_error(
+                            f"Sensor in use by service: {service_name} (ID: {service_id})",
+                            code=406,
+                            details={"service_id": service_id, "service_name": service_name},
+                        )
         result = dao.delete_by_id(sensor_id)
         return response_data_removed(sensor_id) if result else response_error_404()
 
