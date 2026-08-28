@@ -46,7 +46,9 @@ def _generate_trusted_ips(output_dir):
 
 def clean(data, output_dir=config.BASE_PATH, test=False):
     """Removes generated Nginx configurations, certificates, and service files."""
-    conf_dir = f"{output_dir}/nginx/conf/tests" if test else f"{output_dir}/nginx/conf"
+    conf_dir = (
+        f"{output_dir}/nginx/conf/tests" if test else f"{output_dir}/nginx/enabled/conf"
+    )
     logger.info(f"[{output_dir}] - Cleanup (test={test})")
     if test:
         for pattern in [
