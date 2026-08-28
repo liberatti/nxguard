@@ -89,7 +89,7 @@ def apply_config() -> Response:
 
 
 @routes.route("", methods=["GET"])
-@has_any_authority(authorities=["viewer", "superuser"])
+@has_any_authority(authorities=["superuser"])
 def config() -> Response:
     with ConfigDao() as dao:
         return response_data(dao.get_active(), dao.schema)
@@ -180,4 +180,3 @@ def backup_import() -> Response:
     except Exception as e:
         logger.error(f"Error importing configuration: {e}")
         return response_error(f"Failed to import configuration: {str(e)}")
-
