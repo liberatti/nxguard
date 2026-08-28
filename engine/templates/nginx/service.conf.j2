@@ -30,6 +30,7 @@ server {
   {% endif %}
 
   set $service '{{name}}';
+  set $service_render '{{render_name if render_name else name}}';
   set $real_method $request_method;
 
   {% if compression_types and compression_types|length > 0 %}

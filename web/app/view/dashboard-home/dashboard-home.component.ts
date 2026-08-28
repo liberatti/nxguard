@@ -21,6 +21,7 @@ import { EngineNode, Health } from '../../models/config';
 import { TransactionLog } from '../../models/transaction';
 import { DateFormatPipe } from '../../pipes/date_format.pipe';
 import { ByteFormatPipe } from '../../pipes/format_bytes.pipe';
+import { TranslatePipe } from '@ngx-translate/core';
 import { NodeDetailsDialogComponent } from '../../components/node-details-dialog/node-details-dialog.component';
 import { TransactionRAWDialogComponent } from '../../components/transaction-raw-dialog/transaction-raw-dialog.component';
 
@@ -40,6 +41,7 @@ import { TransactionRAWDialogComponent } from '../../components/transaction-raw-
         MatTooltipModule,
         DateFormatPipe,
         ByteFormatPipe,
+        TranslatePipe,
     ],
     templateUrl: './dashboard-home.component.html',
     styleUrl: './dashboard-home.component.css',

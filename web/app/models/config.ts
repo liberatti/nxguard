@@ -23,6 +23,7 @@ export interface Config {
     ca_certificate: string;
     ca_private: string;
     acme_directory_url: string;
+    dns_resolver?: string;
     archive: ConfigArchive;
     purge: ConfigPurge;
     ipxa?: ConfigIpxa;

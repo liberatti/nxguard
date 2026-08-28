@@ -180,8 +180,9 @@ class LogParserTool:
                         else:
                             pending_access[uid] = (acc, now)
                     else:
-                        if not acc.get("service") or not acc["service"].get("_id"):
-                            acc["service"] = {"_id": service_name, "name": service_name}
+                        if not acc.get("service") or not acc["service"].get("name"):
+                            clean_name = service_name.rsplit("_", 1)[0] if ("_" in service_name and service_name.rsplit("_", 1)[1].isdigit()) else service_name
+                            acc["service"] = {"_id": service_name, "name": clean_name}
                         merged_records.append(acc)
 
                 # Correlate incoming audit records
@@ -206,8 +207,9 @@ class LogParserTool:
                 ]
                 for uid in expired_access_uids:
                     acc, _ = pending_access.pop(uid)
-                    if not acc.get("service") or not acc["service"].get("_id"):
-                        acc["service"] = {"_id": service_name, "name": service_name}
+                    if not acc.get("service") or not acc["service"].get("name"):
+                        clean_name = service_name.rsplit("_", 1)[0] if ("_" in service_name and service_name.rsplit("_", 1)[1].isdigit()) else service_name
+                        acc["service"] = {"_id": service_name, "name": clean_name}
                     merged_records.append(acc)
 
                 # Flush pending audit records older than 4 seconds
@@ -263,9 +265,10 @@ class LogParserTool:
             merged["action"] = "DENY"
 
         if service_name and (
-            not merged.get("service") or not merged["service"].get("_id")
+            not merged.get("service") or not merged["service"].get("name")
         ):
-            merged["service"] = {"_id": service_name, "name": service_name}
+            clean_name = service_name.rsplit("_", 1)[0] if ("_" in service_name and service_name.rsplit("_", 1)[1].isdigit()) else service_name
+            merged["service"] = {"_id": service_name, "name": clean_name}
 
         if "http" in audit and audit["http"]:
             aud_http = audit["http"]
@@ -318,11 +321,12 @@ class LogParserTool:
         status_code = audit.get("http", {}).get("response", {}).get("status_code", 403)
         action = audit.get("action") or cls.resolve_status_code(status_code)
 
+        clean_name = service_name.rsplit("_", 1)[0] if ("_" in service_name and service_name.rsplit("_", 1)[1].isdigit()) else service_name
         record = {
             "logtime": audit.get("logtime") or datetime.now(),
             "unique_id": audit.get("unique_id", ""),
             "server_id": audit.get("server_id") or server_id,
-            "service": {"_id": service_name, "name": service_name},
+            "service": {"_id": service_name, "name": clean_name},
             "route_name": "-",
             "upstream": None,
             "sensor": None,

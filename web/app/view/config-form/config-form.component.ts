@@ -53,6 +53,7 @@ export class ConfigFormComponent implements OnInit {
         ca_certificate: new FormControl<string>(''),
         ca_private: new FormControl<string>(''),
         acme_directory_url: new FormControl<string>(''),
+        dns_resolver: new FormControl<string>(''),
         archive: new FormGroup({
             enabled: new FormControl<boolean>(false),
             archive_after: new FormControl<number>(1800),
@@ -92,6 +93,7 @@ export class ConfigFormComponent implements OnInit {
                 ca_certificate: c.ca_certificate,
                 ca_private: c.ca_private,
                 acme_directory_url: c.acme_directory_url,
+                dns_resolver: c.dns_resolver,
                 archive: c.archive || {},
                 purge: c.purge || {},
                 ipxa: c.ipxa || {}

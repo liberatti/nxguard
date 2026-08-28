@@ -29,9 +29,7 @@ def sync_watchers(conf):
         if not svc.get("active", True):
             continue
         svc_name = svc.get("render_name") or (
-            f"{svc.get('name')}_{svc.get('_id')}"
-            if svc.get("_id")
-            else svc.get("name")
+            f"{svc.get('name')}_{svc.get('_id')}" if svc.get("_id") else svc.get("name")
         )
         current_service_names.add(svc_name)
         if svc_name not in ACTIVE_WATCHERS:

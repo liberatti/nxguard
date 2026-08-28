@@ -23,6 +23,13 @@
                         <div class="panel-content-body">
                             <div class="fields-grid">
                                 <mat-form-field class="full-width">
+                                    <mat-label>{{ 'CONFIG_PAGE.DNS_RESOLVER' | translate }}</mat-label>
+                                    <input matInput formControlName="dns_resolver" id="dns-resolver-input" placeholder="1.1.1.1">
+                                    <mat-icon matSuffix class="field-icon">dns</mat-icon>
+                                    <mat-hint>{{ 'CONFIG_PAGE.DNS_RESOLVER_HINT' | translate }}</mat-hint>
+                                </mat-form-field>
+
+                                <mat-form-field class="full-width">
                                     <mat-label>{{ 'CONFIG_PAGE.ACME_URL' | translate }}</mat-label>
                                     <input matInput formControlName="acme_directory_url" id="acme-directory-url-input">
                                     <mat-icon matSuffix class="field-icon">link</mat-icon>
