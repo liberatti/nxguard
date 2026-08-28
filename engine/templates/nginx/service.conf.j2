@@ -44,6 +44,8 @@ server {
   proxy_buffer_size {{buffer}}k;
   proxy_busy_buffers_size {{buffer}}k;
   proxy_set_header Proxy "";
+  proxy_hide_header Server;
+  more_clear_headers Server;
 
   add_header X-Request-Id $request_id always;
   {% for header in headers %}

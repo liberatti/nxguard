@@ -10,6 +10,10 @@ events {
 }
 
 http {
+  server_tokens off;
+  more_clear_headers Server;
+  proxy_hide_header Server;
+
   merge_slashes on;
   resolver {{config.dns_resolver}} valid=30s;
   uninitialized_variable_warn off;

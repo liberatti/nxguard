@@ -55,14 +55,14 @@ class ServiceSchema(Schema):
     buffer = fields.Integer()
     bindings = fields.Nested(BindSchema, many=True)
     headers = fields.Nested(HeaderSchema, many=True)
-    routes = fields.Nested(RouteSchema, many=True, allow_none=True, load_default=[])
+    routes = fields.Nested(RouteSchema, many=True, allow_none=True)
     compression_types = fields.List(fields.String())
     rate_limit_per_sec = fields.Integer()
     sans = fields.List(fields.String())
     ssl_protocols = fields.List(fields.String())
     certificate = fields.Nested(CertificateSchema)
     ssl_client_ca = fields.String()
-    ssl_client_auth = fields.Boolean(load_default=False, dump_default=False)
+    ssl_client_auth = fields.Boolean()
 
 
 class ServiceDao(DuckDAO):

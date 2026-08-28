@@ -115,7 +115,6 @@ export class ServiceFormComponent implements OnInit {
         buffer: new FormControl<number>(256),
         compression_types: new FormControl<Array<string>>([
             'text/plain',
-            'text/html',
             'text/css',
             'application/json',
             'application/xml',
