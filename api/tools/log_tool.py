@@ -163,7 +163,7 @@ class LogParserTool:
 
                 now = time.time()
                 merged_records = []
-                logger.info(
+                logger.debug(
                     f"\n\n{ service_name} Access records: {len(access_records)}, Audit records: {len(audit_records)}"
                 )
 
