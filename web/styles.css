@@ -193,3 +193,10 @@ div.mat-row {
 .mat-mdc-form-field-subscript-wrapper {
     font-size: 0.75rem !important;
 }
+
+.chip-mono {
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace !important;
+    font-size: 0.8125rem !important;
+    background-color: #f1f5f9 !important;
+    border: 1px solid var(--border-dim, #e2e8f0) !important;
+}

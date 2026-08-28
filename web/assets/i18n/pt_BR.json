@@ -150,7 +150,9 @@
     "SECURITY_SENSOR": "Sensor de Segurança",
     "MONITOR_ONLY": "Apenas Monitorar",
     "REQUEST_METHODS": "Métodos de Requisição",
-    "CACHE_METHODS": "Métodos de Cache"
+    "CACHE_METHODS": "Métodos de Cache",
+    "INVALID_REGEX": "Padrão de regex inválido para NGINX",
+    "PATH_HINT": "ex: ^/api/v1/.* ou /static/"
   },
   "SENSOR": {
     "CONFIG": "Configuração",

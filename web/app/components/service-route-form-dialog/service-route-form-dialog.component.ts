@@ -6,7 +6,7 @@ import {
     MatDialogRef,
     MatDialogTitle
 } from '@angular/material/dialog';
-import { AbstractControl, FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { AbstractControl, FormControl, FormGroup, FormsModule, ReactiveFormsModule, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { Sensor } from 'app/models/sensor';
 import { Route, RouteType } from 'app/models/service';
@@ -26,6 +26,36 @@ import { MatTabGroup, MatTabsModule } from '@angular/material/tabs';
 import { TranslatePipe } from '@ngx-translate/core';
 import { StaticServer } from "../../models/static";
 import { StaticService } from "../../services/static.service";
+
+export function nginxRegexValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+        const value = control.value;
+        if (!value || typeof value !== 'string') {
+            return null;
+        }
+
+        const trimmed = value.trim();
+        if (!trimmed) {
+            return null;
+        }
+
+        if (/[\r\n]/.test(trimmed)) {
+            return { invalidRegex: true };
+        }
+
+        if (/\s/.test(trimmed) && !/\\s/.test(trimmed)) {
+            return { invalidRegex: true };
+        }
+
+        try {
+            new RegExp(trimmed);
+        } catch {
+            return { invalidRegex: true };
+        }
+
+        return null;
+    };
+}
 
 
 @Component({
@@ -66,7 +96,7 @@ export class ServiceRouteFormDialogComponent implements OnInit {
     submitted = false;
 
     pathForm = new FormGroup({
-        path: new FormControl<string>('')
+        path: new FormControl<string>('', [nginxRegexValidator()])
     });
 
     methodForm = new FormGroup({
@@ -182,18 +212,25 @@ export class ServiceRouteFormDialogComponent implements OnInit {
     }
 
     onAddPath(): void {
-        let data = this.pathForm.value.path as string;
-        this.form.value.paths?.push(data);
-        this.pathForm.reset();
+        const pathControl = this.pathForm.get('path');
+        if (!pathControl || pathControl.invalid || !pathControl.value) {
+            return;
+        }
+        const data = pathControl.value.trim();
+        if (!data) return;
+
+        const currentPaths = (this.form.get('paths')?.value || []).slice();
+        if (!currentPaths.includes(data)) {
+            currentPaths.push(data);
+            this.form.get('paths')?.setValue(currentPaths);
+        }
+        this.pathForm.reset({ path: '' });
+        pathControl.setErrors(null);
     }
 
     onRemovePath(keyword: any): void {
-        if (this.form.value.paths != null) {
-            let index = this.form.value.paths.indexOf(keyword);
-            if (index >= 0) {
-                this.form.value.paths.splice(index, 1);
-            }
-        }
+        const currentPaths = (this.form.get('paths')?.value || []).filter((p: string) => p !== keyword);
+        this.form.get('paths')?.setValue(currentPaths);
     }
 
     onAddMethod(): void {

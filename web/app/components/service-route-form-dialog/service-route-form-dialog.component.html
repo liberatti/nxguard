@@ -25,17 +25,25 @@
 
         <!-- Path Section -->
         <div class="form-section-card">
-            <form [formGroup]="pathForm" id="service-route-path-form">
+            <form [formGroup]="pathForm" id="service-route-path-form" (ngSubmit)="onAddPath()">
                 <mat-form-field class="full-width">
                     <mat-label>{{ 'ROUTE.REQUEST_PATH' | translate }}</mat-label>
-                    <input matInput formControlName="path" id="service-route-path-input">
-                    <button color="primary" matSuffix mat-icon-button (click)="onAddPath()" id="add-service-route-path-btn">
+                    <input matInput formControlName="path" id="service-route-path-input"
+                        [placeholder]="'ROUTE.PATH_HINT' | translate"
+                        (keydown.enter)="$event.preventDefault(); onAddPath()">
+                    <button color="primary" matSuffix mat-icon-button type="button"
+                        [disabled]="pathForm.invalid || !pathForm.get('path')?.value"
+                        (click)="onAddPath()" id="add-service-route-path-btn">
                         <mat-icon>add</mat-icon>
                     </button>
+                    <mat-hint>{{ 'ROUTE.PATH_HINT' | translate }}</mat-hint>
+                    <mat-error *ngIf="pathForm.get('path')?.hasError('invalidRegex')">
+                        {{ 'ROUTE.INVALID_REGEX' | translate }}
+                    </mat-error>
                 </mat-form-field>
                 <div class="chips-container" *ngIf="form.value.paths && form.value.paths.length > 0">
                     <mat-chip-listbox id="service-route-paths-list">
-                        <mat-chip-row *ngFor="let p of form.value.paths" (removed)="onRemovePath(p)" id="service-route-path-chip-{{p}}">
+                        <mat-chip-row *ngFor="let p of form.value.paths" (removed)="onRemovePath(p)" id="service-route-path-chip-{{p}}" class="chip-mono">
                             {{ p }}
                             <button matChipRemove id="remove-service-route-path-{{p}}">
                                 <mat-icon>cancel</mat-icon>
