@@ -11,7 +11,7 @@ SecArgumentSeparator &
 SecCookieFormat 0
 SecCollectionTimeout 600
 SecAuditEngine On
-SecRequestBodyLimit {{ body_limit }}
+SecRequestBodyLimit {{ (body_limit | int * 1048576) if body_limit else 10485760 }}
 SecAuditLogParts ABHF
 SecAuditLogFormat JSON
 SecAuditLogType Serial
