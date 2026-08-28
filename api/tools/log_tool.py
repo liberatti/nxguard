@@ -228,7 +228,7 @@ class LogParserTool:
                                 logger.error(
                                     f"Error persisting merged transaction: {e}"
                                 )
-                    logger.info(
+                    logger.debug(
                         f"Merged {len(merged_records)} transactions for {service_name}"
                     )
 

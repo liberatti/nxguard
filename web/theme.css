@@ -244,70 +244,9 @@ td.mat-mdc-cell.text-right .toggle-container {
     align-items: center !important;
 }
 
-/* Form Elements Standardization */
+/* Form Elements Typography */
 .mat-mdc-form-field {
-    font-size: 0.875rem !important;
     font-family: var(--font-family) !important;
-    --mdc-outlined-text-field-container-shape: 8px;
-    --mdc-outlined-text-field-outline-color: var(--border-dim);
-    --mdc-outlined-text-field-hover-outline-color: var(--border-bright);
-    --mdc-outlined-text-field-focus-outline-color: var(--primary);
-    --mdc-outlined-text-field-focus-label-text-color: var(--primary);
-    --mdc-outlined-text-field-label-text-color: var(--text-dim);
-}
-
-/* Outlined Wrapper & Background */
-.mat-mdc-text-field-wrapper.mdc-text-field--outlined {
-    background-color: #f8fafc !important;
-    border-radius: 8px !important;
-}
-
-/* Outlines & Borders */
-.mat-mdc-form-field .mdc-notched-outline__leading {
-    border-color: var(--border-dim) !important;
-    border-top-left-radius: 8px !important;
-    border-bottom-left-radius: 8px !important;
-}
-
-.mat-mdc-form-field .mdc-notched-outline__notch {
-    border-color: var(--border-dim) !important;
-}
-
-.mat-mdc-form-field .mdc-notched-outline__trailing {
-    border-color: var(--border-dim) !important;
-    border-top-right-radius: 8px !important;
-    border-bottom-right-radius: 8px !important;
-}
-
-.mat-mdc-form-field:hover .mdc-notched-outline__leading,
-.mat-mdc-form-field:hover .mdc-notched-outline__notch,
-.mat-mdc-form-field:hover .mdc-notched-outline__trailing {
-    border-color: var(--border-bright) !important;
-}
-
-.mat-mdc-form-field.mat-focused .mdc-notched-outline__leading,
-.mat-mdc-form-field.mat-focused .mdc-notched-outline__notch,
-.mat-mdc-form-field.mat-focused .mdc-notched-outline__trailing {
-    border-color: var(--primary) !important;
-}
-
-/* Input & Select Typography */
-.mat-mdc-input-element,
-.mat-mdc-select-value {
-    font-size: 0.875rem !important;
-    font-family: var(--font-family) !important;
-    color: var(--text-main) !important;
-    font-weight: 500 !important;
-}
-
-.mat-mdc-input-element::placeholder {
-    color: var(--text-muted) !important;
-    font-size: 0.875rem !important;
-    font-weight: 400 !important;
-}
-
-.mat-mdc-form-field.mat-focused .mdc-floating-label {
-    color: var(--primary) !important;
 }
 
 /* Dialogs Standardization */

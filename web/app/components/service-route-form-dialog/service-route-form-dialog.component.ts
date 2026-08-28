@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, OnInit, ViewChild } from '@angular/core';
 import {
     MAT_DIALOG_DATA,
     MatDialogActions,
@@ -112,6 +112,7 @@ export class ServiceRouteFormDialogComponent implements OnInit {
         private upstreamService: UpstreamService,
         private staticService: StaticService,
         private sensorService: SensorService,
+        private cdr: ChangeDetectorRef,
         @Inject(MAT_DIALOG_DATA) public routeData: Route
     ) {
         this.isAddMode = false;
@@ -119,14 +120,27 @@ export class ServiceRouteFormDialogComponent implements OnInit {
 
     ngOnInit(): void {
         this.upstreamService.get().subscribe(data => {
-            this._upstreams = data.data;
+            this._upstreams = data.data || [];
+            if (this.routeData && this.routeData.upstream) {
+                const found = this._upstreams.find(u => this.compareFn(u, this.routeData.upstream));
+                if (found) {
+                    this.form.get('upstream')?.setValue(found);
+                }
+            }
+            this.cdr.detectChanges();
         });
 
         this.sensorService.get().subscribe(data => {
-            this._sensors = data.data;
+            this._sensors = data.data || [];
             if (this.isAddMode) {
                 this.form.get('sensor')?.setValue(this._sensors[0]);
+            } else if (this.routeData && this.routeData.sensor) {
+                const found = this._sensors.find(s => this.compareFn(s, this.routeData.sensor));
+                if (found) {
+                    this.form.get('sensor')?.setValue(found);
+                }
             }
+            this.cdr.detectChanges();
         });
         this.isAddMode = !this.routeData;
         if (!this.isAddMode) {
@@ -151,6 +165,7 @@ export class ServiceRouteFormDialogComponent implements OnInit {
                 type: this.routeData.type,
                 cache_methods: this.routeData.cache_methods || []
             });
+            this.cdr.detectChanges();
         }
     }
 
@@ -269,6 +284,12 @@ export class ServiceRouteFormDialogComponent implements OnInit {
 
     compareFn(object1: any, object2: any) {
         if (!object1 || !object2) return false;
+        if (typeof object1 === 'string' && typeof object2 === 'object') {
+            return object1 === object2.name || object1 === String(object2._id);
+        }
+        if (typeof object2 === 'string' && typeof object1 === 'object') {
+            return object2 === object1.name || object2 === String(object1._id);
+        }
         if (object1._id != null && object2._id != null) {
             return String(object1._id) === String(object2._id);
         }

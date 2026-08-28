@@ -33,6 +33,7 @@ import {
 import {
     ServiceRouteFormDialogComponent
 } from 'app/components/service-route-form-dialog/service-route-form-dialog.component';
+import { ErrorDetailsDialogComponent } from 'app/components/error-details-dialog/error-details-dialog.component';
 import { Upstream } from 'app/models/upstream';
 import { Sensor } from 'app/models/sensor';
 import { Bind, Header, ProtocolType, Route, RouteType, Service } from 'app/models/service';
@@ -230,18 +231,27 @@ export class ServiceFormComponent implements OnInit {
 
     onSubmit() {
         if (this.form.status === "INVALID") {
-            let errors = [] as Array<string>;
+            let detailsObj: any = {};
             Object.keys(this.form.controls)
                 .forEach(k => {
                     let control = this.form.get(k) as FormControl;
-                    if (control.status !== "VALID") {
-                        errors.push(" Invalid value on " + k);
+                    if (control && control.status !== "VALID") {
+                        detailsObj[k] = ["Invalid value on " + k];
                     }
                 });
 
-            if (errors.length > 0) {
-                console.log(this.form.value);
-                this.notificationService.openSnackBar(errors);
+            if (Object.keys(detailsObj).length > 0) {
+                this.confirmDialog.open(ErrorDetailsDialogComponent, {
+                    data: {
+                        code: 400,
+                        message: 'Validation Error',
+                        method: this.isAddMode ? 'POST' : 'PUT',
+                        url: '/api/v1/service',
+                        details: detailsObj
+                    },
+                    width: '650px',
+                    maxWidth: '90vw'
+                });
             }
             return;
         }
