@@ -114,11 +114,27 @@ def update(_id=None) -> Response:
 @has_any_authority(authorities=["viewer", "superuser"])
 def backup_export() -> Response:
     conf = c_builder.get_config()
+    upstreams = []
+    for u in conf.get("upstreams", []):
+        u_copy = dict(u)
+        u_copy.pop("healthy", None)
+        if "targets" in u_copy and isinstance(u_copy["targets"], list):
+            clean_targets = []
+            for t in u_copy["targets"]:
+                if isinstance(t, dict):
+                    t_copy = dict(t)
+                    t_copy.pop("healthy", None)
+                    clean_targets.append(t_copy)
+                else:
+                    clean_targets.append(t)
+            u_copy["targets"] = clean_targets
+        upstreams.append(u_copy)
+
     export_data = {
         "config": conf.get("config", {}),
         "certificates": conf.get("certificates", []),
         "sensors": conf.get("sensors", []),
-        "upstreams": conf.get("upstreams", []),
+        "upstreams": upstreams,
         "services": conf.get("services", []),
     }
     return Response(

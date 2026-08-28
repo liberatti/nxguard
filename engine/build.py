@@ -172,8 +172,13 @@ def init_from_data(data_dir=None, data_file="init-data.json", data=None):
     if "upstreams" in data:
         with UpstreamDao() as dao:
             dao.delete_all()
-            dao.persist_many(data["upstreams"])
-            logger.info(f"Upstreams: {len(data['upstreams'])}")
+            cleaned_upstreams = []
+            for u in data["upstreams"]:
+                u_clean = dict(u)
+                u_clean.pop("healthy", None)
+                cleaned_upstreams.append(u_clean)
+            dao.persist_many(cleaned_upstreams)
+            logger.info(f"Upstreams: {len(cleaned_upstreams)}")
 
     if "certificates" in data:
         with CertificateDao() as dao:
