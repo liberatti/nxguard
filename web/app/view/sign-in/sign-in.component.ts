@@ -65,7 +65,9 @@ export class SignInComponent implements OnInit {
             { id: 'en_US', name: 'English (US)' },
             { id: 'pt_BR', name: 'Português (BR)' }
         ];
-        const savedLang = this.localStorage.get('lang') || 'en_US';
+        const uiConfig = this.localStorage.get('ui_config');
+        const uiLocale = uiConfig?.locale ? (typeof uiConfig.locale === 'object' ? (uiConfig.locale.key || uiConfig.locale.id) : uiConfig.locale) : null;
+        const savedLang = this.localStorage.get('lang') || uiLocale || 'en_US';
         this.translate.use(savedLang);
         this.form.controls.locale.setValue(savedLang);
     }
@@ -74,6 +76,19 @@ export class SignInComponent implements OnInit {
         const selectedLang = lang || 'en_US';
         this.translate.use(selectedLang);
         this.localStorage.set('lang', selectedLang);
+
+        let uiConfig = this.localStorage.get('ui_config');
+        if (!uiConfig) {
+            uiConfig = {
+                locale: selectedLang,
+                sidenavOpened: true,
+                navResource: 'dashboard',
+                display: { datetime: 'YYYY-MM-DDTHH:mm:ss' }
+            };
+        } else {
+            uiConfig.locale = selectedLang;
+        }
+        this.localStorage.set('ui_config', uiConfig);
         this.form.controls.locale.setValue(selectedLang);
     }
 

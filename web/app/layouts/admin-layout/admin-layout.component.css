@@ -132,6 +132,57 @@
     box-shadow: 2px 0 8px rgba(0, 0, 0, 0.03);
 }
 
+.sidenav-inner {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+.sidenav-menu-list {
+    flex: 1;
+    overflow-y: auto;
+    padding-top: 16px;
+}
+
+.sidenav-footer {
+    margin-top: auto;
+    padding: 12px 14px;
+    border-top: 1px solid var(--border-dim, #f1f5f9);
+}
+
+.about-discreet-btn {
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    height: 38px;
+    padding: 0 10px !important;
+    border-radius: 8px;
+    color: var(--text-secondary-color, #64748b) !important;
+    font-size: 0.82rem;
+    font-weight: 500;
+    transition: all 0.15s ease;
+}
+
+.about-discreet-btn:hover {
+    background: rgba(0, 0, 0, 0.04) !important;
+    color: var(--text-color, #1e293b) !important;
+}
+
+.about-discreet-btn .about-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: var(--text-muted, #94a3b8);
+    margin-right: 6px;
+}
+
+.about-discreet-btn:hover .about-icon {
+    color: var(--text-secondary-color, #64748b);
+}
+
 .sidenav-content {
     background-color: var(--background-color, #f8fafc) !important;
     display: flex;

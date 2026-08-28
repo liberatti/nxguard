@@ -184,6 +184,11 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
 
     ngOnInit(): void {
         this.translate.setFallbackLang('en_US');
+        const savedLang = this.localStorage.get('lang');
+        if (savedLang) {
+            this.translate.use(savedLang);
+            moment.locale(savedLang);
+        }
         this.menu = (mainMenuData as unknown) as Array<MenuLink>;
         this.toggleSubMenu(undefined);
         this.httpClient.get<any>('assets/main.menu.json').subscribe({
@@ -227,11 +232,16 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     ngAfterViewInit(): void {
+        const savedLang = this.localStorage.get('lang');
         if (this.localStorage.exists('ui_config')) {
             this.config = this.localStorage.get('ui_config');
+            if (savedLang && this.config) {
+                this.config.locale = savedLang;
+                this.localStorage.set('ui_config', this.config);
+            }
         } else {
             this.config = {
-                locale: 'en_US',
+                locale: savedLang || 'en_US',
                 navResource: 'dashboard',
                 sidenavOpened: true,
                 display: {
@@ -240,7 +250,7 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
             } as FrontendConfig;
             this.localStorage.set('ui_config', this.config);
         }
-        const langKey = typeof this.config.locale === 'object' ? (this.config.locale?.key || this.config.locale?.id || 'en_US') : (this.config.locale || 'en_US');
+        const langKey = savedLang || (typeof this.config.locale === 'object' ? (this.config.locale?.key || this.config.locale?.id || 'en_US') : (this.config.locale || 'en_US'));
         this.translate.use(langKey);
         moment.locale(langKey);
 

@@ -22,12 +22,18 @@ export class PublicLayoutComponent implements AfterViewInit {
     }
 
     ngAfterViewInit(): void {
+        const savedLang = this.localStorage.get('lang');
         if (this.localStorage.exists('ui_config')) {
             this.config = this.localStorage.get('ui_config');
+            if (savedLang && this.config) {
+                this.config.locale = savedLang;
+                this.localStorage.set('ui_config', this.config);
+            }
         } else {
+            this.config = <FrontendConfig>{ locale: savedLang || 'en_US', navResource: "transaction", sidenavOpened: false };
             this.localStorage.set('ui_config', this.config);
         }
-        const langKey = typeof this.config.locale === 'object' ? (this.config.locale?.key || this.config.locale?.id || 'en_US') : (this.config.locale || 'en_US');
+        const langKey = savedLang || (typeof this.config.locale === 'object' ? (this.config.locale?.key || this.config.locale?.id || 'en_US') : (this.config.locale || 'en_US'));
         this.translate.use(langKey);
         moment.locale(langKey);
     }

@@ -29,7 +29,7 @@ server {
   limit_req zone={{render_name if render_name else name}}_rate burst=25 nodelay;
   {% endif %}
 
-  set $service '{{render_name if render_name else name}}';
+  set $service '{{name}}';
   set $real_method $request_method;
   client_max_body_size {{body_limit}}m;
 
@@ -99,14 +99,14 @@ server {
   {% for p in r.paths %}
   location ~ {{p}} {
     set $route '{{r.name}}';
-    set $sensor '{{r.sensor.render_name if r.sensor and r.sensor.render_name else (r.sensor.name if r.sensor and r.sensor.name else "-")}}';
-    {%- if r.type == 'UPSTREAM' and r.upstream and (r.upstream.render_name or r.upstream.name) %}
-    set $upstream '{{r.upstream.render_name if r.upstream.render_name else r.upstream.name}}';
+    set $sensor '{{r.sensor.name if r.sensor else "-"}}';
+    {%- if r.type == 'UPSTREAM' and r.upstream and r.upstream.name %}
+    set $upstream '{{r.upstream.name}}';
     {%- else %}
     set $upstream '-';
     {%- endif %}
 
-    {% if r.sensor and (r.sensor.render_name or r.sensor.name) and r.sensor.ipxa_enabled %}
+    {% if r.sensor and r.sensor.ipxa_enabled %}
     access_by_lua_file {{BASE_PATH}}/luajit/share/lua/5.1/nxguard/sensors/{{r.sensor.render_name if r.sensor.render_name else r.sensor.name }}.lua;
     {% endif %}
 

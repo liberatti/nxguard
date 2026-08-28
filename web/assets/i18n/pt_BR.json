@@ -1,6 +1,6 @@
 {
   "ACTIONS": {
-    "CREATE": "Adicionar",
+    "CREATE": "Criar",
     "EDIT": "Editar",
     "REMOVE": "Remover",
     "DELETE": "Excluir",
@@ -30,7 +30,7 @@
     "PASSWORD": "Senha",
     "LANGUAGE": "Idioma",
     "SUBTITLE_LOGIN": "Digite suas credenciais para acessar o console",
-    "FOOTER_NOTICE": "Acesso autorizado apenas. Todas as atividades são monitoradas.",
+    "FOOTER_NOTICE": "Acesso autorizado apenas. Todas as atividades são monitoradas e registradas.",
     "VERSION": "Versão",
     "LICENSE_NOTICE": "Licenciado sob a",
     "LICENSE_NAME": "Apache License 2.0"
@@ -64,7 +64,7 @@
     "UPSTREAMS": "Upstreams",
     "SENSORS": "Sensores",
     "ABOUT": "Sobre",
-    "DASHBOARD": "Painéis",
+    "DASHBOARD": "Painel",
     "SYSTEM": "Sistema",
     "HOSTNAMES": "Hostnames",
     "CERTIFICATES": "Certificados",
@@ -76,12 +76,12 @@
   },
   "VIEW": {
     "BACKUP": {
-      "LINK": "Backup",
+      "LINK": "backup",
       "TITLE": "Backup"
     },
     "DASHBOARD": {
-      "LINK": "Painel",
-      "TITLE": "Painel de Controle"
+      "LINK": "Dashboard",
+      "TITLE": "Painel"
     },
     "TRANSACTION": {
       "LINK": "Atividade de Rede",
@@ -89,35 +89,35 @@
       "SUBTITLE": "Listar todas as transações"
     },
     "SERVICE": {
-      "LINK": "Serviço",
+      "LINK": "Serviços",
       "TITLE": "Serviços",
       "SUBTITLE": "Descrever todos os serviços"
     },
     "UPSTREAM": {
-      "LINK": "Upstream",
-      "TITLE": "Upstream",
+      "LINK": "Upstreams",
+      "TITLE": "Upstreams",
       "SUBTITLE": "Lista de todos os upstreams",
       "FILTER_PLACEHOLDER": "Filtrar upstreams por nome ou descrição...",
-      "ERR_TARGET_REQUIRED": "Upstream do tipo backend requer pelo menos 1 target.",
+      "ERR_TARGET_REQUIRED": "Upstream do tipo backend requer pelo menos um destino.",
       "TARGETS": "Destinos",
       "TARGET_HOST": "Endereço de Rede",
-      "TARGET_PORT": "Porta",
+      "TARGET_PORT": "Porta do Serviço",
       "TARGET_WEIGHT": "Peso",
-      "NO_TARGETS": "Nenhum destino configurado. Adicione pelo menos um destino."
+      "NO_TARGETS": "Nenhum destino configurado. Adicione pelo menos um destino para este backend."
     },
     "HOSTNAME": {
-      "LINK": "Hostname",
-      "TITLE": "Hostname",
+      "LINK": "Hostnames",
+      "TITLE": "Hostnames",
       "SUBTITLE": "Lista de todos os Hostnames"
     },
     "CERTIFICATE": {
-      "LINK": "Certificado",
-      "TITLE": "Certificado",
+      "LINK": "Certificados",
+      "TITLE": "Certificados",
       "SUBTITLE": "Lista de todos os certificados"
     },
     "SENSOR": {
-      "LINK": "Sensor",
-      "TITLE": "Sensor",
+      "LINK": "Sensores",
+      "TITLE": "Sensores",
       "SUBTITLE": "Lista de todos os sensores"
     },
     "USER": {
@@ -127,7 +127,7 @@
     },
     "CONFIG": {
       "LINK": "Configuração",
-      "TITLE": "Configuração",
+      "TITLE": "Configurações",
       "SUBTITLE": "Lista de todas as configurações"
     },
     "SYSTEM": {
@@ -152,15 +152,15 @@
     "REQUEST_METHODS": "Métodos de Requisição",
     "CACHE_METHODS": "Métodos de Cache",
     "INVALID_REGEX": "Padrão de regex inválido para NGINX",
-    "PATH_HINT": "ex: ^/api/v1/.* ou /static/"
+    "PATH_HINT": "ex.: ^/api/v1/.* ou /static/"
   },
   "SENSOR": {
     "CONFIG": "Configuração",
     "IP_REPUTATION": "Reputação de IP",
     "SECURITY_INSPECTION": "Inspeção de Segurança",
     "INSPECT_LEVEL": "Nível de Inspeção",
-    "INBOUND_SCORE": "Score Entrante",
-    "OUTBOUND_SCORE": "Score Saindo",
+    "INBOUND_SCORE": "Score de Entrada",
+    "OUTBOUND_SCORE": "Score de Saída",
     "VARIABLES_TITLE": "Variáveis de Inspeção",
     "ALLOWED_HTTP_VERSIONS": "Versões HTTP Permitidas",
     "MAX_FILE_SIZE": "Tamanho Máx. de Arquivo (bytes)",
@@ -186,7 +186,7 @@
     "ACTION": "Ação",
     "ACTIVE": "Ativo",
     "ALL_RULES": "Todas as Regras",
-    "NO_RULES_FOUND": "Nenhuma regra encontrada para o filtro",
+    "NO_RULES_FOUND": "Nenhuma regra encontrada correspondente ao filtro",
     "TOTAL_RULES": "Regras",
     "CONTROL_RULE": "Controle do Motor / Gate de Paranoia",
     "VIEW_DETAILS": "Ver detalhes da regra",
@@ -206,7 +206,7 @@
     "TIMEOUT": "Timeout da Requisição (segundos)",
     "DOMAINS": "Domínios (SANs)",
     "DOMAIN_INPUT": "Nome do domínio",
-    "DOMAIN_HINT": "Adicione nomes de domínio (ex: exemplo.com, *.exemplo.com)",
+    "DOMAIN_HINT": "Adicione nomes de domínio (ex.: exemplo.com, *.exemplo.com)",
     "RATE_LIMIT_TITLE": "Limite de Requisições",
     "RATE_LIMIT": "Requisições por segundo (0 para desativar)",
     "COMPRESSION_TITLE": "Compressão",
@@ -270,36 +270,36 @@
     "PANEL_POLICY_DESC": "Configure arquivamento automatizado e expurgo de retenção de banco de dados",
     "ARCHIVE_TITLE": "Arquivamento de Transações",
     "ARCHIVE_TOGGLE": "Ativar Arquivamento",
-    "ARCHIVE_DESC": "Transfira e arquive automaticamente a telemetria de transações para um cluster Elasticsearch / OpenSearch externo.",
+    "ARCHIVE_DESC": "Transfira e arquive automaticamente a telemetria de transações para um cluster Elasticsearch / OpenSearch externo para conformidade de auditoria.",
     "ARCHIVE_AFTER": "Arquivar após (minutos)",
     "CLUSTER_URL": "URL do Cluster",
     "CLUSTER_USER": "Usuário",
     "CLUSTER_PASS": "Senha",
     "PURGE_TITLE": "Expurgo de Transações",
     "PURGE_TOGGLE": "Ativar Expurgo do Banco de Dados",
-    "PURGE_DESC": "Remova automaticamente registros antigos do banco local DuckDB para manter alta performance e economizar armazenamento.",
+    "PURGE_DESC": "Remova automaticamente registros antigos do banco local DuckDB para manter alta performance e economizar armazenamento em disco.",
     "PURGE_AFTER": "Idade Máxima dos Dados (dias)",
     "PANEL_IPXA": "Integração IPXA",
     "PANEL_IPXA_DESC": "Configure o endpoint do serviço de inteligência de ameaças e reputação IPXA",
     "IPXA_URL": "URL do Serviço IPXA",
-    "IPXA_URL_HINT": "URL do endpoint do serviço IPXA (ex.: http://ipxa:5000)",
+    "IPXA_URL_HINT": "Endpoint URL do serviço de inteligência de ameaças IPXA (ex.: http://ipxa:5000)",
     "IPXA_KEY": "Chave de API IPXA",
     "IPXA_KEY_HINT": "Chave de API secreta para autenticação com o serviço IPXA"
   },
   "TRANSACTION": {
     "FILTER": {
       "ADD_FILTER": "Adicionar Filtro",
-      "CLEAR_ALL": "Limpar Filtros",
+      "CLEAR_ALL": "Limpar Tudo",
       "ACTIVE_FILTERS": "Filtros Ativos",
       "DIALOG_TITLE": "Adicionar Filtro de Transação",
-      "DIALOG_SUBTITLE": "Selecione um atributo e valor para filtrar o tráfego de rede",
+      "DIALOG_SUBTITLE": "Selecione um atributo e valor de transação para filtrar o tráfego de rede",
       "CATEGORY_LABEL": "Categoria",
       "FIELD_LABEL": "Campo",
       "OPERATOR_LABEL": "Operador",
       "VALUE_LABEL": "Valor",
       "VALUE_PLACEHOLDER": "Informe o valor do filtro...",
       "PREVIEW_LABEL": "Pré-visualização do Filtro JSON",
-      "PRESETS": "Valores Rápidos / Predefinições",
+      "PRESETS": "Predefinições / Valores Rápidos",
       "CANCEL": "Cancelar",
       "APPLY": "Aplicar Filtro",
       "CATEGORIES": {
@@ -322,12 +322,12 @@
         "DESTINATION_IP": "IP de Destino (destination.ip)",
         "DESTINATION_PORT": "Porta de Destino (destination.port)",
         "HTTP_METHOD": "Método HTTP (http.request.method)",
-        "HTTP_URI": "URI da Requisição (http.request.uri)",
+        "HTTP_URI": "URI da Requisição HTTP (http.request.uri)",
         "STATUS_CODE": "Código de Status HTTP (http.response.status_code)",
         "DURATION": "Duração em segundos (http.duration)",
         "SCORE": "Score de Anomalia (score)",
         "RATE_LIMIT_ACTION": "Ação de Limite de Taxa (rate_limit.action)",
-        "LIMIT_REQ_STATUS": "Status de Limite de Requisições (limit_req_status)",
+        "LIMIT_REQ_STATUS": "Status de Limite de Requisição (limit_req_status)",
         "GEOIP_STATUS": "Status GeoIP (geoip_status)",
         "RBL_STATUS": "Status RBL (rbl_status)",
         "IPXA": "Status IPXA (ipxa)",
@@ -386,7 +386,7 @@
     "NO_USERS": "Nenhum usuário encontrado"
   },
   "UPSTREAM": {
-    "ERR_TARGET_REQUIRED": "Upstream do tipo backend requer pelo menos 1 target.",
+    "ERR_TARGET_REQUIRED": "Upstream do tipo backend requer pelo menos um destino.",
     "TARGETS": {
       "TITLE": "Destinos",
       "ADD_BTN": "Adicionar Destino",
@@ -395,7 +395,7 @@
       "DISTRIBUTION_WEIGHT": "Peso de Distribuição",
       "ACTIONS": "Ações",
       "REMOVE_TOOLTIP": "Remover destino",
-      "EMPTY_MESSAGE": "Nenhum destino configurado. Adicione pelo menos um destino para este upstream."
+      "EMPTY_MESSAGE": "Nenhum destino configurado. Adicione pelo menos um destino para este backend."
     },
     "STATES": {
       "TITLE": "Status de Saúde do Upstream",
@@ -412,28 +412,18 @@
     }
   },
   "FORMAT": {
-    "PARSE": {
-      "DATE_INPUT": "YYYY-MM-DDTHH:mm:ss.SSSZ"
-    },
     "DISPLAY": {
-      "TIME": "HH:mm:ss",
       "DATETIME": "DD/MM/YYYY HH:mm:ss",
       "MONTH_YEAR_LABEL": "MMM YYYY",
       "DATE_A11Y_LABEL": "LL",
       "MONTH_YEAR_A11Y_LABEL": "MMMM YYYY"
     }
   },
-  "aboutMessage": "Obrigado",
   "actions": {
-    "create": "Adicionar",
     "edit": "Editar",
     "remove": "Remover",
-    "delete": "Excluir",
-    "search": "Buscar",
-    "filter": "Filtrar",
-    "export": "Exportar",
+    "create": "Criar",
     "save": "Salvar",
-    "import": "Importar",
     "refresh": "Atualizar",
     "close": "Fechar",
     "cancel": "Cancelar",
@@ -441,6 +431,7 @@
     "next": "Próximo",
     "back": "Voltar",
     "add": "Adicionar",
+    "delete": "Excluir",
     "apply": "Aplicar",
     "backup": "Backup",
     "restore": "Restaurar"
@@ -457,41 +448,32 @@
     "api_docs_sub": "Documentação OpenAPI / Swagger"
   },
   "attr": {
+    "active": "Ativo",
     "name": "Nome",
     "domains": "Domínios",
     "routes": "Rotas",
-    "active": "Ativo",
     "description": "Descrição",
     "protocol": "Protocolo",
     "targets": "Destinos",
-    "actions": "Ações",
-    "login": {
-      "username": "Enter your user name",
-      "password": "Password here"
-    },
-    "service": {},
-    "upstream": {}
+    "actions": "Ações"
+  },
+  "content": {
+    "copy": "&copy; 2025 nxguard. Todos os direitos reservados. Esta solução é desenvolvida sobre o OpenResty.",
+    "about": "Este é um servidor proxy construído sobre o OpenResty com ModSecurity para proteção avançada.",
+    "restore_notice": "Aviso de Restauração de Configuração: Todos os dados existentes serão sobrescritos pela configuração restaurada."
   },
   "nav": {
-    "services": "Serviços",
-    "upstreams": "Upstreams",
-    "sensors": "Sensors",
     "about": "Sobre",
-    "dashboard": "Paineis",
-    "system": "Sistema",
-    "hostnames": "Hostnames",
-    "certificates": "Certificados",
-    "dictionaries": "Dicionarios",
-    "gateway": "Gateway",
-    "transactions": "Transações"
+    "account": "Conta",
+    "logout": "Sair"
   },
   "view": {
     "backup": {
       "link": "backup"
     },
     "dashboard": {
-      "link": "Painel",
-      "title": "Painel"
+      "link": "Dashboard",
+      "title": "Dashboard"
     },
     "transaction": {
       "link": "Atividade de Rede",
@@ -502,29 +484,29 @@
       "link": "Serviços",
       "title": "Serviços",
       "subtitle": "Descrever todos os serviços",
-      "filter_placeholder": "Filtrar por nome ou domínio..."
+      "filter_placeholder": "Buscar por nome ou domínio..."
     },
     "upstream": {
       "link": "Upstreams",
-      "title": "Upstream",
+      "title": "Upstreams",
       "subtitle": "Lista de todos os upstreams",
-      "filter_placeholder": "Filtrar por nome ou descrição..."
+      "filter_placeholder": "Buscar por nome ou descrição..."
     },
     "hostname": {
       "link": "Hostnames",
-      "title": "Hostname",
-      "subtitle": "Lista de todos os Hostnames"
+      "title": "Hostnames",
+      "subtitle": "Lista de todos os hostnames"
     },
     "certificate": {
       "link": "Certificados",
-      "title": "Certificado",
+      "title": "Certificados",
       "subtitle": "Lista de todos os certificados"
     },
     "sensor": {
       "link": "Sensores",
-      "title": "Sensor",
+      "title": "Sensores",
       "subtitle": "Lista de todos os sensores",
-      "filter_placeholder": "Filtrar por nome ou descrição..."
+      "filter_placeholder": "Buscar por nome ou descrição..."
     },
     "user": {
       "link": "Usuários",
@@ -533,19 +515,16 @@
     },
     "config": {
       "link": "Configurações",
-      "title": "Configuração",
+      "title": "Configurações",
       "subtitle": "Lista de todas as configurações"
     },
     "system": {
       "link": "Sistema"
     }
   },
+  "aboutMessage": "Obrigado",
   "format": {
-    "parse": {
-      "dateInput": "YYYY-MM-DDTHH:mm:ss.SSSZ"
-    },
     "display": {
-      "time": "HH:mm:ss",
       "datetime": "DD/MM/YYYY HH:mm:ss",
       "monthYearLabel": "MMM YYYY",
       "dateA11yLabel": "LL",

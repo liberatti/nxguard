@@ -41,7 +41,7 @@ export const appConfig: ApplicationConfig = {
         suffix: '.json'
       }),
       fallbackLang: 'en_US',
-      lang: 'en_US'
+      lang: (typeof window !== 'undefined' && (localStorage.getItem('lang') || JSON.parse(localStorage.getItem('ui_config') || '{}')?.locale)) || 'en_US'
     })
   ]
 };

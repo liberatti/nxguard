@@ -27,7 +27,7 @@
     transform: translate(-50%, -50%);
     width: 700px;
     height: 500px;
-    background: radial-gradient(circle, rgba(37, 99, 235, 0.12) 0%, rgba(59, 130, 246, 0.05) 50%, transparent 80%);
+    background: radial-gradient(circle, rgba(15, 39, 68, 0.12) 0%, rgba(22, 54, 92, 0.05) 50%, transparent 80%);
     filter: blur(70px);
     pointer-events: none;
 }
@@ -73,7 +73,7 @@
 /* Left Brand Panel */
 .vmware-brand-pane {
     flex: 1 1 42%;
-    background: linear-gradient(160deg, #1e3a8a 0%, #1e40af 45%, #0f172a 100%);
+    background: linear-gradient(160deg, #0f2744 0%, #16365c 50%, #0b1a2e 100%);
     padding: 44px 36px;
     display: flex;
     flex-direction: column;
@@ -91,7 +91,7 @@
     width: 180px;
     height: 180px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(59, 130, 246, 0.25) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(30, 80, 130, 0.2) 0%, transparent 70%);
     pointer-events: none;
 }
 
@@ -223,13 +223,16 @@
 }
 
 .password-toggle-btn:hover {
-    color: #2563eb;
+    color: #16365c;
 }
 
 .vmware-submit-btn {
+    --mdc-filled-button-container-color: #0f2b4d !important;
+    --mdc-protected-button-container-color: #0f2b4d !important;
+    --mdc-filled-button-label-text-color: #ffffff !important;
     height: 46px !important;
     margin-top: 14px !important;
-    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+    background: linear-gradient(135deg, #0f2b4d 0%, #173f6c 100%) !important;
     color: #ffffff !important;
     border-radius: 8px !important;
     font-size: 0.95rem !important;
@@ -239,13 +242,15 @@
     align-items: center !important;
     justify-content: center !important;
     gap: 8px !important;
-    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25) !important;
+    box-shadow: 0 4px 14px rgba(15, 43, 77, 0.25) !important;
     transition: all 0.2s ease !important;
 }
 
 .vmware-submit-btn:hover:not([disabled]) {
-    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%) !important;
-    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35) !important;
+    --mdc-filled-button-container-color: #173f6c !important;
+    --mdc-protected-button-container-color: #173f6c !important;
+    background: linear-gradient(135deg, #173f6c 0%, #1f5087 100%) !important;
+    box-shadow: 0 6px 18px rgba(15, 43, 77, 0.35) !important;
     transform: translateY(-1px);
 }
 
@@ -283,14 +288,14 @@
 }
 
 .license-link {
-    color: #2563eb;
+    color: #173f6c;
     text-decoration: none;
     font-weight: 500;
     transition: color 0.15s ease, text-decoration 0.15s ease;
 }
 
 .license-link:hover {
-    color: #1d4ed8;
+    color: #0f2b4d;
     text-decoration: underline;
 }
 
