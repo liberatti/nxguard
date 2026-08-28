@@ -441,9 +441,11 @@
     "subtitle": "High-Performance API Gateway & Security Engine",
     "tab_about": "About",
     "tab_restore": "Restore Config",
-    "choose_file": "Choose ZIP file to restore",
+    "choose_file": "Choose JSON file to restore",
     "selected_file": "Selected File",
-    "powered_by": "Powered by OpenResty & ModSecurity"
+    "powered_by": "Powered by OpenResty & ModSecurity",
+    "api_docs": "REST API",
+    "api_docs_sub": "OpenAPI / Swagger docs"
   },
   "attr": {
     "active": "Active",

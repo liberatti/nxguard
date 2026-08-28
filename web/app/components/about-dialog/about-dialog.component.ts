@@ -50,25 +50,29 @@ export class AboutDialogComponent {
 
     onFileSelected(event: any): void {
         this.selectedFile = event.target.files[0];
-        if (this.selectedFile && this.selectedFile.type !== 'application/zip') {
-            this.notificationService.openSnackBar('Only ZIP files are allowed');
-            this.selectedFile = null;
+        if (this.selectedFile) {
+            const isJson = this.selectedFile.name.toLowerCase().endsWith('.json') || this.selectedFile.type === 'application/json';
+            if (!isJson) {
+                this.notificationService.openSnackBar('Only JSON files are allowed');
+                this.selectedFile = null;
+            }
         }
     }
 
     onSubmit(): void {
         if (!this.selectedFile) {
-            this.notificationService.openSnackBar('Please select a ZIP file to upload');
+            this.notificationService.openSnackBar('Please select a JSON file to upload');
             return;
         }
         let formData = new FormData();
-        formData.append('zipfile', this.selectedFile, this.selectedFile.name);
+        formData.append('file', this.selectedFile, this.selectedFile.name);
         this.restoreReady = false;
 
         this.configService.uploadConfig(formData).subscribe({
             next: (data) => {
                 this.restoreReady = true;
-                this.dialogRef.close(false);
+                this.notificationService.openSnackBar('Config restored successfully');
+                this.dialogRef.close(true);
             },
             error: (err) => {
                 this.restoreReady = true;
@@ -83,8 +87,8 @@ export class AboutDialogComponent {
 
     downloadConfig(): void {
         this.configService.downloadConfig().subscribe((resultBlob) => {
-            const blob = new Blob([resultBlob], {type: 'application/zip'});
-            saveAs(blob, 'config.zip');
+            const blob = new Blob([resultBlob], { type: 'application/json' });
+            saveAs(blob, 'init-data.json');
         });
     }
 

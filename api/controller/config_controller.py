@@ -1,3 +1,4 @@
+import json
 from flask import Blueprint, Response, request
 from marshmallow import ValidationError
 from nxcore.controllers.base_controller import (
@@ -7,6 +8,7 @@ from nxcore.controllers.base_controller import (
     has_any_authority,
 )
 from nxcore.middleware.socket_manager import emit_event
+from nxcore.middleware.logging_manager import logger
 
 import engine.admin as c_admin
 import engine.build as c_builder
@@ -106,3 +108,60 @@ def update(_id=None) -> Response:
             return response_data(dao.get_active(), dao.schema)
     except ValidationError as err:
         return response_error_parse(err)
+
+
+@routes.route("/backup", methods=["GET"])
+@has_any_authority(authorities=["viewer", "superuser"])
+def backup_export() -> Response:
+    conf = c_builder.get_config()
+    export_data = {
+        "config": conf.get("config", {}),
+        "certificates": conf.get("certificates", []),
+        "sensors": conf.get("sensors", []),
+        "upstreams": conf.get("upstreams", []),
+        "services": conf.get("services", []),
+    }
+    return Response(
+        json.dumps(
+            export_data,
+            indent=2,
+            default=lambda o: o.isoformat() if hasattr(o, "isoformat") else str(o),
+        ),
+        mimetype="application/json",
+        headers={"Content-Disposition": "attachment; filename=init-data.json"},
+    )
+
+
+@routes.route("/backup", methods=["POST"])
+@has_any_authority(authorities=["superuser"])
+def backup_import() -> Response:
+    try:
+        if "file" in request.files:
+            uploaded_file = request.files["file"]
+            content = uploaded_file.read().decode("utf-8")
+            data = json.loads(content)
+        elif "jsonfile" in request.files:
+            uploaded_file = request.files["jsonfile"]
+            content = uploaded_file.read().decode("utf-8")
+            data = json.loads(content)
+        elif "zipfile" in request.files:
+            uploaded_file = request.files["zipfile"]
+            content = uploaded_file.read().decode("utf-8")
+            data = json.loads(content)
+        elif request.is_json:
+            data = request.get_json()
+        else:
+            return response_error("No JSON configuration file provided")
+
+        c_builder.init_from_data(data=data)
+        with ChangeDao() as dao:
+            if not dao.get_by_name("config"):
+                dao.persist({"name": "config"})
+            emit_event("tracking_evt")
+        return response_data(
+            {"status": "ok", "message": "Configuration imported successfully"}
+        )
+    except Exception as e:
+        logger.error(f"Error importing configuration: {e}")
+        return response_error(f"Failed to import configuration: {str(e)}")
+

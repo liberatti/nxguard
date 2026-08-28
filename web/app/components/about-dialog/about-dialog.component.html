@@ -53,6 +53,10 @@
                             <div class="api-icon-wrapper">
                                 <mat-icon class="link-icon">menu_book</mat-icon>
                             </div>
+                            <div class="link-info">
+                                <span class="link-title">{{ 'about.api_docs' | translate }}</span>
+                                <span class="link-sub">{{ 'about.api_docs_sub' | translate }}</span>
+                            </div>
                             <mat-icon class="link-arrow">open_in_new</mat-icon>
                         </a>
                     </div>
@@ -74,7 +78,7 @@
 
                     <form *ngIf="restoreReady" class="restore-form" id="restore-form">
                         <div class="file-dropzone" [class.has-file]="selectedFile">
-                            <input class="file-input" type="file" id="uploadConfig" accept="application/zip, .zip"
+                            <input class="file-input" type="file" id="uploadConfig" accept="application/json, .json"
                                 (change)="onFileSelected($event)">
 
                             <label for="uploadConfig" class="dropzone-label" id="upload-config-label"
@@ -83,13 +87,13 @@
                                     <mat-icon class="dropzone-icon">cloud_upload</mat-icon>
                                 </div>
                                 <span class="dropzone-title">{{ 'about.choose_file' | translate }}</span>
-                                <span class="dropzone-hint">.ZIP format only</span>
+                                <span class="dropzone-hint">.JSON format only</span>
                             </label>
 
                             <div class="file-selected-card" *ngIf="selectedFile">
                                 <div class="file-info-group">
                                     <div class="file-icon-badge">
-                                        <mat-icon>folder_zip</mat-icon>
+                                        <mat-icon>data_object</mat-icon>
                                     </div>
                                     <div class="file-details">
                                         <span class="file-name">{{ selectedFile.name }}</span>

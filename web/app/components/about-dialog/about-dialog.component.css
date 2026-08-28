@@ -1,15 +1,15 @@
 .about-dialog-container {
     padding: 0;
-    min-width: 440px;
-    max-width: 520px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .about-dialog-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 20px 24px 16px 24px;
-    border-bottom: 1px solid var(--border-dim);
+    padding: 22px 24px 18px 24px;
+    border-bottom: 1px solid var(--border-dim, #e2e8f0);
 }
 
 .header-brand {
@@ -19,10 +19,11 @@
 }
 
 .brand-logo {
-    width: 44px;
-    height: 44px;
-    border-radius: 10px;
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
     object-fit: contain;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12);
 }
 
 .brand-info {
@@ -41,7 +42,8 @@
     font-size: 1.25rem;
     font-weight: 700;
     margin: 0;
-    color: var(--text-main);
+    color: var(--text-main, #0f172a);
+    letter-spacing: -0.2px;
 }
 
 .version-badge {
@@ -49,28 +51,30 @@
     font-weight: 600;
     padding: 2px 8px;
     border-radius: 12px;
-    background: rgba(37, 99, 235, 0.1);
-    color: var(--primary);
+    background: rgba(37, 99, 235, 0.08);
+    color: var(--primary, #2563eb);
     border: 1px solid rgba(37, 99, 235, 0.2);
 }
 
 .brand-subtitle {
     font-size: 0.8rem;
-    color: var(--text-dim);
+    color: var(--text-dim, #475569);
     margin: 0;
 }
 
 .close-header-btn {
-    color: var(--text-muted);
+    color: var(--text-muted, #94a3b8);
+    transition: color 0.15s ease;
 }
 
 .close-header-btn:hover {
-    color: var(--text-main);
+    color: var(--text-main, #0f172a);
 }
 
 .dialog-content {
     padding: 0 24px;
     margin: 0;
+    overflow-x: hidden !important;
 }
 
 .custom-tab-group {
@@ -78,13 +82,13 @@
 }
 
 .tab-content {
-    padding: 16px 0 8px 0;
+    padding: 18px 0 10px 0;
 }
 
 .about-description {
-    font-size: 0.925rem;
+    font-size: 0.9rem;
     line-height: 1.6;
-    color: var(--text-dim);
+    color: var(--text-dim, #475569);
     margin: 0 0 16px 0;
 }
 
@@ -101,50 +105,58 @@
     gap: 6px;
     padding: 6px 12px;
     border-radius: 8px;
-    background: var(--bg-darker);
-    border: 1px solid var(--border-dim);
+    background: var(--bg-darker, #f1f5f9);
+    border: 1px solid var(--border-dim, #e2e8f0);
     font-size: 0.8rem;
     font-weight: 500;
-    color: var(--text-dim);
+    color: var(--text-dim, #475569);
+    transition: all 0.2s ease;
+}
+
+.feature-pill:hover {
+    border-color: var(--border-bright, #cbd5e1);
+    background: var(--bg-main, #f8fafc);
 }
 
 .pill-icon {
     font-size: 16px;
     width: 16px;
     height: 16px;
-    color: var(--primary);
+    color: var(--primary, #2563eb);
+    flex-shrink: 0;
 }
 
 .links-container {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 12px;
+    margin-bottom: 8px;
 }
 
 .link-card {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     padding: 12px 14px;
     border-radius: 10px;
-    border: 1px solid var(--border-dim);
-    background: var(--bg-darker);
+    border: 1px solid var(--border-dim, #e2e8f0);
+    background: var(--bg-darker, #f1f5f9);
     text-decoration: none;
-    color: var(--text-main);
-    transition: all 0.2s var(--transition);
+    color: var(--text-main, #0f172a);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .link-card:hover {
-    border-color: var(--primary);
-    background: var(--bg-main);
+    border-color: var(--primary, #2563eb);
+    background: #ffffff;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
 }
 
 .link-icon {
-    width: 24px;
-    height: 24px;
-    font-size: 24px;
+    width: 22px;
+    height: 22px;
+    font-size: 22px;
     flex-shrink: 0;
 }
 
@@ -152,7 +164,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--primary);
+    color: var(--primary, #2563eb);
 }
 
 .github-icon {
@@ -164,16 +176,18 @@
     flex-direction: column;
     flex: 1;
     min-width: 0;
+    gap: 1px;
 }
 
 .link-title {
-    font-size: 0.875rem;
+    font-size: 0.85rem;
     font-weight: 600;
+    color: var(--text-main, #0f172a);
 }
 
 .link-sub {
     font-size: 0.725rem;
-    color: var(--text-muted);
+    color: var(--text-muted, #94a3b8);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -183,7 +197,13 @@
     font-size: 16px;
     width: 16px;
     height: 16px;
-    color: var(--text-muted);
+    color: var(--text-muted, #94a3b8);
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.link-card:hover .link-arrow {
+    color: var(--primary, #2563eb);
+    transform: translate(1px, -1px);
 }
 
 /* Restore Tab */

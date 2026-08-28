@@ -210,7 +210,8 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
 
     showAbout() {
         this.portDialog.open(AboutDialogComponent, {
-            width: '450px'
+            width: '560px',
+            maxWidth: '95vw'
         });
     }
 

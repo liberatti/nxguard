@@ -450,9 +450,11 @@
     "subtitle": "API Gateway de Alta Performance & Motor de Segurança",
     "tab_about": "Sobre",
     "tab_restore": "Restaurar Config",
-    "choose_file": "Escolher arquivo ZIP para restauração",
+    "choose_file": "Escolher arquivo JSON para restauração",
     "selected_file": "Arquivo Selecionado",
-    "powered_by": "Desenvolvido com OpenResty & ModSecurity"
+    "powered_by": "Desenvolvido com OpenResty & ModSecurity",
+    "api_docs": "API REST",
+    "api_docs_sub": "Documentação OpenAPI / Swagger"
   },
   "attr": {
     "name": "Nome",

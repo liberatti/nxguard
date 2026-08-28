@@ -96,7 +96,7 @@
                             </mat-option>
                         </mat-select>
                     </mat-form-field>
-                    <div class="chips-container" *ngIf="getArrayVal(form.value.allowed_methods)?.length > 0">
+                    <div class="chips-container" *ngIf="getArrayVal(form.value.allowed_methods).length > 0">
                         <mat-chip-listbox id="service-route-allowed-methods-list">
                             <mat-chip-row *ngFor="let p of getArrayVal(form.value.allowed_methods)" (removed)="onRemoveAllowedMethod(p)" id="service-route-allowed-method-chip-{{p}}">
                                 {{ p }}
@@ -143,7 +143,7 @@
                             </mat-option>
                         </mat-select>
                     </mat-form-field>
-                    <div class="chips-container" *ngIf="getArrayVal(form.value.allowed_content_type)?.length > 0">
+                    <div class="chips-container" *ngIf="getArrayVal(form.value.allowed_content_type).length > 0">
                         <mat-chip-listbox id="service-route-allowed-content-types-list">
                             <mat-chip-row *ngFor="let p of getArrayVal(form.value.allowed_content_type)" (removed)="onRemoveAllowedContentType(p)" id="service-route-allowed-content-type-chip-{{p}}">
                                 {{ p }}

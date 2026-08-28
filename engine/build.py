@@ -105,12 +105,16 @@ def create_db():
         dao.create_schema()
 
 
-def init_from_data(data_dir, data_file="init-data.json"):
-    """Populates database tables from an initial dataset dictionary."""
+def init_from_data(data_dir=None, data_file="init-data.json", data=None):
+    """Populates database tables from an initial dataset dictionary or JSON file."""
 
-    logger.info(f"Initialize from {data_dir}/{data_file}")
+    if data is None:
+        if data_dir:
+            logger.info(f"Initialize from {data_dir}/{data_file}")
+            data = read_from_json(data_dir, data_file)
+        else:
+            return
 
-    data = read_from_json(data_dir, data_file)
     if not data:
         return
 
