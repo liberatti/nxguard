@@ -296,6 +296,8 @@ def _generate_services(
     logger.info(f"[{output_dir}] - Generate Services")
     prefix = "test-" if test else ""
     for service in data["services"]:
+        if not service.get("active"):
+            continue
         svc_name = service.get("render_name") or service.get("name")
         service.update(
             {

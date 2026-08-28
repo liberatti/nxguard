@@ -43,9 +43,11 @@ http {
 
   map $host $missing_domain_match {
   {%- for s in services %}
+  {%- if s.active %}
   {%- for t in s.sans %}
     {{ t }} 0;
   {%- endfor %}
+  {%- endif %}
   {%- endfor %}
     default 1;
   }
@@ -64,7 +66,9 @@ http {
   proxy_next_upstream error timeout invalid_header http_500 http_502 http_503 http_504;
   include upstreams.conf;
   {%- for u in services %}
+  {%- if u.active %}
   include service-{{ u.render_name if u.render_name else u.name }}.conf;
+  {%- endif %}
   {%- endfor %}
 
   limit_req_status 429;
