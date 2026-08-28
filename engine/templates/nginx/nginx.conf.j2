@@ -17,8 +17,8 @@ http {
   merge_slashes on;
   resolver {{config.dns_resolver}} valid=30s;
   uninitialized_variable_warn off;
-  lua_shared_dict log_buffer 16m;
-  lua_shared_dict ipxa_cache 64m;
+  lua_shared_dict log_buffer 2m;
+  lua_shared_dict ipxa_cache 1m;
 
   init_worker_by_lua_block {
     local flush = require "nxguard.log_flush"

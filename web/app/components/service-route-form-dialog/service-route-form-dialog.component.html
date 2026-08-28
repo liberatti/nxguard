@@ -1,6 +1,6 @@
 <h1 mat-dialog-title>{{ isAddMode ? 'Add Route' : 'Edit Route' }}</h1>
 
-<div mat-dialog-content>
+<div mat-dialog-content class="dialog-content-body">
     <form [formGroup]="form" id="service-route-form">
 
         <!-- Name and Type -->
@@ -24,8 +24,8 @@
         </div>
 
         <!-- Path Section -->
-        <form [formGroup]="pathForm" id="service-route-path-form">
-            <mat-card>
+        <div class="form-section-card">
+            <form [formGroup]="pathForm" id="service-route-path-form">
                 <mat-form-field class="full-width">
                     <mat-label>{{ 'ROUTE.REQUEST_PATH' | translate }}</mat-label>
                     <input matInput formControlName="path" id="service-route-path-input">
@@ -33,7 +33,7 @@
                         <mat-icon>add</mat-icon>
                     </button>
                 </mat-form-field>
-                <mat-card-content>
+                <div class="chips-container" *ngIf="form.value.paths && form.value.paths.length > 0">
                     <mat-chip-listbox id="service-route-paths-list">
                         <mat-chip-row *ngFor="let p of form.value.paths" (removed)="onRemovePath(p)" id="service-route-path-chip-{{p}}">
                             {{ p }}
@@ -42,38 +42,42 @@
                             </button>
                         </mat-chip-row>
                     </mat-chip-listbox>
-                </mat-card-content>
-            </mat-card>
-        </form>
+                </div>
+            </form>
+        </div>
 
         <!-- Conditional Fields based on Type -->
-        <div *ngIf="form.value.type === 'UPSTREAM'">
-            <mat-form-field class="full-width mt-2">
+        <div *ngIf="form.value.type === 'UPSTREAM'" class="mt-1">
+            <mat-form-field class="full-width">
                 <mat-label>{{ 'ROUTE.UPSTREAM' | translate }}</mat-label>
                 <mat-select formControlName="upstream" [compareWith]="compareFn" color="accent" id="service-route-upstream-select">
                     <mat-option *ngFor="let c of _upstreams; let i = index" [value]="c" id="service-route-upstream-option-{{i}}">
                         {{ c.name }}
-                        <mat-chip>{{ c.type }}</mat-chip>
+                        <mat-chip class="ml-2">{{ c.type }}</mat-chip>
                     </mat-option>
                 </mat-select>
             </mat-form-field>
         </div>
 
-        <div *ngIf="form.value.type === 'REDIRECT'">
-            <div formGroupName="redirect">
-                <mat-form-field class="full-width mt-2">
-                    <mat-label>Code</mat-label>
-                    <input matInput formControlName="code" id="service-route-redirect-code-input">
-                </mat-form-field>
-                <mat-form-field class="full-width">
-                    <mat-label>URL</mat-label>
-                    <input matInput formControlName="url" id="service-route-redirect-url-input">
-                </mat-form-field>
+        <div *ngIf="form.value.type === 'REDIRECT'" class="mt-1">
+            <div formGroupName="redirect" class="mat-row">
+                <div class="mat-col-4">
+                    <mat-form-field class="full-width">
+                        <mat-label>Code</mat-label>
+                        <input matInput formControlName="code" id="service-route-redirect-code-input">
+                    </mat-form-field>
+                </div>
+                <div class="mat-col-8">
+                    <mat-form-field class="full-width">
+                        <mat-label>URL</mat-label>
+                        <input matInput formControlName="url" id="service-route-redirect-url-input">
+                    </mat-form-field>
+                </div>
             </div>
         </div>
 
         <!-- Methods and Cache Methods -->
-        <div class="mat-row">
+        <div class="mat-row mt-1">
             <div class="mat-col-6">
                 <form [formGroup]="allowedMethodForm">
                     <mat-form-field class="full-width">
@@ -84,14 +88,16 @@
                             </mat-option>
                         </mat-select>
                     </mat-form-field>
-                    <mat-chip-listbox id="service-route-allowed-methods-list">
-                        <mat-chip-row *ngFor="let p of getArrayVal(form.value.allowed_methods)" (removed)="onRemoveAllowedMethod(p)" id="service-route-allowed-method-chip-{{p}}">
-                            {{ p }}
-                            <button matChipRemove id="remove-service-route-allowed-method-{{p}}">
-                                <mat-icon>cancel</mat-icon>
-                            </button>
-                        </mat-chip-row>
-                    </mat-chip-listbox>
+                    <div class="chips-container" *ngIf="getArrayVal(form.value.allowed_methods)?.length > 0">
+                        <mat-chip-listbox id="service-route-allowed-methods-list">
+                            <mat-chip-row *ngFor="let p of getArrayVal(form.value.allowed_methods)" (removed)="onRemoveAllowedMethod(p)" id="service-route-allowed-method-chip-{{p}}">
+                                {{ p }}
+                                <button matChipRemove id="remove-service-route-allowed-method-{{p}}">
+                                    <mat-icon>cancel</mat-icon>
+                                </button>
+                            </mat-chip-row>
+                        </mat-chip-listbox>
+                    </div>
                 </form>
             </div>
             <div class="mat-col-6">
@@ -103,20 +109,22 @@
                             <mat-icon>add</mat-icon>
                         </button>
                     </mat-form-field>
-                    <mat-chip-listbox id="service-route-cache-methods-list">
-                        <mat-chip-row *ngFor="let p of form.value.cache_methods" (removed)="onRemoveCacheMethod(p)" id="service-route-cache-method-chip-{{p}}">
-                            {{ p }}
-                            <button matChipRemove id="remove-service-route-cache-method-{{p}}">
-                                <mat-icon>cancel</mat-icon>
-                            </button>
-                        </mat-chip-row>
-                    </mat-chip-listbox>
+                    <div class="chips-container" *ngIf="form.value.cache_methods && form.value.cache_methods.length > 0">
+                        <mat-chip-listbox id="service-route-cache-methods-list">
+                            <mat-chip-row *ngFor="let p of form.value.cache_methods" (removed)="onRemoveCacheMethod(p)" id="service-route-cache-method-chip-{{p}}">
+                                {{ p }}
+                                <button matChipRemove id="remove-service-route-cache-method-{{p}}">
+                                    <mat-icon>cancel</mat-icon>
+                                </button>
+                            </mat-chip-row>
+                        </mat-chip-listbox>
+                    </div>
                 </form>
             </div>
         </div>
 
         <!-- Allowed Content Types -->
-        <div class="mat-row mt-2">
+        <div class="mat-row mt-1">
             <div class="mat-col-12">
                 <form [formGroup]="allowedContentTypeForm">
                     <mat-form-field class="full-width">
@@ -127,20 +135,22 @@
                             </mat-option>
                         </mat-select>
                     </mat-form-field>
-                    <mat-chip-listbox id="service-route-allowed-content-types-list">
-                        <mat-chip-row *ngFor="let p of getArrayVal(form.value.allowed_content_type)" (removed)="onRemoveAllowedContentType(p)" id="service-route-allowed-content-type-chip-{{p}}">
-                            {{ p }}
-                            <button matChipRemove id="remove-service-route-allowed-content-type-{{p}}">
-                                <mat-icon>cancel</mat-icon>
-                            </button>
-                        </mat-chip-row>
-                    </mat-chip-listbox>
+                    <div class="chips-container" *ngIf="getArrayVal(form.value.allowed_content_type)?.length > 0">
+                        <mat-chip-listbox id="service-route-allowed-content-types-list">
+                            <mat-chip-row *ngFor="let p of getArrayVal(form.value.allowed_content_type)" (removed)="onRemoveAllowedContentType(p)" id="service-route-allowed-content-type-chip-{{p}}">
+                                {{ p }}
+                                <button matChipRemove id="remove-service-route-allowed-content-type-{{p}}">
+                                    <mat-icon>cancel</mat-icon>
+                                </button>
+                            </mat-chip-row>
+                        </mat-chip-listbox>
+                    </div>
                 </form>
             </div>
         </div>
 
         <!-- Security Sensor and Monitor Only -->
-        <mat-card class="mt-2">
+        <div class="form-section-card mt-1">
             <mat-form-field class="full-width">
                 <mat-label>{{ 'ROUTE.SECURITY_SENSOR' | translate }}</mat-label>
                 <mat-select formControlName="sensor" [compareWith]="compareFn" id="service-route-sensor-select">
@@ -149,11 +159,11 @@
                     </mat-option>
                 </mat-select>
             </mat-form-field>
-            <mat-card-actions align="end">
+            <div class="toggle-row">
                 <span class="spacer"></span>
                 <mat-slide-toggle color="primary" formControlName="monitor_only" id="service-route-monitor-toggle">{{ 'ROUTE.MONITOR_ONLY' | translate }}</mat-slide-toggle>
-            </mat-card-actions>
-        </mat-card>
+            </div>
+        </div>
 
     </form>
 </div>

@@ -326,7 +326,8 @@ export class ServiceFormComponent implements OnInit {
     onEditBind(index: number) {
         const dialogRef = this.confirmDialog.open(ServiceBindFormDialogComponent,
             {
-                maxWidth: undefined,
+                width: '450px',
+                maxWidth: '95vw',
                 data: this.bindingDS.data[index]
             });
 
@@ -374,7 +375,8 @@ export class ServiceFormComponent implements OnInit {
 
     onAddRoute() {
         const dialogRef = this.confirmDialog.open(ServiceRouteFormDialogComponent, {
-            maxWidth: undefined
+            width: '780px',
+            maxWidth: '95vw'
         });
 
         dialogRef.afterClosed().subscribe(result => {
@@ -391,7 +393,8 @@ export class ServiceFormComponent implements OnInit {
     onEditRoute(index: number) {
         const targetRoute = this.routeDS.data[index];
         const dialogRef = this.confirmDialog.open(ServiceRouteFormDialogComponent, {
-            maxWidth: undefined,
+            width: '780px',
+            maxWidth: '95vw',
             data: targetRoute
         });
 

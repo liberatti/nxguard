@@ -31,6 +31,7 @@ import { StaticService } from "../../services/static.service";
 @Component({
     selector: 'app-service-route-form-dialog',
     templateUrl: './service-route-form-dialog.component.html',
+    styleUrl: './service-route-form-dialog.component.css',
     standalone: true,
     imports: [ReactiveFormsModule, CommonModule, TranslatePipe,
         MatFormFieldModule, MatChipsModule,

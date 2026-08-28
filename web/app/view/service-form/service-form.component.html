@@ -378,6 +378,13 @@
                                     <mat-card-subtitle class="section-subtitle">
                                         {{ 'SERVICE.ROUTES_SUBTITLE' | translate }}
                                     </mat-card-subtitle>
+                                    <div class="align-right">
+                                        <button mat-flat-button color="primary" type="button" *ngIf="form.enabled"
+                                            (click)="onAddRoute()" id="add-route-button">
+                                            <mat-icon>add</mat-icon>
+                                            {{ 'actions.create' | translate }}
+                                        </button>
+                                    </div>
                                 </mat-card-header>
                                 <mat-card-content>
                                     <table class="custom-table cdk-drop-list-table"
@@ -385,10 +392,10 @@
                                         <thead>
                                             <tr>
                                                 <th class="drag-handle-cell"></th>
-                                                <th>{{ 'ROUTE.NAME' | translate }}</th>
-                                                <th>{{ 'ROUTE.UPSTREAM' | translate }}</th>
-                                                <th>{{ 'ROUTE.REQUEST_PATH' | translate }}</th>
-                                                <th class="text-right"></th>
+                                                <th class="col-name">{{ 'ROUTE.NAME' | translate }}</th>
+                                                <th class="col-upstream">{{ 'ROUTE.UPSTREAM' | translate }}</th>
+                                                <th class="col-path">{{ 'ROUTE.REQUEST_PATH' | translate }}</th>
+                                                <th class="col-actions text-right"></th>
                                             </tr>
                                         </thead>
                                         <tbody cdkDropList [cdkDropListData]="routeDS.data"
@@ -397,10 +404,10 @@
                                                 <td cdkDragHandle class="drag-handle-cell">
                                                     <mat-icon>drag_indicator</mat-icon>
                                                 </td>
-                                                <td class="route-name-cell">
+                                                <td class="col-name route-name-cell">
                                                     {{ r.name }}
                                                 </td>
-                                                <td>
+                                                <td class="col-upstream">
                                                     <span class="target-badge"
                                                         *ngIf="r.type != 'REDIRECT' && r.type != 'STATIC'">
                                                         {{ r.upstream?.name }}
@@ -412,14 +419,14 @@
                                                         STATIC
                                                     </span>
                                                 </td>
-                                                <td>
+                                                <td class="col-path">
                                                     <div class="paths-list">
                                                         <span class="path-chip" *ngFor="let p of r.paths">
                                                             {{ p }}
                                                         </span>
                                                     </div>
                                                 </td>
-                                                <td class="text-right">
+                                                <td class="col-actions text-right">
                                                     <div class="table-cell-actions" *ngIf="form.enabled">
                                                         <button mat-icon-button type="button"
                                                             [matMenuTriggerFor]="menu">
@@ -448,13 +455,6 @@
                                         <span class="empty-state-text">{{ 'SERVICE.NO_ROUTES' | translate }}</span>
                                     </div>
                                 </mat-card-content>
-                                <mat-card-actions class="align-right">
-                                    <button mat-flat-button color="primary" type="button" *ngIf="form.enabled"
-                                        (click)="onAddRoute()" id="add-route-button">
-                                        <mat-icon>add</mat-icon>
-                                        {{ 'actions.create' | translate }}
-                                    </button>
-                                </mat-card-actions>
                             </mat-card>
                             <div class="step-actions">
                                 <button mat-stroked-button matStepperPrevious type="button" id="back-routes-button">
