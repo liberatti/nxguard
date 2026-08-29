@@ -134,7 +134,7 @@ class FeedService:
     def get_by_type(self, t):
         try:
             url, headers = IPXAService.get_api_config(f"/api/feed?type={t}")
-            response = requests.get(url, headers=headers, timeout=5, retries=1)
+            response = requests.get(url, headers=headers, timeout=5)
             if response.status_code == 200:
                 res_data = response.json()
                 if (
