@@ -203,7 +203,8 @@ def install():
 
 def renew_certificates():
     with CertificateDao() as dao_c, ServiceDao() as dao_s:
-        crt_count = 0
+        crt_c1 = 0
+        crt_c2 = 0
         certificates = dao_c.get_all()["data"]
         for cert in certificates:
             if cert["provider"] in ["SELF", "MANAGED"]:
@@ -218,14 +219,17 @@ def renew_certificates():
                     try:
                         if "MANAGED" in cert["provider"]:
                             AcmeTool.renew_lets(cert)
+                            crt_c2 += 1
                         if "SELF" in cert["provider"]:
                             AcmeTool.renew_self(cert)
-                        crt_count += 1
+                            crt_c1 += 1
                     except Exception as e:
                         stack_trace = traceback.format_exc()
                         logger.error(f"{e}, {stack_trace}")
 
     AcmeTool.clean_expired_challenges()
-    if crt_count > 0:
-        logger.info(f"{crt_count} certificate renewed")
+    if crt_c1 > 0 or crt_c2 > 0:
+        logger.info(
+            f"{crt_c1} SELF certificates renewed, {crt_c2} MANAGED certificates renewed"
+        )
         update_main_config()
