@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, timedelta
 import os
 import socket
 import subprocess
@@ -6,7 +6,7 @@ import time
 import traceback
 
 import requests
-from nxcore.common_utils import get_server_id
+from nxcore.common_utils import get_server_id, replace_tz
 from nxcore.middleware.logging_manager import logger
 
 import config
@@ -16,6 +16,8 @@ import engine.seclang.seclang_indexer as seclang_indexer
 from api.model.config_model import ConfigBackupDao, ConfigDao
 from api.model.upstream_model import NodeStatusDao, UpstreamDao, UpstreamStatesDao
 from api.model.certificate_model import CertificateDao
+from api.model.service_model import ServiceDao
+from api.tools.acme_tool import AcmeTool
 
 
 def update_node_config() -> None:
@@ -45,7 +47,7 @@ def update_node_config() -> None:
                                     backup_dao.persist(
                                         {
                                             "scn": remote_cnf["scn"],
-                                            "created_at": datetime.datetime.now(),
+                                            "created_at": datetime.now(),
                                             "data": remote_cnf,
                                         }
                                     )
@@ -72,7 +74,7 @@ def update_node_status() -> None:
     node = {
         "status": st,
         "scn": scn,
-        "last_check": datetime.datetime.now(config.TZ).isoformat(),
+        "last_check": datetime.now(config.TZ).isoformat(),
         "version": config.APP_VERSION,
         "net_recv": 0,
         "net_send": 0,
@@ -85,7 +87,7 @@ def update_node_status() -> None:
 def update_upstream_states() -> None:
     """Performs health checks on backend upstream targets and records state for the local node."""
     node_id = get_server_id()
-    now_iso = datetime.datetime.now(config.TZ).isoformat()
+    now_iso = datetime.now(config.TZ).isoformat()
 
     with UpstreamDao() as upstream_dao, UpstreamStatesDao() as states_dao:
         upstreams_resp = upstream_dao.get_all()
@@ -200,12 +202,30 @@ def install():
 
 
 def renew_certificates():
-    with CertificateDao() as certificate_dao:
-        certificates = certificate_dao.get_all()["data"]
-        for certificate in certificates:
-            if certificate["force_renew"] or (certificate["status"] == "EXPIRED"):
-                logger.info(f"Renewing certificate for {certificate['subjects']}")
-                certificate_dao.update_by_id(
-                    certificate["_id"], {"force_renew": False, "status": "VALID"}
+    with ServiceDao() as dao_s:
+        services = dao_s.get_all()
+    crt_count = 0
+    if "data" in services:
+        for service in services["data"]:
+            if "certificate" in service:
+                renew_date = datetime.now() - timedelta(
+                    days=config.CERTIFICATE_RENEW
                 )
+                renew_date = replace_tz(renew_date)
+                certificate = service["certificate"]
+                if (
+                    certificate["force_renew"]
+                    or replace_tz(certificate["not_after"]) < renew_date
+                ):
+                    try:
+                        if "MANAGED" in certificate["provider"]:
+                            AcmeTool.renew_lets(certificate)
+                        if "SELF" in certificate["provider"]:
+                            AcmeTool.renew_self(certificate)
+                        crt_count += 1
+                    except Exception as e:
+                        stack_trace = traceback.format_exc()
+                        logger.error(f"{e}, {stack_trace}")
+    logger.info(f"{crt_count} certificate renewed")
+    AcmeTool.clean_expired_challenges()
     update_main_config()

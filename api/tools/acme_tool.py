@@ -2,6 +2,7 @@ import traceback
 from datetime import datetime, timedelta
 from acme import errors as ACMEerrors
 
+import config
 from nxcore.middleware.logging_manager import logger
 
 # noinspection PyPep8Naming
@@ -14,13 +15,11 @@ from api.tools.ssl_tool import SSLLetsEncryptTool, SSLTool
 
 
 class AcmeTool:
-    __CERTIFICATE_RENEW = 7
-
     @classmethod
     def clean_expired_challenges(cls):
         with ChallengeDao() as dao:
             dao.delete_issued_before(
-                datetime.now() + timedelta(days=cls.__CERTIFICATE_RENEW)
+                datetime.now() + timedelta(days=config.CERTIFICATE_RENEW)
             )
 
     @classmethod
@@ -31,7 +30,7 @@ class AcmeTool:
             raise ValueError("No active configuration found")
         ca = SSLTool.get_or_create_ca(c)
         with ServiceDao() as dao_s:
-            services = dao_s.getall_by_certificate_id(certificate["_id"])
+            services = dao_s.get_all_by_certificate_id(certificate["_id"])
 
         cn = None
         sans = []
@@ -65,7 +64,7 @@ class AcmeTool:
     def renew_lets(cls, certificate):
         try:
             with ServiceDao() as dao_s:
-                services = dao_s.getall_by_certificate_id(certificate["_id"])
+                services = dao_s.get_all_by_certificate_id(certificate["_id"])
             cn = None
             sans = []
             for s in services:
@@ -104,33 +103,3 @@ class AcmeTool:
             for rs in e.failed_authzrs:
                 for challenge in rs.body.challenges:
                     logger.error(challenge.error)
-
-    @classmethod
-    def auto_renew(cls):
-        cls.clean_expired_challenges()
-        with ServiceDao() as dao_s:
-            services = dao_s.get_all()
-        crt_count = 0
-        if "data" in services:
-            for service in services["data"]:
-                if "certificate" in service:
-                    renew_date = datetime.now() - timedelta(
-                        days=cls.__CERTIFICATE_RENEW
-                    )
-                    renew_date = replace_tz(renew_date)
-                    certificate = service["certificate"]
-                    if (
-                        certificate["force_renew"]
-                        or replace_tz(certificate["not_after"]) < renew_date
-                    ):
-                        try:
-                            if "MANAGED" in certificate["provider"]:
-                                cls.renew_lets(certificate)
-                            if "SELF" in certificate["provider"]:
-                                cls.renew_self(certificate)
-                            crt_count += 1
-                        except Exception as e:
-                            stack_trace = traceback.format_exc()
-                            logger.error(f"{e}, {stack_trace}")
-            logger.info(f"{crt_count} certificate renewed")
-        return crt_count
