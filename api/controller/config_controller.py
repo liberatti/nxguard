@@ -1,4 +1,5 @@
 import json
+import threading
 from flask import Blueprint, Response, request
 from marshmallow import ValidationError
 from nxcore.controllers.base_controller import (
@@ -77,7 +78,7 @@ def apply_config() -> Response:
         if cst and cst.get("status") == "ok":
             with ChangeDao() as change_dao:
                 if change_dao.has_certificate_change():
-                    renew_certificates.delay()
+                    renew_certificates()
                 change_dao.delete_all()
             emit_event("tracking_aply")
             return response_data({"status": "ok", "scn": cst.get("scn")})
