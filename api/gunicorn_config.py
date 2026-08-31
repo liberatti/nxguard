@@ -70,7 +70,7 @@ def post_fork(server, worker):
         else:
             logger.error(f"Failed to apply config: {val['message']}")
         schedule.every(10).seconds.do(update_main_config)
-        schedule.every(10).seconds.do(renew_certificates)
+        schedule.every(1).days.do(renew_certificates)
         with UpstreamStatesDao() as states_dao:
             states_dao.delete_all()
     else:
