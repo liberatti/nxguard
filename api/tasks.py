@@ -202,30 +202,30 @@ def install():
 
 
 def renew_certificates():
-    with ServiceDao() as dao_s:
-        services = dao_s.get_all()
-    crt_count = 0
-    if "data" in services:
-        for service in services["data"]:
-            if "certificate" in service:
-                renew_date = datetime.now() - timedelta(
-                    days=config.CERTIFICATE_RENEW
-                )
+    with CertificateDao() as dao_c, ServiceDao() as dao_s:
+        crt_count = 0
+        certificates = dao_c.get_all()["data"]
+        for cert in certificates:
+            if cert["provider"] in ["SELF", "MANAGED"]:
+                renew_date = datetime.now() - timedelta(days=config.CERTIFICATE_RENEW)
                 renew_date = replace_tz(renew_date)
-                certificate = service["certificate"]
-                if (
-                    certificate["force_renew"]
-                    or replace_tz(certificate["not_after"]) < renew_date
-                ):
+                if cert["force_renew"] or replace_tz(cert["not_after"]) < renew_date:
+                    sans = []
+                    services = dao_s.get_all_by_certificate_id(cert["_id"])
+                    if services:
+                        for s in services:
+                            sans.extend(s["sans"])
                     try:
-                        if "MANAGED" in certificate["provider"]:
-                            AcmeTool.renew_lets(certificate)
-                        if "SELF" in certificate["provider"]:
-                            AcmeTool.renew_self(certificate)
+                        if "MANAGED" in cert["provider"]:
+                            AcmeTool.renew_lets(cert)
+                        if "SELF" in cert["provider"]:
+                            AcmeTool.renew_self(cert)
                         crt_count += 1
                     except Exception as e:
                         stack_trace = traceback.format_exc()
                         logger.error(f"{e}, {stack_trace}")
-    logger.info(f"{crt_count} certificate renewed")
+
     AcmeTool.clean_expired_challenges()
-    update_main_config()
+    if crt_count > 0:
+        logger.info(f"{crt_count} certificate renewed")
+        update_main_config()
