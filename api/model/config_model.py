@@ -216,3 +216,12 @@ class ChangeDao(DuckDAO):
             );
         """
         )
+
+    def has_certificate_change(self) -> bool:
+        try:
+            query = f"SELECT COUNT(*) as count FROM {self.table_name} WHERE name = 'certificate'"
+            rs = self._query(query, fetch=True)
+            return rs[0]["count"] > 0
+        except Exception as e:
+            logger.error(f"Error checking for certificate change: {str(e)}")
+            return False

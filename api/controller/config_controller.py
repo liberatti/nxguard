@@ -14,6 +14,7 @@ import engine.admin as c_admin
 import engine.build as c_builder
 from api.model.config_model import ChangeDao, ConfigDao
 from api.model.upstream_model import NodeStatusDao
+from api.tasks import renew_certificates
 
 routes = Blueprint("config", __name__)
 
@@ -75,6 +76,8 @@ def apply_config() -> Response:
         cst = c_admin.apply(val["scn"])
         if cst and cst.get("status") == "ok":
             with ChangeDao() as change_dao:
+                if change_dao.has_certificate_change():
+                    renew_certificates.delay()
                 change_dao.delete_all()
             emit_event("tracking_aply")
             return response_data({"status": "ok", "scn": cst.get("scn")})
