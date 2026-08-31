@@ -119,6 +119,14 @@ div.mat-row {
     color: var(--text-main);
 }
 
+.text-dim {
+    color: var(--text-dim) !important;
+}
+
+.text-muted {
+    color: var(--text-muted) !important;
+}
+
 /* -------------------------------------------------------------------------- */
 /* 5. Reusable Components                                                     */
 /* -------------------------------------------------------------------------- */
