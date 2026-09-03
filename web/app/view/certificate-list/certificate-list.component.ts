@@ -39,7 +39,8 @@ import {OAuthService} from "../../services/oauth.service";
         MatTableModule, MatMenuModule, MatSortModule,
         MatTooltipModule, MatSelectModule, MatPaginatorModule,
         MatFormFieldModule, MatChipsModule],
-    templateUrl: './certificate-list.component.html'
+    templateUrl: './certificate-list.component.html',
+    styleUrl: './certificate-list.component.css'
 })
 
 export class CertificateListComponent implements OnInit {

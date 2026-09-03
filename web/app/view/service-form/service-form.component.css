@@ -195,6 +195,67 @@
     text-align: left;
 }
 
+.field-prefix-icon {
+    color: #64748b;
+    margin-right: 8px;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+}
+
+.field-unit {
+    color: #64748b;
+    font-weight: 600;
+    font-size: 0.8125rem;
+    padding-right: 4px;
+}
+
+.chip-avatar-icon {
+    font-size: 16px !important;
+    width: 16px !important;
+    height: 16px !important;
+    color: #0284c7;
+}
+
+.ca-textarea {
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 0.8rem;
+    line-height: 1.4;
+}
+
+.header-name-text {
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 0.85rem;
+    color: #0f172a;
+    font-weight: 600;
+}
+
+.badge-force-ssl {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: #ecfdf5;
+    color: #059669;
+    border: 1px solid #a7f3d0;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.badge-force-ssl mat-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+}
+
+.badge-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+    margin-right: 4px;
+}
+
 .col-actions {
     width: 64px;
     min-width: 64px;
@@ -217,13 +278,31 @@
 .target-badge {
     display: inline-flex;
     align-items: center;
-    padding: 4px 10px;
+    padding: 3px 8px;
     border-radius: 6px;
     font-size: 0.8125rem;
-    font-weight: 500;
+    font-weight: 600;
     background-color: #eff6ff;
-    color: var(--primary);
+    color: #2563eb;
     border: 1px solid #bfdbfe;
+}
+
+.target-badge.https {
+    background-color: #ecfdf5;
+    color: #059669;
+    border-color: #a7f3d0;
+}
+
+.target-badge.http {
+    background-color: #eff6ff;
+    color: #2563eb;
+    border-color: #bfdbfe;
+}
+
+.target-badge.upstream {
+    background-color: #eff6ff;
+    color: #2563eb;
+    border-color: #bfdbfe;
 }
 
 .target-badge.redirect {
@@ -234,7 +313,7 @@
 
 .target-badge.static {
     background-color: #f3e8ff;
-    color: var(--secondary);
+    color: #7c3aed;
     border-color: #e9d5ff;
 }
 
@@ -250,9 +329,9 @@
     font-size: 0.75rem;
     padding: 2px 8px;
     border-radius: 4px;
-    background-color: var(--bg-darker);
-    border: 1px solid var(--border-dim);
-    color: var(--text-dim);
+    background-color: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    color: #334155;
 }
 
 /* Empty states */

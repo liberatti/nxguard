@@ -39,7 +39,8 @@ import {OAuthService} from "../../services/oauth.service";
         MatTableModule, MatMenuModule, MatSortModule,
         MatTooltipModule, MatSelectModule, MatPaginatorModule,
         MatFormFieldModule, MatChipsModule],
-    templateUrl: './sensor-list.component.html'
+    templateUrl: './sensor-list.component.html',
+    styleUrl: './sensor-list.component.css'
 })
 
 export class SensorListComponent implements OnInit {

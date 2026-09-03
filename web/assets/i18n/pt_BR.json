@@ -1,4 +1,8 @@
 {
+  "THEME": {
+    "DARK_MODE": "Alternar para tema escuro",
+    "LIGHT_MODE": "Alternar para tema claro"
+  },
   "ACTIONS": {
     "CREATE": "Criar",
     "EDIT": "Editar",
@@ -191,6 +195,11 @@
     "CONTROL_RULE": "Controle do Motor / Gate de Paranoia",
     "VIEW_DETAILS": "Ver detalhes da regra",
     "NO_CATEGORIES_SELECTED": "Nenhuma categoria adicionada a este sensor ainda",
+    "FILTER_FEEDS_PLACEHOLDER": "Filtrar feeds selecionados...",
+    "NO_FEEDS_SELECTED": "Nenhum feed selecionado ainda. Selecione na lista acima.",
+    "FILTER_GEO_PLACEHOLDER": "Filtrar países selecionados...",
+    "NO_GEO_SELECTED": "Nenhum país bloqueado selecionado.",
+    "CLEAR_ALL": "Limpar todos",
     "SAVED_SUCCESS": "Sensor salvo com sucesso",
     "UPDATED_SUCCESS": "Sensor atualizado com sucesso"
   },
@@ -230,6 +239,34 @@
     "NO_DOMAINS": "Nenhum domínio adicionado ainda.",
     "NO_HEADERS": "Nenhum cabeçalho personalizado configurado.",
     "NO_ROUTES": "Nenhuma rota configurada ainda."
+  },
+  "GEOIP_DIALOG": {
+    "TITLE": "Informações GeoIP",
+    "SUBTITLE": "Inteligência geográfica e de rede do IP de origem",
+    "IP_ADDRESS": "Endereço IP",
+    "COUNTRY": "País",
+    "STATUS": "Ação GeoIP",
+    "ORGANIZATION": "Organização / Provedor",
+    "ASN": "Número ASN",
+    "IP_RANGE": "Faixa de IP",
+    "IPXA": "Status IPXa",
+    "RAW_DATA": "Dados brutos de GeoIP",
+    "COPIED": "IP copiado para a área de transferência"
+  },
+  "RBL_DIALOG": {
+    "TITLE": "Reputação RBL & IP",
+    "SUBTITLE": "Análise de reputação e inteligência de ameaças para o IP de origem",
+    "IP_ADDRESS": "IP de Origem",
+    "STATUS": "Ação RBL",
+    "SCORE": "Pontuação de Risco",
+    "TRUSTED": "Bypass Confiável",
+    "MATCHED_FEEDS": "Feed(s) Correspondente(s)",
+    "NO_MATCH": "Nenhuma correspondência em feeds maliciosos",
+    "IPXA": "Status IPXa",
+    "RAW_DATA": "Dados brutos de reputação",
+    "YES": "Sim",
+    "NO": "Não",
+    "COPIED": "IP copiado para a área de transferência"
   },
   "APPLY_DIALOG": {
     "TITLE": "Aplicar Configurações",
@@ -438,7 +475,10 @@
       "SERVICE_PORT": "Porta do Serviço",
       "DISTRIBUTION_WEIGHT": "Peso de Distribuição",
       "ACTIONS": "Ações",
+      "EDIT_TOOLTIP": "Editar destino",
       "REMOVE_TOOLTIP": "Remover destino",
+      "MODAL_TITLE_ADD": "Adicionar Destino de Upstream",
+      "MODAL_TITLE_EDIT": "Editar Destino de Upstream",
       "EMPTY_MESSAGE": "Nenhum destino configurado. Adicione pelo menos um destino para este backend."
     },
     "STATES": {
@@ -454,6 +494,11 @@
       "NO_STATES": "Nenhum estado de checagem registrado ainda para este upstream.",
       "WARNING_TOOLTIP": "Um ou mais destinos estão em estado de falha"
     }
+  },
+  "DATETIME": {
+    "HOUR": "Hora",
+    "MINUTE": "Minuto",
+    "SECOND": "Segundo"
   },
   "FORMAT": {
     "DISPLAY": {
@@ -483,13 +528,21 @@
   "about": {
     "title": "Sobre o NXGuard",
     "subtitle": "API Gateway de Alta Performance & Motor de Segurança",
-    "tab_about": "Sobre",
-    "tab_restore": "Restaurar Config",
-    "choose_file": "Escolher arquivo JSON para restauração",
+    "tab_about": "Visão Geral",
+    "tab_backup_restore": "Backup & Restauração",
+    "backup_title": "Exportar Configuração (Backup)",
+    "backup_desc": "Baixe um backup completo de todos os serviços, upstreams e regras de segurança em formato JSON.",
+    "backup_btn": "Baixar Backup",
+    "restore_title": "Importar Configuração (Restaurar)",
+    "restore_desc": "Envie um arquivo JSON de backup previamente exportado para restaurar a configuração do sistema.",
+    "choose_file": "Escolher arquivo JSON de backup",
     "selected_file": "Arquivo Selecionado",
     "powered_by": "Desenvolvido com OpenResty & ModSecurity",
     "api_docs": "API REST",
-    "api_docs_sub": "Documentação OpenAPI / Swagger"
+    "api_docs_sub": "Documentação OpenAPI / Swagger",
+    "github_title": "Repositório GitHub",
+    "github_sub": "Código fonte, versões e problemas",
+    "architecture_title": "Arquitetura Principal"
   },
   "attr": {
     "active": "Ativo",

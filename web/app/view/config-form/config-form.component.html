@@ -133,7 +133,8 @@
                                 <mat-card-content class="policy-body">
                                     <p class="policy-desc">{{ 'CONFIG_PAGE.ARCHIVE_DESC' | translate }}</p>
 
-                                    <div class="policy-fields" *ngIf="form.get('archive.enabled')?.value">
+                                    @if (form.get('archive.enabled')?.value) {
+                                    <div class="policy-fields">
                                         <div class="fields-grid-3">
                                             <mat-form-field class="full-width">
                                                 <mat-label>{{ 'CONFIG_PAGE.ARCHIVE_AFTER' | translate }}</mat-label>
@@ -162,6 +163,7 @@
                                             </mat-form-field>
                                         </div>
                                     </div>
+                                    }
                                 </mat-card-content>
                             </mat-card>
 
@@ -180,7 +182,8 @@
                                 <mat-card-content class="policy-body">
                                     <p class="policy-desc">{{ 'CONFIG_PAGE.PURGE_DESC' | translate }}</p>
 
-                                    <div class="policy-fields" *ngIf="form.get('purge.enabled')?.value">
+                                    @if (form.get('purge.enabled')?.value) {
+                                    <div class="policy-fields">
                                         <div class="fields-grid-single">
                                             <mat-form-field class="max-w-md">
                                                 <mat-label>{{ 'CONFIG_PAGE.PURGE_AFTER' | translate }}</mat-label>
@@ -189,6 +192,7 @@
                                             </mat-form-field>
                                         </div>
                                     </div>
+                                    }
                                 </mat-card-content>
                             </mat-card>
                         </div>
@@ -198,11 +202,13 @@
         </mat-card-content>
 
         <mat-card-actions align="end" class="mat-mdc-card-actions bottom-actions">
-            <button type="button" mat-flat-button color="primary" *ngIf="oauth.isRole('superuser')" (click)="onSubmit()"
+            @if (oauth.isRole('superuser')) {
+            <button type="button" mat-flat-button color="primary" (click)="onSubmit()"
                 id="save-btn">
                 <mat-icon>save</mat-icon>
                 {{ 'ACTIONS.SAVE' | translate }}
             </button>
+            }
         </mat-card-actions>
     </mat-card>
 </ng-container>

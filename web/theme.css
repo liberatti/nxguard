@@ -370,3 +370,178 @@ td.mat-mdc-cell.text-right .toggle-container {
     color: var(--text-main) !important;
 }
 
+/* -------------------------------------------------------------------------- */
+/* 7. Dark & Futuristic Theme (M3 Dark Tokens)                                */
+/* -------------------------------------------------------------------------- */
+body.dark-theme {
+    /* Primary / Secondary */
+    --primary: #3b82f6;         /* Bright electric blue */
+    --primary-alt: #60a5fa;
+    --secondary: #8b5cf6;       /* Violet */
+    --secondary-alt: #a78bfa;
+    
+    /* Semantic Colors */
+    --success: #10b981;
+    --warning: #f59e0b;
+    --error: #ef4444;
+    --info: #38bdf8;
+    --critical: #f87171;
+
+    /* Dark Backgrounds & Surfaces (M3 Dark Hierarchy) */
+    --bg-main: #0b0f19;         /* Very dark navy */
+    --bg-darker: #070a12;       /* Deepest background */
+    --surface: #111827;         /* Container surface */
+    
+    /* Borders & Shadow */
+    --border-dim: #1e293b;      /* Slate 800 */
+    --border-bright: #334155;   /* Slate 700 */
+    --shadow-premium: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
+    
+    /* Typography */
+    --text-main: #f8fafc;       /* Slate 50 */
+    --text-dim: #94a3b8;        /* Slate 400 */
+    --text-muted: #64748b;      /* Slate 500 */
+
+    /* Backward Compatibility Aliases */
+    --sidebar-background: #0d1322;
+    --surface-color: #111827;
+    --background-color: var(--bg-main);
+    --surface-border: var(--border-dim);
+    --text-color: var(--text-main);
+    --text-secondary-color: var(--text-dim);
+}
+
+/* Dark Theme Specific Overrides */
+body.dark-theme .navbar,
+body.dark-theme .mat-toolbar.mat-primary {
+    background: #0d1322 !important;
+    border-bottom: 1px solid var(--border-dim) !important;
+    color: var(--text-main) !important;
+}
+
+body.dark-theme .sidenav,
+body.dark-theme .mat-sidenav {
+    background-color: #0d1322 !important;
+    border-right: 1px solid var(--border-dim) !important;
+}
+
+body.dark-theme .mat-mdc-card {
+    background: #111827 !important;
+    border-color: var(--border-dim) !important;
+    color: var(--text-main) !important;
+}
+
+body.dark-theme .mat-mdc-card-header {
+    border-bottom-color: var(--border-dim) !important;
+}
+
+body.dark-theme .user-btn {
+    background: #1e293b !important;
+    border-color: var(--border-dim) !important;
+}
+
+body.dark-theme .user-btn:hover {
+    background: #334155 !important;
+}
+
+body.dark-theme .mat-mdc-dialog-container .mdc-dialog__surface {
+    background: #111827 !important;
+    color: var(--text-main) !important;
+}
+
+body.dark-theme .mat-mdc-dialog-title {
+    color: var(--text-main) !important;
+    border-bottom-color: var(--border-dim) !important;
+}
+
+body.dark-theme .mat-mdc-dialog-actions,
+body.dark-theme .bottom-actions {
+    background: #0d1322 !important;
+    border-top: 1px solid var(--border-dim) !important;
+}
+
+body.dark-theme .mat-mdc-text-field-wrapper.mdc-text-field--outlined {
+    background-color: #0d1322 !important;
+}
+
+body.dark-theme .mat-mdc-table {
+    background: #111827 !important;
+    color: var(--text-main) !important;
+}
+
+body.dark-theme .mat-mdc-header-cell {
+    color: var(--text-dim) !important;
+    border-bottom-color: var(--border-dim) !important;
+}
+
+body.dark-theme .mat-mdc-cell {
+    color: var(--text-main) !important;
+    border-bottom-color: var(--border-dim) !important;
+}
+
+body.dark-theme .mat-mdc-row:hover {
+    background-color: rgba(59, 130, 246, 0.06) !important;
+}
+
+body.dark-theme .mat-mdc-menu-panel {
+    background-color: #111827 !important;
+    border: 1px solid var(--border-dim) !important;
+}
+
+body.dark-theme .mat-mdc-menu-item {
+    color: var(--text-main) !important;
+}
+
+body.dark-theme .mat-mdc-menu-item mat-icon {
+    color: var(--text-dim) !important;
+}
+
+body.dark-theme .chip-mono {
+    background-color: #1e293b !important;
+    border-color: var(--border-dim) !important;
+    color: #e2e8f0 !important;
+}
+
+body.dark-theme .mat-mdc-chip-option,
+body.dark-theme .mat-mdc-chip-row,
+body.dark-theme .mat-mdc-chip {
+    background-color: #1e293b !important;
+    color: var(--text-main) !important;
+}
+
+body.dark-theme .about-dialog-container,
+body.dark-theme .about-dialog-header,
+body.dark-theme .about-hero-box,
+body.dark-theme .feature-pill,
+body.dark-theme .link-card,
+body.dark-theme .action-card,
+body.dark-theme .file-dropzone,
+body.dark-theme .file-selected-card,
+body.dark-theme .form-section-card {
+    background: #0d1322 !important;
+    border-color: var(--border-dim) !important;
+    color: var(--text-main) !important;
+}
+
+body.dark-theme .link-card:hover {
+    background: #1e293b !important;
+}
+
+body.dark-theme .filter-dialog-container,
+body.dark-theme .date-range-dialog-container,
+body.dark-theme .confirm-dialog-container {
+    background: #111827 !important;
+    color: var(--text-main) !important;
+}
+
+body.dark-theme .mat-expansion-panel {
+    background: #111827 !important;
+    color: var(--text-main) !important;
+}
+
+body.dark-theme .mat-expansion-panel-header-title,
+body.dark-theme .mat-expansion-panel-header-description {
+    color: var(--text-main) !important;
+}
+
+

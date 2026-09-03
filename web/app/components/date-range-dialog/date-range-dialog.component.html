@@ -19,12 +19,13 @@
             <div class="presets-section">
                 <span class="presets-section-title">{{ 'TRANSACTION.DATE_RANGE.PRESETS' | translate }}:</span>
                 <div class="presets-grid">
+                    @for (preset of presets; track preset.labelKey) {
                     <button type="button" mat-stroked-button class="preset-btn"
-                        *ngFor="let preset of presets"
                         (click)="applyPreset(preset)">
                         <mat-icon class="preset-icon">{{ preset.icon }}</mat-icon>
                         <span>{{ preset.labelKey | translate }}</span>
                     </button>
+                    }
                 </div>
             </div>
 
@@ -54,14 +55,18 @@
                         <mat-form-field appearance="outline" subscriptSizing="dynamic" class="time-select">
                             <mat-label>HH</mat-label>
                             <mat-select formControlName="startHour">
-                                <mat-option *ngFor="let h of hours" [value]="h">{{ h }}</mat-option>
+                                @for (h of hours; track h) {
+                                <mat-option [value]="h">{{ h }}</mat-option>
+                                }
                             </mat-select>
                         </mat-form-field>
                         <span class="time-sep">:</span>
                         <mat-form-field appearance="outline" subscriptSizing="dynamic" class="time-select">
                             <mat-label>MM</mat-label>
                             <mat-select formControlName="startMinute">
-                                <mat-option *ngFor="let m of minutes" [value]="m">{{ m }}</mat-option>
+                                @for (m of minutes; track m) {
+                                <mat-option [value]="m">{{ m }}</mat-option>
+                                }
                             </mat-select>
                         </mat-form-field>
                     </div>
@@ -87,14 +92,18 @@
                         <mat-form-field appearance="outline" subscriptSizing="dynamic" class="time-select">
                             <mat-label>HH</mat-label>
                             <mat-select formControlName="endHour">
-                                <mat-option *ngFor="let h of hours" [value]="h">{{ h }}</mat-option>
+                                @for (h of hours; track h) {
+                                <mat-option [value]="h">{{ h }}</mat-option>
+                                }
                             </mat-select>
                         </mat-form-field>
                         <span class="time-sep">:</span>
                         <mat-form-field appearance="outline" subscriptSizing="dynamic" class="time-select">
                             <mat-label>MM</mat-label>
                             <mat-select formControlName="endMinute">
-                                <mat-option *ngFor="let m of minutes" [value]="m">{{ m }}</mat-option>
+                                @for (m of minutes; track m) {
+                                <mat-option [value]="m">{{ m }}</mat-option>
+                                }
                             </mat-select>
                         </mat-form-field>
                     </div>
@@ -103,15 +112,15 @@
         </form>
     </mat-dialog-content>
 
-    <!-- Dialog Actions (Left Aligned) -->
-    <mat-dialog-actions align="start" class="dialog-actions">
-        <button mat-flat-button color="primary" (click)="onApply()" [disabled]="rangeForm.invalid" class="action-btn">
-            <mat-icon>check</mat-icon>
-            {{ 'TRANSACTION.DATE_RANGE.APPLY' | translate }}
-        </button>
+    <!-- Dialog Actions -->
+    <mat-dialog-actions align="end" class="dialog-actions">
         <button mat-stroked-button (click)="onCancel()" class="action-btn">
             <mat-icon>keyboard_return</mat-icon>
             {{ 'TRANSACTION.DATE_RANGE.CANCEL' | translate }}
+        </button>
+        <button mat-flat-button color="primary" (click)="onApply()" [disabled]="rangeForm.invalid" class="action-btn">
+            <mat-icon>check</mat-icon>
+            {{ 'TRANSACTION.DATE_RANGE.APPLY' | translate }}
         </button>
     </mat-dialog-actions>
 </div>

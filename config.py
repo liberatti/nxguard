@@ -70,3 +70,11 @@ CORS = {
         "max_age": 3600,
     }
 }
+
+MASKED_HEADERS = [
+    "Authorization",
+    "X-Requested-With",
+    "Account-ID",
+    "Refresh-Token",
+    "Cookie",
+]

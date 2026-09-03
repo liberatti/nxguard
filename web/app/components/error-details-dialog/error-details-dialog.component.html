@@ -4,28 +4,40 @@
 </h2>
 
 <mat-dialog-content class="dialog-content">
-    <div class="error-meta-card mb-3" *ngIf="data.method || data.url">
-        <span *ngIf="data.method" class="method-badge" [ngClass]="data.method.toLowerCase()">{{ data.method }}</span>
-        <span *ngIf="data.url" class="url-text">{{ data.url }}</span>
+    @if (data.method || data.url) {
+    <div class="error-meta-card mb-3">
+        @if (data.method) {
+        <span class="method-badge" [ngClass]="data.method.toLowerCase()">{{ data.method }}</span>
+        }
+        @if (data.url) {
+        <span class="url-text">{{ data.url }}</span>
+        }
     </div>
+    }
 
     <!-- Validation Error Field Highlights -->
-    <div *ngIf="fieldErrors.length > 0" class="validation-errors-section mb-3">
+    @if (fieldErrors.length > 0) {
+    <div class="validation-errors-section mb-3">
         <div class="section-title">
             <mat-icon color="warn">warning</mat-icon>
             <span>Validation Error Fields</span>
         </div>
         <div class="field-error-list">
-            <div *ngFor="let item of fieldErrors" class="field-error-card">
+            @for (item of fieldErrors; track item.field) {
+            <div class="field-error-card">
                 <div class="field-header">
                     <span class="field-name-badge">{{ item.field }}</span>
                 </div>
                 <ul class="error-msg-list">
-                    <li *ngFor="let msg of item.messages">{{ msg }}</li>
+                    @for (msg of item.messages; track msg) {
+                    <li>{{ msg }}</li>
+                    }
                 </ul>
             </div>
+            }
         </div>
     </div>
+    }
 
     <!-- Raw JSON / Full Payload details -->
     <mat-expansion-panel class="json-panel" [expanded]="fieldErrors.length === 0">

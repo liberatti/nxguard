@@ -15,10 +15,12 @@
                 <div class="hero-details">
                     <div class="hero-name-row">
                         <h2 class="hero-name">{{ form.get('name')?.value || userInfo?.name || 'User' }}</h2>
-                        <span class="role-badge" *ngIf="userInfo?.role">
+                        @if (userInfo?.role) {
+                        <span class="role-badge">
                             <mat-icon class="role-badge-icon">verified_user</mat-icon>
                             {{ userInfo?.role }}
                         </span>
+                        }
                     </div>
                     <p class="hero-email">
                         <mat-icon class="hero-email-icon">mail_outline</mat-icon>

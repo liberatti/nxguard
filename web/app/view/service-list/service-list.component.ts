@@ -41,7 +41,8 @@ import {OAuthService} from "../../services/oauth.service";
         MatTableModule, MatMenuModule, MatSortModule,
         MatTooltipModule, MatSelectModule, MatPaginatorModule, MatSlideToggleModule,
         MatFormFieldModule, MatChipsModule],
-    templateUrl: './service-list.component.html'
+    templateUrl: './service-list.component.html',
+    styleUrl: './service-list.component.css'
 })
 
 export class ServiceListComponent implements OnInit {

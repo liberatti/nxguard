@@ -1,102 +1,290 @@
 <ng-container>
-    <mat-card class="sensor-form-card">
-        <mat-card-header class="mb-2">
-            <mat-card-title>{{ 'view.sensor.title' | translate }}</mat-card-title>
-            <mat-card-subtitle>{{ (isAddMode ? 'actions.create' : 'actions.edit') | translate }}</mat-card-subtitle>
+    <mat-card class="elevation-card" id="sensor-form-card">
+        <mat-card-header class="mat-mdc-card-header">
+            <mat-card-title>
+                <h1>{{ isAddMode ? ('SENSOR.ADD_TITLE' | translate) : ('SENSOR.EDIT_TITLE' | translate) }}</h1>
+            </mat-card-title>
         </mat-card-header>
         <mat-card-content>
-            <form [formGroup]="form">
-                <mat-stepper [linear]="false" class="form-stepper">
-                    <mat-step [label]="'SENSOR.CONFIG' | translate" id="config-tab">
+            <form [formGroup]="form" id="sensor-form">
+                <mat-stepper orientation="horizontal" #stepper class="custom-stepper" id="sensor-stepper">
+                    <mat-step [label]="'SENSOR.GENERAL' | translate" id="general-tab">
                         <div class="mat-row mt-2">
-                            <div class="mat-col-6">
+                            <div class="mat-col-4">
                                 <mat-form-field class="full-width" appearance="outline">
                                     <mat-label>{{ 'SENSOR.NAME' | translate }}</mat-label>
                                     <input matInput formControlName="name" id="sensor-name-input">
                                 </mat-form-field>
                             </div>
-                            <div class="mat-col-6">
+                            <div class="mat-col-8">
                                 <mat-form-field class="full-width" appearance="outline">
                                     <mat-label>{{ 'SENSOR.DESCRIPTION' | translate }}</mat-label>
                                     <input matInput formControlName="description" id="sensor-description-input">
                                 </mat-form-field>
                             </div>
                         </div>
-                        <div class="mat-row" formGroupName="security">
+                        <div class="mat-row mt-2" formGroupName="security">
                             <div class="mat-col-12">
-                                <mat-form-field class="full-width" appearance="outline">
-                                    <mat-label>{{ 'SENSOR.GEO_BLOCKED' | translate }}</mat-label>
-                                    <mat-select (selectionChange)="onAddGeo($event)" id="geo-countries-select">
-                                        <mat-option
-                                            *ngFor="let country of filterActiveGeo(_geo_countries); let i = index"
-                                            [value]="country" id="geo-country-option-{{i}}">
-                                            <span *ngIf="country !== 'None' && country !== 'Unknown'"
-                                                  class="fi fi-{{country | lowercase}}"
-                                                  style="margin-right: 8px; border-radius: 2px;"></span>
-                                            <mat-icon *ngIf="country === 'None' || country === 'Unknown'"
-                                                      style="vertical-align: middle; font-size: 18px; width: 18px; height: 18px; margin-right: 8px;">public_off</mat-icon>
-                                            <span>{{ country }}</span>
-                                        </mat-option>
-                                    </mat-select>
-                                </mat-form-field>
-                                <mat-chip-listbox class="full-width" [multiple]="false" [selectable]="true">
-                                    <mat-chip-option class="small-chip" *ngFor="let p of getGeoCodes()"
-                                        (removed)="onRemoveGeo(p)">
-                                        <span *ngIf="p !== 'None' && p !== 'Unknown'"
-                                              class="fi fi-{{p | lowercase}}"
-                                              style="margin-right: 6px; border-radius: 2px;"></span>
-                                        <mat-icon *ngIf="p === 'None' || p === 'Unknown'"
-                                                  style="vertical-align: middle; font-size: 16px; width: 16px; height: 16px; margin-right: 6px;">public_off</mat-icon>
-                                        {{ p }}
-                                        <button matChipRemove>
-                                            <mat-icon>cancel</mat-icon>
-                                        </button>
-                                    </mat-chip-option>
-                                </mat-chip-listbox>
+                                <mat-card appearance="outlined" class="feed-panel-card">
+                                    <mat-card-header class="feed-panel-header">
+                                        <mat-card-title class="feed-panel-title">
+                                            <mat-icon class="feed-panel-icon geo-icon">public</mat-icon>
+                                            {{ 'SENSOR.GEO_BLOCKED' | translate }}
+                                        </mat-card-title>
+                                        <div class="feed-panel-header-actions">
+                                            @if (getGeoCodes().length) {
+                                            <span class="feed-badge geo-badge">
+                                                {{ getGeoCodes().length }}
+                                            </span>
+                                            <button mat-button color="warn" type="button" class="btn-clear-feed"
+                                                (click)="onClearAllGeo()">
+                                                <mat-icon>clear_all</mat-icon>
+                                                {{ 'SENSOR.CLEAR_ALL' | translate }}
+                                            </button>
+                                            }
+                                        </div>
+                                    </mat-card-header>
+                                    <mat-card-content class="feed-panel-content">
+                                        <mat-form-field class="full-width" appearance="outline">
+                                            <mat-label>{{ 'SENSOR.GEO_BLOCKED' | translate }}</mat-label>
+                                            <mat-icon matPrefix class="field-prefix-icon">add_circle_outline</mat-icon>
+                                            <mat-select (selectionChange)="onAddGeo($event)" id="geo-countries-select">
+                                                @for (country of filterActiveGeo(_geo_countries); track country; let i = $index) {
+                                                <mat-option [value]="country" id="geo-country-option-{{i}}">
+                                                    @if (country !== 'None' && country !== 'Unknown') {
+                                                    <span class="fi fi-{{country | lowercase}} geo-country-flag"></span>
+                                                    }
+                                                    @if (country === 'None' || country === 'Unknown') {
+                                                    <mat-icon class="geo-country-fallback-icon">public_off</mat-icon>
+                                                    }
+                                                    <span>{{ country }}</span>
+                                                </mat-option>
+                                                }
+                                            </mat-select>
+                                        </mat-form-field>
+
+                                        <!-- Quick Search Filter if > 6 countries -->
+                                        @if (getGeoCodes().length > 6) {
+                                        <div class="feed-search-row">
+                                            <mat-form-field appearance="outline" class="full-width search-mini" subscriptSizing="dynamic">
+                                                <mat-icon matPrefix>search</mat-icon>
+                                                <input matInput [(ngModel)]="geoSearchQuery" [ngModelOptions]="{standalone: true}"
+                                                    [placeholder]="'SENSOR.FILTER_GEO_PLACEHOLDER' | translate">
+                                                @if (geoSearchQuery) {
+                                                <button matSuffix mat-icon-button type="button" (click)="geoSearchQuery = ''">
+                                                    <mat-icon>close</mat-icon>
+                                                </button>
+                                                }
+                                            </mat-form-field>
+                                        </div>
+                                        }
+
+                                        @if (getGeoCodes().length > 0) {
+                                        <div class="feed-chips-scroll">
+                                            <mat-chip-listbox class="chips-container" [multiple]="false" [selectable]="true">
+                                                @for (p of getFilteredGeoCodes(); track p) {
+                                                <mat-chip-option class="small-chip feed-chip geo-chip"
+                                                    (removed)="onRemoveGeo(p)">
+                                                    @if (p !== 'None' && p !== 'Unknown') {
+                                                    <span class="fi fi-{{p | lowercase}} geo-chip-flag"></span>
+                                                    }
+                                                    @if (p === 'None' || p === 'Unknown') {
+                                                    <mat-icon class="geo-chip-fallback-icon">public_off</mat-icon>
+                                                    }
+                                                    {{ p }}
+                                                    <button matChipRemove [matTooltip]="'ACTIONS.REMOVE' | translate">
+                                                        <mat-icon>cancel</mat-icon>
+                                                    </button>
+                                                </mat-chip-option>
+                                                }
+                                            </mat-chip-listbox>
+                                            @if (getFilteredGeoCodes().length === 0) {
+                                            <p class="no-filter-match">
+                                                {{ 'SENSOR.NO_RULES_FOUND' | translate }}
+                                            </p>
+                                            }
+                                        </div>
+                                        }
+
+                                        @if (getGeoCodes().length === 0) {
+                                        <div class="empty-state-feed">
+                                            <mat-icon class="empty-state-icon">public</mat-icon>
+                                            <span class="empty-state-text">{{ 'SENSOR.NO_GEO_SELECTED' | translate }}</span>
+                                        </div>
+                                        }
+                                    </mat-card-content>
+                                </mat-card>
                             </div>
                         </div>
                     </mat-step>
                     <mat-step [label]="'SENSOR.IP_REPUTATION' | translate" id="ip-reputation-tab">
                         <div class="mat-row mt-2" formGroupName="security">
+                            <!-- RBL Blocking Column -->
                             <div class="mat-col-6">
-                                <mat-form-field class="full-width" appearance="outline">
-                                    <mat-label>{{ 'SENSOR.RBL_BLOCK' | translate }}</mat-label>
-                                    <mat-select (selectionChange)="onAddBlock($event)" id="rbl-block-select">
-                                        <mat-option *ngFor="let c of filterActiveFeed(_rbl_feeds); let i = index"
-                                            [value]="c.name || c._id" id="block-option-{{i}}">
-                                            {{ c.name || c._id }}
-                                        </mat-option>
-                                    </mat-select>
-                                </mat-form-field>
-                                <mat-chip-listbox class="full-width" [multiple]="false" [selectable]="true">
-                                    <mat-chip-option *ngFor="let p of getReputation(); let i = index" class="small-chip"
-                                        (removed)="onRemoveBlock(p)" id="block-chip-{{p}}">
-                                        {{ p }}
-                                        <button matChipRemove id="remove-block-{{p}}">
-                                            <mat-icon>cancel</mat-icon>
-                                        </button>
-                                    </mat-chip-option>
-                                </mat-chip-listbox>
+                                <mat-card appearance="outlined" class="feed-panel-card block-panel">
+                                    <mat-card-header class="feed-panel-header">
+                                        <mat-card-title class="feed-panel-title">
+                                            <mat-icon class="feed-panel-icon block-icon">block</mat-icon>
+                                            {{ 'SENSOR.RBL_BLOCK' | translate }}
+                                        </mat-card-title>
+                                        <div class="feed-panel-header-actions">
+                                            @if (getReputation().length) {
+                                            <span class="feed-badge block-badge">
+                                                {{ getReputation().length }}
+                                            </span>
+                                            <button mat-button color="warn" type="button" class="btn-clear-feed"
+                                                (click)="onClearAllBlock()">
+                                                <mat-icon>clear_all</mat-icon>
+                                                {{ 'SENSOR.CLEAR_ALL' | translate }}
+                                            </button>
+                                            }
+                                        </div>
+                                    </mat-card-header>
+                                    <mat-card-content class="feed-panel-content">
+                                        <mat-form-field class="full-width" appearance="outline">
+                                            <mat-label>{{ 'SENSOR.RBL_BLOCK' | translate }}</mat-label>
+                                            <mat-icon matPrefix class="field-prefix-icon">add_circle_outline</mat-icon>
+                                            <mat-select (selectionChange)="onAddBlock($event)" id="rbl-block-select">
+                                                @for (c of filterActiveFeed(_rbl_feeds); track c._id || c.name; let i = $index) {
+                                                <mat-option [value]="c.name || c._id" id="block-option-{{i}}">
+                                                    {{ c.name || c._id }}
+                                                </mat-option>
+                                                }
+                                            </mat-select>
+                                        </mat-form-field>
+
+                                        <!-- Quick Search Filter for large lists -->
+                                        @if (getReputation().length > 6) {
+                                        <div class="feed-search-row">
+                                            <mat-form-field appearance="outline" class="full-width search-mini" subscriptSizing="dynamic">
+                                                <mat-icon matPrefix>search</mat-icon>
+                                                <input matInput [(ngModel)]="blockSearchQuery" [ngModelOptions]="{standalone: true}"
+                                                    [placeholder]="'SENSOR.FILTER_FEEDS_PLACEHOLDER' | translate">
+                                                @if (blockSearchQuery) {
+                                                <button matSuffix mat-icon-button type="button" (click)="blockSearchQuery = ''">
+                                                    <mat-icon>close</mat-icon>
+                                                </button>
+                                                }
+                                            </mat-form-field>
+                                        </div>
+                                        }
+
+                                        <!-- Scrollable chips container -->
+                                        @if (getReputation().length > 0) {
+                                        <div class="feed-chips-scroll">
+                                            <mat-chip-listbox class="chips-container" [multiple]="false" [selectable]="true">
+                                                @for (p of getFilteredReputation(); track p; let i = $index) {
+                                                <mat-chip-option
+                                                    class="feed-chip block-chip chip-mono"
+                                                    (removed)="onRemoveBlock(p)" id="block-chip-{{p}}">
+                                                    <mat-icon matChipAvatar class="chip-avatar-icon">shield</mat-icon>
+                                                    {{ p }}
+                                                    <button matChipRemove id="remove-block-{{p}}" [matTooltip]="'ACTIONS.REMOVE' | translate">
+                                                        <mat-icon>cancel</mat-icon>
+                                                    </button>
+                                                </mat-chip-option>
+                                                }
+                                            </mat-chip-listbox>
+                                            @if (getFilteredReputation().length === 0) {
+                                            <p class="no-filter-match">
+                                                {{ 'SENSOR.NO_RULES_FOUND' | translate }}
+                                            </p>
+                                            }
+                                        </div>
+                                        }
+
+                                        @if (getReputation().length === 0) {
+                                        <div class="empty-state-feed">
+                                            <mat-icon class="empty-state-icon">shield</mat-icon>
+                                            <span class="empty-state-text">{{ 'SENSOR.NO_FEEDS_SELECTED' | translate }}</span>
+                                        </div>
+                                        }
+                                    </mat-card-content>
+                                </mat-card>
                             </div>
+
+                            <!-- RBL ByPass Column -->
                             <div class="mat-col-6">
-                                <mat-form-field class="full-width" appearance="outline">
-                                    <mat-label>{{ 'SENSOR.RBL_BYPASS' | translate }}</mat-label>
-                                    <mat-select (selectionChange)="onAddPermit($event)" id="rbl-permit-select">
-                                        <mat-option *ngFor="let c of filterActiveFeed(_rbl_feeds); let i = index"
-                                            [value]="c.name || c._id" id="permit-option-{{i}}">
-                                            {{ c.name || c._id }}
-                                        </mat-option>
-                                    </mat-select>
-                                </mat-form-field>
-                                <mat-chip-listbox class="full-width" [multiple]="false" [selectable]="true">
-                                    <mat-chip-option *ngFor="let p of getTrusted(); let i = index" class="small-chip"
-                                        (removed)="onRemovePermit(p)" id="permit-chip-{{p}}">
-                                        {{ p }}
-                                        <button matChipRemove id="remove-permit-{{p}}">
-                                            <mat-icon>cancel</mat-icon>
-                                        </button>
-                                    </mat-chip-option>
-                                </mat-chip-listbox>
+                                <mat-card appearance="outlined" class="feed-panel-card permit-panel">
+                                    <mat-card-header class="feed-panel-header">
+                                        <mat-card-title class="feed-panel-title">
+                                            <mat-icon class="feed-panel-icon permit-icon">verified_user</mat-icon>
+                                            {{ 'SENSOR.RBL_BYPASS' | translate }}
+                                        </mat-card-title>
+                                        <div class="feed-panel-header-actions">
+                                            @if (getTrusted().length) {
+                                            <span class="feed-badge permit-badge">
+                                                {{ getTrusted().length }}
+                                            </span>
+                                            <button mat-button color="warn" type="button" class="btn-clear-feed"
+                                                (click)="onClearAllPermit()">
+                                                <mat-icon>clear_all</mat-icon>
+                                                {{ 'SENSOR.CLEAR_ALL' | translate }}
+                                            </button>
+                                            }
+                                        </div>
+                                    </mat-card-header>
+                                    <mat-card-content class="feed-panel-content">
+                                        <mat-form-field class="full-width" appearance="outline">
+                                            <mat-label>{{ 'SENSOR.RBL_BYPASS' | translate }}</mat-label>
+                                            <mat-icon matPrefix class="field-prefix-icon">add_circle_outline</mat-icon>
+                                            <mat-select (selectionChange)="onAddPermit($event)" id="rbl-permit-select">
+                                                @for (c of filterActiveFeed(_rbl_feeds); track c._id || c.name; let i = $index) {
+                                                <mat-option [value]="c.name || c._id" id="permit-option-{{i}}">
+                                                    {{ c.name || c._id }}
+                                                </mat-option>
+                                                }
+                                            </mat-select>
+                                        </mat-form-field>
+
+                                        <!-- Quick Search Filter for large lists -->
+                                        @if (getTrusted().length > 6) {
+                                        <div class="feed-search-row">
+                                            <mat-form-field appearance="outline" class="full-width search-mini" subscriptSizing="dynamic">
+                                                <mat-icon matPrefix>search</mat-icon>
+                                                <input matInput [(ngModel)]="bypassSearchQuery" [ngModelOptions]="{standalone: true}"
+                                                    [placeholder]="'SENSOR.FILTER_FEEDS_PLACEHOLDER' | translate">
+                                                @if (bypassSearchQuery) {
+                                                <button matSuffix mat-icon-button type="button" (click)="bypassSearchQuery = ''">
+                                                    <mat-icon>close</mat-icon>
+                                                </button>
+                                                }
+                                            </mat-form-field>
+                                        </div>
+                                        }
+
+                                        <!-- Scrollable chips container -->
+                                        @if (getTrusted().length > 0) {
+                                        <div class="feed-chips-scroll">
+                                            <mat-chip-listbox class="chips-container" [multiple]="false" [selectable]="true">
+                                                @for (p of getFilteredTrusted(); track p; let i = $index) {
+                                                <mat-chip-option
+                                                    class="feed-chip permit-chip chip-mono"
+                                                    (removed)="onRemovePermit(p)" id="permit-chip-{{p}}">
+                                                    <mat-icon matChipAvatar class="chip-avatar-icon">check_circle</mat-icon>
+                                                    {{ p }}
+                                                    <button matChipRemove id="remove-permit-{{p}}" [matTooltip]="'ACTIONS.REMOVE' | translate">
+                                                        <mat-icon>cancel</mat-icon>
+                                                    </button>
+                                                </mat-chip-option>
+                                                }
+                                            </mat-chip-listbox>
+                                            @if (getFilteredTrusted().length === 0) {
+                                            <p class="no-filter-match">
+                                                {{ 'SENSOR.NO_RULES_FOUND' | translate }}
+                                            </p>
+                                            }
+                                        </div>
+                                        }
+
+                                        @if (getTrusted().length === 0) {
+                                        <div class="empty-state-feed">
+                                            <mat-icon class="empty-state-icon">verified_user</mat-icon>
+                                            <span class="empty-state-text">{{ 'SENSOR.NO_FEEDS_SELECTED' | translate }}</span>
+                                        </div>
+                                        }
+                                    </mat-card-content>
+                                </mat-card>
                             </div>
                         </div>
                     </mat-step>
@@ -141,23 +329,24 @@
                                                 <mat-select
                                                     (selectionChange)="onAddVariableItem('allowed_http_versions', $event)"
                                                     id="allowed-http-versions-select">
-                                                    <mat-option
-                                                        *ngFor="let v of filterActiveVariable(_allowed_http_versions, 'allowed_http_versions'); let i = index"
-                                                        [value]="v" id="allowed-http-versions-option-{{i}}">
+                                                    @for (v of filterActiveVariable(_allowed_http_versions, 'allowed_http_versions'); track v; let i = $index) {
+                                                    <mat-option [value]="v" id="allowed-http-versions-option-{{i}}">
                                                         {{ v }}
                                                     </mat-option>
+                                                    }
                                                 </mat-select>
                                             </mat-form-field>
                                             <mat-chip-listbox class="full-width mb-2" [multiple]="false"
                                                 [selectable]="true">
+                                                @for (p of getVariableList('allowed_http_versions'); track p) {
                                                 <mat-chip-option class="small-chip"
-                                                    *ngFor="let p of getVariableList('allowed_http_versions')"
                                                     (removed)="onRemoveVariableItem('allowed_http_versions', p)">
                                                     {{ p }}
                                                     <button matChipRemove>
                                                         <mat-icon>cancel</mat-icon>
                                                     </button>
                                                 </mat-chip-option>
+                                                }
                                             </mat-chip-listbox>
                                         </div>
                                         <div class="mat-col-6">
@@ -166,23 +355,24 @@
                                                 <mat-select
                                                     (selectionChange)="onAddVariableItem('restricted_extensions', $event)"
                                                     id="restricted-extensions-select">
-                                                    <mat-option
-                                                        *ngFor="let v of filterActiveVariable(_restricted_extensions, 'restricted_extensions'); let i = index"
-                                                        [value]="v" id="restricted-extensions-option-{{i}}">
+                                                    @for (v of filterActiveVariable(_restricted_extensions, 'restricted_extensions'); track v; let i = $index) {
+                                                    <mat-option [value]="v" id="restricted-extensions-option-{{i}}">
                                                         {{ v }}
                                                     </mat-option>
+                                                    }
                                                 </mat-select>
                                             </mat-form-field>
                                             <mat-chip-listbox class="full-width mb-2" [multiple]="false"
                                                 [selectable]="true">
+                                                @for (p of getVariableList('restricted_extensions'); track p) {
                                                 <mat-chip-option class="small-chip"
-                                                    *ngFor="let p of getVariableList('restricted_extensions')"
                                                     (removed)="onRemoveVariableItem('restricted_extensions', p)">
                                                     {{ p }}
                                                     <button matChipRemove>
                                                         <mat-icon>cancel</mat-icon>
                                                     </button>
                                                 </mat-chip-option>
+                                                }
                                             </mat-chip-listbox>
                                         </div>
                                     </div>
@@ -222,22 +412,27 @@
                         <mat-form-field class="full-width" appearance="outline">
                             <mat-label>{{ 'SENSOR.CATEGORY' | translate }}</mat-label>
                             <mat-select (selectionChange)="onAddCategory($event)" id="category-select" [placeholder]="'SENSOR.CATEGORY_SELECT_PLACEHOLDER' | translate">
-                                <mat-option *ngFor="let c of filterActiveCategory(_categories, form.value.categories)"
-                                    [value]="c.name || c" id="category-option-{{c.name || c}}">
+                                @for (c of filterActiveCategory(_categories, form.value.categories); track c.name || c) {
+                                <mat-option [value]="c.name || c" id="category-option-{{c.name || c}}">
                                     {{ c.name || c }}
                                 </mat-option>
+                                }
                             </mat-select>
                         </mat-form-field>
                         <mat-chip-listbox class="category-chip-list" [multiple]="false" [selectable]="true">
-                            <mat-chip-option *ngFor="let p of form.value.categories; let i = index" class="category-chip small-chip"
+                            @for (p of form.value.categories; track p; let i = $index) {
+                            <mat-chip-option class="category-chip small-chip"
                                 [selected]="selectedCategory === p"
                                 (removed)="onRemoveCategory(p)" (click)="onSelectCategory(p)" id="category-chip-{{p}}">
-                                <mat-icon matChipAvatar *ngIf="selectedCategory === p">check</mat-icon>
+                                @if (selectedCategory === p) {
+                                <mat-icon matChipAvatar>check</mat-icon>
+                                }
                                 {{ p }}
                                 <button matChipRemove [matTooltip]="'ACTIONS.REMOVE' | translate">
                                     <mat-icon>cancel</mat-icon>
                                 </button>
                             </mat-chip-option>
+                            }
                         </mat-chip-listbox>
                         
                         <div class="rules-container-card">
@@ -247,24 +442,30 @@
                                         <mat-icon>security</mat-icon>
                                         {{ selectedCategory || ('SENSOR.CATEGORIES' | translate) }}
                                     </span>
-                                    <span *ngIf="selectedCategory && ruleDS.data.length" class="rules-count-badge">
+                                    @if (selectedCategory && ruleDS.data.length) {
+                                    <span class="rules-count-badge">
                                         {{ ruleDS.filteredData.length }} / {{ ruleDS.data.length }} {{ 'SENSOR.TOTAL_RULES' | translate }}
                                     </span>
+                                    }
                                 </div>
-                                <div *ngIf="selectedCategory && ruleDS.data.length" class="rules-toolbar-right">
+                                @if (selectedCategory && ruleDS.data.length) {
+                                <div class="rules-toolbar-right">
                                     <mat-form-field appearance="outline" subscriptSizing="dynamic" class="rules-search-field">
                                         <mat-icon matPrefix>search</mat-icon>
                                         <input matInput [(ngModel)]="ruleSearchQuery" [ngModelOptions]="{standalone: true}"
                                             (ngModelChange)="applyRuleFilter()"
                                             [placeholder]="'SENSOR.FILTER_RULES_PLACEHOLDER' | translate">
-                                        <button *ngIf="ruleSearchQuery" matSuffix mat-icon-button (click)="clearRuleFilter()">
+                                        @if (ruleSearchQuery) {
+                                        <button matSuffix mat-icon-button (click)="clearRuleFilter()">
                                             <mat-icon>close</mat-icon>
                                         </button>
+                                        }
                                     </mat-form-field>
                                 </div>
+                                }
                             </div>
 
-                            <ng-container *ngIf="selectedCategory && ruleDS.data.length; else noCategoryOrRules">
+                            @if (selectedCategory && ruleDS.data.length) {
                                 <table mat-table [dataSource]="ruleDS" matSort class="rules-table">
                                     <tr mat-header-row *matHeaderRowDef="ruleDC"></tr>
                                     <tr mat-row *matRowDef="let row; columns: ruleDC;"></tr>
@@ -279,7 +480,7 @@
                                             </mat-checkbox>
                                         </th>
                                         <td mat-cell *matCellDef="let element">
-                                            <div style="display: flex; align-items: center; gap: 8px;">
+                                            <div class="rule-checkbox-wrapper">
                                                 <mat-checkbox [checked]="isRuleSelected(element.code)"
                                                     (change)="selectRule($event.checked, element.code)">
                                                 </mat-checkbox>
@@ -309,15 +510,24 @@
                                         </th>
                                         <td mat-cell *matCellDef="let element">
                                             <div class="rule-desc-wrapper">
-                                                <span *ngIf="element.msg" class="rule-msg-text">{{ element.msg }}</span>
-                                                <span *ngIf="!element.msg && element.comment"
-                                                    class="rule-msg-text text-dim">{{ element.comment }}</span>
-                                                <span *ngIf="!element.msg && !element.comment" class="rule-control-hint">
+                                                @if (element.msg) {
+                                                <span class="rule-msg-text">{{ element.msg }}</span>
+                                                }
+                                                @if (!element.msg && element.comment) {
+                                                <span class="rule-msg-text text-dim">{{ element.comment }}</span>
+                                                }
+                                                @if (!element.msg && !element.comment) {
+                                                <span class="rule-control-hint">
                                                     {{ 'SENSOR.CONTROL_RULE' | translate }}
                                                 </span>
-                                                <div *ngIf="element.tags && element.tags.length" class="tag-list-container">
-                                                    <span *ngFor="let tag of element.tags" class="tag-badge">{{ tag }}</span>
+                                                }
+                                                @if (element.tags && element.tags.length) {
+                                                <div class="tag-list-container">
+                                                    @for (tag of element.tags; track tag) {
+                                                    <span class="tag-badge">{{ tag }}</span>
+                                                    }
                                                 </div>
+                                                }
                                             </div>
                                         </td>
                                     </ng-container>
@@ -352,34 +562,36 @@
                                     [pageSizeOptions]="pageSizeOptions"
                                     [showFirstLastButtons]="true">
                                 </mat-paginator>
-                            </ng-container>
-
-                            <ng-template #noCategoryOrRules>
+                            } @else {
                                 <div class="empty-rules-state">
                                     <mat-icon>shield</mat-icon>
                                     <div class="empty-state-title">
                                         {{ selectedCategory ? ('SENSOR.NO_RULES_FOUND' | translate) : ('SENSOR.SELECT_CATEGORY_HINT' | translate) }}
                                     </div>
-                                    <div class="empty-state-subtitle" *ngIf="!selectedCategory && (!form.value.categories || !form.value.categories.length)">
+                                    @if (!selectedCategory && (!form.value.categories || !form.value.categories.length)) {
+                                    <div class="empty-state-subtitle">
                                         {{ 'SENSOR.NO_CATEGORIES_SELECTED' | translate }}
                                     </div>
+                                    }
                                 </div>
-                            </ng-template>
+                            }
                         </div>
                     </mat-step>
                 </mat-stepper>
             </form>
         </mat-card-content>
         <mat-card-actions align="end" class="mat-mdc-card-actions bottom-actions">
-            <button type="button" mat-flat-button color="primary" *ngIf="form.enabled" (click)="onSave()"
-                id="save-sensor-button">
-                <mat-icon>save</mat-icon>
-                {{ 'ACTIONS.SAVE' | translate }}
-            </button>
             <button type="button" mat-stroked-button [routerLink]="['/sensor']" id="return-sensor-button">
                 <mat-icon>arrow_back</mat-icon>
                 {{ 'ACTIONS.CANCEL' | translate }}
             </button>
+            @if (form.enabled) {
+            <button type="button" mat-flat-button color="primary" (click)="onSave()"
+                id="save-sensor-button">
+                <mat-icon>save</mat-icon>
+                {{ 'ACTIONS.SAVE' | translate }}
+            </button>
+            }
         </mat-card-actions>
     </mat-card>
 </ng-container>

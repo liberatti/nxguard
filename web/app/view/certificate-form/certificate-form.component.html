@@ -11,17 +11,19 @@
                     <mat-form-field class="full-width">
                         <mat-label>{{ 'CERT_FORM.NAME' | translate }}</mat-label>
                         <input matInput formControlName="name" [readonly]="!isAddMode" id="certificate-name-input">
-                        <mat-hint *ngIf="isAddMode">{{ 'CERT_FORM.NAME_HINT' | translate }}</mat-hint>
+                        @if (isAddMode) {
+                        <mat-hint>{{ 'CERT_FORM.NAME_HINT' | translate }}</mat-hint>
+                        }
                     </mat-form-field>
 
                     <mat-form-field class="full-width">
                         <mat-label>{{ 'CERT_FORM.PROVIDER' | translate }}</mat-label>
                         <mat-select id="certificate-provider-select" formControlName="provider">
-                            <mat-option id="provider-option-{{i}}"
-                                        *ngFor="let ut of _supportedProviders; let i = index"
-                                        [value]="ut">
+                            @for (ut of _supportedProviders; track ut; let i = $index) {
+                            <mat-option id="provider-option-{{i}}" [value]="ut">
                                 {{ ut }}
                             </mat-option>
+                            }
                         </mat-select>
                     </mat-form-field>
                 </div>
@@ -87,15 +89,17 @@
         </mat-card-content>
 
         <mat-card-actions align="end" class="mat-mdc-card-actions bottom-actions">
-            <button type="button" mat-flat-button color="primary" *ngIf="form.enabled" (click)="onSubmit()"
-                id="save-certificate-btn">
-                <mat-icon>save</mat-icon>
-                {{ 'ACTIONS.SAVE' | translate }}
-            </button>
             <button type="button" mat-stroked-button [routerLink]="['/certificate']" id="back-certificate-btn">
                 <mat-icon>arrow_back</mat-icon>
                 {{ 'ACTIONS.CANCEL' | translate }}
             </button>
+            @if (form.enabled) {
+            <button type="button" mat-flat-button color="primary" (click)="onSubmit()"
+                id="save-certificate-btn">
+                <mat-icon>save</mat-icon>
+                {{ 'ACTIONS.SAVE' | translate }}
+            </button>
+            }
         </mat-card-actions>
     </mat-card>
 </ng-container>

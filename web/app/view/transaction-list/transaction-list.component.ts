@@ -50,6 +50,8 @@ import {MatSnackBarModule} from '@angular/material/snack-bar';
 import {HighlightModule} from 'ngx-highlightjs';
 import {HighlightLineNumbers} from 'ngx-highlightjs/line-numbers';
 import {DateRangeDialogComponent} from 'app/components/date-range-dialog/date-range-dialog.component';
+import {GeoipDetailsDialogComponent} from 'app/components/geoip-details-dialog/geoip-details-dialog.component';
+import {RblDetailsDialogComponent} from 'app/components/rbl-details-dialog/rbl-details-dialog.component';
 
 @Component({
     selector: 'app-transaction-list',
@@ -452,6 +454,22 @@ export class TransactionListComponent implements OnInit {
             data: trn,
             width: '780px',
             maxWidth: '90vw',
+        });
+    }
+
+    onShowGeoIP(trn: TransactionLog) {
+        this.confirmDialog.open(GeoipDetailsDialogComponent, {
+            data: trn,
+            width: '680px',
+            maxWidth: '92vw',
+        });
+    }
+
+    onShowRBL(trn: TransactionLog) {
+        this.confirmDialog.open(RblDetailsDialogComponent, {
+            data: trn,
+            width: '680px',
+            maxWidth: '92vw',
         });
     }
 

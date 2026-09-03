@@ -39,12 +39,14 @@
                         <mat-form-field appearance="outline" class="full-width">
                             <mat-label>{{ 'USER_MGMT.ROLE' | translate }}</mat-label>
                             <mat-select id="user-role-select" formControlName="role">
-                                <mat-option id="role-option-{{i}}" *ngFor="let ut of _supportedRoles; let i = index" [value]="ut">
+                                @for (ut of _supportedRoles; track ut; let i = $index) {
+                                <mat-option id="role-option-{{i}}" [value]="ut">
                                     <div class="role-option-item">
                                         <mat-icon class="role-opt-icon">{{ ut === 'superuser' ? 'verified_user' : 'visibility' }}</mat-icon>
                                         <span>{{ ut }}</span>
                                     </div>
                                 </mat-option>
+                                }
                             </mat-select>
                         </mat-form-field>
                     </div>
@@ -85,15 +87,17 @@
 
         <!-- Actions -->
         <mat-card-actions align="end" class="mat-mdc-card-actions bottom-actions">
-            <button type="button" mat-flat-button color="primary" *ngIf="form.enabled" (click)="onSubmit()"
-                id="save-user-btn">
-                <mat-icon>save</mat-icon>
-                {{ 'ACTIONS.SAVE' | translate }}
-            </button>
             <button type="button" mat-stroked-button [routerLink]="['/users']" id="back-user-btn">
                 <mat-icon>arrow_back</mat-icon>
                 {{ 'ACTIONS.CANCEL' | translate }}
             </button>
+            @if (form.enabled) {
+            <button type="button" mat-flat-button color="primary" (click)="onSubmit()"
+                id="save-user-btn">
+                <mat-icon>save</mat-icon>
+                {{ 'ACTIONS.SAVE' | translate }}
+            </button>
+            }
         </mat-card-actions>
     </mat-card>
 </ng-container>

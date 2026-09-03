@@ -1,4 +1,8 @@
 {
+  "THEME": {
+    "DARK_MODE": "Switch to dark theme",
+    "LIGHT_MODE": "Switch to light theme"
+  },
   "ACTIONS": {
     "CREATE": "Create",
     "EDIT": "Edit",
@@ -191,6 +195,11 @@
     "CONTROL_RULE": "Engine Control / Paranoia Gate",
     "VIEW_DETAILS": "View rule details",
     "NO_CATEGORIES_SELECTED": "No categories added to this sensor yet",
+    "FILTER_FEEDS_PLACEHOLDER": "Filter selected feeds...",
+    "NO_FEEDS_SELECTED": "No feeds selected yet. Select from the dropdown above.",
+    "FILTER_GEO_PLACEHOLDER": "Filter selected countries...",
+    "NO_GEO_SELECTED": "No geo-blocked countries selected.",
+    "CLEAR_ALL": "Clear all",
     "SAVED_SUCCESS": "Sensor saved successfully",
     "UPDATED_SUCCESS": "Sensor updated successfully"
   },
@@ -230,6 +239,34 @@
     "NO_DOMAINS": "No domains added yet.",
     "NO_HEADERS": "No custom headers configured.",
     "NO_ROUTES": "No routes configured yet."
+  },
+  "GEOIP_DIALOG": {
+    "TITLE": "GeoIP Information",
+    "SUBTITLE": "Geographic and network intelligence for source IP",
+    "IP_ADDRESS": "IP Address",
+    "COUNTRY": "Country",
+    "STATUS": "GeoIP Action",
+    "ORGANIZATION": "Organization / ISP",
+    "ASN": "ASN Number",
+    "IP_RANGE": "IP Range",
+    "IPXA": "IPXa Status",
+    "RAW_DATA": "Raw GeoIP Data",
+    "COPIED": "IP copied to clipboard"
+  },
+  "RBL_DIALOG": {
+    "TITLE": "RBL & IP Reputation",
+    "SUBTITLE": "Reputation analysis and threat intelligence for source IP",
+    "IP_ADDRESS": "Source IP",
+    "STATUS": "RBL Action",
+    "SCORE": "Risk Score",
+    "TRUSTED": "Trusted Bypass",
+    "MATCHED_FEEDS": "Matched Feed(s)",
+    "NO_MATCH": "No malicious feed matches",
+    "IPXA": "IPXa Status",
+    "RAW_DATA": "Raw Reputation Data",
+    "YES": "Yes",
+    "NO": "No",
+    "COPIED": "IP copied to clipboard"
   },
   "APPLY_DIALOG": {
     "TITLE": "Apply Configuration",
@@ -438,7 +475,10 @@
       "SERVICE_PORT": "Service Port",
       "DISTRIBUTION_WEIGHT": "Distribution Weight",
       "ACTIONS": "Actions",
+      "EDIT_TOOLTIP": "Edit target",
       "REMOVE_TOOLTIP": "Remove target",
+      "MODAL_TITLE_ADD": "Add Upstream Target",
+      "MODAL_TITLE_EDIT": "Edit Upstream Target",
       "EMPTY_MESSAGE": "No targets configured. Add at least one target for this backend."
     },
     "STATES": {
@@ -454,6 +494,11 @@
       "NO_STATES": "No health check states recorded yet for this upstream.",
       "WARNING_TOOLTIP": "One or more targets are in failure state"
     }
+  },
+  "DATETIME": {
+    "HOUR": "Hour",
+    "MINUTE": "Minute",
+    "SECOND": "Second"
   },
   "FORMAT": {
     "DISPLAY": {
@@ -483,13 +528,21 @@
   "about": {
     "title": "About NXGuard",
     "subtitle": "High-Performance API Gateway & Security Engine",
-    "tab_about": "About",
-    "tab_restore": "Restore Config",
-    "choose_file": "Choose JSON file to restore",
+    "tab_about": "Overview",
+    "tab_backup_restore": "Backup & Restore",
+    "backup_title": "Export Configuration (Backup)",
+    "backup_desc": "Download a complete backup of all services, upstreams, and security rules in JSON format.",
+    "backup_btn": "Download Backup",
+    "restore_title": "Import Configuration (Restore)",
+    "restore_desc": "Upload a previously exported JSON backup to restore system configuration.",
+    "choose_file": "Choose JSON backup file",
     "selected_file": "Selected File",
     "powered_by": "Powered by OpenResty & ModSecurity",
     "api_docs": "REST API",
-    "api_docs_sub": "OpenAPI / Swagger docs"
+    "api_docs_sub": "OpenAPI / Swagger documentation",
+    "github_title": "GitHub Repository",
+    "github_sub": "Source code, releases & issue tracking",
+    "architecture_title": "Core Architecture"
   },
   "attr": {
     "active": "Active",

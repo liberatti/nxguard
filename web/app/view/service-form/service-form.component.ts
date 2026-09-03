@@ -59,7 +59,7 @@ import { minArrayLength } from '../../validators/min-array-length.validator';
         MatTooltipModule, MatSelectModule, MatPaginatorModule, MatSlideToggleModule, MatCheckboxModule,
         MatFormFieldModule, MatChipsModule, MatStepperModule],
     templateUrl: './service-form.component.html',
-    styleUrls: ['./service-form.component.css']
+    styleUrl: './service-form.component.css'
 })
 export class ServiceFormComponent implements OnInit {
 

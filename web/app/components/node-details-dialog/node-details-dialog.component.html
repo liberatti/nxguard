@@ -5,19 +5,25 @@
 </h2>
 <mat-dialog-content>
     <small><strong>Last Check:</strong> {{ data.last_check | date:'short' }}</small>
-    <mat-expansion-panel *ngFor="let upstream of data.upstreams" id="upstream-panel-{{upstream.name}}">
-        <mat-expansion-panel-header *ngIf="!isHealthy(upstream)">
-            <mat-panel-title>{{ upstream.name }}</mat-panel-title>
-        </mat-expansion-panel-header>
-        <div *ngIf="!isHealthy(upstream)">
-            <div *ngFor="let target of upstream.targets" id="target-info-{{target.endpoint}}">
-                <strong>Target:</strong> {{ target.endpoint }}
-                @if (!data.healthy) {
-                    <mat-icon color="warn">warning_amber</mat-icon>
+    @for (upstream of data.upstreams; track upstream.name) {
+        @if (!isHealthy(upstream)) {
+        <mat-expansion-panel id="upstream-panel-{{upstream.name}}">
+            <mat-expansion-panel-header>
+                <mat-panel-title>{{ upstream.name }}</mat-panel-title>
+            </mat-expansion-panel-header>
+            <div>
+                @for (target of upstream.targets; track target.endpoint) {
+                <div id="target-info-{{target.endpoint}}">
+                    <strong>Target:</strong> {{ target.endpoint }}
+                    @if (!data.healthy) {
+                        <mat-icon color="warn">warning_amber</mat-icon>
+                    }
+                </div>
                 }
             </div>
-        </div>
-    </mat-expansion-panel>
+        </mat-expansion-panel>
+        }
+    }
 </mat-dialog-content>
 <mat-dialog-actions align="end" class="dialog-actions">
     <button mat-raised-button color="primary" (click)="onDismiss()" id="node-details-close-btn">

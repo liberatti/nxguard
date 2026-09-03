@@ -10,14 +10,18 @@
                     <input matInput id="sensor-filter-input" [(ngModel)]="searchQuery"
                            (keyup.enter)="applyFilter()"
                            [placeholder]="'view.sensor.filter_placeholder' | translate">
-                    <button *ngIf="searchQuery" matSuffix mat-icon-button id="sensor-filter-clear-btn" (click)="clearFilter()">
+                    @if (searchQuery) {
+                    <button matSuffix mat-icon-button id="sensor-filter-clear-btn" (click)="clearFilter()">
                         <mat-icon>close</mat-icon>
                     </button>
+                    }
                 </mat-form-field>
-                <button mat-flat-button color="primary" [routerLink]="['add']" *ngIf="oauth.isRole('superuser')" id="add-sensor-btn">
+                @if (oauth.isRole('superuser')) {
+                <button mat-flat-button color="primary" [routerLink]="['add']" id="add-sensor-btn">
                     <mat-icon>add</mat-icon>
                     {{ 'actions.create'|translate }}
                 </button>
+                }
             </mat-card-actions>
         </mat-card-header>
         <mat-card-content>
@@ -42,7 +46,7 @@
                     <th mat-header-cell *matHeaderCellDef class="text-right"> {{ 'attr.actions'|translate }}</th>
                     <td mat-cell *matCellDef="let element;let i = index;" class="text-right">
                         <div class="table-cell-actions">
-                            <div style="border:none" class="toggle-container">
+                            <div class="toggle-container no-border">
                                 <button mat-button [matMenuTriggerFor]="menu" id="sensor-menu-{{i}}">
                                     <mat-icon>more_vert</mat-icon>
                                 </button>
@@ -51,11 +55,12 @@
                                         <mat-icon>edit</mat-icon>
                                         {{ 'actions.edit'|translate }}
                                     </button>
-                                    <button mat-menu-item type="button" (click)="onRemove(element)"
-                                            *ngIf="oauth.isRole('superuser')" id="delete-sensor-{{i}}">
+                                    @if (oauth.isRole('superuser')) {
+                                    <button mat-menu-item type="button" (click)="onRemove(element)" id="delete-sensor-{{i}}">
                                         <mat-icon>delete</mat-icon>
                                         {{ 'actions.remove'|translate }}
                                     </button>
+                                    }
                                 </mat-menu>
                             </div>
                         </div>

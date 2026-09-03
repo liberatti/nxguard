@@ -16,10 +16,11 @@
                             <mat-form-field class="full-width" id="upstream-type-col">
                                 <mat-label>Type</mat-label>
                                 <mat-select formControlName="type" id="upstream-type-select">
-                                    <mat-option *ngFor="let ut of _types" [value]="ut" id="type-option-{{ut}}"
-                                        style="text-transform: capitalize">
+                                    @for (ut of _types; track ut) {
+                                    <mat-option [value]="ut" id="type-option-{{ut}}" class="capitalize-option">
                                         {{ ut }}
                                     </mat-option>
+                                    }
                                 </mat-select>
                             </mat-form-field>
                         </div>
@@ -27,20 +28,21 @@
                         <div class="form-row-full" id="upstream-description-row">
                             <mat-form-field class="full-width" id="upstream-description-col">
                                 <mat-label>Description</mat-label>
-                                <textarea id="upstream-description" matInput
-                                    formControlName="description"></textarea>
+                                <textarea id="upstream-description" matInput formControlName="description"></textarea>
                             </mat-form-field>
                         </div>
 
-                        <div *ngIf="form.value.type == 'backend'" id="upstream-backend-settings">
+                        @if (form.value.type == 'backend') {
+                        <div id="upstream-backend-settings">
                             <div class="form-grid-2">
                                 <mat-form-field class="full-width">
                                     <mat-label>Protocol</mat-label>
                                     <mat-select formControlName="protocol" id="upstream-protocol-select">
-                                        <mat-option *ngFor="let ut of _supportedProtocols" [value]="ut"
-                                            id="protocol-option-{{ut}}">
+                                        @for (ut of _supportedProtocols; track ut) {
+                                        <mat-option [value]="ut" id="protocol-option-{{ut}}">
                                             {{ ut }}
                                         </mat-option>
+                                        }
                                     </mat-select>
                                 </mat-form-field>
                                 <mat-form-field class="full-width">
@@ -60,12 +62,14 @@
                                 </mat-form-field>
                             </div>
 
-                            <div class="form-row-full" *ngIf="form.value.protocol == 'FASTCGI'">
+                            @if (form.value.protocol == 'FASTCGI') {
+                            <div class="form-row-full">
                                 <mat-form-field class="full-width">
                                     <mat-label>FastCGI Script Path</mat-label>
                                     <input matInput formControlName="script_path" id="upstream-script-path">
                                 </mat-form-field>
                             </div>
+                            }
 
                             <mat-card class="full-width persist-card">
                                 <mat-card-header>
@@ -76,7 +80,8 @@
                                         </mat-slide-toggle>
                                     </mat-card-title>
                                 </mat-card-header>
-                                <mat-card-content *ngIf="persistEnabledControl.value">
+                                @if (persistEnabledControl.value) {
+                                <mat-card-content>
                                     <div class="form-grid-2">
                                         <mat-form-field class="full-width">
                                             <mat-label>Cookie Name (Optional)</mat-label>
@@ -88,11 +93,14 @@
                                         </mat-form-field>
                                     </div>
                                 </mat-card-content>
+                                }
                             </mat-card>
                         </div>
+                        }
                     </div>
                     <div class="mat-col-6" id="upstream-form-right-col">
-                        <div class="mat-row" *ngIf="form.value.type == 'static'" id="upstream-static-content">
+                        @if (form.value.type == 'static') {
+                        <div class="mat-row" id="upstream-static-content">
                             <mat-card class="full-width">
                                 <mat-card-header>
                                     <mat-card-title>
@@ -115,21 +123,24 @@
                                 </mat-card-content>
                             </mat-card>
                         </div>
-                        <div *ngIf="form.value.type == 'backend'" id="upstream-targets-section">
+                        }
+                        @if (form.value.type == 'backend') {
+                        <div id="upstream-targets-section">
                             <mat-card class="full-width targets-card">
                                 <mat-card-header>
                                     <mat-card-title>
                                         <span class="targets-header-title">
                                             <mat-icon class="targets-icon">hub</mat-icon>
                                             {{ 'UPSTREAM.TARGETS.TITLE' | translate }}
-                                            <span class="targets-count-badge">{{ targetDS.data ? targetDS.data.length : 0 }}</span>
+                                            <span class="targets-count-badge">{{ targetDS.data ? targetDS.data.length :
+                                                0 }}</span>
                                         </span>
                                     </mat-card-title>
 
                                 </mat-card-header>
                                 <mat-card-content class="targets-card-content">
-                                    <table mat-table [dataSource]="targetDS" matSort class="targets-table"
-                                        *ngIf="targetDS.data && targetDS.data.length > 0; else noTargetsTemplate">
+                                    @if (targetDS.data && targetDS.data.length > 0) {
+                                    <table mat-table [dataSource]="targetDS" matSort class="targets-table">
                                         <tr mat-header-row *matHeaderRowDef="targetDC"></tr>
                                         <tr mat-row *matRowDef="let row; columns: targetDC;"></tr>
 
@@ -153,44 +164,56 @@
                                             <th mat-header-cell *matHeaderCellDef class="text-right"> {{
                                                 'UPSTREAM.TARGETS.ACTIONS' | translate }}</th>
                                             <td mat-cell *matCellDef="let element; let i = index" class="text-right">
+                                                @if (form.enabled) {
+                                                <button mat-icon-button color="primary" type="button"
+                                                    (click)="onEditTarget(element, i)"
+                                                    id="edit-target-{{element._id || i}}"
+                                                    [matTooltip]="'UPSTREAM.TARGETS.EDIT_TOOLTIP' | translate">
+                                                    <mat-icon>edit</mat-icon>
+                                                </button>
                                                 <button mat-icon-button color="warn" type="button" (click)="onRemove(i)"
                                                     id="delete-target-{{element._id || i}}"
                                                     [matTooltip]="'UPSTREAM.TARGETS.REMOVE_TOOLTIP' | translate">
                                                     <mat-icon>delete_outline</mat-icon>
                                                 </button>
+                                                }
                                             </td>
                                         </ng-container>
                                     </table>
-                                    <ng-template #noTargetsTemplate>
-                                        <div class="targets-empty-state">
-                                            <mat-icon class="empty-icon">dns</mat-icon>
-                                            <p class="empty-text">{{ 'UPSTREAM.TARGETS.EMPTY_MESSAGE' | translate }}</p>
-                                        </div>
-                                    </ng-template>
+                                    } @else {
+                                    <div class="targets-empty-state">
+                                        <mat-icon class="empty-icon">dns</mat-icon>
+                                        <p class="empty-text">{{ 'UPSTREAM.TARGETS.EMPTY_MESSAGE' | translate }}</p>
+                                    </div>
+                                    }
                                 </mat-card-content>
                                 <mat-card-actions class="align-right">
-                                    <button mat-flat-button color="primary" type="button" *ngIf="form.enabled"
-                                        (click)="onAddTarget()" id="add-target-btn">
+                                    @if (form.enabled) {
+                                    <button mat-flat-button color="primary" type="button" (click)="onAddTarget()"
+                                        id="add-target-btn">
                                         <mat-icon>add</mat-icon>
                                         {{ 'UPSTREAM.TARGETS.ADD_BTN' | translate }}
                                     </button>
+                                    }
                                 </mat-card-actions>
                             </mat-card>
                         </div>
+                        }
                     </div>
                 </div>
             </form>
         </mat-card-content>
         <mat-card-actions align="end" class="mat-mdc-card-actions bottom-actions">
-            <button id="save-upstream-btn" type="button" mat-flat-button color="primary" *ngIf="form.enabled"
-                (click)="onSubmit()">
-                <mat-icon>save</mat-icon>
-                {{ 'ACTIONS.SAVE' | translate }}
-            </button>
-            <button type="button" mat-stroked-button [routerLink]="['/ups']" id="upstream-form-back-btn">
+            <button type="button" mat-stroked-button [routerLink]="['/upstream']" id="upstream-form-back-btn">
                 <mat-icon>arrow_back</mat-icon>
                 {{ 'ACTIONS.CANCEL' | translate }}
             </button>
+            @if (form.enabled) {
+            <button id="save-upstream-btn" type="button" mat-flat-button color="primary" (click)="onSubmit()">
+                <mat-icon>save</mat-icon>
+                {{ 'ACTIONS.SAVE' | translate }}
+            </button>
+            }
         </mat-card-actions>
     </mat-card>
 </ng-container>

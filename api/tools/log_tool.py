@@ -15,6 +15,7 @@ except ImportError:
 
 from nxcore.middleware.logging_manager import logger
 from api.model.transaction_model import TransactionDao
+from config import MASKED_HEADERS
 
 
 def get_server_id():
@@ -106,6 +107,21 @@ class LogParserTool:
         for k, v in headers_dict.items():
             headers_list.append({"name": str(k), "content": str(v)})
         return headers_list
+
+    @classmethod
+    def _filter_headers(cls, headers):
+        if not headers:
+            return headers
+        masked = {h.lower() for h in MASKED_HEADERS}
+        if isinstance(headers, list):
+            return [
+                h
+                for h in headers
+                if not (isinstance(h, dict) and h.get("name", "").lower() in masked)
+            ]
+        if isinstance(headers, dict):
+            return {k: v for k, v in headers.items() if k.lower() not in masked}
+        return headers
 
     @classmethod
     def _extract_json_objects(cls, line: str) -> List[Dict[str, Any]]:
@@ -275,9 +291,9 @@ class LogParserTool:
             acc_http = merged.get("http", {})
             if "request" in aud_http and aud_http["request"]:
                 if "headers" in aud_http["request"] and aud_http["request"]["headers"]:
-                    acc_http.setdefault("request", {})["headers"] = aud_http["request"][
-                        "headers"
-                    ]
+                    acc_http.setdefault("request", {})["headers"] = cls._filter_headers(
+                        aud_http["request"]["headers"]
+                    )
                 if "method" in aud_http["request"] and not acc_http.get(
                     "request", {}
                 ).get("method"):
@@ -296,9 +312,9 @@ class LogParserTool:
                     "headers" in aud_http["response"]
                     and aud_http["response"]["headers"]
                 ):
-                    acc_http.setdefault("response", {})["headers"] = aud_http[
-                        "response"
-                    ]["headers"]
+                    acc_http.setdefault("response", {})["headers"] = cls._filter_headers(
+                        aud_http["response"]["headers"]
+                    )
                 if "status_code" in aud_http["response"] and not acc_http.get(
                     "response", {}
                 ).get("status_code"):
@@ -322,6 +338,16 @@ class LogParserTool:
         action = audit.get("action") or cls.resolve_status_code(status_code)
 
         clean_name = service_name.rsplit("_", 1)[0] if ("_" in service_name and service_name.rsplit("_", 1)[1].isdigit()) else service_name
+        http_data = audit.get("http", {})
+        if "request" in http_data and "headers" in http_data["request"]:
+            http_data["request"]["headers"] = cls._filter_headers(
+                http_data["request"]["headers"]
+            )
+        if "response" in http_data and "headers" in http_data["response"]:
+            http_data["response"]["headers"] = cls._filter_headers(
+                http_data["response"]["headers"]
+            )
+
         record = {
             "logtime": audit.get("logtime") or datetime.now(),
             "unique_id": audit.get("unique_id", ""),
@@ -350,7 +376,7 @@ class LogParserTool:
                 "port": audit.get("destination", {}).get("port", 443),
                 "host": "",
             },
-            "http": audit.get("http", {}),
+            "http": http_data,
             "audit": audit.get("audit", {}),
         }
         return record

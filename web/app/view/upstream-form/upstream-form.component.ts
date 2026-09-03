@@ -249,12 +249,30 @@ export class UpstreamFormComponent implements OnInit {
 
     onAddTarget() {
         const dialogRef = this.confirmDialog.open(UpstreamTargetDialogComponent, {
+            data: null,
             width: '450px',
         });
 
         dialogRef.afterClosed().subscribe(result => {
             if (result) {
                 const data = [...this.targetDS.data, result];
+                this.targetDS.data = data;
+                this.form.get('targets')?.setValue(data);
+                this.cdr.detectChanges();
+            }
+        });
+    }
+
+    onEditTarget(element: TargetEntity, index: number) {
+        const dialogRef = this.confirmDialog.open(UpstreamTargetDialogComponent, {
+            data: { ...element },
+            width: '450px',
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result) {
+                const data = [...this.targetDS.data];
+                data[index] = { ...data[index], ...result };
                 this.targetDS.data = data;
                 this.form.get('targets')?.setValue(data);
                 this.cdr.detectChanges();

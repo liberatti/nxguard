@@ -80,6 +80,9 @@ export class SensorFormComponent implements OnInit, AfterViewInit {
     ruleCH: number[] = [];
     selectedCategory: string | null = null;
     ruleSearchQuery: string = '';
+    blockSearchQuery: string = '';
+    bypassSearchQuery: string = '';
+    geoSearchQuery: string = '';
     pageSizeOptions: number[] = [10, 15, 25, 50, 100];
 
     @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -173,12 +176,48 @@ export class SensorFormComponent implements OnInit, AfterViewInit {
         return (this.form.get('security.geo_codes')?.value as string[]) || [];
     }
 
+    getFilteredGeoCodes(): string[] {
+        const list = this.getGeoCodes();
+        if (!this.geoSearchQuery) return list;
+        const q = this.geoSearchQuery.toLowerCase();
+        return list.filter(item => item.toLowerCase().includes(q));
+    }
+
     getReputation(): string[] {
         return (this.form.get('security.reputation')?.value as string[]) || [];
     }
 
+    getFilteredReputation(): string[] {
+        const list = this.getReputation();
+        if (!this.blockSearchQuery) return list;
+        const q = this.blockSearchQuery.toLowerCase();
+        return list.filter(item => item.toLowerCase().includes(q));
+    }
+
     getTrusted(): string[] {
         return (this.form.get('security.trusted')?.value as string[]) || [];
+    }
+
+    getFilteredTrusted(): string[] {
+        const list = this.getTrusted();
+        if (!this.bypassSearchQuery) return list;
+        const q = this.bypassSearchQuery.toLowerCase();
+        return list.filter(item => item.toLowerCase().includes(q));
+    }
+
+    onClearAllBlock(): void {
+        this.form.get('security.reputation')?.setValue([]);
+        this.form.markAsTouched();
+    }
+
+    onClearAllPermit(): void {
+        this.form.get('security.trusted')?.setValue([]);
+        this.form.markAsTouched();
+    }
+
+    onClearAllGeo(): void {
+        this.form.get('security.geo_codes')?.setValue([]);
+        this.form.markAsTouched();
     }
 
     onSave() {

@@ -211,11 +211,6 @@ def renew_certificates():
                 renew_date = datetime.now() - timedelta(days=config.CERTIFICATE_RENEW)
                 renew_date = replace_tz(renew_date)
                 if cert["force_renew"] or replace_tz(cert["not_after"]) < renew_date:
-                    sans = []
-                    services = dao_s.get_all_by_certificate_id(cert["_id"])
-                    if services:
-                        for s in services:
-                            sans.extend(s["sans"])
                     try:
                         if "MANAGED" in cert["provider"]:
                             AcmeTool.renew_lets(cert)
