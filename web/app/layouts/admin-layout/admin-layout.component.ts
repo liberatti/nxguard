@@ -28,7 +28,6 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from 'environments/environment';
 import { ConfigService, HealthService } from '../../services/config.service';
 import { Health } from '../../models/config';
-import { ThemeService } from 'app/services/theme.service';
 
 import mainMenuData from '../../../assets/main.menu.json';
 
@@ -91,8 +90,7 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
         private route: ActivatedRoute,
         private router: Router,
         private healthService: HealthService,
-        private ngZone: NgZone,
-        public themeService: ThemeService
+        private ngZone: NgZone
     ) {
         this.httpClient = this.injector.get(HttpClient);
         breakpointObserver

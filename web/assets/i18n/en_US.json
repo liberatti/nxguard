@@ -1,8 +1,4 @@
 {
-  "THEME": {
-    "DARK_MODE": "Switch to dark theme",
-    "LIGHT_MODE": "Switch to light theme"
-  },
   "ACTIONS": {
     "CREATE": "Create",
     "EDIT": "Edit",

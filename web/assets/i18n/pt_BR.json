@@ -1,8 +1,4 @@
 {
-  "THEME": {
-    "DARK_MODE": "Alternar para tema escuro",
-    "LIGHT_MODE": "Alternar para tema claro"
-  },
   "ACTIONS": {
     "CREATE": "Criar",
     "EDIT": "Editar",

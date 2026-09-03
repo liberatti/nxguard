@@ -6,7 +6,6 @@ import { MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/mater
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { saveAs } from 'file-saver';
-import { HttpClient } from '@angular/common/http';
 import { MatTabChangeEvent, MatTabsModule } from '@angular/material/tabs';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
@@ -40,11 +39,10 @@ export class AboutDialogComponent {
     selectedFile: File | null = null;
     currentTab: number = 0;
     restoreReady: boolean = true;
-    _REST_API_URL: string = environment.apiUrl;
     version: string = environment.version;
     constructor(
         public dialogRef: MatDialogRef<AboutDialogComponent>,
-        private configService: ConfigService, private http: HttpClient,
+        private configService: ConfigService,
         private notificationService: NotificationService,
     ) {
     }

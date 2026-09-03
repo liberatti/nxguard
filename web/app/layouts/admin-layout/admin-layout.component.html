@@ -13,13 +13,6 @@
         <span class="navbar-spacer"></span>
 
         <div class="navbar-actions">
-            <!-- Dark / Light Theme Toggle Button -->
-            <button mat-icon-button (click)="themeService.toggleTheme()" id="navbar-theme-toggle-btn"
-                class="nav-icon-btn theme-toggle-btn"
-                [matTooltip]="(themeService.isDarkMode() ? 'THEME.LIGHT_MODE' : 'THEME.DARK_MODE') | translate">
-                <mat-icon>{{ themeService.isDarkMode() ? 'light_mode' : 'dark_mode' }}</mat-icon>
-            </button>
-
             <!-- Notifications / Apply Icon Button -->
             <button mat-icon-button (click)="onApply()" id="navbar-apply-btn"
                 class="nav-icon-btn notification-apply-btn" [matTooltip]="'APPLY_DIALOG.TITLE' | translate">

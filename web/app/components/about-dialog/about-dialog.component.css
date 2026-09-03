@@ -165,9 +165,9 @@
 }
 
 .links-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .link-card {
@@ -194,19 +194,6 @@
     width: 24px;
     height: 24px;
     flex-shrink: 0;
-}
-
-.api-icon-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #2563eb;
-}
-
-.api-icon-wrapper mat-icon {
-    font-size: 24px;
-    width: 24px;
-    height: 24px;
 }
 
 .github-icon {
