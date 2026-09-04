@@ -61,7 +61,7 @@
     }
   },
   "CONTENT": {
-    "COPY": "&copy; 2026 nxguard. Todos os direitos reservados. Esta solução é desenvolvida sobre o OpenResty.",
+    "COPY": "&copy; 2026 NXGuard. Todos os direitos reservados. Esta solução é desenvolvida sobre o OpenResty.",
     "ABOUT": "Este é um servidor proxy construído sobre o OpenResty com ModSecurity para proteção avançada.",
     "RESTORE_NOTICE": "Aviso de Restauração de Configuração: Todos os dados existentes serão sobrescritos pela configuração restaurada."
   },
@@ -557,7 +557,7 @@
     "actions": "Ações"
   },
   "content": {
-    "copy": "&copy; 2025 nxguard. Todos os direitos reservados. Esta solução é desenvolvida sobre o OpenResty.",
+    "copy": "&copy; 2026 NXGuard. Todos os direitos reservados. Esta solução é desenvolvida sobre o OpenResty.",
     "about": "Este é um servidor proxy construído sobre o OpenResty com ModSecurity para proteção avançada.",
     "restore_notice": "Aviso de Restauração de Configuração: Todos os dados existentes serão sobrescritos pela configuração restaurada."
   },

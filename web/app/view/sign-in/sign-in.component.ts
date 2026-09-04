@@ -37,7 +37,6 @@ import {environment} from "environments/environment";
 export class SignInComponent implements OnInit {
     locales = [] as Array<Language>;
     hidePassword = true;
-    isDarkMode = false;
     version: string = environment.version;
     currentYear: number = new Date().getFullYear();
     currentLangCode: string = 'EN';
@@ -75,30 +74,10 @@ export class SignInComponent implements OnInit {
         this.translate.use(savedLang);
         this.form.controls.locale.setValue(savedLang);
         this.updateLangCode(savedLang);
-
-        const savedTheme = this.localStorage.get('theme');
-        if (savedTheme === 'dark') {
-            this.isDarkMode = true;
-            document.documentElement.setAttribute('data-theme', 'dark');
-            document.body.classList.add('dark-theme');
-        }
     }
 
     updateLangCode(lang: string) {
         this.currentLangCode = lang && lang.toLowerCase().startsWith('pt') ? 'PT' : 'EN';
-    }
-
-    toggleTheme() {
-        this.isDarkMode = !this.isDarkMode;
-        if (this.isDarkMode) {
-            document.documentElement.setAttribute('data-theme', 'dark');
-            document.body.classList.add('dark-theme');
-            this.localStorage.set('theme', 'dark');
-        } else {
-            document.documentElement.removeAttribute('data-theme');
-            document.body.classList.remove('dark-theme');
-            this.localStorage.set('theme', 'light');
-        }
     }
 
     onLocaleChange(lang: string) {

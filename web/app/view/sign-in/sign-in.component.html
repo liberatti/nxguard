@@ -13,7 +13,8 @@
 
             <div class="header-actions-right">
                 <!-- Language Menu Trigger -->
-                <button type="button" class="action-pill-btn" [matMenuTriggerFor]="langMenu" id="sign-in-language-btn" [attr.aria-label]="'AUTH.SELECT_LANGUAGE' | translate">
+                <button type="button" class="action-pill-btn" [matMenuTriggerFor]="langMenu" id="sign-in-language-btn"
+                    [attr.aria-label]="'AUTH.SELECT_LANGUAGE' | translate">
                     <mat-icon class="lang-globe-icon">language</mat-icon>
                     <span class="lang-text">{{ currentLangCode }}</span>
                     <mat-icon class="dropdown-chevron-icon">arrow_drop_down</mat-icon>
@@ -25,11 +26,6 @@
                     </button>
                     }
                 </mat-menu>
-
-                <!-- Theme Toggle Button -->
-                <button type="button" class="action-icon-btn" (click)="toggleTheme()" id="sign-in-theme-toggle" [attr.aria-label]="'AUTH.TOGGLE_THEME' | translate">
-                    <mat-icon class="theme-icon">{{ isDarkMode ? 'light_mode' : 'nightlight_round' }}</mat-icon>
-                </button>
             </div>
         </div>
 
@@ -57,7 +53,8 @@
                         [placeholder]="'AUTH.PLACEHOLDER_PASSWORD' | translate">
                     <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" type="button"
                         class="password-toggle-btn" [attr.aria-label]="'AUTH.TOGGLE_PASSWORD' | translate">
-                        <mat-icon class="suffix-toggle-icon">{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+                        <mat-icon class="suffix-toggle-icon">{{hidePassword ? 'visibility_off' :
+                            'visibility'}}</mat-icon>
                     </button>
                 </mat-form-field>
             </div>
@@ -75,7 +72,8 @@
     <div class="login-page-footer">
         <div class="footer-platform-title">{{ 'AUTH.ENTERPRISE_PLATFORM' | translate }}</div>
         <div class="footer-copyright-row">
-            <span>&copy; {{ currentYear }} {{ 'AUTH.TITLE' | translate }} - {{ 'AUTH.BRAND_DESCRIPTION' | translate }}</span>
+            <span>&copy; {{ currentYear }} {{ 'AUTH.TITLE' | translate }} - {{ 'AUTH.BRAND_DESCRIPTION' | translate
+                }}</span>
             <span class="version-badge">{{ version }}</span>
         </div>
     </div>
