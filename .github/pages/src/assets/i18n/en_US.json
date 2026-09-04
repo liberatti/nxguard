@@ -1,0 +1,163 @@
+{
+  "PAGES": {
+    "NAV": {
+      "FEATURES": "Features",
+      "SCREENSHOTS": "Screenshots",
+      "ARCHITECTURE": "Architecture",
+      "BENCHMARKS": "Benchmarks",
+      "QUICKSTART": "Quick Start",
+      "SPONSOR": "Sponsor",
+      "GITHUB": "GitHub",
+      "LANGUAGE": "Language",
+      "LANG_EN": "English",
+      "LANG_PT": "Português"
+    },
+    "HERO": {
+      "BADGE": "High-Performance API Gateway & Security Reverse Proxy",
+      "TITLE_LINE_1": "Next-Generation Layer 7 Defense with",
+      "TITLE_GRADIENT": "OpenResty & ModSecurity v3",
+      "SUBTITLE_1": "NXGuard provides sub-millisecond request inspection via LuaJIT, live threat intelligence synchronized with",
+      "SUBTITLE_2": ", embedded",
+      "SUBTITLE_3": "telemetry analytics, and zero-touch ACME SSL automation.",
+      "CHIP_LICENSE": "Apache 2.0",
+      "CHIP_DOCKER": "Docker Ready",
+      "CHIP_LATENCY": "Sub-0.4ms Latency",
+      "CHIP_OWASP": "OWASP CRS 4.25+",
+      "CTA_QUICKSTART": "Quick Start",
+      "CTA_PREVIEW": "View UI Preview",
+      "CTA_GITHUB": "Star on GitHub"
+    },
+    "METRICS": {
+      "LATENCY": {
+        "LABEL": "Latency Overhead",
+        "VALUE": "< 0.4ms",
+        "CAPTION": "Sub-millisecond Layer 7 inspection"
+      },
+      "CRS": {
+        "LABEL": "Core Rule Set",
+        "VALUE": "CRS 4.25+",
+        "CAPTION": "Latest OWASP threat rules"
+      },
+      "ENGINE": {
+        "LABEL": "Engine Stack",
+        "VALUE": "Nginx + LuaJIT",
+        "CAPTION": "High concurrency OpenResty core"
+      },
+      "ANALYTICS": {
+        "LABEL": "Analytics DB",
+        "VALUE": "DuckDB",
+        "CAPTION": "Embedded zero-overhead SQL telemetry"
+      }
+    },
+    "SCREENSHOTS": {
+      "BADGE": "UI & Observability",
+      "TITLE": "Intuitive Management & Inspection Interface",
+      "SUBTITLE": "Clean, enterprise-grade dashboard designed for complete visibility and rapid policy management.",
+      "DASHBOARD": {
+        "TITLE": "Executive Security Dashboard",
+        "SUBTITLE": "Real-time overview of threats, blocked requests, and system health",
+        "DESCRIPTION": "Intuitive management interface with live metrics, transaction counts, WAF alerts, and operational controls."
+      },
+      "TRANSACTIONS": {
+        "TITLE": "Transaction Stream & Monitoring",
+        "SUBTITLE": "Live transaction logging and traffic inspection",
+        "DESCRIPTION": "Search, filter, and inspect incoming requests by service, status, IP, country, and threat score."
+      },
+      "RAW_INSPECTION": {
+        "TITLE": "Raw Request & Payload Inspection",
+        "SUBTITLE": "Deep dive into headers, query parameters, and body payloads",
+        "DESCRIPTION": "Complete inspection of raw HTTP transactions to investigate attacks and debug traffic anomalies."
+      },
+      "RULE_DETAILS": {
+        "TITLE": "ModSecurity Rule Match Details",
+        "SUBTITLE": "Granular rule triggers and matched patterns",
+        "DESCRIPTION": "Detailed analysis of matched ModSecurity rule IDs, tags, severity levels, and matched string segments."
+      }
+    },
+    "ARCHITECTURE": {
+      "BADGE": "Architecture",
+      "TITLE": "Processing Pipeline & Security Flow",
+      "SUBTITLE": "Modular pipeline linking network ingress, policy evaluation, and telemetry storage.",
+      "DIAGRAM_TITLE": "Pipeline Diagram",
+      "DIAGRAM_SUBTITLE": "Ingress, Inspection, and Telemetry Flow",
+      "STEP_1_TITLE": "Ingress & LuaJIT Pre-flight",
+      "STEP_1_DESC": "Traffic arrives on OpenResty worker threads. Custom Lua sensors perform rapid dynamic bypass, geo-filtering, and initial validation before invoking inspection.",
+      "STEP_2_TITLE": "ModSecurity v3 & CRS Rules",
+      "STEP_2_DESC": "Comprehensive payload parsing and regex evaluation against OWASP Core Rule Set 4.25+. Granular per-route sensor policies enable dynamic rule tailoring without reloads.",
+      "STEP_3_TITLE": "IPXA Feeds & DuckDB Telemetry",
+      "STEP_3_DESC": "Continuous threat intelligence synchronized with IPXA. All audit logs and blocked transactions are saved in embedded DuckDB for instant analytics and reporting."
+    },
+    "FEATURES": {
+      "BADGE": "Capabilities",
+      "TITLE": "Core Engine Features",
+      "SUBTITLE": "Engineered for high-throughput APIs and enterprise security compliance.",
+      "MODSECURITY": {
+        "TITLE": "Advanced ModSecurity v3 WAF",
+        "BADGE": "Layer 7 Protection",
+        "DESCRIPTION": "Native integration with ModSecurity v3 and OWASP Core Rule Set 4.25+ protecting against SQLi, XSS, RCE, LFI/RFI, and zero-day vulnerabilities."
+      },
+      "LUAJIT": {
+        "TITLE": "High-Performance LuaJIT Core",
+        "BADGE": "Sub-Millisecond",
+        "DESCRIPTION": "Custom Lua sensors running directly inside OpenResty worker threads for rapid request filtering, header sanitization, and rate-limiting."
+      },
+      "IPXA": {
+        "TITLE": "IPXA Threat Intelligence",
+        "BADGE": "Feed Sync",
+        "DESCRIPTION": "Continuous synchronization with IPXA for dynamic IP reputation, real-time threat feed integration, geo-blocking, and smart bypass rules."
+      },
+      "DUCKDB": {
+        "TITLE": "DuckDB Embedded Analytics",
+        "BADGE": "Zero External DB",
+        "DESCRIPTION": "Columnar storage engine embedded directly in the admin backend for rapid real-time transaction query, aggregation, and auditing."
+      },
+      "ACME": {
+        "TITLE": "ACME & SSL Automation",
+        "BADGE": "Automated TLS",
+        "DESCRIPTION": "Automated certificate issuance and renewal via Let's Encrypt / ACME with HTTP-01 challenges and seamless Nginx reload."
+      },
+      "ROUTING": {
+        "TITLE": "Smart Reverse Proxy & Routing",
+        "BADGE": "Traffic Control",
+        "DESCRIPTION": "Upstream health checks, session stickiness, HTTP method filtering, allowed content-type validation, and route-specific security policies."
+      }
+    },
+    "BENCHMARKS": {
+      "BADGE": "Security Testing",
+      "TITLE": "Security Validation with GoTestWAF",
+      "SUBTITLE": "Continuous automated verification against modern attack payloads and OWASP categories.",
+      "REPORT_TITLE": "GoTestWAF Evaluation",
+      "REPORT_SUBTITLE": "Verification of Block & Alerting Efficacy",
+      "RUNNER_TITLE": "Run Security Validation",
+      "RUNNER_SUBTITLE": "Validate your local instance",
+      "RUNNER_DESC": "Execute the official GoTestWAF container to simulate multi-vector exploits against your ruleset:",
+      "COPY_BTN": "Copy GoTestWAF Command",
+      "COPIED_BTN": "Copied"
+    },
+    "QUICKSTART": {
+      "BADGE": "Deployment",
+      "TITLE": "Quick Start with Docker Compose",
+      "SUBTITLE": "Deploy the full stack (NXGuard + IPXA Threat Feed) in seconds.",
+      "COMPOSE_TITLE": "docker-compose.yml",
+      "COMPOSE_SUBTITLE": "Full stack service definition",
+      "COPY_COMPOSE_BTN": "Copy docker-compose.yml",
+      "COPIED_BTN": "Copied",
+      "CREDS_TITLE": "Default Credentials",
+      "DASHBOARD_URL": "Dashboard URL",
+      "USERNAME": "Username",
+      "PASSWORD": "Password",
+      "INGRESS_PORTS": "Ingress Ports",
+      "PRIVACY_TITLE": "Telemetry & Privacy",
+      "PRIVACY_DESC": "NXGuard collects anonymous, aggregated traffic statistics over 24-hour cycles to optimize threat detection models.",
+      "PRIVACY_STRONG": "No sensitive, personal, or request-specific payloads are ever collected."
+    },
+    "FOOTER": {
+      "DESC": "High-performance API Gateway & Web Application Firewall. Licensed under Apache 2.0.",
+      "DEVELOPED_WITH": "Developed with",
+      "BY": "by",
+      "GITHUB": "GitHub",
+      "IPXA": "IPXA",
+      "SPONSOR": "Sponsor"
+    }
+  }
+}

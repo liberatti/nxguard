@@ -1,0 +1,163 @@
+{
+  "PAGES": {
+    "NAV": {
+      "FEATURES": "Recursos",
+      "SCREENSHOTS": "Telas",
+      "ARCHITECTURE": "Arquitetura",
+      "BENCHMARKS": "Testes de Segurança",
+      "QUICKSTART": "Início Rápido",
+      "SPONSOR": "Patrocinar",
+      "GITHUB": "GitHub",
+      "LANGUAGE": "Idioma",
+      "LANG_EN": "English",
+      "LANG_PT": "Português"
+    },
+    "HERO": {
+      "BADGE": "API Gateway de Alta Performance & Proxy Reverso Seguro",
+      "TITLE_LINE_1": "Defesa de Camada 7 de Próxima Geração com",
+      "TITLE_GRADIENT": "OpenResty & ModSecurity v3",
+      "SUBTITLE_1": "O NXGuard oferece inspeção de requisições em sub-milissegundos via LuaJIT, inteligência de ameaças em tempo real sincronizada com o",
+      "SUBTITLE_2": ", telemetria e análises integradas com",
+      "SUBTITLE_3": "e automação SSL ACME sem intervenção manual.",
+      "CHIP_LICENSE": "Apache 2.0",
+      "CHIP_DOCKER": "Pronto para Docker",
+      "CHIP_LATENCY": "Latência < 0.4ms",
+      "CHIP_OWASP": "OWASP CRS 4.25+",
+      "CTA_QUICKSTART": "Início Rápido",
+      "CTA_PREVIEW": "Ver Telas da UI",
+      "CTA_GITHUB": "Favoritar no GitHub"
+    },
+    "METRICS": {
+      "LATENCY": {
+        "LABEL": "Sobrecarga de Latência",
+        "VALUE": "< 0.4ms",
+        "CAPTION": "Inspeção de Camada 7 em sub-milissegundo"
+      },
+      "CRS": {
+        "LABEL": "Conjunto de Regras Core",
+        "VALUE": "CRS 4.25+",
+        "CAPTION": "Regras de ameaças OWASP mais recentes"
+      },
+      "ENGINE": {
+        "LABEL": "Stack do Motor",
+        "VALUE": "Nginx + LuaJIT",
+        "CAPTION": "Núcleo OpenResty de alta concorrência"
+      },
+      "ANALYTICS": {
+        "LABEL": "Banco de Telemetria",
+        "VALUE": "DuckDB",
+        "CAPTION": "SQL embutido de sobrecarga zero"
+      }
+    },
+    "SCREENSHOTS": {
+      "BADGE": "UI & Observabilidade",
+      "TITLE": "Interface Intuitiva de Gestão e Inspeção",
+      "SUBTITLE": "Dashboard limpo e corporativo projetado para total visibilidade e rápida gestão de políticas.",
+      "DASHBOARD": {
+        "TITLE": "Dashboard Executivo de Segurança",
+        "SUBTITLE": "Visão em tempo real de ameaças, requisições bloqueadas e integridade do sistema",
+        "DESCRIPTION": "Interface intuitiva com métricas ao vivo, contagem de transações, alertas WAF e controles operacionais."
+      },
+      "TRANSACTIONS": {
+        "TITLE": "Fluxo de Transações & Monitoramento",
+        "SUBTITLE": "Registro de transações em tempo real e inspeção de tráfego",
+        "DESCRIPTION": "Pesquise, filtre e inspecione requisições por serviço, status, IP, país e pontuação de risco."
+      },
+      "RAW_INSPECTION": {
+        "TITLE": "Inspeção Detalhada de Requisições e Payloads",
+        "SUBTITLE": "Detalhamento de cabeçalhos, parâmetros de query e payloads do body",
+        "DESCRIPTION": "Inspeção completa de transações HTTP puras para investigar ataques e diagnosticar anomalias de tráfego."
+      },
+      "RULE_DETAILS": {
+        "TITLE": "Detalhes de Regras ModSecurity Acionadas",
+        "SUBTITLE": "Gatilhos de regras granulares e padrões identificados",
+        "DESCRIPTION": "Análise detalhada de IDs de regras do ModSecurity acionadas, tags, níveis de severidade e trechos identificados."
+      }
+    },
+    "ARCHITECTURE": {
+      "BADGE": "Arquitetura",
+      "TITLE": "Pipeline de Processamento & Fluxo de Segurança",
+      "SUBTITLE": "Pipeline modular interligando entrada de rede, avaliação de políticas e armazenamento de telemetria.",
+      "DIAGRAM_TITLE": "Diagrama do Pipeline",
+      "DIAGRAM_SUBTITLE": "Fluxo de Entrada, Inspeção e Telemetria",
+      "STEP_1_TITLE": "Entrada & Pré-validação LuaJIT",
+      "STEP_1_DESC": "O tráfego chega aos processos do OpenResty. Sensores Lua customizados realizam bypass dinâmico ultra rápido, geo-filtro e validação inicial antes de acionar a inspeção.",
+      "STEP_2_TITLE": "Regras ModSecurity v3 & CRS",
+      "STEP_2_DESC": "Análise completa de payload e avaliação regex contra o OWASP Core Rule Set 4.25+. Políticas granulares por rota permitem ajustes dinâmicos sem reinicialização.",
+      "STEP_3_TITLE": "Feeds IPXA & Telemetria DuckDB",
+      "STEP_3_DESC": "Inteligência de ameaças sincronizada continuamente com o IPXA. Todos os logs de auditoria e transações bloqueadas são salvos no DuckDB embutido para relatórios imediatos."
+    },
+    "FEATURES": {
+      "BADGE": "Capacidades",
+      "TITLE": "Recursos Principais do Motor",
+      "SUBTITLE": "Projetado para APIs de alta vazão e conformidade com padrões de segurança corporativa.",
+      "MODSECURITY": {
+        "TITLE": "WAF Avançado ModSecurity v3",
+        "BADGE": "Proteção Camada 7",
+        "DESCRIPTION": "Integração nativa com ModSecurity v3 e OWASP Core Rule Set 4.25+ contra SQLi, XSS, RCE, LFI/RFI e vulnerabilidades de dia zero."
+      },
+      "LUAJIT": {
+        "TITLE": "Núcleo LuaJIT de Alta Performance",
+        "BADGE": "Sub-milissegundo",
+        "DESCRIPTION": "Sensores Lua executados diretamente nos processos do OpenResty para filtragem rápida, sanitização de cabeçalhos e limitação de taxa."
+      },
+      "IPXA": {
+        "TITLE": "Inteligência de Ameaças IPXA",
+        "BADGE": "Sincronização de Feeds",
+        "DESCRIPTION": "Sincronização contínua com o IPXA para reputação dinâmica de IP, feeds de ameaças em tempo real, bloqueio geográfico e regras de bypass inteligentes."
+      },
+      "DUCKDB": {
+        "TITLE": "Telemetria Embutida DuckDB",
+        "BADGE": "Zero DB Externo",
+        "DESCRIPTION": "Mecanismo colunar embutido diretamente no backend de administração para consultas, agregações e auditoria instantâneas."
+      },
+      "ACME": {
+        "TITLE": "Automação ACME & SSL",
+        "BADGE": "TLS Automatizado",
+        "DESCRIPTION": "Emissão e renovação automática de certificados via Let's Encrypt / ACME com desafios HTTP-01 e reload suave do Nginx."
+      },
+      "ROUTING": {
+        "TITLE": "Proxy Reverso Inteligente & Roteamento",
+        "BADGE": "Controle de Tráfego",
+        "DESCRIPTION": "Verificação de integridade de upstreams, persistência de sessão, filtragem de métodos HTTP, validação de content-type e políticas de segurança por rota."
+      }
+    },
+    "BENCHMARKS": {
+      "BADGE": "Testes de Segurança",
+      "TITLE": "Validação de Segurança com GoTestWAF",
+      "SUBTITLE": "Verificação automatizada contínua contra vetores de ataque modernos e categorias OWASP.",
+      "REPORT_TITLE": "Avaliação GoTestWAF",
+      "REPORT_SUBTITLE": "Verificação da Eficácia de Bloqueio e Alertas",
+      "RUNNER_TITLE": "Executar Validação de Segurança",
+      "RUNNER_SUBTITLE": "Valide sua instância local",
+      "RUNNER_DESC": "Execute o container oficial do GoTestWAF para simular ataques multi-vetoriais contra o seu conjunto de regras:",
+      "COPY_BTN": "Copiar Comando GoTestWAF",
+      "COPIED_BTN": "Copiado"
+    },
+    "QUICKSTART": {
+      "BADGE": "Deploy",
+      "TITLE": "Início Rápido com Docker Compose",
+      "SUBTITLE": "Implemente a stack completa (NXGuard + Feed de Ameaças IPXA) em segundos.",
+      "COMPOSE_TITLE": "docker-compose.yml",
+      "COMPOSE_SUBTITLE": "Definição de serviços da stack completa",
+      "COPY_COMPOSE_BTN": "Copiar docker-compose.yml",
+      "COPIED_BTN": "Copiado",
+      "CREDS_TITLE": "Credenciais Padrão",
+      "DASHBOARD_URL": "URL do Dashboard",
+      "USERNAME": "Usuário",
+      "PASSWORD": "Senha",
+      "INGRESS_PORTS": "Portas de Entrada",
+      "PRIVACY_TITLE": "Telemetria & Privacidade",
+      "PRIVACY_DESC": "O NXGuard coleta estatísticas anônimas e agregadas de tráfego em ciclos de 24 horas para aprimorar os modelos de detecção de ameaças.",
+      "PRIVACY_STRONG": "Nenhum dado sensível, pessoal ou específico da requisição é coletado."
+    },
+    "FOOTER": {
+      "DESC": "API Gateway e Web Application Firewall de alta performance. Licenciado sob Apache 2.0.",
+      "DEVELOPED_WITH": "Desenvolvido com",
+      "BY": "por",
+      "GITHUB": "GitHub",
+      "IPXA": "IPXA",
+      "SPONSOR": "Patrocinar"
+    }
+  }
+}

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
@@ -8,26 +8,36 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatMenuModule } from '@angular/material/menu';
+import { TranslatePipe, TranslateDirective, TranslateService } from '@ngx-translate/core';
+import packageJson from '../../package.json';
 
 interface FeatureItem {
   icon: string;
-  title: string;
-  badge: string;
-  description: string;
+  titleKey: string;
+  badgeKey: string;
+  descriptionKey: string;
 }
 
 interface ScreenshotItem {
   id: string;
-  title: string;
-  subtitle: string;
+  titleKey: string;
+  subtitleKey: string;
   image: string;
-  description: string;
+  descriptionKey: string;
 }
 
 interface MetricItem {
-  label: string;
-  value: string;
-  caption: string;
+  labelKey: string;
+  valueKey: string;
+  captionKey: string;
+}
+
+interface LanguageOption {
+  code: string;
+  labelKey: string;
+  flag: string;
+  short: string;
 }
 
 @Component({
@@ -42,89 +52,130 @@ interface MetricItem {
     MatChipsModule,
     MatTabsModule,
     MatDividerModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatMenuModule,
+    TranslatePipe,
+    TranslateDirective
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
 export class AppComponent {
+  private readonly translate = inject(TranslateService);
+
   readonly title = 'NXGuard';
-  readonly version = 'v1.0.8';
+  readonly version = `${packageJson.version}`;
+
+  readonly supportedLanguages: LanguageOption[] = [
+    { code: 'en_US', labelKey: 'PAGES.NAV.LANG_EN', flag: '🇺🇸', short: 'EN' },
+    { code: 'pt_BR', labelKey: 'PAGES.NAV.LANG_PT', flag: '🇧🇷', short: 'PT' }
+  ];
+
+  get currentLang(): string {
+    return this.translate.currentLang() || (typeof window !== 'undefined' && localStorage.getItem('lang')) || 'en_US';
+  }
+
+  get currentLanguageOption(): LanguageOption {
+    return this.supportedLanguages.find(l => l.code === this.currentLang) || this.supportedLanguages[0];
+  }
+
+  switchLanguage(langCode: string): void {
+    this.translate.use(langCode);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('lang', langCode);
+    }
+  }
 
   readonly metrics: MetricItem[] = [
-    { label: 'Latency Overhead', value: '< 0.4ms', caption: 'Sub-millisecond Layer 7 inspection' },
-    { label: 'Core Rule Set', value: 'CRS 4.25+', caption: 'Latest OWASP threat rules' },
-    { label: 'Engine Stack', value: 'Nginx + LuaJIT', caption: 'High concurrency OpenResty core' },
-    { label: 'Analytics DB', value: 'DuckDB', caption: 'Embedded zero-overhead SQL telemetry' }
+    {
+      labelKey: 'PAGES.METRICS.LATENCY.LABEL',
+      valueKey: 'PAGES.METRICS.LATENCY.VALUE',
+      captionKey: 'PAGES.METRICS.LATENCY.CAPTION'
+    },
+    {
+      labelKey: 'PAGES.METRICS.CRS.LABEL',
+      valueKey: 'PAGES.METRICS.CRS.VALUE',
+      captionKey: 'PAGES.METRICS.CRS.CAPTION'
+    },
+    {
+      labelKey: 'PAGES.METRICS.ENGINE.LABEL',
+      valueKey: 'PAGES.METRICS.ENGINE.VALUE',
+      captionKey: 'PAGES.METRICS.ENGINE.CAPTION'
+    },
+    {
+      labelKey: 'PAGES.METRICS.ANALYTICS.LABEL',
+      valueKey: 'PAGES.METRICS.ANALYTICS.VALUE',
+      captionKey: 'PAGES.METRICS.ANALYTICS.CAPTION'
+    }
   ];
 
   readonly features: FeatureItem[] = [
     {
       icon: 'shield',
-      title: 'Advanced ModSecurity v3 WAF',
-      badge: 'Layer 7 Protection',
-      description: 'Native integration with ModSecurity v3 and OWASP Core Rule Set 4.25+ protecting against SQLi, XSS, RCE, LFI/RFI, and zero-day vulnerabilities.'
+      titleKey: 'PAGES.FEATURES.MODSECURITY.TITLE',
+      badgeKey: 'PAGES.FEATURES.MODSECURITY.BADGE',
+      descriptionKey: 'PAGES.FEATURES.MODSECURITY.DESCRIPTION'
     },
     {
       icon: 'bolt',
-      title: 'High-Performance LuaJIT Core',
-      badge: 'Sub-Millisecond',
-      description: 'Custom Lua sensors running directly inside OpenResty worker threads for rapid request filtering, header sanitization, and rate-limiting.'
+      titleKey: 'PAGES.FEATURES.LUAJIT.TITLE',
+      badgeKey: 'PAGES.FEATURES.LUAJIT.BADGE',
+      descriptionKey: 'PAGES.FEATURES.LUAJIT.DESCRIPTION'
     },
     {
       icon: 'hub',
-      title: 'IPXA Threat Intelligence',
-      badge: 'Feed Sync',
-      description: 'Continuous synchronization with IPXA for dynamic IP reputation, real-time threat feed integration, geo-blocking, and smart bypass rules.'
+      titleKey: 'PAGES.FEATURES.IPXA.TITLE',
+      badgeKey: 'PAGES.FEATURES.IPXA.BADGE',
+      descriptionKey: 'PAGES.FEATURES.IPXA.DESCRIPTION'
     },
     {
       icon: 'analytics',
-      title: 'DuckDB Embedded Analytics',
-      badge: 'Zero External DB',
-      description: 'Columnar storage engine embedded directly in the admin backend for rapid real-time transaction query, aggregation, and auditing.'
+      titleKey: 'PAGES.FEATURES.DUCKDB.TITLE',
+      badgeKey: 'PAGES.FEATURES.DUCKDB.BADGE',
+      descriptionKey: 'PAGES.FEATURES.DUCKDB.DESCRIPTION'
     },
     {
       icon: 'vpn_key',
-      title: 'ACME & SSL Automation',
-      badge: 'Automated TLS',
-      description: 'Automated certificate issuance and renewal via Let\'s Encrypt / ACME with HTTP-01 challenges and seamless Nginx reload.'
+      titleKey: 'PAGES.FEATURES.ACME.TITLE',
+      badgeKey: 'PAGES.FEATURES.ACME.BADGE',
+      descriptionKey: 'PAGES.FEATURES.ACME.DESCRIPTION'
     },
     {
       icon: 'alt_route',
-      title: 'Smart Reverse Proxy & Routing',
-      badge: 'Traffic Control',
-      description: 'Upstream health checks, session stickiness, HTTP method filtering, allowed content-type validation, and route-specific security policies.'
+      titleKey: 'PAGES.FEATURES.ROUTING.TITLE',
+      badgeKey: 'PAGES.FEATURES.ROUTING.BADGE',
+      descriptionKey: 'PAGES.FEATURES.ROUTING.DESCRIPTION'
     }
   ];
 
   readonly screenshots: ScreenshotItem[] = [
     {
       id: 'dashboard',
-      title: 'Executive Security Dashboard',
-      subtitle: 'Real-time overview of threats, blocked requests, and system health',
+      titleKey: 'PAGES.SCREENSHOTS.DASHBOARD.TITLE',
+      subtitleKey: 'PAGES.SCREENSHOTS.DASHBOARD.SUBTITLE',
       image: 'assets/dashboard.png',
-      description: 'Intuitive management interface with live metrics, transaction counts, WAF alerts, and operational controls.'
+      descriptionKey: 'PAGES.SCREENSHOTS.DASHBOARD.DESCRIPTION'
     },
     {
       id: 'transactions',
-      title: 'Transaction Stream & Monitoring',
-      subtitle: 'Live transaction logging and traffic inspection',
+      titleKey: 'PAGES.SCREENSHOTS.TRANSACTIONS.TITLE',
+      subtitleKey: 'PAGES.SCREENSHOTS.TRANSACTIONS.SUBTITLE',
       image: 'assets/transactions.png',
-      description: 'Search, filter, and inspect incoming requests by service, status, IP, country, and threat score.'
+      descriptionKey: 'PAGES.SCREENSHOTS.TRANSACTIONS.DESCRIPTION'
     },
     {
       id: 'raw-inspection',
-      title: 'Raw Request & Payload Inspection',
-      subtitle: 'Deep dive into headers, query parameters, and body payloads',
+      titleKey: 'PAGES.SCREENSHOTS.RAW_INSPECTION.TITLE',
+      subtitleKey: 'PAGES.SCREENSHOTS.RAW_INSPECTION.SUBTITLE',
       image: 'assets/transaction-raw.png',
-      description: 'Complete inspection of raw HTTP transactions to investigate attacks and debug traffic anomalies.'
+      descriptionKey: 'PAGES.SCREENSHOTS.RAW_INSPECTION.DESCRIPTION'
     },
     {
       id: 'rule-details',
-      title: 'ModSecurity Rule Match Details',
-      subtitle: 'Granular rule triggers and matched patterns',
+      titleKey: 'PAGES.SCREENSHOTS.RULE_DETAILS.TITLE',
+      subtitleKey: 'PAGES.SCREENSHOTS.RULE_DETAILS.SUBTITLE',
       image: 'assets/transaction-rule-raw.png',
-      description: 'Detailed analysis of matched ModSecurity rule IDs, tags, severity levels, and matched string segments.'
+      descriptionKey: 'PAGES.SCREENSHOTS.RULE_DETAILS.DESCRIPTION'
     }
   ];
 
@@ -174,7 +225,7 @@ volumes:
   readonly gotestwafCode = `docker run --rm \\
   --shm-size=2g \\
   --add-host nxguard.local:host-gateway \\
-  -v \${PWD}/.docs/reports:/app/reports \\
+  -v \${PWD}/.github/pages/src/assets/reports:/app/reports \\
   wallarm/gotestwaf --url=http://nxguard.local:8080/nxg/ \\
   --blockStatusCodes=403,404,400 --reportFormat=html --noEmailReport`;
 

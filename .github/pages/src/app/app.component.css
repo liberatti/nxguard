@@ -56,6 +56,18 @@
   background-clip: text;
 }
 
+.brand-version {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 9999px;
+  background: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+  font-family: 'JetBrains Mono', monospace;
+  line-height: 1.2;
+}
+
 .toolbar-spacer {
   flex: 1 1 auto;
 }
@@ -89,56 +101,127 @@
   margin: 0 6px;
 }
 
-.sponsor-btn {
+.lang-select-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  font-size: 0.85rem !important;
+  font-weight: 600 !important;
+  color: #334155 !important;
+  background-color: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 8px !important;
+  height: 36px !important;
+  line-height: 36px !important;
+  padding: 0 10px !important;
+  transition: all 0.15s ease !important;
+}
+
+.lang-select-btn:hover {
+  background-color: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+.lang-flag {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.lang-short-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  color: #1e293b;
+}
+
+.dropdown-arrow {
+  font-size: 18px !important;
+  width: 18px !important;
+  height: 18px !important;
+  margin-left: -4px !important;
+  color: #64748b;
+}
+
+.lang-item-label {
+  margin-left: 8px;
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+
+.active-lang {
+  color: #2563eb !important;
+  font-weight: 600 !important;
+  background-color: #eff6ff !important;
+}
+
+.check-icon {
+  font-size: 18px !important;
+  width: 18px !important;
+  height: 18px !important;
+  color: #2563eb !important;
+  margin-left: auto !important;
+}
+
+.nav-icon-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sponsor-icon-btn {
   color: #e11d48 !important;
   background-color: #fff1f2 !important;
   border: 1px solid #fecdd3 !important;
   border-radius: 8px !important;
-  font-size: 0.85rem !important;
-  font-weight: 600 !important;
+  width: 36px !important;
   height: 36px !important;
-  line-height: 36px !important;
-  padding: 0 12px !important;
-  transition: all 0.15s ease;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  transition: all 0.15s ease !important;
 }
 
-.sponsor-btn:hover {
+.sponsor-icon-btn:hover {
   background-color: #ffe4e6 !important;
+  border-color: #fda4af !important;
+  transform: translateY(-1px);
 }
 
-.heart-icon-sm {
-  font-size: 1rem !important;
-  width: 16px !important;
-  height: 16px !important;
-  margin-right: 4px !important;
-  vertical-align: middle;
+.sponsor-icon-btn .heart-icon-sm {
+  font-size: 1.15rem !important;
+  width: 18px !important;
+  height: 18px !important;
+  margin: 0 !important;
   color: #e11d48;
 }
 
-.github-btn {
-  background-color: #0f172a !important;
-  color: #ffffff !important;
+.github-icon-btn {
+  color: #0f172a !important;
+  background-color: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
   border-radius: 8px !important;
-  font-size: 0.85rem !important;
-  font-weight: 600 !important;
+  width: 36px !important;
   height: 36px !important;
-  line-height: 36px !important;
-  padding: 0 14px !important;
   display: inline-flex !important;
-  align-items: center;
-  gap: 4px;
-  transition: all 0.15s ease;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  transition: all 0.15s ease !important;
 }
 
-.github-btn:hover {
-  background-color: #1e293b !important;
+.github-icon-btn:hover {
+  background-color: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #000000 !important;
+  transform: translateY(-1px);
 }
 
-.github-btn mat-icon {
-  font-size: 1.1rem !important;
-  width: 18px !important;
-  height: 18px !important;
-  margin-right: 2px !important;
+.github-svg-icon {
+  width: 18px;
+  height: 18px;
+  display: block;
 }
 
 /* Page Layout */
@@ -491,6 +574,32 @@
   font-size: 0.88rem;
   line-height: 1.5;
   margin: 0;
+}
+
+.card-copy-icon-btn {
+  color: #2563eb !important;
+  background-color: #eff6ff !important;
+  border: 1px solid #bfdbfe !important;
+  border-radius: 8px !important;
+  width: 36px !important;
+  height: 36px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  transition: all 0.15s ease !important;
+}
+
+.card-copy-icon-btn:hover {
+  background-color: #dbeafe !important;
+  border-color: #93c5fd !important;
+  transform: translateY(-1px);
+}
+
+.card-copy-icon-btn.copied {
+  color: #16a34a !important;
+  background-color: #f0fdf4 !important;
+  border-color: #bbf7d0 !important;
 }
 
 /* Quick Start Grid */
