@@ -10,6 +10,7 @@ import {MatIconModule} from '@angular/material/icon';
 import {MatInputModule} from '@angular/material/input';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
 import {MatSelectModule} from '@angular/material/select';
+import {MatMenuModule} from '@angular/material/menu';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {Router, RouterModule} from '@angular/router';
 import {User} from 'app/models/oauth';
@@ -17,7 +18,7 @@ import {Language} from 'app/models/shared';
 import {LocalStorageService} from 'app/services/localstorage.service';
 import {NotificationService} from 'app/services/notification.service';
 import {OAuthService} from 'app/services/oauth.service';
-import {CommonModule, NgOptimizedImage} from "@angular/common";
+import {CommonModule} from "@angular/common";
 import {TranslatePipe, TranslateService} from "@ngx-translate/core";
 import {environment} from "environments/environment";
 
@@ -27,7 +28,7 @@ import {environment} from "environments/environment";
     imports: [RouterModule, CommonModule, FormsModule, ReactiveFormsModule, TranslatePipe,
         MatIconModule, MatButtonModule, MatFormFieldModule,
         MatCardModule, MatProgressBarModule, MatInputModule,
-        MatTooltipModule, MatSelectModule, MatOptionModule, MatGridListModule
+        MatTooltipModule, MatSelectModule, MatOptionModule, MatGridListModule, MatMenuModule
     ],
 
     templateUrl: './sign-in.component.html',
@@ -36,7 +37,10 @@ import {environment} from "environments/environment";
 export class SignInComponent implements OnInit {
     locales = [] as Array<Language>;
     hidePassword = true;
+    isDarkMode = false;
     version: string = environment.version;
+    currentYear: number = new Date().getFullYear();
+    currentLangCode: string = 'EN';
 
     form = new FormGroup({
         email: new FormControl<string>('', {
@@ -70,6 +74,31 @@ export class SignInComponent implements OnInit {
         const savedLang = this.localStorage.get('lang') || uiLocale || 'en_US';
         this.translate.use(savedLang);
         this.form.controls.locale.setValue(savedLang);
+        this.updateLangCode(savedLang);
+
+        const savedTheme = this.localStorage.get('theme');
+        if (savedTheme === 'dark') {
+            this.isDarkMode = true;
+            document.documentElement.setAttribute('data-theme', 'dark');
+            document.body.classList.add('dark-theme');
+        }
+    }
+
+    updateLangCode(lang: string) {
+        this.currentLangCode = lang && lang.toLowerCase().startsWith('pt') ? 'PT' : 'EN';
+    }
+
+    toggleTheme() {
+        this.isDarkMode = !this.isDarkMode;
+        if (this.isDarkMode) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            document.body.classList.add('dark-theme');
+            this.localStorage.set('theme', 'dark');
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+            document.body.classList.remove('dark-theme');
+            this.localStorage.set('theme', 'light');
+        }
     }
 
     onLocaleChange(lang: string) {
@@ -90,6 +119,7 @@ export class SignInComponent implements OnInit {
         }
         this.localStorage.set('ui_config', uiConfig);
         this.form.controls.locale.setValue(selectedLang);
+        this.updateLangCode(selectedLang);
     }
 
     login() {
@@ -103,7 +133,7 @@ export class SignInComponent implements OnInit {
                 this.router.navigate(['/dashboard']).then(r => true);
             },
             error: (err) => {
-                this.notificationService.openSnackBar("Authentication failed")
+                this.notificationService.openSnackBar("Authentication failed");
                 this.router.navigate(['/signin']).then(r => true);
             }
         });
@@ -114,3 +144,4 @@ export class SignInComponent implements OnInit {
         this.localStorage.remove('oidc');
     }
 }
+

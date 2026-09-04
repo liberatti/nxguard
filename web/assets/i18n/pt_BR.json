@@ -21,19 +21,25 @@
     "RESTORE": "Restaurar"
   },
   "AUTH": {
-    "TITLE": "NXGUARD",
+    "TITLE": "NXGuard",
     "SUBTITLE": "Gateway Corporativo de Proxy e Segurança",
     "HOST_CLIENT": "Cliente de Gerenciamento de Host",
     "SIGN_IN": "Entrar",
-    "SIGN_IN_BTN": "Fazer Login",
-    "EMAIL": "Nome de usuário / E-mail",
+    "SIGN_IN_BTN": "Entrar no Painel",
+    "EMAIL": "E-mail",
     "PASSWORD": "Senha",
+    "PLACEHOLDER_EMAIL": "seu@email.com",
+    "PLACEHOLDER_PASSWORD": "Digite sua senha",
     "LANGUAGE": "Idioma",
     "SUBTITLE_LOGIN": "Digite suas credenciais para acessar o console",
     "FOOTER_NOTICE": "Acesso autorizado apenas. Todas as atividades são monitoradas e registradas.",
     "VERSION": "Versão",
     "LICENSE_NOTICE": "Licenciado sob a",
-    "LICENSE_NAME": "Apache License 2.0"
+    "LICENSE_NAME": "Apache License 2.0",
+    "ENTERPRISE_PLATFORM": "PLATAFORMA DE INTELIGÊNCIA CORPORATIVA",
+    "BRAND_DESCRIPTION": "Inteligência IP Avançada",
+    "TOGGLE_PASSWORD": "Ocultar senha",
+    "TOGGLE_THEME": "Alternar modo escuro"
   },
   "ABOUT": {
     "TITLE": "Sobre o NXGuard",

@@ -1,82 +1,82 @@
-<div class="vmware-login-viewport">
-    <div class="vmware-bg-glow"></div>
-    <div class="vmware-bg-grid"></div>
+<div class="login-viewport">
+    <div class="login-bg-grid"></div>
 
-    <div class="vmware-login-box" id="sign-in-card">
-        <!-- Left Brand Pane (VMware Clarity Dark Blue Panel) -->
-        <div class="vmware-brand-pane">
-            <div class="brand-top-content">
-                <div class="brand-icon-wrapper">
-                    <img class="brand-logo-img" src="assets/logo.png" alt="NXGuard Logo">
+    <div class="login-card" id="sign-in-card">
+        <!-- Card Header -->
+        <div class="card-header">
+            <div class="brand-header-left">
+                <div class="brand-icon-box">
+                    <img class="brand-logo-img" src="assets/logo.png" alt="nxguard logo">
                 </div>
-                <h1 class="brand-title">{{ 'AUTH.TITLE' | translate }}</h1>
-                <p class="brand-subtitle">{{ 'AUTH.SUBTITLE' | translate }}</p>
+                <span class="brand-title">{{ 'AUTH.TITLE' | translate }}</span>
             </div>
 
-            <div class="brand-bottom-status">
-                <div class="engine-version">{{ 'AUTH.VERSION' | translate }} {{ version }}</div>
+            <div class="header-actions-right">
+                <!-- Language Menu Trigger -->
+                <button type="button" class="action-pill-btn" [matMenuTriggerFor]="langMenu" id="sign-in-language-btn" [attr.aria-label]="'AUTH.SELECT_LANGUAGE' | translate">
+                    <mat-icon class="lang-globe-icon">language</mat-icon>
+                    <span class="lang-text">{{ currentLangCode }}</span>
+                    <mat-icon class="dropdown-chevron-icon">arrow_drop_down</mat-icon>
+                </button>
+                <mat-menu #langMenu="matMenu" class="custom-lang-menu">
+                    @for (loc of locales; track loc.id) {
+                    <button mat-menu-item (click)="onLocaleChange(loc.id)" id="lang-option-{{loc.id}}">
+                        <span>{{ loc.name }}</span>
+                    </button>
+                    }
+                </mat-menu>
+
+                <!-- Theme Toggle Button -->
+                <button type="button" class="action-icon-btn" (click)="toggleTheme()" id="sign-in-theme-toggle" [attr.aria-label]="'AUTH.TOGGLE_THEME' | translate">
+                    <mat-icon class="theme-icon">{{ isDarkMode ? 'light_mode' : 'nightlight_round' }}</mat-icon>
+                </button>
             </div>
         </div>
 
-        <!-- Right Login Form Pane (VMware Clarity Clean Form Panel) -->
-        <div class="vmware-form-pane">
-            <div class="form-header">
-                <div class="form-header-row">
-                    <div>
-                        <h2 class="form-title">{{ 'AUTH.SIGN_IN' | translate }}</h2>
-                        <p class="form-subtitle">{{ 'AUTH.SUBTITLE_LOGIN' | translate }}</p>
-                    </div>
-                    <mat-form-field appearance="outline" class="language-select-field" subscriptSizing="dynamic">
-                        <mat-icon matPrefix class="lang-icon">language</mat-icon>
-                        <mat-select [formControl]="form.controls.locale" (selectionChange)="onLocaleChange($event.value)" id="sign-in-language-select">
-                            @for (loc of locales; track loc.id) {
-                            <mat-option [value]="loc.id" id="lang-option-{{loc.id}}">
-                                {{ loc.name }}
-                            </mat-option>
-                            }
-                        </mat-select>
-                    </mat-form-field>
-                </div>
+        <div class="header-divider"></div>
+
+        <!-- Login Form -->
+        <form [formGroup]="form" id="sign-in-form" class="login-form">
+            <!-- Email Field -->
+            <div class="form-group">
+                <label class="field-label" for="sign-in-email">{{ 'AUTH.EMAIL' | translate }}</label>
+                <mat-form-field appearance="outline" class="full-width form-field-input" subscriptSizing="dynamic">
+                    <span matPrefix class="prefix-symbol">@</span>
+                    <input id="sign-in-email" matInput formControlName="email" autocomplete="username email"
+                        type="email" [placeholder]="'AUTH.PLACEHOLDER_EMAIL' | translate">
+                </mat-form-field>
             </div>
 
-            <form [formGroup]="form" id="sign-in-form" class="login-form">
-                <!-- Username / Email -->
-                <mat-form-field appearance="outline" class="full-width form-field-custom">
-                    <mat-label>{{ 'AUTH.EMAIL' | translate }}</mat-label>
-                    <input id="sign-in-email" matInput formControlName="email" autocomplete="username email"
-                        type="email" placeholder="admin@nxguard.local">
-                    <mat-icon matSuffix class="input-icon">person</mat-icon>
-                </mat-form-field>
-
-                <!-- Password -->
-                <mat-form-field appearance="outline" class="full-width form-field-custom">
-                    <mat-label>{{ 'AUTH.PASSWORD' | translate }}</mat-label>
+            <!-- Password Field -->
+            <div class="form-group">
+                <label class="field-label" for="sign-in-password">{{ 'AUTH.PASSWORD' | translate }}</label>
+                <mat-form-field appearance="outline" class="full-width form-field-input" subscriptSizing="dynamic">
+                    <mat-icon matPrefix class="prefix-icon">lock_outline</mat-icon>
                     <input id="sign-in-password" matInput formControlName="password"
                         [type]="hidePassword ? 'password' : 'text'" autocomplete="current-password"
-                        placeholder="••••••••">
+                        [placeholder]="'AUTH.PLACEHOLDER_PASSWORD' | translate">
                     <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" type="button"
-                        class="password-toggle-btn" [attr.aria-label]="'Hide password'">
-                        <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+                        class="password-toggle-btn" [attr.aria-label]="'AUTH.TOGGLE_PASSWORD' | translate">
+                        <mat-icon class="suffix-toggle-icon">{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
                     </button>
                 </mat-form-field>
-
-                <!-- Action Button -->
-                <button mat-flat-button id="sign-in-button" class="vmware-submit-btn" (click)="login()"
-                    [disabled]="form.invalid">
-                    <mat-icon class="btn-icon">login</mat-icon>
-                    <span>{{ 'AUTH.SIGN_IN_BTN' | translate }}</span>
-                </button>
-            </form>
-
-            <div class="form-footer-notice">
-                <mat-icon class="notice-icon">lock_outline</mat-icon>
-                <span>{{ 'AUTH.FOOTER_NOTICE' | translate }}</span>
             </div>
-        </div>
+
+            <!-- Submit Button -->
+            <button mat-flat-button id="sign-in-button" class="login-submit-btn" (click)="login()"
+                [disabled]="form.invalid">
+                <mat-icon class="submit-lock-icon">lock_outline</mat-icon>
+                <span>{{ 'AUTH.SIGN_IN_BTN' | translate }}</span>
+            </button>
+        </form>
     </div>
 
-    <!-- Bottom Global Footer -->
-    <div class="vmware-global-footer">
-        <span>{{ 'AUTH.LICENSE_NOTICE' | translate }} <a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener noreferrer" class="license-link">{{ 'AUTH.LICENSE_NAME' | translate }}</a></span>
+    <!-- Bottom Global Footer Outside Card -->
+    <div class="login-page-footer">
+        <div class="footer-platform-title">{{ 'AUTH.ENTERPRISE_PLATFORM' | translate }}</div>
+        <div class="footer-copyright-row">
+            <span>&copy; {{ currentYear }} {{ 'AUTH.TITLE' | translate }} - {{ 'AUTH.BRAND_DESCRIPTION' | translate }}</span>
+            <span class="version-badge">{{ version }}</span>
+        </div>
     </div>
 </div>

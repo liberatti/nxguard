@@ -21,19 +21,25 @@
     "RESTORE": "Restore"
   },
   "AUTH": {
-    "TITLE": "NXGUARD",
+    "TITLE": "NXGuard",
     "SUBTITLE": "Enterprise Proxy & Security Gateway",
     "HOST_CLIENT": "Host Management Client",
     "SIGN_IN": "Sign In",
-    "SIGN_IN_BTN": "Log in",
-    "EMAIL": "User name / Email",
+    "SIGN_IN_BTN": "Login to Dashboard",
+    "EMAIL": "Email",
     "PASSWORD": "Password",
+    "PLACEHOLDER_EMAIL": "your@email.com",
+    "PLACEHOLDER_PASSWORD": "Enter your password",
     "LANGUAGE": "Language",
     "SUBTITLE_LOGIN": "Enter your credentials to access the console",
     "FOOTER_NOTICE": "Authorized access only. All activities are monitored and logged.",
     "VERSION": "Version",
     "LICENSE_NOTICE": "Licensed under the",
-    "LICENSE_NAME": "Apache License 2.0"
+    "LICENSE_NAME": "Apache License 2.0",
+    "ENTERPRISE_PLATFORM": "ENTERPRISE INTELLIGENCE PLATFORM",
+    "BRAND_DESCRIPTION": "Advanced IP Intelligence",
+    "TOGGLE_PASSWORD": "Hide password",
+    "TOGGLE_THEME": "Toggle theme"
   },
   "ABOUT": {
     "TITLE": "About NXGuard",
