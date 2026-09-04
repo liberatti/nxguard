@@ -10,11 +10,15 @@ events {
 }
 
 http {
+  server_tokens off;
+  more_clear_headers Server;
+  proxy_hide_header Server;
+
   merge_slashes on;
   resolver {{config.dns_resolver}} valid=30s;
   uninitialized_variable_warn off;
-  lua_shared_dict log_buffer 16m;
-  lua_shared_dict ipxa_cache 64m;
+  lua_shared_dict log_buffer 2m;
+  lua_shared_dict ipxa_cache 1m;
 
   init_worker_by_lua_block {
     local flush = require "nxguard.log_flush"
@@ -39,9 +43,11 @@ http {
 
   map $host $missing_domain_match {
   {%- for s in services %}
+  {%- if s.active %}
   {%- for t in s.sans %}
     {{ t }} 0;
   {%- endfor %}
+  {%- endif %}
   {%- endfor %}
     default 1;
   }
@@ -59,9 +65,10 @@ http {
 
   proxy_next_upstream error timeout invalid_header http_500 http_502 http_503 http_504;
   include upstreams.conf;
-  include monitor.conf;
   {%- for u in services %}
-  include service-{{ u.name }}.conf;
+  {%- if u.active %}
+  include service-{{ u.render_name if u.render_name else u.name }}.conf;
+  {%- endif %}
   {%- endfor %}
 
   limit_req_status 429;

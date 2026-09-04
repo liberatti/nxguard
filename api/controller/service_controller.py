@@ -12,9 +12,7 @@ from nxcore.controllers.base_controller import (
     response_data_removed,
 )
 
-from nxcore.common_utils import (
-    deep_merge,
-)
+
 from nxcore.middleware.socket_manager import emit_event
 from api.model.config_model import ChangeDao
 from api.model.service_model import ServiceDao
@@ -96,8 +94,14 @@ def search() -> Response:
     Returns:
         Response: JSON response containing paginated service list or 404 error
     """
+    query = (
+        request.args.get("query")
+        or request.args.get("q")
+        or request.args.get("name")
+        or request.args.get("search")
+    )
     with ServiceDao() as dao:
-        result = dao.get_all(pagination=get_pagination())
+        result = dao.search(query=query, pagination=get_pagination())
         return (
             response_data(result, dao.pageSchema)
             if result["metadata"]["total_elements"] > 0
@@ -119,9 +123,11 @@ def partial_update(service_id: str) -> Response:
     """
     try:
         with ServiceDao() as dao:
-            service_new = dao.json_load(request.json)
-            service_old = dao.get_by_id(service_id)
-            dao.update_by_id(service_id, deep_merge(service_old, service_new))
+            service_new = dao.json_load(request.json, partial=True)
+            if not dao.get_by_id(service_id):
+                return response_error_404()
+            if "active" in service_new:
+                dao.update_by_id(service_id, {"active": service_new["active"]})
             return response_ok("Partially updated")
     except ValidationError as err:
         return response_error_parse(err)

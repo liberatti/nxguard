@@ -1,0 +1,139 @@
+<div class="states-dialog-container">
+    <div class="states-dialog-header">
+        <div class="header-main-group">
+            <div class="status-avatar"
+                 [class.healthy]="data.upstream.healthy === 'healthy'"
+                 [class.partially-healthy]="data.upstream.healthy === 'partially_healthy'"
+                 [class.unhealthy]="data.upstream.healthy === 'unhealthy'"
+                 [class.invalid]="!data.upstream.healthy || data.upstream.healthy === 'invalid'">
+                <mat-icon>
+                    @if (data.upstream.healthy === 'healthy') {
+                        check_circle
+                    } @else if (data.upstream.healthy === 'partially_healthy') {
+                        warning
+                    } @else if (data.upstream.healthy === 'unhealthy') {
+                        error
+                    } @else {
+                        help_outline
+                    }
+                </mat-icon>
+            </div>
+            <div class="header-text-group">
+                <h2 class="dialog-title" mat-dialog-title>{{ data.upstream.name }}</h2>
+                <div class="meta-row">
+                    <span class="meta-chip protocol-chip"
+                          [class.healthy]="data.upstream.healthy === 'healthy'"
+                          [class.partially-healthy]="data.upstream.healthy === 'partially_healthy'"
+                          [class.unhealthy]="data.upstream.healthy === 'unhealthy'"
+                          [class.invalid]="!data.upstream.healthy || data.upstream.healthy === 'invalid'">
+                        {{ data.upstream.protocol }}
+                    </span>
+                    <span class="meta-chip status-chip"
+                          [class.healthy]="data.upstream.healthy === 'healthy'"
+                          [class.partially-healthy]="data.upstream.healthy === 'partially_healthy'"
+                          [class.unhealthy]="data.upstream.healthy === 'unhealthy'"
+                          [class.invalid]="!data.upstream.healthy || data.upstream.healthy === 'invalid'">
+                        {{ getUpstreamStatusKey() | translate }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="header-actions">
+            <button mat-icon-button (click)="onClose()" [matTooltip]="'actions.close' | translate">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+    </div>
+
+    <mat-dialog-content class="states-dialog-content">
+        @if (loading) {
+            <div class="loading-state">
+                <mat-spinner diameter="36"></mat-spinner>
+            </div>
+        } @else if (states.length === 0) {
+            <div class="empty-state">
+                <mat-icon class="empty-icon">info</mat-icon>
+                <p>{{ 'UPSTREAM.STATES.NO_STATES' | translate }}</p>
+            </div>
+        } @else {
+            <div class="nodes-container">
+                @for (state of states; track state.node_id || $index) {
+                    <div class="node-card"
+                         [class.node-card-healthy]="isNodeHealthy(state.healthy)"
+                         [class.node-card-partially-healthy]="isNodePartiallyHealthy(state.healthy)"
+                         [class.node-card-unhealthy]="isNodeUnhealthy(state.healthy)">
+                        <div class="node-card-header">
+                            <div class="node-identity">
+                                <mat-icon class="node-icon">dns</mat-icon>
+                                <span class="node-label">{{ 'UPSTREAM.STATES.NODE' | translate }}:</span>
+                                <span class="node-id-badge">{{ state.node_id }}</span>
+                            </div>
+                            <div class="node-status-meta">
+                                <span class="node-status-pill"
+                                      [class.healthy]="isNodeHealthy(state.healthy)"
+                                      [class.partially-healthy]="isNodePartiallyHealthy(state.healthy)"
+                                      [class.unhealthy]="isNodeUnhealthy(state.healthy)">
+                                    <span class="status-dot"></span>
+                                    {{ getNodeStatusKey(state.healthy) | translate }}
+                                </span>
+                                <span class="node-check-time">
+                                    <mat-icon class="clock-icon">schedule</mat-icon>
+                                    {{ state.last_check | date:'dd/MM/yyyy HH:mm:ss' }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="targets-table-wrapper">
+                            <div class="targets-table-header">
+                                <span class="col-status">{{ 'UPSTREAM.STATES.STATUS' | translate }}</span>
+                                <span class="col-endpoint">{{ 'UPSTREAM.TARGETS.NETWORK_ADDRESS' | translate }}</span>
+                                <span class="col-latency">{{ 'UPSTREAM.STATES.LATENCY' | translate }}</span>
+                            </div>
+
+                            @for (target of state.targets; track target.endpoint || $index) {
+                                <div class="target-table-row" [class.target-row-unhealthy]="!target.healthy">
+                                    <div class="col-status">
+                                        <mat-icon class="target-state-icon" [class.target-healthy-icon]="target.healthy" [class.target-unhealthy-icon]="!target.healthy">
+                                            {{ target.healthy ? 'check_circle' : 'cancel' }}
+                                        </mat-icon>
+                                        <span class="target-state-text" [class.healthy]="target.healthy" [class.unhealthy]="!target.healthy">
+                                            {{ target.healthy ? 'UP' : 'DOWN' }}
+                                        </span>
+                                    </div>
+
+                                    <div class="col-endpoint">
+                                        <span class="endpoint-code">{{ target.endpoint }}</span>
+                                    </div>
+
+                                    <div class="col-latency">
+                                        @if (target.latency_ms !== undefined && target.latency_ms !== null) {
+                                            <span class="latency-badge">
+                                                <mat-icon class="speed-icon">bolt</mat-icon>
+                                                {{ target.latency_ms }} ms
+                                            </span>
+                                        } @else {
+                                            <span class="latency-na">-</span>
+                                        }
+                                    </div>
+                                </div>
+                                @if (target.error) {
+                                    <div class="target-error-banner">
+                                        <mat-icon class="error-banner-icon">error_outline</mat-icon>
+                                        <span class="error-banner-text">{{ target.error }}</span>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end" class="states-dialog-actions">
+        <button mat-flat-button color="primary" (click)="onClose()" id="upstream-states-close-btn">
+            {{ 'actions.close' | translate }}
+        </button>
+    </mat-dialog-actions>
+</div>

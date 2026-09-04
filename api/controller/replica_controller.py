@@ -1,3 +1,4 @@
+import json
 from flask import Blueprint, Response
 
 from nxcore.controllers.base_controller import (
@@ -39,5 +40,11 @@ def config() -> Response:
     with ConfigBackupDao() as backup_dao:
         latest = backup_dao.get_latest()
         if latest and "data" in latest:
-            return response_data(latest["data"])
+            r = latest["data"]
+            if isinstance(r, str):
+                try:
+                    r = json.loads(r)
+                except Exception:
+                    pass
+            return response_data(r)
     return response_error_404()

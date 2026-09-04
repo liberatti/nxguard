@@ -1,0 +1,16 @@
+.align-right {
+    margin-left: auto;
+}
+
+.table-cell-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.toggle-container.no-border {
+    border: none;
+}
+
+.text-muted-icon {
+    color: var(--text-muted);
+}

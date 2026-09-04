@@ -2,10 +2,10 @@
 # service: {{name}}
 #####################################################################
 {% if rate_limit_per_sec and rate_limit_per_sec > 0 %}
-limit_req_zone $binary_remote_addr zone={{name}}_rate:16m rate={{rate_limit_per_sec}}r/s;
+limit_req_zone $binary_remote_addr zone={{render_name if render_name else name}}_rate:16m rate={{rate_limit_per_sec}}r/s;
 {% endif %}
 
-proxy_cache_path {{BASE_PATH}}/cache/{{name}} keys_zone={{name}}_cache:10m use_temp_path=off loader_threshold=300 loader_files=200 max_size=128m;
+proxy_cache_path {{BASE_PATH}}/cache/{{render_name if render_name else name}} keys_zone={{render_name if render_name else name}}_cache:10m use_temp_path=off loader_threshold=300 loader_files=200 max_size=128m;
 
 server {
   lua_code_cache on;
@@ -26,12 +26,12 @@ server {
   }
 
   {% if rate_limit_per_sec and rate_limit_per_sec > 0 %}
-  limit_req zone={{name}}_rate burst=25 nodelay;
+  limit_req zone={{render_name if render_name else name}}_rate burst=25 nodelay;
   {% endif %}
 
   set $service '{{name}}';
+  set $service_render '{{render_name if render_name else name}}';
   set $real_method $request_method;
-  client_max_body_size {{body_limit}}m;
 
   {% if compression_types and compression_types|length > 0 %}
 {% include 'nginx/gzip.j2' %}
@@ -44,10 +44,11 @@ server {
   proxy_buffer_size {{buffer}}k;
   proxy_busy_buffers_size {{buffer}}k;
   proxy_set_header Proxy "";
-
+  proxy_hide_header Server;
   add_header X-Request-Id $request_id always;
   {% for header in headers %}
   add_header {{ header.name }} '{{ header.content }}' always;
+  proxy_hide_header {{ header.name }};
   {%- endfor %}
 
   modsecurity on;
@@ -97,15 +98,15 @@ server {
   {% for p in r.paths %}
   location ~ {{p}} {
     set $route '{{r.name}}';
-    set $sensor '{{r.sensor.name if r.sensor and r.sensor.name else "-"}}';
-    {%- if r.type == 'UPSTREAM' and r.upstream.name %}
+    set $sensor '{{r.sensor.name if r.sensor else "-"}}';
+    {%- if r.type == 'UPSTREAM' and r.upstream and r.upstream.name %}
     set $upstream '{{r.upstream.name}}';
     {%- else %}
     set $upstream '-';
     {%- endif %}
 
-    {% if r.sensor and r.sensor.name and r.sensor.ipxa_enabled %}
-    access_by_lua_file {{BASE_PATH}}/luajit/share/lua/5.1/nxguard/sensors/{{r.sensor.name }}.lua;
+    {% if r.sensor and r.sensor.ipxa_enabled %}
+    access_by_lua_file {{BASE_PATH}}/luajit/share/lua/5.1/nxguard/sensors/{{r.sensor.render_name if r.sensor.render_name else r.sensor.name }}.lua;
     {% endif %}
 
     {%- if r.route_policy_file %}
@@ -115,17 +116,20 @@ server {
     modsecurity_rules_file {{r.sensor_policy_file }};
     {% endif %}
 
-    {%- if r.type == 'UPSTREAM' and r.upstream.name %}
+    {%- if r.type == 'UPSTREAM' and r.upstream and (r.upstream.render_name or r.upstream.name) %}
     proxy_http_version 1.1;
     proxy_intercept_errors on;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Forwarded-Host $http_host;
+    proxy_set_header X-Forwarded-Port $server_port;
     proxy_read_timeout {{timeout}}s;
-    proxy_set_header Host $host;
+    proxy_set_header Host $http_host;
     proxy_set_header X-Real-IP $remote_addr;
     proxy_set_header Upgrade $http_upgrade;
     proxy_set_header Connection $connection_upgrade;
     proxy_redirect off;
-    proxy_pass http://{{r.upstream.name if r.upstream and r.upstream.name else "default"}}/$1$is_args$args;
+    proxy_pass http://{{r.upstream.render_name if r.upstream.render_name else r.upstream.name}}/$1$is_args$args;
     {%- endif %}
 
     {%- if r.type == 'REDIRECT' %}
@@ -146,6 +150,6 @@ server {
   }
 
   access_log off;
-  error_log /opt/nxguard/logs/error-{{name}}.log warn;
+  error_log /opt/nxguard/logs/error-{{render_name if render_name else name}}.log warn;
   log_by_lua_file {{BASE_PATH}}/luajit/share/lua/5.1/nxguard/log_by_custom.lua;
 }

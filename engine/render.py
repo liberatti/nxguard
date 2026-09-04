@@ -46,7 +46,9 @@ def _generate_trusted_ips(output_dir):
 
 def clean(data, output_dir=config.BASE_PATH, test=False):
     """Removes generated Nginx configurations, certificates, and service files."""
-    conf_dir = f"{output_dir}/nginx/conf/tests" if test else f"{output_dir}/nginx/conf"
+    conf_dir = (
+        f"{output_dir}/nginx/conf/tests" if test else f"{output_dir}/nginx/enabled/conf"
+    )
     logger.info(f"[{output_dir}] - Cleanup (test={test})")
     if test:
         for pattern in [
@@ -62,7 +64,6 @@ def clean(data, output_dir=config.BASE_PATH, test=False):
             f"{conf_dir}/fastcgi_params",
             f"{conf_dir}/scgi_params",
             f"{conf_dir}/upstreams.conf",
-            f"{conf_dir}/monitor.conf",
             f"{conf_dir}/fastcgi.conf",
             f"{conf_dir}/nginx.conf",
         ]
@@ -118,13 +119,18 @@ def _generate_sensors(
     logger.info(f"[{output_dir}] - Generate sensor")
     prefix = "test-" if test else ""
 
+    conf = data.get("config") or {}
+    ipxa = conf.get("ipxa") if isinstance(conf, dict) else {}
+    ipxa = ipxa or {}
+
     for sensor in data["sensors"]:
-        if "url" in data["config"]["ipxa"]:
+        sensor_name = sensor.get("render_name") or sensor.get("name")
+        if isinstance(ipxa, dict) and ipxa.get("url"):
             sensor.update(
                 {
                     "ipxa_enabled": True,
-                    "ipxa_url": data["config"]["ipxa"]["url"],
-                    "ipxa_key": data["config"]["ipxa"]["key"],
+                    "ipxa_url": ipxa.get("url"),
+                    "ipxa_key": ipxa.get("key"),
                     "blq_geo": ",".join(sensor["security"]["geo_codes"]),
                     "blq_rbl": ",".join(sensor["security"]["reputation"]),
                     "trusted": ",".join(sensor["security"]["trusted"]),
@@ -134,7 +140,7 @@ def _generate_sensors(
             _render_template_to_file(
                 env,
                 "lua/sensor.lua",
-                f"{config.LUA_LIBS_PATH}/nxguard/sensors/{sensor['name']}.lua",
+                f"{config.LUA_LIBS_PATH}/nxguard/sensors/{sensor_name}.lua",
                 sensor,
             )
         else:
@@ -163,7 +169,7 @@ def _generate_sensors(
 
         sensor.update(
             {
-                "name": sensor["name"],
+                "name": sensor_name,
                 "inbound_anomaly_score_threshold": sensor["inspection"]["score"][
                     "inbound"
                 ],
@@ -198,29 +204,89 @@ def _generate_sensors(
             _render_template_to_file(
                 env,
                 "modsec/modsec_sensor.j2",
-                f"{output_dir}/modsec/coreruleset/{prefix}SENSOR-{sensor['name']}.policy",
+                f"{output_dir}/modsec/coreruleset/{prefix}SENSOR-{sensor_name}.policy",
                 sensor,
             )
 
 
+def _normalize_name_for_render(item: dict) -> str:
+    """Normalizes item name to lowercase with _id suffix if present."""
+    name = str(item.get("name") or "").strip().lower()
+    _id = item.get("_id")
+    if _id is not None and str(_id).strip():
+        _id_str = str(_id).strip()
+        if not name.endswith(f"_{_id_str}"):
+            name = f"{name}_{_id_str}"
+    return name
+
+
+def _normalize_entities(data: dict) -> None:
+    """Normalizes names in services, upstreams, and sensors to lowercase with _id suffix for rendering."""
+    for key in ["services", "upstreams", "sensors"]:
+        if key in data and isinstance(data[key], list):
+            for item in data[key]:
+                if isinstance(item, dict):
+                    item["render_name"] = _normalize_name_for_render(item)
+
+
 def __resolve_sensor_by_name(sensor_name, data):
+    if not sensor_name:
+        return None
     sensors = data.get("sensors", [])
     for s in sensors:
-        if s.get("name") == sensor_name:
-            return s
+        if isinstance(sensor_name, dict):
+            ref_id = sensor_name.get("_id") or sensor_name.get("id")
+            if ref_id is not None and str(s.get("_id")) == str(ref_id):
+                return s
+            name = sensor_name.get("name")
+        else:
+            name = sensor_name
+            if name is not None and str(s.get("_id")) == str(name):
+                return s
+
+        if name:
+            name_str = str(name).strip()
+            if (
+                s.get("name") == name_str
+                or s.get("render_name") == name_str
+                or str(s.get("name", "")).lower() == name_str.lower()
+                or s.get("render_name")
+                == _normalize_name_for_render({"name": name_str, "_id": s.get("_id")})
+            ):
+                return s
     logger.warning(
-        f"__resolve_sensor_by_name: {sensor_name} not found in {data['sensors']}"
+        f"__resolve_sensor_by_name: {sensor_name} not found in {data.get('sensors', [])}"
     )
     return None
 
 
 def __resolve_upstream_by_name(upstream_name, data):
+    if not upstream_name:
+        return None
     upstreams = data.get("upstreams", [])
     for u in upstreams:
-        if u.get("name") == upstream_name:
-            return u
+        if isinstance(upstream_name, dict):
+            ref_id = upstream_name.get("_id") or upstream_name.get("id")
+            if ref_id is not None and str(u.get("_id")) == str(ref_id):
+                return u
+            name = upstream_name.get("name")
+        else:
+            name = upstream_name
+            if name is not None and str(u.get("_id")) == str(name):
+                return u
+
+        if name:
+            name_str = str(name).strip()
+            if (
+                u.get("name") == name_str
+                or u.get("render_name") == name_str
+                or str(u.get("name", "")).lower() == name_str.lower()
+                or u.get("render_name")
+                == _normalize_name_for_render({"name": name_str, "_id": u.get("_id")})
+            ):
+                return u
     logger.warning(
-        f"__resolve_upstream_by_name: {upstream_name} not found in {data['upstreams']}"
+        f"__resolve_upstream_by_name: {upstream_name} not found in {data.get('upstreams', [])}"
     )
     return None
 
@@ -232,6 +298,9 @@ def _generate_services(
     logger.info(f"[{output_dir}] - Generate Services")
     prefix = "test-" if test else ""
     for service in data["services"]:
+        if not service.get("active"):
+            continue
+        svc_name = service.get("render_name") or service.get("name")
         service.update(
             {
                 "BASE_PATH": config.BASE_PATH,
@@ -239,8 +308,8 @@ def _generate_services(
                 "config": data["config"],
             }
         )
-        os.makedirs(f"{output_dir}/cache/{service['name']}", exist_ok=True)
-        service_path = f"{conf_dir}/service-{service['name']}.conf"
+        os.makedirs(f"{output_dir}/cache/{svc_name}", exist_ok=True)
+        service_path = f"{conf_dir}/service-{svc_name}.conf"
         logger.info(f"[{output_dir}] - Generate {service_path}")
         for b in service.get("bindings", []):
             if b["protocol"] == "HTTPS":
@@ -248,26 +317,33 @@ def _generate_services(
 
         for r in service.get("routes", []):
             if r["type"] == RouteType.UPSTREAM:
-                r["upstream"] = __resolve_upstream_by_name(
-                    r["upstream"].get("name"), data
-                )
+                r["upstream"] = __resolve_upstream_by_name(r.get("upstream"), data)
             if r["type"] == RouteType.STATIC:
                 r.update({"upstream": None})
             if r["type"] == RouteType.REDIRECT:
                 r.update({"upstream": None})
 
-            if "sensor" in r and "name" in r["sensor"]:
-                sensor = __resolve_sensor_by_name(r["sensor"].get("name"), data)
+            if "sensor" in r and r.get("sensor"):
+                sensor = __resolve_sensor_by_name(r["sensor"], data)
+                sensor_name = (
+                    (sensor.get("render_name") or sensor.get("name"))
+                    if sensor
+                    else (
+                        r["sensor"].get("name")
+                        if isinstance(r["sensor"], dict)
+                        else r["sensor"]
+                    )
+                )
                 service.update(
                     {
-                        "service_policy_file": f"{output_dir}/modsec/conf/{prefix}SERVICE-{service['name']}.policy",
+                        "service_policy_file": f"{output_dir}/modsec/conf/{prefix}SERVICE-{svc_name}.policy",
                     }
                 )
                 r.update(
                     {
                         "sensor": sensor,
-                        "route_policy_file": f"{output_dir}/modsec/conf/{prefix}ROUTE-{service['name']}.{r['name']}.policy",
-                        "sensor_policy_file": f"{output_dir}/modsec/coreruleset/{prefix}SENSOR-{sensor['name']}.policy",
+                        "route_policy_file": f"{output_dir}/modsec/conf/{prefix}ROUTE-{svc_name}.{r['name']}.policy",
+                        "sensor_policy_file": f"{output_dir}/modsec/coreruleset/{prefix}SENSOR-{sensor_name}.policy",
                     }
                 )
                 _render_template_to_file(
@@ -291,6 +367,7 @@ def generate(data, output_dir=config.BASE_PATH, test=False):
     for t in t_dir:
         os.makedirs(f"{output_dir}/temp/{t}", exist_ok=True)
 
+    _normalize_entities(data)
     data.update({"IS_TEST": test, "config.BASE_PATH": config.BASE_PATH})
     env = Environment(loader=FileSystemLoader("engine/templates"))
 
@@ -324,14 +401,6 @@ def generate(data, output_dir=config.BASE_PATH, test=False):
         data,
     )
 
-    logger.info(f"[{output_dir}] - Generate {conf_dir}/monitor.conf")
-    _render_template_to_file(
-        env,
-        "nginx/monitor.conf.j2",
-        f"{conf_dir}/monitor.conf",
-        data,
-    )
-
     if "upstreams" in data:
         logger.info(f"[{output_dir}] - Generate {conf_dir}/upstreams.conf")
         _render_template_to_file(
@@ -346,7 +415,9 @@ def generate(data, output_dir=config.BASE_PATH, test=False):
         _generate_certificates(env, output_dir, prefix, data["certificates"])
 
     if "sensors" in data:
-        if "ipxa" in data["config"] and data["config"]["ipxa"].get("url"):
+        conf = data.get("config") or {}
+        ipxa = conf.get("ipxa") if isinstance(conf, dict) else {}
+        if isinstance(ipxa, dict) and ipxa.get("url"):
             _generate_trusted_ips(f"{config.BASE_PATH}/modsec/coreruleset")
         _generate_sensors(env, output_dir, data, test)
 

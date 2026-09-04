@@ -9,6 +9,7 @@ from api.model.acme_model import ChallengeDao
 routes = Blueprint("acme", __name__)
 
 
+@routes.route("/.well-known/acme-challenge/<key>", methods=["GET"])
 @routes.route("/acme-challenge/<key>", methods=["GET"])
 def get_config(key: str) -> Response:
     """

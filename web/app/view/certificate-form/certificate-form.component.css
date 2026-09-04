@@ -142,18 +142,11 @@
     line-height: 1.5;
 }
 
+/* Bottom Actions */
 .bottom-actions {
+    padding: 16px 24px !important;
     display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 12px;
-    padding: 16px 24px;
-    border-top: 1px solid var(--border-dim);
-}
-
-.action-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-weight: 600;
+    gap: 10px;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
 }

@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, OnInit, ViewChild } from '@angular/core';
 import {
     MAT_DIALOG_DATA,
     MatDialogActions,
@@ -6,7 +6,7 @@ import {
     MatDialogRef,
     MatDialogTitle
 } from '@angular/material/dialog';
-import { AbstractControl, FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { AbstractControl, FormControl, FormGroup, FormsModule, ReactiveFormsModule, ValidationErrors, ValidatorFn } from '@angular/forms';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { Sensor } from 'app/models/sensor';
 import { Route, RouteType } from 'app/models/service';
@@ -27,10 +27,41 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { StaticServer } from "../../models/static";
 import { StaticService } from "../../services/static.service";
 
+export function nginxRegexValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+        const value = control.value;
+        if (!value || typeof value !== 'string') {
+            return null;
+        }
+
+        const trimmed = value.trim();
+        if (!trimmed) {
+            return null;
+        }
+
+        if (/[\r\n]/.test(trimmed)) {
+            return { invalidRegex: true };
+        }
+
+        if (/\s/.test(trimmed) && !/\\s/.test(trimmed)) {
+            return { invalidRegex: true };
+        }
+
+        try {
+            new RegExp(trimmed);
+        } catch {
+            return { invalidRegex: true };
+        }
+
+        return null;
+    };
+}
+
 
 @Component({
     selector: 'app-service-route-form-dialog',
     templateUrl: './service-route-form-dialog.component.html',
+    styleUrl: './service-route-form-dialog.component.css',
     standalone: true,
     imports: [ReactiveFormsModule, CommonModule, TranslatePipe,
         MatFormFieldModule, MatChipsModule,
@@ -65,7 +96,7 @@ export class ServiceRouteFormDialogComponent implements OnInit {
     submitted = false;
 
     pathForm = new FormGroup({
-        path: new FormControl<string>('')
+        path: new FormControl<string>('', [nginxRegexValidator()])
     });
 
     methodForm = new FormGroup({
@@ -111,6 +142,7 @@ export class ServiceRouteFormDialogComponent implements OnInit {
         private upstreamService: UpstreamService,
         private staticService: StaticService,
         private sensorService: SensorService,
+        private cdr: ChangeDetectorRef,
         @Inject(MAT_DIALOG_DATA) public routeData: Route
     ) {
         this.isAddMode = false;
@@ -118,14 +150,27 @@ export class ServiceRouteFormDialogComponent implements OnInit {
 
     ngOnInit(): void {
         this.upstreamService.get().subscribe(data => {
-            this._upstreams = data.data;
+            this._upstreams = data.data || [];
+            if (this.routeData && this.routeData.upstream) {
+                const found = this._upstreams.find(u => this.compareFn(u, this.routeData.upstream));
+                if (found) {
+                    this.form.get('upstream')?.setValue(found);
+                }
+            }
+            this.cdr.detectChanges();
         });
 
         this.sensorService.get().subscribe(data => {
-            this._sensors = data.data;
+            this._sensors = data.data || [];
             if (this.isAddMode) {
                 this.form.get('sensor')?.setValue(this._sensors[0]);
+            } else if (this.routeData && this.routeData.sensor) {
+                const found = this._sensors.find(s => this.compareFn(s, this.routeData.sensor));
+                if (found) {
+                    this.form.get('sensor')?.setValue(found);
+                }
             }
+            this.cdr.detectChanges();
         });
         this.isAddMode = !this.routeData;
         if (!this.isAddMode) {
@@ -150,6 +195,7 @@ export class ServiceRouteFormDialogComponent implements OnInit {
                 type: this.routeData.type,
                 cache_methods: this.routeData.cache_methods || []
             });
+            this.cdr.detectChanges();
         }
     }
 
@@ -166,18 +212,25 @@ export class ServiceRouteFormDialogComponent implements OnInit {
     }
 
     onAddPath(): void {
-        let data = this.pathForm.value.path as string;
-        this.form.value.paths?.push(data);
-        this.pathForm.reset();
+        const pathControl = this.pathForm.get('path');
+        if (!pathControl || pathControl.invalid || !pathControl.value) {
+            return;
+        }
+        const data = pathControl.value.trim();
+        if (!data) return;
+
+        const currentPaths = (this.form.get('paths')?.value || []).slice();
+        if (!currentPaths.includes(data)) {
+            currentPaths.push(data);
+            this.form.get('paths')?.setValue(currentPaths);
+        }
+        this.pathForm.reset({ path: '' });
+        pathControl.setErrors(null);
     }
 
     onRemovePath(keyword: any): void {
-        if (this.form.value.paths != null) {
-            let index = this.form.value.paths.indexOf(keyword);
-            if (index >= 0) {
-                this.form.value.paths.splice(index, 1);
-            }
-        }
+        const currentPaths = (this.form.get('paths')?.value || []).filter((p: string) => p !== keyword);
+        this.form.get('paths')?.setValue(currentPaths);
     }
 
     onAddMethod(): void {
@@ -268,6 +321,12 @@ export class ServiceRouteFormDialogComponent implements OnInit {
 
     compareFn(object1: any, object2: any) {
         if (!object1 || !object2) return false;
+        if (typeof object1 === 'string' && typeof object2 === 'object') {
+            return object1 === object2.name || object1 === String(object2._id);
+        }
+        if (typeof object2 === 'string' && typeof object1 === 'object') {
+            return object2 === object1.name || object2 === String(object1._id);
+        }
         if (object1._id != null && object2._id != null) {
             return String(object1._id) === String(object2._id);
         }

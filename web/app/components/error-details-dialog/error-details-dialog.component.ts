@@ -4,6 +4,7 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { TranslatePipe } from '@ngx-translate/core';
 import { APIErrorResponse } from 'app/models/shared';
 
 export interface FieldError {
@@ -19,7 +20,8 @@ export interface FieldError {
         MatDialogModule,
         MatButtonModule,
         MatIconModule,
-        MatExpansionModule
+        MatExpansionModule,
+        TranslatePipe
     ],
     templateUrl: './error-details-dialog.component.html',
     styleUrls: ['./error-details-dialog.component.css']

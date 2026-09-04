@@ -1,0 +1,10 @@
+.toggle-container.no-border {
+    border: none;
+}
+
+.table-cell-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+}

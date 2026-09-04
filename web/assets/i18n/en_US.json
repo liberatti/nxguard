@@ -28,6 +28,8 @@
     "SIGN_IN_BTN": "Log in",
     "EMAIL": "User name / Email",
     "PASSWORD": "Password",
+    "LANGUAGE": "Language",
+    "SUBTITLE_LOGIN": "Enter your credentials to access the console",
     "FOOTER_NOTICE": "Authorized access only. All activities are monitored and logged.",
     "VERSION": "Version",
     "LICENSE_NOTICE": "Licensed under the",
@@ -94,7 +96,14 @@
     "UPSTREAM": {
       "LINK": "Upstream",
       "TITLE": "Upstream",
-      "SUBTITLE": "List of all upstreams"
+      "SUBTITLE": "List of all upstreams",
+      "FILTER_PLACEHOLDER": "Filter upstreams by name or description...",
+      "ERR_TARGET_REQUIRED": "Backend upstream requires at least one target.",
+      "TARGETS": "Targets",
+      "TARGET_HOST": "Network Address",
+      "TARGET_PORT": "Service Port",
+      "TARGET_WEIGHT": "Weight",
+      "NO_TARGETS": "No targets configured. Add at least one target for this backend."
     },
     "HOSTNAME": {
       "LINK": "Hostname",
@@ -125,6 +134,12 @@
       "LINK": "System"
     }
   },
+  "CERTIFICATE": {
+    "FORCE_RENEW": "Pending Renewal",
+    "RENEW_PENDING": "Pending renewal",
+    "RENEW_SCHEDULED": "Renewal scheduled",
+    "RENEW_NOT_SCHEDULED": "No renewal scheduled"
+  },
   "ROUTE": {
     "ALLOWED_METHODS": "Allowed HTTP Methods",
     "ALLOWED_CONTENT_TYPE": "Allowed Content Types",
@@ -135,7 +150,9 @@
     "SECURITY_SENSOR": "Security Sensor",
     "MONITOR_ONLY": "Monitor Only",
     "REQUEST_METHODS": "Request Methods",
-    "CACHE_METHODS": "Cache Methods"
+    "CACHE_METHODS": "Cache Methods",
+    "INVALID_REGEX": "Invalid NGINX regex pattern",
+    "PATH_HINT": "e.g. ^/api/v1/.* or /static/"
   },
   "SENSOR": {
     "CONFIG": "Config",
@@ -174,6 +191,11 @@
     "CONTROL_RULE": "Engine Control / Paranoia Gate",
     "VIEW_DETAILS": "View rule details",
     "NO_CATEGORIES_SELECTED": "No categories added to this sensor yet",
+    "FILTER_FEEDS_PLACEHOLDER": "Filter selected feeds...",
+    "NO_FEEDS_SELECTED": "No feeds selected yet. Select from the dropdown above.",
+    "FILTER_GEO_PLACEHOLDER": "Filter selected countries...",
+    "NO_GEO_SELECTED": "No geo-blocked countries selected.",
+    "CLEAR_ALL": "Clear all",
     "SAVED_SUCCESS": "Sensor saved successfully",
     "UPDATED_SUCCESS": "Sensor updated successfully"
   },
@@ -214,6 +236,34 @@
     "NO_HEADERS": "No custom headers configured.",
     "NO_ROUTES": "No routes configured yet."
   },
+  "GEOIP_DIALOG": {
+    "TITLE": "GeoIP Information",
+    "SUBTITLE": "Geographic and network intelligence for source IP",
+    "IP_ADDRESS": "IP Address",
+    "COUNTRY": "Country",
+    "STATUS": "GeoIP Action",
+    "ORGANIZATION": "Organization / ISP",
+    "ASN": "ASN Number",
+    "IP_RANGE": "IP Range",
+    "IPXA": "IPXa Status",
+    "RAW_DATA": "Raw GeoIP Data",
+    "COPIED": "IP copied to clipboard"
+  },
+  "RBL_DIALOG": {
+    "TITLE": "RBL & IP Reputation",
+    "SUBTITLE": "Reputation analysis and threat intelligence for source IP",
+    "IP_ADDRESS": "Source IP",
+    "STATUS": "RBL Action",
+    "SCORE": "Risk Score",
+    "TRUSTED": "Trusted Bypass",
+    "MATCHED_FEEDS": "Matched Feed(s)",
+    "NO_MATCH": "No malicious feed matches",
+    "IPXA": "IPXa Status",
+    "RAW_DATA": "Raw Reputation Data",
+    "YES": "Yes",
+    "NO": "No",
+    "COPIED": "IP copied to clipboard"
+  },
   "APPLY_DIALOG": {
     "TITLE": "Apply Configuration",
     "DESCRIPTION": "The following items have pending changes that need to be applied to the proxy engine:",
@@ -243,8 +293,8 @@
     "SUBTITLE": "Manage global engine settings, PKI certificates, and transaction policies",
     "PANEL_GENERAL": "General & Integrations",
     "PANEL_GENERAL_DESC": "Third-party API keys and external directory endpoints",
-    "MAXMIND_KEY": "MaxMind Geolocation License Key",
-    "MAXMIND_HINT": "Used for IP geolocation and country-based security blocking",
+    "DNS_RESOLVER": "DNS Resolver",
+    "DNS_RESOLVER_HINT": "DNS resolver IP address for domain and upstream name resolution (e.g. 1.1.1.1 or 127.0.0.11)",
     "ACME_URL": "ACME Directory URL",
     "ACME_HINT": "Let's Encrypt / ACME directory endpoint (e.g. https://acme-v02.api.letsencrypt.org/directory)",
     "PANEL_CA": "Certification Authority (Internal CA)",
@@ -263,7 +313,55 @@
     "PURGE_TITLE": "Transaction Purging",
     "PURGE_TOGGLE": "Enable Database Purging",
     "PURGE_DESC": "Automatically delete outdated transactional records from the local DuckDB database to preserve high performance and disk storage.",
-    "PURGE_AFTER": "Maximum Data Age (days)"
+    "PURGE_AFTER": "Maximum Data Age (days)",
+    "PANEL_IPXA": "IPXA Integration",
+    "PANEL_IPXA_DESC": "Configure IPXA threat intelligence and IP reputation service endpoint",
+    "IPXA_URL": "IPXA Service URL",
+    "IPXA_URL_HINT": "Endpoint URL of the IPXA threat intelligence service (e.g. http://ipxa:5000)",
+    "IPXA_KEY": "IPXA API Key",
+    "IPXA_KEY_HINT": "Secret API key for authenticating with IPXA service"
+  },
+  "DASHBOARD_PAGE": {
+    "TITLE": "Security Overview",
+    "SUBTITLE": "Real-time threat monitoring and system health",
+    "REFRESH_LABEL": "Refresh",
+    "REFRESH_5S": "Refresh: 5s",
+    "REFRESH_10S": "Refresh: 10s",
+    "REFRESH_15S": "Refresh: 15s",
+    "REFRESH_30S": "Refresh: 30s",
+    "REFRESH_60S": "Refresh: 60s",
+    "REFRESH_OFF": "Refresh: Off",
+    "TOTAL_UPSTREAMS": "Total Upstreams",
+    "CONFIGURED_BACKENDS": "Configured Backends",
+    "TOTAL_REQUESTS": "Total Requests",
+    "BLOCKED": "Blocked",
+    "WARN": "Warn",
+    "PROTECTED_ASSETS": "Protected Assets",
+    "ACTIVE_ROUTES": "Active Routes",
+    "SYSTEM_HEALTH": "System Health",
+    "HEALTHY": "HEALTHY",
+    "DEGRADED": "DEGRADED",
+    "ACTIVE_NODES": "{{count}} Active Nodes",
+    "BANDWIDTH_TITLE": "Bandwidth Throughput",
+    "BANDWIDTH_DESC": "Data volume transferred (Bytes In vs Bytes Out)",
+    "BYTES_IN": "BYTES IN",
+    "BYTES_OUT": "BYTES OUT",
+    "LAST_24H": "Last 24h",
+    "REQUESTS_TITLE": "Request Volume",
+    "REQUESTS_DESC": "Transaction rate over time (req/min)",
+    "PEAK": "PEAK",
+    "AVG": "AVG",
+    "REQ_PER_MIN": "req/m",
+    "THREAT_LOGS_TITLE": "Threat Detection Log",
+    "THREAT_LOGS_DESC": "Recent inspected transactions",
+    "VIEW_ALL_TRANSACTIONS": "View all transactions",
+    "TH_TIMESTAMP": "TIMESTAMP",
+    "TH_EVENT_ROUTE": "EVENT / ROUTE",
+    "TH_CLIENT_IP": "CLIENT IP",
+    "TH_STATUS": "STATUS",
+    "NO_LOGS": "No threat logs recorded yet",
+    "HTTP_REQUEST": "HTTP Request",
+    "SERVICE": "Service"
   },
   "TRANSACTION": {
     "FILTER": {
@@ -364,6 +462,40 @@
     "ACTIONS": "Actions",
     "NO_USERS": "No users found"
   },
+  "UPSTREAM": {
+    "ERR_TARGET_REQUIRED": "Backend upstream requires at least one target.",
+    "TARGETS": {
+      "TITLE": "Targets",
+      "ADD_BTN": "Add Target",
+      "NETWORK_ADDRESS": "Network Address",
+      "SERVICE_PORT": "Service Port",
+      "DISTRIBUTION_WEIGHT": "Distribution Weight",
+      "ACTIONS": "Actions",
+      "EDIT_TOOLTIP": "Edit target",
+      "REMOVE_TOOLTIP": "Remove target",
+      "MODAL_TITLE_ADD": "Add Upstream Target",
+      "MODAL_TITLE_EDIT": "Edit Upstream Target",
+      "EMPTY_MESSAGE": "No targets configured. Add at least one target for this backend."
+    },
+    "STATES": {
+      "TITLE": "Upstream Health Status",
+      "NODE": "Node",
+      "STATUS": "Status",
+      "LAST_CHECK": "Last Check",
+      "LATENCY": "Latency",
+      "HEALTHY": "Healthy",
+      "PARTIALLY_HEALTHY": "Partially Healthy",
+      "UNHEALTHY": "Unhealthy",
+      "INVALID": "Unverified",
+      "NO_STATES": "No health check states recorded yet for this upstream.",
+      "WARNING_TOOLTIP": "One or more targets are in failure state"
+    }
+  },
+  "DATETIME": {
+    "HOUR": "Hour",
+    "MINUTE": "Minute",
+    "SECOND": "Second"
+  },
   "FORMAT": {
     "DISPLAY": {
       "DATETIME": "DD/MM/YYYY HH:mm:ss",
@@ -392,20 +524,34 @@
   "about": {
     "title": "About NXGuard",
     "subtitle": "High-Performance API Gateway & Security Engine",
-    "tab_about": "About",
-    "tab_restore": "Restore Config",
-    "choose_file": "Choose ZIP file to restore",
+    "tab_about": "Overview",
+    "tab_backup_restore": "Backup & Restore",
+    "backup_title": "Export Configuration (Backup)",
+    "backup_desc": "Download a complete backup of all services, upstreams, and security rules in JSON format.",
+    "backup_btn": "Download Backup",
+    "restore_title": "Import Configuration (Restore)",
+    "restore_desc": "Upload a previously exported JSON backup to restore system configuration.",
+    "choose_file": "Choose JSON backup file",
     "selected_file": "Selected File",
-    "powered_by": "Powered by OpenResty & ModSecurity"
+    "powered_by": "Powered by OpenResty & ModSecurity",
+    "api_docs": "REST API",
+    "api_docs_sub": "OpenAPI / Swagger documentation",
+    "github_title": "GitHub Repository",
+    "github_sub": "Source code, releases & issue tracking",
+    "architecture_title": "Core Architecture"
   },
   "attr": {
     "active": "Active",
     "name": "Name",
     "domains": "Domains",
-    "routes": "Routes"
+    "routes": "Routes",
+    "description": "Description",
+    "protocol": "Protocol",
+    "targets": "Targets",
+    "actions": "Actions"
   },
   "content": {
-    "copy": "&copy; 2025 nxguard. All rights reserved. This solution is built on top of OpenResty.",
+    "copy": "&copy; 2026 nxguard. All rights reserved. This solution is built on top of OpenResty.",
     "about": "This is a proxy server built on OpenResty with ModSecurity for advanced protection.",
     "restore_notice": "Configuration Restore Notice: All existing data will be overwritten by the restored configuration."
   },
@@ -430,12 +576,14 @@
     "service": {
       "link": "Services",
       "title": "Services",
-      "subtitle": "Describe all services"
+      "subtitle": "Describe all services",
+      "filter_placeholder": "Search by name or domain..."
     },
     "upstream": {
       "link": "Upstreams",
       "title": "Upstreams",
-      "subtitle": "List of all upstreams"
+      "subtitle": "List of all upstreams",
+      "filter_placeholder": "Search by name or description..."
     },
     "hostname": {
       "link": "Hostnames",
@@ -450,7 +598,8 @@
     "sensor": {
       "link": "Sensors",
       "title": "Sensors",
-      "subtitle": "List of all sensors"
+      "subtitle": "List of all sensors",
+      "filter_placeholder": "Search by name or description..."
     },
     "user": {
       "link": "Users",

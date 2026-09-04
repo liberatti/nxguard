@@ -12,8 +12,22 @@ export class NotificationService {
 
     public openSnackBar(message: string | string[]) {
         if (Array.isArray(message)) {
+            const detailsObj: any = {};
+            message.forEach((msg, idx) => {
+                const parts = msg.trim().split('on ');
+                const fieldName = parts.length > 1 ? parts[1].trim() : `error_${idx + 1}`;
+                detailsObj[fieldName] = [msg.trim()];
+            });
+
             this.snackBar.openFromComponent(MultiSnackbarComponent, {
-                data: { messages: message },
+                data: {
+                    messages: message,
+                    errorData: {
+                        code: 400,
+                        message: 'Validation Error',
+                        details: detailsObj
+                    }
+                },
                 duration: 5000,
                 panelClass: 'snackbar-error',
                 verticalPosition: 'bottom',

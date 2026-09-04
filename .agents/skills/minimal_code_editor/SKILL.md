@@ -5,86 +5,48 @@ trigger: always_on
 # Skill: minimal_code_editor
 
 ## Objective
-Modify Python projects with direct, minimal, and review-friendly changes.  
-Return only what is necessary for quick manual review.
+Execute surgical, deterministic, and review-friendly edits on Python codebases.  
+Output only raw code or standard unified diffs designed for immediate manual review.
 
 ---
 
-## Response Rules
+## Output Protocol (Zero-Fluff)
 
-- Always respond with:
-  - a `unified diff`, OR
-  - the full file (only if small)
-- Do not explain changes
-- Do not justify decisions
-- No unnecessary text
-- At most: one optional line of context
-
----
-
-## Code Standards (Python)
-
-Strictly follow:
-
-- PEP 8
-- Compatible with Flake8:
-  - `max-line-length = 88`
-  - Proper import ordering
-  - No unused variables or imports
-  - No trailing whitespace
-  - Ensure newline at end of file
-- Use type hints where applicable (`typing`)
-- Keep functions small and focused
+- **Default Format:** Standard `unified diff` with standard 2–3 lines of anchoring context.
+- **Full File Exception:** Return full file inside a single fenced code block (` ```python `) ONLY for new files or files under 40 lines.
+- **Text Rules:**
+  - Zero conversational filler, greetings, or sign-offs.
+  - Zero explanations, rationales, or justifications.
+  - No markdown text, titles, or headers outside the code fence.
+  - At most: a single line of critical technical context preceding the block if, and only if, a breaking dependency or migration step is required.
 
 ---
 
-## Editing Rules
+## Python Engineering Standards
 
-- Preserve existing structure
-- Do not rename symbols unless required
-- Do not refactor beyond the requested scope
-- Apply minimal and surgical changes
-- Avoid adding new dependencies
+- **Formatting & Linting:** Strict adherence to PEP 8 and **Ruff/Flake8** defaults:
+  - Line length: maximum 88 characters.
+  - Proper import sorting (standard lib -> third-party -> local).
+  - Zero unused imports or variables.
+  - Zero trailing whitespace; ensure terminal newline.
+- **Type Annotations:**
+  - Use modern built-in generics (`list[str]`, `dict[str, Any]`, `X | None`) over deprecated `typing` constructs where possible.
+- **Docstrings:** Match existing project conventions. If creating new modules, default strictly to NumPy style.
 
 ---
 
-## Output Formats
+## Surgical Modification Rules
 
-- Return only changed hunks (no full file unless necessary)
-- Do not repeat unchanged context
-- Do not restate filenames outside diff headers
-- No headers, titles, or markdown outside code blocks
-- No IDs in code blocks
-- Documentation should be in reStructuredText format or numpy style (docstrings)
+- **Scope Boundary:** Modify exclusively the logic requested. Never reformat, reorder, or rename unrelated code.
+- **Dependency Guard:** Do not introduce third-party dependencies unless explicitly requested.
+- **No Artifacts:** Never leave debug statements (`print`, breakpoint), ad-hoc logging, or extraneous comments.
 
-## Forbidden
+---
 
-- Long explanations
-- Unnecessary code comments
-- Debug logs or prints (unless requested)
-- Out-of-context example code
+## Pre-Response Verification Checklist
 
-## Behavior
-
-- Assume the user will manually review all changes
-- Prioritize visual clarity in diffs
-- Avoid implicit or hidden modifications
-- Prefer consistency over cleverness
-- Do not introduce breaking changes unless explicitly required
-
-## Validation Expectations
-
-Before responding, ensure:
-
-- Code passes Flake8 checks
-- No syntax errors
-- Imports are valid and used
-- Changes are minimal and scoped
-- Output is clean and copy-paste ready
-
-## User Profile
-
-- User is an experienced developer
-- Be concise and technical
-- No hand-holding
-- No explanations unless explicitly requested
+Before emitting the block, verify internally:
+1. Syntax is 100% valid Python.
+2. Diff headers (`---`, `+++`, `@@`) and line anchors are syntactically accurate.
+3. All imports used in modified blocks are properly declared.
+4. No explanatory prose exists outside the code fence.

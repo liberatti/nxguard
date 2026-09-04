@@ -25,7 +25,7 @@
                 <button mat-flat-button color="primary" class="search-btn" (click)="onRefresh()"
                     [matTooltip]="'actions.refresh' | translate">
                     <mat-icon>refresh</mat-icon>
-                    <span>Refresh</span>
+                    <span>{{ 'actions.refresh' | translate }}</span>
                 </button>
             </div>
 
@@ -33,7 +33,8 @@
             <div class="active-filters-container">
                 <span class="active-filters-title">{{ 'TRANSACTION.FILTER.ACTIVE_FILTERS' | translate }}:</span>
                 <mat-chip-listbox class="active-chips-box">
-                    <mat-chip-row *ngFor="let p of form.value.filters" (removed)="onRemoveFilter(p)"
+                    @for (p of form.value.filters; track p) {
+                    <mat-chip-row (removed)="onRemoveFilter(p)"
                         class="filter-chip-item">
                         <mat-icon matChipAvatar class="chip-avatar-icon">filter_list</mat-icon>
                         <span class="chip-filter-label">{{ formatFilterChip(p) }}</span>
@@ -41,6 +42,7 @@
                             <mat-icon>cancel</mat-icon>
                         </button>
                     </mat-chip-row>
+                    }
                 </mat-chip-listbox>
                 <button mat-button color="warn" class="btn-clear-all" (click)="onClearAllFilters()">
                     <mat-icon>clear_all</mat-icon>
@@ -85,7 +87,9 @@
             <ng-container matColumnDef="score">
                 <mat-header-cell *matHeaderCellDef> Score </mat-header-cell>
                 <mat-cell *matCellDef="let element">
-                    <span class="score_chip {{ element.action | lowercase }}">
+                    <span class="score_chip score-clickable {{ element.action | lowercase }}"
+                        (click)="onShowRBL(element); $event.stopPropagation()"
+                        [matTooltip]="('RBL_DIALOG.TITLE' | translate) + ' - ' + ('RBL_DIALOG.SCORE' | translate) + ': ' + (element.score || 0)">
                         {{ element.score || 0 }}
                     </span>
                 </mat-cell>
@@ -98,8 +102,10 @@
                     @if (element.source) {
                     <span class="source-ip">{{ element.source.ip }}</span>
                     @if (element.source.geo?.country && element.source.geo.country !== '--') {
-                    <span class="fi fi-{{ element.source.geo.country | lowercase }}"
-                        [matTooltip]="element.source.geo.country" matTooltipPosition="below" matTooltipHideDelay="2000">
+                    <span class="fi fi-{{ element.source.geo.country | lowercase }} flag-clickable"
+                        (click)="onShowGeoIP(element); $event.stopPropagation()"
+                        [matTooltip]="('GEOIP_DIALOG.TITLE' | translate) + ': ' + element.source.geo.country"
+                        matTooltipPosition="below" matTooltipHideDelay="2000">
                     </span>
                     }
                     }
@@ -160,10 +166,16 @@
                                         <span class="exp-panel-token"><b>Action:</b> {{ element.action }}</span>
                                         <span class="exp-panel-token"><b>DoS:</b> {{ element.limit_req_status ||
                                             element.rate_limit?.action || '-' }}</span>
-                                        <span class="exp-panel-token"><b>GeoIP:</b> {{ element.geoip_status ||
-                                            element.geoip?.action || '-' }}</span>
-                                        <span class="exp-panel-token"><b>RBL:</b> {{ element.rbl_status ||
-                                            element.reputation?.action || '-' }}</span>
+                                        <span class="exp-panel-token token-clickable" (click)="onShowGeoIP(element); $event.stopPropagation()"
+                                            [matTooltip]="'GEOIP_DIALOG.TITLE' | translate">
+                                            <b>GeoIP:</b> {{ element.geoip_status || element.geoip?.action || '-' }}
+                                            <mat-icon class="token-mini-icon">open_in_new</mat-icon>
+                                        </span>
+                                        <span class="exp-panel-token token-clickable" (click)="onShowRBL(element); $event.stopPropagation()"
+                                            [matTooltip]="'RBL_DIALOG.TITLE' | translate">
+                                            <b>RBL:</b> {{ element.rbl_status || element.reputation?.action || '-' }}
+                                            <mat-icon class="token-mini-icon">open_in_new</mat-icon>
+                                        </span>
                                         }
                                     </mat-panel-description>
                                 </mat-expansion-panel-header>
@@ -179,8 +191,15 @@
                                     @if (element.source) {
                                     <div class="detail-item">
                                         <label>Source IP & Port</label>
-                                        <span>{{ element.source.ip }}{{ element.source.port ? ':' + element.source.port
-                                            : '' }}</span>
+                                        <span class="source-ip-badge-link" (click)="onShowGeoIP(element); $event.stopPropagation()"
+                                            [matTooltip]="'GEOIP_DIALOG.TITLE' | translate">
+                                            @if (element.source.geo?.country && element.source.geo.country !== '--') {
+                                            <span class="fi fi-{{ element.source.geo.country | lowercase }}"></span>
+                                            }
+                                            {{ element.source.ip }}{{ element.source.port ? ':' + element.source.port
+                                                : '' }}
+                                            <mat-icon class="inline-open-icon">open_in_new</mat-icon>
+                                        </span>
                                     </div>
                                     }
                                     @if (element.destination) {
@@ -209,11 +228,13 @@
                                 <div class="headers-section">
                                     <label class="section-label">Request Headers</label>
                                     <div class="headers-chips">
-                                        <div class="header-chip" *ngFor="let p of element.http.request.headers"
+                                        @for (p of element.http.request.headers; track p.name) {
+                                        <div class="header-chip"
                                             [matTooltip]="p.content">
                                             <span class="h-name">{{ p.name }}:</span>
                                             <span class="h-val">{{ p.content }}</span>
                                         </div>
+                                        }
                                     </div>
                                 </div>
                                 }
@@ -239,11 +260,13 @@
                                 <div class="headers-section">
                                     <label class="section-label">Response Headers</label>
                                     <div class="headers-chips">
-                                        <div class="header-chip" *ngFor="let p of element.http.response.headers"
+                                        @for (p of element.http.response.headers; track p.name) {
+                                        <div class="header-chip"
                                             [matTooltip]="p.content">
                                             <span class="h-name">{{ p.name }}:</span>
                                             <span class="h-val">{{ p.content }}</span>
                                         </div>
+                                        }
                                     </div>
                                 </div>
                                 }

@@ -18,7 +18,7 @@ from api.controller.user_controller import routes as user_routes
 
 routes = [
     (certificate_routes, f"{config.APP_CONTEXT}/api/certificate"),
-    (challenge_routes, f"{config.APP_CONTEXT}"),
+    (challenge_routes, ""),
     (config_routes, f"{config.APP_CONTEXT}/api/config"),
     (feed_routes, f"{config.APP_CONTEXT}/api/feed"),
     (oauth_routes, f"{config.APP_CONTEXT}/api/oauth"),
@@ -43,8 +43,10 @@ def register(app, bp):
     def catch_all(path: str):
         context_prefix = config.APP_CONTEXT.strip("/")
         rel_path = path
-        if context_prefix and (rel_path == context_prefix or rel_path.startswith(f"{context_prefix}/")):
-            rel_path = rel_path[len(context_prefix):].lstrip("/")
+        if context_prefix and (
+            rel_path == context_prefix or rel_path.startswith(f"{context_prefix}/")
+        ):
+            rel_path = rel_path[len(context_prefix) :].lstrip("/")
 
         if "." in rel_path and not rel_path.endswith("/"):
             try:

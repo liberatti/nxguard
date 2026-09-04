@@ -1,17 +1,43 @@
-from flask import Blueprint, Response
+import json
+import threading
+from flask import Blueprint, Response, request
+from marshmallow import ValidationError
 from nxcore.controllers.base_controller import (
     response_data,
     response_error,
+    response_error_parse,
     has_any_authority,
 )
 from nxcore.middleware.socket_manager import emit_event
+from nxcore.middleware.logging_manager import logger
 
 import engine.admin as c_admin
 import engine.build as c_builder
-from api.model.config_model import ChangeDao, ConfigBackupDao
+from api.model.config_model import ChangeDao, ConfigDao
 from api.model.upstream_model import NodeStatusDao
+from api.tasks import renew_certificates
 
 routes = Blueprint("config", __name__)
+
+
+@routes.after_request
+def after(response: Response) -> Response:
+    if (
+        request.method
+        in [
+            "PUT",
+            "POST",
+            "DELETE",
+            "PATCH",
+        ]
+        and response.status_code in [200, 201]
+        and not request.path.endswith("/apply")
+    ):
+        with ChangeDao() as dao:
+            if not dao.get_by_name("config"):
+                dao.persist({"name": "config"})
+            emit_event("tracking_evt")
+    return response
 
 
 @routes.route("/health", methods=["GET"])
@@ -51,6 +77,8 @@ def apply_config() -> Response:
         cst = c_admin.apply(val["scn"])
         if cst and cst.get("status") == "ok":
             with ChangeDao() as change_dao:
+                if change_dao.has_certificate_change():
+                    renew_certificates()
                 change_dao.delete_all()
             emit_event("tracking_aply")
             return response_data({"status": "ok", "scn": cst.get("scn")})
@@ -65,9 +93,94 @@ def apply_config() -> Response:
 
 
 @routes.route("", methods=["GET"])
-@has_any_authority(authorities=["viewer", "superuser"])
+@has_any_authority(authorities=["superuser"])
 def config() -> Response:
-    with ConfigBackupDao() as backup_dao:
-        latest = backup_dao.get_latest()
-        r = latest["data"] if latest else None
-    return response_data(r)
+    with ConfigDao() as dao:
+        return response_data(dao.get_active(), dao.schema)
+
+
+@routes.route("", methods=["PUT"])
+@routes.route("/<_id>", methods=["PUT"])
+@has_any_authority(authorities=["superuser"])
+def update(_id=None) -> Response:
+    try:
+        with ConfigDao() as dao:
+            active = dao.get_active()
+            conf_id = _id or (active["_id"] if active else 1)
+            config_dict = dao.json_load(request.json)
+            dao.update_by_id(conf_id, config_dict)
+            return response_data(dao.get_active(), dao.schema)
+    except ValidationError as err:
+        return response_error_parse(err)
+
+
+@routes.route("/backup", methods=["GET"])
+@has_any_authority(authorities=["viewer", "superuser"])
+def backup_export() -> Response:
+    conf = c_builder.get_config()
+    upstreams = []
+    for u in conf.get("upstreams", []):
+        u_copy = dict(u)
+        u_copy.pop("healthy", None)
+        if "targets" in u_copy and isinstance(u_copy["targets"], list):
+            clean_targets = []
+            for t in u_copy["targets"]:
+                if isinstance(t, dict):
+                    t_copy = dict(t)
+                    t_copy.pop("healthy", None)
+                    clean_targets.append(t_copy)
+                else:
+                    clean_targets.append(t)
+            u_copy["targets"] = clean_targets
+        upstreams.append(u_copy)
+
+    export_data = {
+        "config": conf.get("config", {}),
+        "certificates": conf.get("certificates", []),
+        "sensors": conf.get("sensors", []),
+        "upstreams": upstreams,
+        "services": conf.get("services", []),
+    }
+    return Response(
+        json.dumps(
+            export_data,
+            indent=2,
+            default=lambda o: o.isoformat() if hasattr(o, "isoformat") else str(o),
+        ),
+        mimetype="application/json",
+        headers={"Content-Disposition": "attachment; filename=init-data.json"},
+    )
+
+
+@routes.route("/backup", methods=["POST"])
+@has_any_authority(authorities=["superuser"])
+def backup_import() -> Response:
+    try:
+        if "file" in request.files:
+            uploaded_file = request.files["file"]
+            content = uploaded_file.read().decode("utf-8")
+            data = json.loads(content)
+        elif "jsonfile" in request.files:
+            uploaded_file = request.files["jsonfile"]
+            content = uploaded_file.read().decode("utf-8")
+            data = json.loads(content)
+        elif "zipfile" in request.files:
+            uploaded_file = request.files["zipfile"]
+            content = uploaded_file.read().decode("utf-8")
+            data = json.loads(content)
+        elif request.is_json:
+            data = request.get_json()
+        else:
+            return response_error("No JSON configuration file provided")
+
+        c_builder.init_from_data(data=data)
+        with ChangeDao() as dao:
+            if not dao.get_by_name("config"):
+                dao.persist({"name": "config"})
+            emit_event("tracking_evt")
+        return response_data(
+            {"status": "ok", "message": "Configuration imported successfully"}
+        )
+    except Exception as e:
+        logger.error(f"Error importing configuration: {e}")
+        return response_error(f"Failed to import configuration: {str(e)}")

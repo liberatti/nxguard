@@ -477,35 +477,53 @@ class TransactionDao(DuckDAO):
                 EXTRACT(day FROM CAST(logtime AS TIMESTAMP)) AS day,
                 EXTRACT(hour FROM CAST(logtime AS TIMESTAMP)) AS hour,
                 EXTRACT(minute FROM CAST(logtime AS TIMESTAMP)) AS minute,
+                COALESCE(UPPER(action), 'PASSED') AS action,
                 COUNT(*) AS count,
                 COALESCE(SUM(TRY_CAST(json_extract_string(CAST(http_json AS JSON), '$.request.bytes') AS UBIGINT)), 0) AS bytes_in,
                 COALESCE(SUM(TRY_CAST(json_extract_string(CAST(http_json AS JSON), '$.response.bytes') AS UBIGINT)), 0) AS bytes_out
             FROM {self.table_name}
             {where_sql}
-            GROUP BY year, month, day, hour, minute
+            GROUP BY year, month, day, hour, minute, COALESCE(UPPER(action), 'PASSED')
             ORDER BY year, month, day, hour, minute
         """
         rs = self._query(query, params, fetch=True)
-        tpm = []
+        tpm_map = {}
         if rs:
             for r in rs:
-                tpm.append(
-                    {
-                        "_id": {
-                            "year": int(r["year"]) if r["year"] is not None else 0,
-                            "month": int(r["month"]) if r["month"] is not None else 0,
-                            "day": int(r["day"]) if r["day"] is not None else 0,
-                            "hour": int(r["hour"]) if r["hour"] is not None else 0,
-                            "minute": (
-                                int(r["minute"]) if r["minute"] is not None else 0
-                            ),
-                        },
-                        "count": int(r["count"]) if r["count"] is not None else 0,
-                        "bytes_in": int(r["bytes_in"]) if r.get("bytes_in") is not None else 0,
-                        "bytes_out": int(r["bytes_out"]) if r.get("bytes_out") is not None else 0,
-                    }
+                key = (
+                    int(r["year"]) if r["year"] is not None else 0,
+                    int(r["month"]) if r["month"] is not None else 0,
+                    int(r["day"]) if r["day"] is not None else 0,
+                    int(r["hour"]) if r["hour"] is not None else 0,
+                    int(r["minute"]) if r["minute"] is not None else 0,
                 )
-        return tpm
+                action = str(r["action"]).upper() if r.get("action") else "PASSED"
+                count = int(r["count"]) if r["count"] is not None else 0
+                bytes_in = int(r["bytes_in"]) if r.get("bytes_in") is not None else 0
+                bytes_out = int(r["bytes_out"]) if r.get("bytes_out") is not None else 0
+
+                if key not in tpm_map:
+                    tpm_map[key] = {
+                        "_id": {
+                            "year": key[0],
+                            "month": key[1],
+                            "day": key[2],
+                            "hour": key[3],
+                            "minute": key[4],
+                        },
+                        "count": 0,
+                        "bytes_in": 0,
+                        "bytes_out": 0,
+                        "actions": {},
+                    }
+                tpm_map[key]["count"] += count
+                tpm_map[key]["bytes_in"] += bytes_in
+                tpm_map[key]["bytes_out"] += bytes_out
+                tpm_map[key]["actions"][action] = (
+                    tpm_map[key]["actions"].get(action, 0) + count
+                )
+
+        return list(tpm_map.values())
 
     def get_node_bandwidth(self, node_name: str) -> List[Dict[str, Any]]:
         try:

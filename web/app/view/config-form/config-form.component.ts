@@ -50,10 +50,10 @@ export class ConfigFormComponent implements OnInit {
     submitted = false;
     form = new FormGroup({
         _id: new FormControl<string>(''),
-        maxmind_key: new FormControl<string>(''),
         ca_certificate: new FormControl<string>(''),
         ca_private: new FormControl<string>(''),
         acme_directory_url: new FormControl<string>(''),
+        dns_resolver: new FormControl<string>(''),
         archive: new FormGroup({
             enabled: new FormControl<boolean>(false),
             archive_after: new FormControl<number>(1800),
@@ -65,6 +65,10 @@ export class ConfigFormComponent implements OnInit {
         purge: new FormGroup({
             enabled: new FormControl<boolean>(false),
             purge_after: new FormControl<number>(1800)
+        }),
+        ipxa: new FormGroup({
+            url: new FormControl<string>(''),
+            key: new FormControl<string>('')
         }),
         telemetry: new FormGroup({
             enabled: new FormControl<boolean>(false),
@@ -83,14 +87,16 @@ export class ConfigFormComponent implements OnInit {
     ngOnInit(): void {
         // Fetch active configuration and patch form values
         this.configService.getActive().subscribe(data => {
+            const c = (data as any)?.config || data;
             this.form.patchValue({
-                _id: data._id,
-                maxmind_key: data.maxmind_key,
-                ca_certificate: data.ca_certificate,
-                ca_private: data.ca_private,
-                acme_directory_url: data.acme_directory_url,
-                archive: data.archive || {},
-                purge: data.purge || {}
+                _id: c._id,
+                ca_certificate: c.ca_certificate,
+                ca_private: c.ca_private,
+                acme_directory_url: c.acme_directory_url,
+                dns_resolver: c.dns_resolver,
+                archive: c.archive || {},
+                purge: c.purge || {},
+                ipxa: c.ipxa || {}
             });
         });
     }

@@ -126,6 +126,9 @@ USER nxguard
 
 EXPOSE 5000
 
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+    CMD python3 cli.py health_check
+
 VOLUME [ "/data" ]
 
 ENTRYPOINT ["gunicorn", "-c", "api/gunicorn_config.py", "main:app"]

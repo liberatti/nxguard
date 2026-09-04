@@ -12,32 +12,38 @@
                                id="datetime-date-toggle"></mat-datepicker-toggle>
         <mat-datepicker #picker>
           <mat-datepicker-actions>
-            <div class="time-selection" style="padding-bottom: 25px;">
+            <div class="time-selection-container">
               <mat-form-field class="time-field" appearance="outline" subscriptSizing="dynamic">
-                <mat-label>Hora</mat-label>
+                <mat-label>{{ 'DATETIME.HOUR' | translate }}</mat-label>
                 <mat-select [(ngModel)]="selectedHour" (selectionChange)="onTimeChange()">
-                  <mat-option *ngFor="let hour of hours" [value]="hour">{{hour}}</mat-option>
+                  @for (hour of hours; track hour) {
+                    <mat-option [value]="hour">{{hour}}</mat-option>
+                  }
                 </mat-select>
               </mat-form-field>
               <mat-form-field class="time-field" appearance="outline" subscriptSizing="dynamic">
-                <mat-label>Minuto</mat-label>
+                <mat-label>{{ 'DATETIME.MINUTE' | translate }}</mat-label>
                 <mat-select [(ngModel)]="selectedMinute" (selectionChange)="onTimeChange()">
-                  <mat-option *ngFor="let minute of minutes" [value]="minute">{{minute}}</mat-option>
+                  @for (minute of minutes; track minute) {
+                    <mat-option [value]="minute">{{minute}}</mat-option>
+                  }
                 </mat-select>
               </mat-form-field>
               <mat-form-field class="time-field" appearance="outline" subscriptSizing="dynamic">
-                <mat-label>Segundo</mat-label>
+                <mat-label>{{ 'DATETIME.SECOND' | translate }}</mat-label>
                 <mat-select [(ngModel)]="selectedSecond" (selectionChange)="onTimeChange()">
-                  <mat-option *ngFor="let second of seconds" [value]="second">{{second}}</mat-option>
+                  @for (second of seconds; track second) {
+                    <mat-option [value]="second">{{second}}</mat-option>
+                  }
                 </mat-select>
               </mat-form-field>
             </div>
             <button mat-raised-button color="primary" 
-                    style="position: absolute; right: 10px;bottom: 5px;"
+                    class="datetime-confirm-action"
                     (click)="onConfirm()"
                     id="datetime-confirm-btn"
                     matDatepickerApply>
-                Confirmar
+                {{ 'ACTIONS.CONFIRM' | translate }}
             </button>
           </mat-datepicker-actions>
         </mat-datepicker>

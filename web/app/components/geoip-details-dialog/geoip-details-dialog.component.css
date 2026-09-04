@@ -1,0 +1,322 @@
+.geoip-dialog-container {
+    display: flex;
+    flex-direction: column;
+    max-height: 85vh;
+    min-width: 520px;
+    max-width: 720px;
+    background: #ffffff;
+}
+
+.geoip-dialog-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px 14px 20px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.header-title-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.header-icon {
+    font-size: 28px;
+    height: 28px;
+    width: 28px;
+    color: #0284c7;
+}
+
+.dialog-title {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #0f172a;
+    letter-spacing: -0.2px;
+    padding: 0 !important;
+}
+
+.dialog-subtitle {
+    font-size: 0.8rem;
+    color: #64748b;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+}
+
+.geoip-dialog-content {
+    padding: 20px !important;
+    margin: 0 !important;
+    max-height: 65vh;
+    overflow-y: auto;
+    background: #f8fafc;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Hero Summary Card */
+.geoip-hero-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    background: #ffffff;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.hero-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.flag-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 33px;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    flex-shrink: 0;
+}
+
+.flag-large {
+    width: 44px !important;
+    height: 33px !important;
+    line-height: 33px !important;
+    background-size: cover;
+    background-position: center;
+}
+
+.flag-placeholder {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+    color: #94a3b8;
+}
+
+.hero-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.hero-ip-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.hero-ip {
+    font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.mini-copy-btn {
+    width: 26px !important;
+    height: 26px !important;
+    line-height: 26px !important;
+    padding: 0 !important;
+}
+
+.mini-copy-btn mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: #64748b;
+}
+
+.hero-country-name {
+    font-size: 0.85rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+/* Status Badge */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.status-badge.status-allowed,
+.status-badge.status-passed {
+    background: #ecfdf5;
+    color: #059669;
+    border: 1px solid #a7f3d0;
+}
+
+.status-badge.status-blocked,
+.status-badge.status-deny,
+.status-badge.status-rejected {
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+.status-badge.status-warn,
+.status-badge.status-delayed {
+    background: #fffbeb;
+    color: #d97706;
+    border: 1px solid #fef3c7;
+}
+
+.badge-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}
+
+/* Key-Value Details Grid */
+.geoip-details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.grid-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: #ffffff;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.grid-card-wide {
+    grid-column: span 2;
+}
+
+.grid-card-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: #f1f5f9;
+    color: #475569;
+    flex-shrink: 0;
+}
+
+.grid-card-icon mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+}
+
+.grid-card-content {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex: 1;
+}
+
+.grid-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 2px;
+}
+
+.grid-value {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #0f172a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.grid-value.monospace {
+    font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+    font-size: 0.82rem;
+}
+
+.status-text-allowed,
+.status-text-passed {
+    color: #059669;
+}
+
+.status-text-blocked,
+.status-text-deny,
+.status-text-rejected {
+    color: #dc2626;
+}
+
+/* Expandable Raw Data */
+.raw-data-accordion mat-expansion-panel {
+    border-radius: 8px !important;
+    border: 1px solid #e2e8f0;
+    box-shadow: none !important;
+    background: #ffffff;
+    overflow: hidden;
+}
+
+.accordion-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #475569;
+}
+
+.panel-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: #0284c7;
+}
+
+.code-wrapper {
+    background: #f8fafc;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+}
+
+.code-wrapper pre {
+    margin: 0;
+    padding: 12px;
+    font-family: 'JetBrains Mono', 'Fira Code', Consolas, Monaco, monospace;
+    font-size: 0.8rem;
+    line-height: 1.45;
+    background: #f8fafc !important;
+}
+
+.code-wrapper pre code {
+    background: transparent !important;
+    padding: 0 !important;
+    color: #0f172a !important;
+}
+
+/* Actions */
+.geoip-dialog-actions {
+    padding: 12px 20px 16px 20px !important;
+    margin: 0 !important;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    gap: 8px;
+    background: #ffffff;
+}

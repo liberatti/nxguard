@@ -1,0 +1,128 @@
+<div class="geoip-dialog-container">
+    <div class="geoip-dialog-header">
+        <div class="header-title-group">
+            <mat-icon class="header-icon">public</mat-icon>
+            <div>
+                <h2 class="dialog-title" mat-dialog-title>{{ 'GEOIP_DIALOG.TITLE' | translate }}</h2>
+                <span class="dialog-subtitle">{{ 'GEOIP_DIALOG.SUBTITLE' | translate }}</span>
+            </div>
+        </div>
+
+        <div class="header-actions">
+            <button mat-icon-button (click)="onDismiss()" [matTooltip]="'ACTIONS.CLOSE' | translate" id="btn-close-geoip-dialog">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+    </div>
+
+    <mat-dialog-content class="geoip-dialog-content">
+        <!-- Main Summary Hero Card -->
+        <div class="geoip-hero-card">
+            <div class="hero-left">
+                <div class="flag-wrapper">
+                    @if (countryCode) {
+                        <span class="fi fi-{{ countryCode | lowercase }} flag-large"></span>
+                    } @else {
+                        <mat-icon class="flag-placeholder">public_off</mat-icon>
+                    }
+                </div>
+                <div class="hero-info">
+                    <div class="hero-ip-row">
+                        <span class="hero-ip">{{ ipAddress }}</span>
+                        <button mat-icon-button class="mini-copy-btn" (click)="copyIp()" [matTooltip]="'GEOIP_DIALOG.COPIED' | translate" id="btn-copy-ip">
+                            <mat-icon>{{ copiedIp ? 'check' : 'content_copy' }}</mat-icon>
+                        </button>
+                    </div>
+                    <div class="hero-country-name">
+                        {{ countryCode ? countryCode : ('SENSOR.GEO_BLOCKED' | translate) }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-right">
+                <span class="status-badge" [ngClass]="'status-' + (geoipAction | lowercase)">
+                    <mat-icon class="badge-icon">{{ (geoipAction === 'allowed' || geoipAction === 'PASSED') ? 'verified' : 'block' }}</mat-icon>
+                    {{ geoipAction }}
+                </span>
+            </div>
+        </div>
+
+        <!-- Key-Value Details Grid -->
+        <div class="geoip-details-grid">
+            <div class="grid-card">
+                <div class="grid-card-icon"><mat-icon>location_on</mat-icon></div>
+                <div class="grid-card-content">
+                    <label class="grid-label">{{ 'GEOIP_DIALOG.COUNTRY' | translate }}</label>
+                    <span class="grid-value">{{ countryCode || '--' }}</span>
+                </div>
+            </div>
+
+            <div class="grid-card">
+                <div class="grid-card-icon"><mat-icon>security</mat-icon></div>
+                <div class="grid-card-content">
+                    <label class="grid-label">{{ 'GEOIP_DIALOG.STATUS' | translate }}</label>
+                    <span class="grid-value" [ngClass]="'status-text-' + (geoipAction | lowercase)">{{ geoipAction }}</span>
+                </div>
+            </div>
+
+            <div class="grid-card">
+                <div class="grid-card-icon"><mat-icon>domain</mat-icon></div>
+                <div class="grid-card-content">
+                    <label class="grid-label">{{ 'GEOIP_DIALOG.ORGANIZATION' | translate }}</label>
+                    <span class="grid-value" [matTooltip]="organization">{{ organization }}</span>
+                </div>
+            </div>
+
+            <div class="grid-card">
+                <div class="grid-card-icon"><mat-icon>tag</mat-icon></div>
+                <div class="grid-card-content">
+                    <label class="grid-label">{{ 'GEOIP_DIALOG.ASN' | translate }}</label>
+                    <span class="grid-value">{{ asn }}</span>
+                </div>
+            </div>
+
+            <div class="grid-card grid-card-wide">
+                <div class="grid-card-icon"><mat-icon>timeline</mat-icon></div>
+                <div class="grid-card-content">
+                    <label class="grid-label">{{ 'GEOIP_DIALOG.IP_RANGE' | translate }}</label>
+                    <span class="grid-value monospace">{{ ipRange }}</span>
+                </div>
+            </div>
+
+            @if (ipxa && ipxa !== '-') {
+            <div class="grid-card grid-card-wide">
+                <div class="grid-card-icon"><mat-icon>hub</mat-icon></div>
+                <div class="grid-card-content">
+                    <label class="grid-label">{{ 'GEOIP_DIALOG.IPXA' | translate }}</label>
+                    <span class="grid-value">{{ ipxa }}</span>
+                </div>
+            </div>
+            }
+        </div>
+
+        <!-- Raw Geo Data Expandable Section -->
+        <mat-accordion class="raw-data-accordion">
+            <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                    <mat-panel-title class="accordion-title">
+                        <mat-icon class="panel-icon">data_object</mat-icon>
+                        {{ 'GEOIP_DIALOG.RAW_DATA' | translate }}
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <div class="code-wrapper">
+                    <pre><code [highlight]="rawGeoJson" language="json"></code></pre>
+                </div>
+            </mat-expansion-panel>
+        </mat-accordion>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end" class="geoip-dialog-actions">
+        <button mat-stroked-button (click)="copyJson()" id="btn-copy-geo-json">
+            <mat-icon>{{ copiedJson ? 'check' : 'content_copy' }}</mat-icon>
+            {{ 'ACTIONS.EXPORT' | translate }} JSON
+        </button>
+        <button mat-flat-button color="primary" (click)="onDismiss()" id="btn-close-geoip-footer">
+            {{ 'ACTIONS.CLOSE' | translate }}
+        </button>
+    </mat-dialog-actions>
+</div>

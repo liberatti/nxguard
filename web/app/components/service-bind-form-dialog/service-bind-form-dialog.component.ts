@@ -17,6 +17,7 @@ import { Bind, ProtocolType } from 'app/models/service';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatChipsModule } from '@angular/material/chips';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
     selector: 'app-service-bind-form-dialog',
@@ -31,8 +32,8 @@ import { MatChipsModule } from '@angular/material/chips';
         MatDialogContent,
         MatDialogActions,
         MatChipsModule,
-        MatIconModule, MatSelectModule, MatCheckboxModule
-
+        MatIconModule, MatSelectModule, MatCheckboxModule,
+        TranslatePipe
     ],
 })
 export class ServiceBindFormDialogComponent implements OnInit {

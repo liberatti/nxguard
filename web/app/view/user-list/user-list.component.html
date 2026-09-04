@@ -4,10 +4,12 @@
             <mat-card-title>{{ 'view.user.title' | translate }}</mat-card-title>
             <mat-card-subtitle>{{ 'view.user.subtitle' | translate }}</mat-card-subtitle>
             <mat-card-actions class="align-right">
-                <button id="add-user-btn" mat-flat-button color="primary" [routerLink]="['add']" *ngIf="oauth.isRole('superuser')" class="create-btn">
+                @if (oauth.isRole('superuser')) {
+                <button id="add-user-btn" mat-flat-button color="primary" [routerLink]="['add']" class="create-btn">
                     <mat-icon>person_add</mat-icon>
                     {{ 'actions.create' | translate }}
                 </button>
+                }
             </mat-card-actions>
         </mat-card-header>
 
@@ -56,7 +58,7 @@
                     <th mat-header-cell *matHeaderCellDef class="text-right">{{ 'USER_MGMT.ACTIONS' | translate }}</th>
                     <td mat-cell *matCellDef="let element; let i = index;" class="text-right">
                         <div class="table-cell-actions">
-                            <div style="border:none" class="toggle-container">
+                            <div class="toggle-container no-border">
                                 <button mat-icon-button [matMenuTriggerFor]="menu" id="user-menu-{{element._id}}" class="action-menu-btn">
                                     <mat-icon>more_vert</mat-icon>
                                 </button>
@@ -65,10 +67,12 @@
                                         <mat-icon>edit</mat-icon>
                                         <span>{{ 'actions.edit' | translate }}</span>
                                     </button>
-                                    <button mat-menu-item (click)="onRemove(element)" *ngIf="oauth.isRole('superuser')" id="delete-user-{{element._id}}" class="delete-menu-item">
+                                    @if (oauth.isRole('superuser')) {
+                                    <button mat-menu-item (click)="onRemove(element)" id="delete-user-{{element._id}}" class="delete-menu-item">
                                         <mat-icon color="warn">delete</mat-icon>
                                         <span class="text-warn">{{ 'actions.delete' | translate }}</span>
                                     </button>
+                                    }
                                 </mat-menu>
                             </div>
                         </div>

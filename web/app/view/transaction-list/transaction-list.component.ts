@@ -50,6 +50,8 @@ import {MatSnackBarModule} from '@angular/material/snack-bar';
 import {HighlightModule} from 'ngx-highlightjs';
 import {HighlightLineNumbers} from 'ngx-highlightjs/line-numbers';
 import {DateRangeDialogComponent} from 'app/components/date-range-dialog/date-range-dialog.component';
+import {GeoipDetailsDialogComponent} from 'app/components/geoip-details-dialog/geoip-details-dialog.component';
+import {RblDetailsDialogComponent} from 'app/components/rbl-details-dialog/rbl-details-dialog.component';
 
 @Component({
     selector: 'app-transaction-list',
@@ -107,25 +109,31 @@ export class TransactionListComponent implements OnInit {
     currentRowSelected: TransactionLog = {} as TransactionLog;
     expandedElement: TransactionLog | null = null;
 
+    actionColors: Record<string, { border: string; bg: string; point: string }> = {
+        PASSED: { border: '#10b981', bg: 'rgba(16, 185, 129, 0.12)', point: '#10b981' },
+        ALLOW: { border: '#06b6d4', bg: 'rgba(6, 182, 212, 0.12)', point: '#06b6d4' },
+        PASS: { border: '#10b981', bg: 'rgba(16, 185, 129, 0.12)', point: '#10b981' },
+        WARN: { border: '#f59e0b', bg: 'rgba(245, 158, 11, 0.12)', point: '#f59e0b' },
+        DENY: { border: '#ef4444', bg: 'rgba(239, 68, 68, 0.12)', point: '#ef4444' },
+        BLOCK: { border: '#dc2626', bg: 'rgba(220, 38, 38, 0.12)', point: '#dc2626' },
+        REJECTED: { border: '#f97316', bg: 'rgba(249, 115, 22, 0.12)', point: '#f97316' },
+    };
+
+    fallbackPalette = [
+        { border: '#8b5cf6', bg: 'rgba(139, 92, 246, 0.12)', point: '#8b5cf6' },
+        { border: '#ec4899', bg: 'rgba(236, 72, 153, 0.12)', point: '#ec4899' },
+        { border: '#3b82f6', bg: 'rgba(59, 130, 246, 0.12)', point: '#3b82f6' },
+        { border: '#14b8a6', bg: 'rgba(20, 184, 166, 0.12)', point: '#14b8a6' },
+        { border: '#64748b', bg: 'rgba(100, 116, 139, 0.12)', point: '#64748b' },
+    ];
+
     chart: any;
     chartConfig = {
         type: 'line',
         plugins: [ChartDataLabels],
         data: {
             labels: [],
-            datasets: [
-                {
-                    label: "TPM",
-                    data: [],
-                    borderColor: '#0284c7',
-                    backgroundColor: 'rgba(2, 132, 199, 0.15)',
-                    fill: true,
-                    tension: 0.3,
-                    borderWidth: 2,
-                    pointRadius: 2,
-                    pointHoverRadius: 5,
-                }
-            ]
+            datasets: []
         },
         options: {
             layout: {
@@ -134,12 +142,47 @@ export class TransactionListComponent implements OnInit {
             aspectRatio: 1.5,
             responsive: true,
             maintainAspectRatio: false,
+            interaction: {
+                intersect: false,
+                mode: 'index',
+            },
             plugins: {
                 legend: {
-                    display: false
+                    display: true,
+                    position: 'top',
+                    align: 'end',
+                    labels: {
+                        boxWidth: 8,
+                        boxHeight: 8,
+                        usePointStyle: true,
+                        pointStyle: 'circle',
+                        color: '#64748b',
+                        font: { size: 11, weight: '600' },
+                        padding: 12,
+                    }
                 },
                 datalabels: {
                     display: false
+                },
+                tooltip: {
+                    enabled: true,
+                    backgroundColor: '#0f172a',
+                    titleColor: '#f8fafc',
+                    bodyColor: '#e2e8f0',
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                    borderWidth: 1,
+                    padding: 10,
+                    cornerRadius: 8,
+                    displayColors: true,
+                    boxWidth: 8,
+                    boxHeight: 8,
+                    usePointStyle: true,
+                    callbacks: {
+                        label: (context: any) => {
+                            const val = context.parsed.y ?? 0;
+                            return ` ${context.dataset.label}: ${this.formatService.tpm(val)}`;
+                        }
+                    }
                 },
                 zoom: {
                     zoom: {
@@ -283,32 +326,91 @@ export class TransactionListComponent implements OnInit {
         });
     }
 
+    renderTpmChart(data: any[]): void {
+        if (this.chart != null) {
+            this.chart.destroy();
+        }
+
+        const labels: any[] = [];
+        let datasets: any[] = [];
+
+        if (data && Array.isArray(data) && data.length > 0) {
+            for (let i = 0; i < data.length; i++) {
+                labels.push(moment(data[i].logtime));
+            }
+
+            const actionSet = new Set<string>();
+            for (const d of data) {
+                if (d.actions) {
+                    Object.keys(d.actions).forEach((a) => actionSet.add(a.toUpperCase()));
+                }
+            }
+
+            if (actionSet.size > 0) {
+                const order = ['PASSED', 'ALLOW', 'WARN', 'REJECTED', 'DENY', 'BLOCK'];
+                const sortedActions = Array.from(actionSet).sort((a, b) => {
+                    const idxA = order.indexOf(a);
+                    const idxB = order.indexOf(b);
+                    if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+                    if (idxA !== -1) return -1;
+                    if (idxB !== -1) return 1;
+                    return a.localeCompare(b);
+                });
+
+                let fallbackIdx = 0;
+                datasets = sortedActions.map((action) => {
+                    const colorConfig =
+                        this.actionColors[action] ||
+                        this.fallbackPalette[fallbackIdx++ % this.fallbackPalette.length];
+                    const seriesData = data.map((d: any) =>
+                        d.actions && d.actions[action] != null ? d.actions[action] : 0
+                    );
+
+                    return {
+                        label: action,
+                        data: seriesData,
+                        borderColor: colorConfig.border,
+                        backgroundColor: colorConfig.bg,
+                        fill: false,
+                        tension: 0.3,
+                        borderWidth: 2,
+                        pointRadius: 2,
+                        pointHoverRadius: 5,
+                        pointBackgroundColor: colorConfig.point,
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 1.5,
+                    };
+                });
+            } else {
+                datasets = [
+                    {
+                        label: 'TPM',
+                        data: data.map((d: any) => d.count || 0),
+                        borderColor: '#0284c7',
+                        backgroundColor: 'rgba(2, 132, 199, 0.15)',
+                        fill: true,
+                        tension: 0.3,
+                        borderWidth: 2,
+                        pointRadius: 2,
+                        pointHoverRadius: 5,
+                    },
+                ];
+            }
+        }
+
+        this.chartConfig.data.labels = labels;
+        this.chartConfig.data.datasets = datasets;
+        this.chart = new Chart('trn-chart', this.chartConfig);
+    }
+
     onSearch() {
         let filter = this.form.value as TransactionFilter;
         this.transactionService.getTpm(filter).subscribe({
             next: (data) => {
-                if (this.chart != null) {
-                    this.chart.destroy();
-                }
-                this.chart = new Chart("trn-chart", this.chartConfig);
-                this.chart.data.labels = [];
-                this.chart.data.datasets[0].data = [];
-                if (data && Array.isArray(data)) {
-                    for (let i = 0; i < data.length; i++) {
-                        this.chart.data.labels.push(moment(data[i].logtime));
-                        this.chart.data.datasets[0].data.push(data[i].count);
-                    }
-                }
-                this.chart.update();
+                this.renderTpmChart(data || []);
             },
             error: () => {
-                if (this.chart != null) {
-                    this.chart.destroy();
-                }
-                this.chart = new Chart("trn-chart", this.chartConfig);
-                this.chart.data.labels = [];
-                this.chart.data.datasets[0].data = [];
-                this.chart.update();
+                this.renderTpmChart([]);
             }
         });
 
@@ -352,6 +454,22 @@ export class TransactionListComponent implements OnInit {
             data: trn,
             width: '780px',
             maxWidth: '90vw',
+        });
+    }
+
+    onShowGeoIP(trn: TransactionLog) {
+        this.confirmDialog.open(GeoipDetailsDialogComponent, {
+            data: trn,
+            width: '680px',
+            maxWidth: '92vw',
+        });
+    }
+
+    onShowRBL(trn: TransactionLog) {
+        this.confirmDialog.open(RblDetailsDialogComponent, {
+            data: trn,
+            width: '680px',
+            maxWidth: '92vw',
         });
     }
 

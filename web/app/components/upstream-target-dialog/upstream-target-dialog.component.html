@@ -1,35 +1,52 @@
-<h1 mat-dialog-title>Upstream Target</h1>
-<div mat-dialog-content>
-    <form [formGroup]="form" id="upstream-target-form">
-        <div class="row">
-            <div class="col">
-                <mat-form-field class='full-width'>
-                    <mat-label>Network Address</mat-label>
-                    <input id="upstream-target-host" matInput formControlName="host">
-                </mat-form-field>
+<div class="target-dialog-container">
+    <div class="target-dialog-header">
+        <div class="header-title-group">
+            <mat-icon class="header-icon">hub</mat-icon>
+            <div>
+                <h2 class="dialog-title" mat-dialog-title>
+                    {{ (isAddMode ? 'UPSTREAM.TARGETS.MODAL_TITLE_ADD' : 'UPSTREAM.TARGETS.MODAL_TITLE_EDIT') | translate }}
+                </h2>
             </div>
         </div>
-        <div class="row">
-            <div class="col">
-                <mat-form-field class='full-width'>
-                    <mat-label>Target Port</mat-label>
-                    <input id="upstream-target-port" matInput formControlName="port">
+        <button mat-icon-button type="button" (click)="cancel()" [matTooltip]="'ACTIONS.CLOSE' | translate" id="btn-close-target-dialog">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+
+    <mat-dialog-content class="target-dialog-content">
+        <form [formGroup]="form" id="upstream-target-form" (ngSubmit)="onSubmit()">
+            <div class="field-row mt-1">
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>{{ 'UPSTREAM.TARGETS.NETWORK_ADDRESS' | translate }}</mat-label>
+                    <mat-icon matPrefix class="field-icon">dns</mat-icon>
+                    <input id="upstream-target-host" matInput formControlName="host" placeholder="e.g. 192.168.1.100 or backend.local" required>
                 </mat-form-field>
             </div>
-            <div class="col">
-                <mat-form-field class='full-width'>
-                    <mat-label>Distribution Weight</mat-label>
-                    <input id="upstream-target-weight" matInput formControlName="weight">
+
+            <div class="field-grid-2 mt-1">
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>{{ 'UPSTREAM.TARGETS.SERVICE_PORT' | translate }}</mat-label>
+                    <mat-icon matPrefix class="field-icon">numbers</mat-icon>
+                    <input id="upstream-target-port" matInput type="number" formControlName="port" min="1" max="65535" required>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>{{ 'UPSTREAM.TARGETS.DISTRIBUTION_WEIGHT' | translate }}</mat-label>
+                    <mat-icon matPrefix class="field-icon">balance</mat-icon>
+                    <input id="upstream-target-weight" matInput type="number" formControlName="weight" min="1">
                 </mat-form-field>
             </div>
-        </div>
-    </form>
-</div>
-<div mat-dialog-actions align="end" class="dialog-actions">
-    <button id="save-upstream-target-btn" type="button" (click)="onSubmit()" mat-raised-button color="primary" cdkFocusInitial>
-        <mat-icon>save</mat-icon> Save
-    </button>
-    <button id="cancel-upstream-target-btn" mat-mini-fab type="button" color="primary" (click)="cancel()">
-        <mat-icon>keyboard_return</mat-icon>
-    </button>
+        </form>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end" class="target-dialog-actions">
+        <button id="cancel-upstream-target-btn" mat-stroked-button type="button" (click)="cancel()">
+            <mat-icon>close</mat-icon>
+            {{ 'ACTIONS.CANCEL' | translate }}
+        </button>
+        <button id="save-upstream-target-btn" type="button" (click)="onSubmit()" mat-flat-button color="primary" [disabled]="form.invalid" cdkFocusInitial>
+            <mat-icon>save</mat-icon>
+            {{ 'ACTIONS.SAVE' | translate }}
+        </button>
+    </mat-dialog-actions>
 </div>

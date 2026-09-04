@@ -30,6 +30,14 @@ export interface TransactionFilter {
     filters?: Array<string>;
 }
 
+export interface TransactionTpmStat {
+    logtime: string;
+    count: number;
+    bytes_in?: number;
+    bytes_out?: number;
+    actions?: Record<string, number>;
+}
+
 export interface TransactionHeader {
     name: string;
     content: string;
@@ -76,6 +84,14 @@ export interface TransactionGeo {
     ip: string;
 }
 
+export interface TransactionReputation {
+    score?: number;
+    action?: string;
+    trusted?: boolean;
+    feed?: string;
+    feeds?: string[];
+}
+
 export interface TransactionLog {
     _id: string;
     action: string;
@@ -94,5 +110,7 @@ export interface TransactionLog {
     limit_req_status: string;
     geoip_status: string;
     rbl_status: string;
+    reputation?: TransactionReputation;
+    ipxa?: string;
     score: number;
 }

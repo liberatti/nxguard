@@ -8,6 +8,7 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatIconModule} from '@angular/material/icon';
 import {MatInputModule} from '@angular/material/input';
 import {Header} from 'app/models/service';
+import {TranslatePipe} from '@ngx-translate/core';
 
 @Component({
     selector: 'app-service-header-form-dialog',
@@ -21,7 +22,8 @@ import {Header} from 'app/models/service';
         MatDialogTitle,
         MatDialogContent,
         MatDialogActions,
-        MatIconModule
+        MatIconModule,
+        TranslatePipe
     ],
 })
 
