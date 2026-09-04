@@ -78,6 +78,18 @@
   gap: 6px;
 }
 
+.nav-menu-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .nav-link-item {
   color: #475569 !important;
   font-size: 0.88rem !important;
@@ -729,8 +741,23 @@
     font-size: 2.25rem;
   }
 
-  .nav-links {
+  .nav-menu-links,
+  .nav-divider {
     display: none;
+  }
+
+  .nav-links {
+    display: flex;
+  }
+
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .brand-title {
+    font-size: 1.1rem;
   }
 
   .footer-inner {
@@ -740,5 +767,47 @@
 
   .footer-actions {
     justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .toolbar-content {
+    padding: 0 8px;
+  }
+
+  .brand-group {
+    gap: 6px;
+  }
+
+  .brand-logo {
+    height: 26px;
+  }
+
+  .brand-title {
+    font-size: 1rem;
+  }
+
+  .brand-version {
+    display: none;
+  }
+
+  .lang-select-btn {
+    padding: 0 6px !important;
+    height: 32px !important;
+    font-size: 0.78rem !important;
+  }
+
+  .sponsor-icon-btn,
+  .github-icon-btn {
+    width: 32px !important;
+    height: 32px !important;
+  }
+
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-title {
+    font-size: 1.75rem;
   }
 }

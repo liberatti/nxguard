@@ -3,40 +3,109 @@
 
 <head>
   <meta charset="utf-8">
-  <title>NXGuard — Next-Gen Web Application Firewall & Security Gateway</title>
+  <title>NXGuard — High-Performance API Gateway & Web Application Firewall (WAF)</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description"
-    content="NXGuard is a high-performance Web Application Firewall and Security Gateway built on OpenResty, ModSecurity v3, and LuaJIT.">
+    content="NXGuard is an enterprise-grade, high-performance API Gateway and Web Application Firewall (WAF) powered by OpenResty, ModSecurity v3, LuaJIT, OWASP CRS, and DuckDB telemetry.">
+  <meta name="keywords"
+    content="NXGuard, WAF, Web Application Firewall, API Gateway, Reverse Proxy, ModSecurity, ModSecurity v3, OpenResty, Nginx, LuaJIT, OWASP CRS, CRS 4, DuckDB, IPXA, Threat Intelligence, Cybersecurity, Layer 7 Security, ACME SSL, Docker">
+  <meta name="author" content="Gustavo Liberatti">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
   <meta name="theme-color" content="#2563eb">
+  <link rel="canonical" href="https://liberatti.github.io/nxguard/">
+
+  <!-- Google Site Verification -->
   <meta name="google-site-verification" content="LLhkyFmThhjOw4GsRmUomfeNg0bQkyuB3e0rt-XeME0" />
+
   <!-- Open Graph / Facebook / LinkedIn -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://liberatti.github.io/nxguard/">
+  <meta property="og:site_name" content="NXGuard">
   <meta property="og:title" content="NXGuard — Next-Gen Web Application Firewall & Security Gateway">
   <meta property="og:description"
-    content="NXGuard is a high-performance Web Application Firewall and Security Gateway built on OpenResty, ModSecurity v3, and LuaJIT.">
+    content="High-performance API Gateway and Web Application Firewall with native ModSecurity v3, sub-millisecond LuaJIT inspection, live IPXA threat intelligence, and DuckDB analytics.">
   <meta property="og:image" content="https://liberatti.github.io/nxguard/assets/dashboard.png">
+  <meta property="og:image:secure_url" content="https://liberatti.github.io/nxguard/assets/dashboard.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="NXGuard Web Application Firewall Executive Dashboard">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:locale:alternate" content="pt_BR">
 
   <!-- Twitter / X Cards -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="https://liberatti.github.io/nxguard/">
   <meta name="twitter:title" content="NXGuard — Next-Gen Web Application Firewall & Security Gateway">
   <meta name="twitter:description"
-    content="NXGuard is a high-performance Web Application Firewall and Security Gateway built on OpenResty, ModSecurity v3, and LuaJIT.">
+    content="High-performance API Gateway and Web Application Firewall with native ModSecurity v3, sub-millisecond LuaJIT inspection, live IPXA threat intelligence, and DuckDB analytics.">
   <meta name="twitter:image" content="https://liberatti.github.io/nxguard/assets/dashboard.png">
+  <meta name="twitter:image:alt" content="NXGuard Web Application Firewall Executive Dashboard">
 
+  <!-- Favicon & App Icons -->
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icon-32x32.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="assets/icon-96x96.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192x192.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/icon-180x180.png">
+
+  <!-- Performance & Fonts Preconnects -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com">
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Material+Icons&display=swap"
     rel="stylesheet">
+
+  <!-- Structured Data (JSON-LD) for Search Engines -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "@id": "https://liberatti.github.io/nxguard/#software",
+        "name": "NXGuard",
+        "applicationCategory": "SecurityApplication",
+        "operatingSystem": "Linux, Docker",
+        "description": "High-performance API Gateway and Web Application Firewall (WAF) powered by OpenResty, ModSecurity v3, LuaJIT, OWASP Core Rule Set, and DuckDB telemetry.",
+        "url": "https://liberatti.github.io/nxguard/",
+        "image": "https://liberatti.github.io/nxguard/assets/dashboard.png",
+        "license": "https://opensource.org/licenses/Apache-2.0",
+        "softwareVersion": "v1.0.8",
+        "author": {
+          "@type": "Person",
+          "name": "Gustavo Liberatti",
+          "url": "https://github.com/liberatti"
+        },
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://liberatti.github.io/nxguard/#website",
+        "url": "https://liberatti.github.io/nxguard/",
+        "name": "NXGuard",
+        "description": "Next-Generation Web Application Firewall & Security Gateway Documentation and Overview.",
+        "inLanguage": ["en", "pt-BR"],
+        "publisher": {
+          "@type": "Person",
+          "name": "Gustavo Liberatti"
+        }
+      }
+    ]
+  }
+  </script>
 </head>
 
 <body class="mat-typography mat-app-background light-theme">
   <app-root></app-root>
 </body>
+
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-2KB9L1T2KK"></script>
 <script>
