@@ -3,7 +3,7 @@ import {MatTableDataSource, MatTableModule} from '@angular/material/table';
 import {MatPaginatorModule, PageEvent} from '@angular/material/paginator';
 import {MatDialog} from '@angular/material/dialog';
 import {CommonModule} from '@angular/common';
-import {ReactiveFormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatMomentDateModule} from '@angular/material-moment-adapter';
 import {MatButtonModule} from '@angular/material/button';
 import {MatCardModule} from '@angular/material/card';
@@ -21,6 +21,7 @@ import {MatTooltipModule} from '@angular/material/tooltip';
 import {RouterModule} from '@angular/router';
 import {TranslatePipe} from '@ngx-translate/core';
 import {ConfirmDialogComponent} from 'app/components/confirm-dialog/confirm-dialog.component';
+import {UpstreamStatesDialogComponent} from 'app/components/upstream-states-dialog/upstream-states-dialog.component';
 import {Upstream} from 'app/models/upstream';
 import {UpstreamService} from 'app/services/upstream.service';
 import {NotificationService} from 'app/services/notification.service';
@@ -31,6 +32,7 @@ import {OAuthService} from "../../services/oauth.service";
     selector: 'app-upstream-list',
     standalone: true,
     imports: [RouterModule, CommonModule,
+        FormsModule,
         ReactiveFormsModule, TranslatePipe,
         MatMomentDateModule,
         MatSidenavModule, MatIconModule, MatButtonModule,
@@ -38,12 +40,14 @@ import {OAuthService} from "../../services/oauth.service";
         MatTableModule, MatMenuModule, MatSortModule,
         MatTooltipModule, MatSelectModule, MatPaginatorModule,
         MatFormFieldModule, MatChipsModule],
-    templateUrl: './upstream-list.component.html'
+    templateUrl: './upstream-list.component.html',
+    styleUrl: './upstream-list.component.css'
 })
 export class UpstreamListComponent implements OnInit {
     upstreamDC: string[] = ['name', 'protocol', 'description', 'targetCount', 'action'];
     upstreamDS: MatTableDataSource<Upstream>;
     upstreamPA = new DefaultPageMeta();
+    searchQuery: string = '';
 
     constructor(
         private notificationService: NotificationService,
@@ -58,12 +62,28 @@ export class UpstreamListComponent implements OnInit {
         this.updateGridTable();
     }
 
+    applyFilter(): void {
+        this.upstreamPA.page = 1;
+        this.updateGridTable();
+    }
+
+    clearFilter(): void {
+        this.searchQuery = '';
+        this.applyFilter();
+    }
+
     updateGridTable() {
-        this.upstreamService.get(this.upstreamPA).subscribe(data => {
-            if (data.metadata) {
-                this.upstreamDS.data = data.data;
-                this.upstreamPA.total_elements = data.metadata.total_elements;
-            } else {
+        this.upstreamService.get(this.upstreamPA, this.searchQuery).subscribe({
+            next: (data) => {
+                if (data && data.metadata) {
+                    this.upstreamDS.data = data.data || [];
+                    this.upstreamPA.total_elements = data.metadata.total_elements;
+                } else {
+                    this.upstreamDS.data = [];
+                    this.upstreamPA.total_elements = 0;
+                }
+            },
+            error: () => {
                 this.upstreamDS.data = [];
                 this.upstreamPA.total_elements = 0;
             }
@@ -74,6 +94,13 @@ export class UpstreamListComponent implements OnInit {
         this.upstreamPA.page = event.pageIndex + 1;
         this.upstreamPA.per_page = event.pageSize;
         this.updateGridTable();
+    }
+
+    openStatesDialog(element: Upstream): void {
+        this.confirmDialog.open(UpstreamStatesDialogComponent, {
+            data: { upstream: element },
+            width: '600px'
+        });
     }
 
     onRemove(dto: Upstream) {

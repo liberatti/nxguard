@@ -54,8 +54,8 @@ local log_data = {
 
 local json_line = cjson.encode(log_data)
 
-local service_name = ngx.var.service or "default"
-local key = service_name .. ":" .. ngx.now() .. ":" .. math.random()
+local service_file = ngx.var.service_render or ngx.var.service or "default"
+local key = service_file .. ":" .. ngx.now() .. ":" .. math.random()
 local ok, err = log_buffer:set(key, json_line)
 if not ok then
     ngx.log(ngx.ERR, "log buffer set failed: ", err)

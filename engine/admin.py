@@ -28,7 +28,9 @@ def sync_watchers(conf):
     for svc in services:
         if not svc.get("active", True):
             continue
-        svc_name = svc.get("name") or svc.get("_id")
+        svc_name = svc.get("render_name") or (
+            f"{svc.get('name')}_{svc.get('_id')}" if svc.get("_id") else svc.get("name")
+        )
         current_service_names.add(svc_name)
         if svc_name not in ACTIVE_WATCHERS:
             try:
@@ -93,7 +95,12 @@ def apply(scn):
     """Tests the new configuration, and if valid, cleans old files, generates new ones, and reloads Nginx."""
     with ConfigBackupDao() as backup_dao:
         backup = backup_dao.get_by_scn(scn)
-        conf = json.loads(backup["data"]) if backup else None
+        if backup and "data" in backup:
+            conf = backup["data"]
+            if isinstance(conf, str):
+                conf = json.loads(conf)
+        else:
+            conf = None
 
     if not conf:
         logger.error(f"Configuration with SCN {scn} not found in ConfigBackupDao.")
@@ -154,7 +161,10 @@ def is_running() -> bool:
 
 def restart():
     """Reloads Nginx if running, or starts Nginx if stopped."""
-    subprocess.run(f"sudo chmod -R 777 {BASE_PATH}/logs", shell=True)
+    subprocess.run(
+        f"sudo chown -R nxguard:nxguard {BASE_PATH}/logs && sudo chmod -R 777 {BASE_PATH}/logs",
+        shell=True,
+    )
     if is_running():
         logger.info("Nginx is running, reload required")
         result = subprocess.Popen(
@@ -166,7 +176,10 @@ def restart():
         stdout, stderr = result.communicate()
         if result.returncode == 0:
             return
-        logger.warn("Nginx reload failed: %s. Attempting clean restart...", stderr.decode().strip())
+        logger.warn(
+            "Nginx reload failed: %s. Attempting clean restart...",
+            stderr.decode().strip(),
+        )
         subprocess.run("sudo pkill -9 nginx", shell=True)
         time.sleep(0.5)
 
@@ -182,7 +195,9 @@ def restart():
         err_msg = stderr.decode().strip()
         logger.error("Failed to start Nginx: %s", err_msg)
         if "Address already in use" in err_msg:
-            logger.info("Address already in use. Killing rogue nginx processes and retrying...")
+            logger.info(
+                "Address already in use. Killing rogue nginx processes and retrying..."
+            )
             subprocess.run("sudo pkill -9 nginx", shell=True)
             time.sleep(0.5)
             retry = subprocess.Popen(

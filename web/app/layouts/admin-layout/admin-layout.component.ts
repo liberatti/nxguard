@@ -9,7 +9,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { ActivatedRoute, NavigationEnd, Router, RouterModule } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import * as moment from 'moment';
-import { filter, interval, Subject, takeUntil } from 'rxjs';
+import { filter, Subject, takeUntil } from 'rxjs';
 import { FrontendConfig, MenuLink } from 'app/models/shared';
 import { LocalStorageService } from 'app/services/localstorage.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
@@ -184,6 +184,11 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
 
     ngOnInit(): void {
         this.translate.setFallbackLang('en_US');
+        const savedLang = this.localStorage.get('lang');
+        if (savedLang) {
+            this.translate.use(savedLang);
+            moment.locale(savedLang);
+        }
         this.menu = (mainMenuData as unknown) as Array<MenuLink>;
         this.toggleSubMenu(undefined);
         this.httpClient.get<any>('assets/main.menu.json').subscribe({
@@ -210,7 +215,8 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
 
     showAbout() {
         this.portDialog.open(AboutDialogComponent, {
-            width: '450px'
+            width: '560px',
+            maxWidth: '95vw'
         });
     }
 
@@ -226,11 +232,16 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     ngAfterViewInit(): void {
+        const savedLang = this.localStorage.get('lang');
         if (this.localStorage.exists('ui_config')) {
             this.config = this.localStorage.get('ui_config');
+            if (savedLang && this.config) {
+                this.config.locale = savedLang;
+                this.localStorage.set('ui_config', this.config);
+            }
         } else {
             this.config = {
-                locale: 'en_US',
+                locale: savedLang || 'en_US',
                 navResource: 'dashboard',
                 sidenavOpened: true,
                 display: {
@@ -239,7 +250,7 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
             } as FrontendConfig;
             this.localStorage.set('ui_config', this.config);
         }
-        const langKey = typeof this.config.locale === 'object' ? (this.config.locale?.key || this.config.locale?.id || 'en_US') : (this.config.locale || 'en_US');
+        const langKey = savedLang || (typeof this.config.locale === 'object' ? (this.config.locale?.key || this.config.locale?.id || 'en_US') : (this.config.locale || 'en_US'));
         this.translate.use(langKey);
         moment.locale(langKey);
 
@@ -273,12 +284,6 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
             });
         });
 
-        // Polling fallback to keep changes synchronized even if websocket reconnects
-        interval(10000)
-            .pipe(takeUntil(this.destroyed))
-            .subscribe(() => {
-                this.loadChanges();
-            });
     }
 
     ngOnDestroy() {

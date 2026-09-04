@@ -121,18 +121,23 @@ class DuckDAO:
         """
         return vo
 
-    def json_load(self, json_data, many=False):
+    def json_load(self, json_data, many=False, partial=False):
         """
         Loads and validates JSON data using the assigned schema.
 
         Args:
             json_data (dict|list): The JSON data to load.
             many (bool): Whether to load multiple objects. Defaults to False.
+            partial (bool): Whether to allow partial validation. Defaults to False.
 
         Returns:
             object: The loaded and validated data.
         """
-        return self.schema.load(json_data, many=many) if self.schema else json_data
+        return (
+            self.schema.load(json_data, many=many, partial=partial)
+            if self.schema
+            else json_data
+        )
 
     def json_dump(self, row, many=False):
         """
@@ -280,7 +285,11 @@ class DuckDAO:
         Returns:
             bool: True if operation completed successfully.
         """
+        vo = dict(vo)
+        vo.pop("_id", None)
         vo = self.from_dict(vo)
+        if not vo:
+            return True
         keys = ", ".join([f"{k} = ?" for k in vo.keys()])
         sql = f"UPDATE {self.table_name} SET {keys} WHERE _id = ?"
         values = list(vo.values()) + [_id]

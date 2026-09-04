@@ -12,10 +12,12 @@ import { provideHighlightOptions } from 'ngx-highlightjs';
 export const REST_API_URL = new InjectionToken<string>('REST_API_URL');
 export const API_DATA_FORMAT = new InjectionToken<string>('API_DATA_FORMAT');
 
+import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 import { provideTranslateService } from "@ngx-translate/core";
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: { appearance: 'outline' } },
     provideHighlightOptions({
       coreLibraryLoader: () => import('highlight.js/lib/core'),
       lineNumbersLoader: () => import('ngx-highlightjs/line-numbers'), // Optional, add line numbers if needed
@@ -39,7 +41,7 @@ export const appConfig: ApplicationConfig = {
         suffix: '.json'
       }),
       fallbackLang: 'en_US',
-      lang: 'en_US'
+      lang: (typeof window !== 'undefined' && (localStorage.getItem('lang') || JSON.parse(localStorage.getItem('ui_config') || '{}')?.locale)) || 'en_US'
     })
   ]
 };

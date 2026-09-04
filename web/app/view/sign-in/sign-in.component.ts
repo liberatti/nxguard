@@ -55,14 +55,41 @@ export class SignInComponent implements OnInit {
     constructor(private router: Router,
                 private auth: OAuthService, private http: HttpClient,
                 private localStorage: LocalStorageService,
-                private notificationService: NotificationService) {
+                private notificationService: NotificationService,
+                private translate: TranslateService) {
     }
 
     ngOnInit() {
         this.logout();
         this.locales = [
-            {id: 'en_US', name: "English (US)"}
+            { id: 'en_US', name: 'English (US)' },
+            { id: 'pt_BR', name: 'Português (BR)' }
         ];
+        const uiConfig = this.localStorage.get('ui_config');
+        const uiLocale = uiConfig?.locale ? (typeof uiConfig.locale === 'object' ? (uiConfig.locale.key || uiConfig.locale.id) : uiConfig.locale) : null;
+        const savedLang = this.localStorage.get('lang') || uiLocale || 'en_US';
+        this.translate.use(savedLang);
+        this.form.controls.locale.setValue(savedLang);
+    }
+
+    onLocaleChange(lang: string) {
+        const selectedLang = lang || 'en_US';
+        this.translate.use(selectedLang);
+        this.localStorage.set('lang', selectedLang);
+
+        let uiConfig = this.localStorage.get('ui_config');
+        if (!uiConfig) {
+            uiConfig = {
+                locale: selectedLang,
+                sidenavOpened: true,
+                navResource: 'dashboard',
+                display: { datetime: 'YYYY-MM-DDTHH:mm:ss' }
+            };
+        } else {
+            uiConfig.locale = selectedLang;
+        }
+        this.localStorage.set('ui_config', uiConfig);
+        this.form.controls.locale.setValue(selectedLang);
     }
 
     login() {

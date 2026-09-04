@@ -15,6 +15,7 @@ except ImportError:
 
 from nxcore.middleware.logging_manager import logger
 from api.model.transaction_model import TransactionDao
+from config import MASKED_HEADERS
 
 
 def get_server_id():
@@ -108,6 +109,21 @@ class LogParserTool:
         return headers_list
 
     @classmethod
+    def _filter_headers(cls, headers):
+        if not headers:
+            return headers
+        masked = {h.lower() for h in MASKED_HEADERS}
+        if isinstance(headers, list):
+            return [
+                h
+                for h in headers
+                if not (isinstance(h, dict) and h.get("name", "").lower() in masked)
+            ]
+        if isinstance(headers, dict):
+            return {k: v for k, v in headers.items() if k.lower() not in masked}
+        return headers
+
+    @classmethod
     def _extract_json_objects(cls, line: str) -> List[Dict[str, Any]]:
         line = line.strip()
         if not line:
@@ -163,6 +179,9 @@ class LogParserTool:
 
                 now = time.time()
                 merged_records = []
+                logger.debug(
+                    f"\n\n{ service_name} Access records: {len(access_records)}, Audit records: {len(audit_records)}"
+                )
 
                 # Correlate incoming access records
                 for acc in access_records:
@@ -177,8 +196,9 @@ class LogParserTool:
                         else:
                             pending_access[uid] = (acc, now)
                     else:
-                        if not acc.get("service") or not acc["service"].get("_id"):
-                            acc["service"] = {"_id": service_name, "name": service_name}
+                        if not acc.get("service") or not acc["service"].get("name"):
+                            clean_name = service_name.rsplit("_", 1)[0] if ("_" in service_name and service_name.rsplit("_", 1)[1].isdigit()) else service_name
+                            acc["service"] = {"_id": service_name, "name": clean_name}
                         merged_records.append(acc)
 
                 # Correlate incoming audit records
@@ -203,8 +223,9 @@ class LogParserTool:
                 ]
                 for uid in expired_access_uids:
                     acc, _ = pending_access.pop(uid)
-                    if not acc.get("service") or not acc["service"].get("_id"):
-                        acc["service"] = {"_id": service_name, "name": service_name}
+                    if not acc.get("service") or not acc["service"].get("name"):
+                        clean_name = service_name.rsplit("_", 1)[0] if ("_" in service_name and service_name.rsplit("_", 1)[1].isdigit()) else service_name
+                        acc["service"] = {"_id": service_name, "name": clean_name}
                     merged_records.append(acc)
 
                 # Flush pending audit records older than 4 seconds
@@ -225,6 +246,10 @@ class LogParserTool:
                                 logger.error(
                                     f"Error persisting merged transaction: {e}"
                                 )
+                    logger.debug(
+                        f"Merged {len(merged_records)} transactions for {service_name}"
+                    )
+
             except Exception as e:
                 logger.error(
                     f"Error merging transactions for {service_name}: {e} {traceback.format_exc()}"
@@ -256,18 +281,19 @@ class LogParserTool:
             merged["action"] = "DENY"
 
         if service_name and (
-            not merged.get("service") or not merged["service"].get("_id")
+            not merged.get("service") or not merged["service"].get("name")
         ):
-            merged["service"] = {"_id": service_name, "name": service_name}
+            clean_name = service_name.rsplit("_", 1)[0] if ("_" in service_name and service_name.rsplit("_", 1)[1].isdigit()) else service_name
+            merged["service"] = {"_id": service_name, "name": clean_name}
 
         if "http" in audit and audit["http"]:
             aud_http = audit["http"]
             acc_http = merged.get("http", {})
             if "request" in aud_http and aud_http["request"]:
                 if "headers" in aud_http["request"] and aud_http["request"]["headers"]:
-                    acc_http.setdefault("request", {})["headers"] = aud_http["request"][
-                        "headers"
-                    ]
+                    acc_http.setdefault("request", {})["headers"] = cls._filter_headers(
+                        aud_http["request"]["headers"]
+                    )
                 if "method" in aud_http["request"] and not acc_http.get(
                     "request", {}
                 ).get("method"):
@@ -286,9 +312,9 @@ class LogParserTool:
                     "headers" in aud_http["response"]
                     and aud_http["response"]["headers"]
                 ):
-                    acc_http.setdefault("response", {})["headers"] = aud_http[
-                        "response"
-                    ]["headers"]
+                    acc_http.setdefault("response", {})["headers"] = cls._filter_headers(
+                        aud_http["response"]["headers"]
+                    )
                 if "status_code" in aud_http["response"] and not acc_http.get(
                     "response", {}
                 ).get("status_code"):
@@ -311,11 +337,22 @@ class LogParserTool:
         status_code = audit.get("http", {}).get("response", {}).get("status_code", 403)
         action = audit.get("action") or cls.resolve_status_code(status_code)
 
+        clean_name = service_name.rsplit("_", 1)[0] if ("_" in service_name and service_name.rsplit("_", 1)[1].isdigit()) else service_name
+        http_data = audit.get("http", {})
+        if "request" in http_data and "headers" in http_data["request"]:
+            http_data["request"]["headers"] = cls._filter_headers(
+                http_data["request"]["headers"]
+            )
+        if "response" in http_data and "headers" in http_data["response"]:
+            http_data["response"]["headers"] = cls._filter_headers(
+                http_data["response"]["headers"]
+            )
+
         record = {
             "logtime": audit.get("logtime") or datetime.now(),
             "unique_id": audit.get("unique_id", ""),
             "server_id": audit.get("server_id") or server_id,
-            "service": {"_id": service_name, "name": service_name},
+            "service": {"_id": service_name, "name": clean_name},
             "route_name": "-",
             "upstream": None,
             "sensor": None,
@@ -339,7 +376,7 @@ class LogParserTool:
                 "port": audit.get("destination", {}).get("port", 443),
                 "host": "",
             },
-            "http": audit.get("http", {}),
+            "http": http_data,
             "audit": audit.get("audit", {}),
         }
         return record

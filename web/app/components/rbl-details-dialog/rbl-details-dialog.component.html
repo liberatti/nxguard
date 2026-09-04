@@ -1,0 +1,146 @@
+<div class="rbl-dialog-container">
+    <div class="rbl-dialog-header">
+        <div class="header-title-group">
+            <mat-icon class="header-icon">shield</mat-icon>
+            <div>
+                <h2 class="dialog-title" mat-dialog-title>{{ 'RBL_DIALOG.TITLE' | translate }}</h2>
+                <span class="dialog-subtitle">{{ 'RBL_DIALOG.SUBTITLE' | translate }}</span>
+            </div>
+        </div>
+
+        <div class="header-actions">
+            <button mat-icon-button (click)="onDismiss()" [matTooltip]="'ACTIONS.CLOSE' | translate" id="btn-close-rbl-dialog">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+    </div>
+
+    <mat-dialog-content class="rbl-dialog-content">
+        <!-- Main Summary Hero Card -->
+        <div class="rbl-hero-card">
+            <div class="hero-left">
+                <div class="shield-wrapper" [ngClass]="'shield-' + (rblAction | lowercase)">
+                    <mat-icon class="shield-icon">{{ (rblAction === 'allowed' || rblAction === 'PASSED') ? 'verified_user' : 'gpp_bad' }}</mat-icon>
+                </div>
+                <div class="hero-info">
+                    <div class="hero-ip-row">
+                        <span class="hero-ip">{{ ipAddress }}</span>
+                        <button mat-icon-button class="mini-copy-btn" (click)="copyIp()" [matTooltip]="'RBL_DIALOG.COPIED' | translate" id="btn-copy-rbl-ip">
+                            <mat-icon>{{ copiedIp ? 'check' : 'content_copy' }}</mat-icon>
+                        </button>
+                    </div>
+                    <div class="hero-subtext">
+                        @if (isTrusted) {
+                            <span class="trusted-pill">
+                                <mat-icon class="pill-icon">check</mat-icon>
+                                {{ 'RBL_DIALOG.TRUSTED' | translate }}
+                            </span>
+                        } @else {
+                            <span class="score-pill" [ngClass]="riskScore > 50 ? 'high-risk' : (riskScore > 0 ? 'med-risk' : 'low-risk')">
+                                {{ 'RBL_DIALOG.SCORE' | translate }}: {{ riskScore }}
+                            </span>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-right">
+                <span class="status-badge" [ngClass]="'status-' + (rblAction | lowercase)">
+                    <mat-icon class="badge-icon">{{ (rblAction === 'allowed' || rblAction === 'PASSED') ? 'verified' : 'block' }}</mat-icon>
+                    {{ rblAction }}
+                </span>
+            </div>
+        </div>
+
+        <!-- Key-Value Details Grid -->
+        <div class="rbl-details-grid">
+            <div class="grid-card">
+                <div class="grid-card-icon"><mat-icon>dns</mat-icon></div>
+                <div class="grid-card-content">
+                    <label class="grid-label">{{ 'RBL_DIALOG.IP_ADDRESS' | translate }}</label>
+                    <span class="grid-value monospace">{{ ipAddress }}</span>
+                </div>
+            </div>
+
+            <div class="grid-card">
+                <div class="grid-card-icon"><mat-icon>security</mat-icon></div>
+                <div class="grid-card-content">
+                    <label class="grid-label">{{ 'RBL_DIALOG.STATUS' | translate }}</label>
+                    <span class="grid-value" [ngClass]="'status-text-' + (rblAction | lowercase)">{{ rblAction }}</span>
+                </div>
+            </div>
+
+            <div class="grid-card">
+                <div class="grid-card-icon"><mat-icon>speed</mat-icon></div>
+                <div class="grid-card-content">
+                    <label class="grid-label">{{ 'RBL_DIALOG.SCORE' | translate }}</label>
+                    <span class="grid-value score-val" [ngClass]="riskScore > 50 ? 'text-danger' : (riskScore > 0 ? 'text-warning' : 'text-success')">
+                        {{ riskScore }} / 100
+                    </span>
+                </div>
+            </div>
+
+            <div class="grid-card">
+                <div class="grid-card-icon"><mat-icon>verified</mat-icon></div>
+                <div class="grid-card-content">
+                    <label class="grid-label">{{ 'RBL_DIALOG.TRUSTED' | translate }}</label>
+                    <span class="grid-value" [ngClass]="isTrusted ? 'text-success' : 'text-muted'">
+                        {{ (isTrusted ? 'RBL_DIALOG.YES' : 'RBL_DIALOG.NO') | translate }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Matched Feeds Card -->
+            <div class="grid-card grid-card-wide">
+                <div class="grid-card-icon"><mat-icon>dynamic_feed</mat-icon></div>
+                <div class="grid-card-content">
+                    <label class="grid-label">{{ 'RBL_DIALOG.MATCHED_FEEDS' | translate }}</label>
+                    @if (matchedFeeds.length > 0) {
+                        <div class="matched-feeds-list">
+                            @for (feed of matchedFeeds; track feed) {
+                                <span class="feed-chip">{{ feed }}</span>
+                            }
+                        </div>
+                    } @else {
+                        <span class="grid-value text-success font-normal">{{ 'RBL_DIALOG.NO_MATCH' | translate }}</span>
+                    }
+                </div>
+            </div>
+
+            @if (ipxa && ipxa !== '-') {
+            <div class="grid-card grid-card-wide">
+                <div class="grid-card-icon"><mat-icon>hub</mat-icon></div>
+                <div class="grid-card-content">
+                    <label class="grid-label">{{ 'RBL_DIALOG.IPXA' | translate }}</label>
+                    <span class="grid-value">{{ ipxa }}</span>
+                </div>
+            </div>
+            }
+        </div>
+
+        <!-- Raw Reputation Data Expandable Section -->
+        <mat-accordion class="raw-data-accordion">
+            <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                    <mat-panel-title class="accordion-title">
+                        <mat-icon class="panel-icon">data_object</mat-icon>
+                        {{ 'RBL_DIALOG.RAW_DATA' | translate }}
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <div class="code-wrapper">
+                    <pre><code [highlight]="rawReputationJson" language="json"></code></pre>
+                </div>
+            </mat-expansion-panel>
+        </mat-accordion>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end" class="rbl-dialog-actions">
+        <button mat-stroked-button (click)="copyJson()" id="btn-copy-rbl-json">
+            <mat-icon>{{ copiedJson ? 'check' : 'content_copy' }}</mat-icon>
+            {{ 'ACTIONS.EXPORT' | translate }} JSON
+        </button>
+        <button mat-flat-button color="primary" (click)="onDismiss()" id="btn-close-rbl-footer">
+            {{ 'ACTIONS.CLOSE' | translate }}
+        </button>
+    </mat-dialog-actions>
+</div>

@@ -6,7 +6,7 @@
         </button>
 
         <div class="navbar-brand" [routerLink]="['/']">
-            <mat-icon class="brand-icon">shield</mat-icon>
+            <img class="brand-logo-img" src="assets/logo.png" alt="NXGuard Logo">
             <span class="gradient-text brand-title">NXGUARD</span>
         </div>
 
@@ -23,7 +23,8 @@
             </button>
 
             <!-- User Profile -->
-            <button mat-button [matMenuTriggerFor]="userMenu" *ngIf="oauth.userInfo()" id="user-menu-btn"
+            @if (oauth.userInfo()) {
+            <button mat-button [matMenuTriggerFor]="userMenu" id="user-menu-btn"
                 class="user-btn">
                 <div class="user-btn-content">
                     <img [src]="'https://api.dicebear.com/7.x/avataaars/svg?seed=Alex'" class="user-avatar">
@@ -31,14 +32,15 @@
                     <mat-icon class="dropdown-icon">arrow_drop_down</mat-icon>
                 </div>
             </button>
+            }
             <mat-menu #userMenu="matMenu" class="premium-menu" xPosition="before">
                 <a mat-menu-item [routerLink]="['/account']">
                     <mat-icon>person</mat-icon>
-                    <span>Account</span>
+                    <span>{{ 'nav.account' | translate }}</span>
                 </a>
                 <a mat-menu-item (click)="signOut()">
                     <mat-icon>exit_to_app</mat-icon>
-                    <span>Log out</span>
+                    <span>{{ 'nav.logout' | translate }}</span>
                 </a>
             </mat-menu>
         </div>
@@ -49,54 +51,46 @@
         <mat-sidenav [opened]="isSidenavActive()" [mode]="isMobile() ? 'over' : 'side'" class="sidenav"
             id="main-sidenav">
 
-            <mat-nav-list style="padding-top: 16px;">
-                @for (link of menu; track link.label) {
-                <div style="margin-bottom: 4px; padding: 0 12px;">
-                    @if (link.route) {
-                    <a mat-list-item [routerLink]="[link.route]" routerLinkActive="active-link" (click)="onMenuClick()"
-                        style="border-radius: 8px; margin-bottom: 4px;">
-                        <mat-icon matListItemIcon style="color: var(--text-secondary-color)">{{ link.icon }}</mat-icon>
-                        <span matListItemTitle style="font-weight: 500; font-size: 0.9rem;">{{ link.label | translate
-                            }}</span>
-                    </a>
-                    } @else {
-                    <div (click)="toggleSubMenu(link)"
-                        style="cursor: pointer; display: flex; align-items: center; padding: 10px 12px; border-radius: 8px; margin-bottom: 4px;"
-                        [style.background]="link.expanded ? 'rgba(37, 99, 235, 0.05)' : 'transparent'">
-                        <mat-icon style="color: var(--text-secondary-color); margin-right: 16px;">{{ link.icon
-                            }}</mat-icon>
-                        <span style="flex: 1; font-weight: 500; font-size: 0.9rem; color: var(--text-color);">{{
-                            link.label | translate }}</span>
-                        <mat-icon
-                            style="font-size: 18px; width: 18px; height: 18px; color: var(--text-secondary-color);">{{
-                            link.expanded ? 'expand_less' : 'expand_more' }}</mat-icon>
-                    </div>
-
-                    @if (link.expanded) {
-                    <div style="padding-left: 16px;">
-                        @for (subLink of link.menu; track subLink.label) {
-                        <a mat-list-item [routerLink]="[subLink.route]" routerLinkActive="active-link"
-                            (click)="onMenuClick()" style="border-radius: 8px; margin-bottom: 2px;">
-                            <mat-icon matListItemIcon
-                                style="font-size: 20px; width: 20px; height: 20px; color: var(--text-muted)">{{
-                                subLink.icon }}</mat-icon>
-                            <span matListItemTitle style="font-size: 0.85rem;">{{ subLink.label | translate }}</span>
+            <div class="sidenav-inner">
+                <mat-nav-list class="sidenav-menu-list">
+                    @for (link of menu; track link.label) {
+                    <div class="menu-item-group">
+                        @if (link.route) {
+                        <a mat-list-item [routerLink]="[link.route]" routerLinkActive="active-link" (click)="onMenuClick()"
+                            class="nav-link-item">
+                            <mat-icon matListItemIcon class="nav-link-icon">{{ link.icon }}</mat-icon>
+                            <span matListItemTitle class="nav-link-title">{{ link.label | translate }}</span>
                         </a>
+                        } @else {
+                        <div (click)="toggleSubMenu(link)" class="submenu-toggle-item" [class.expanded]="link.expanded">
+                            <mat-icon class="submenu-toggle-icon">{{ link.icon }}</mat-icon>
+                            <span class="submenu-toggle-title">{{ link.label | translate }}</span>
+                            <mat-icon class="submenu-arrow-icon">{{ link.expanded ? 'expand_less' : 'expand_more' }}</mat-icon>
+                        </div>
+
+                        @if (link.expanded) {
+                        <div class="submenu-container">
+                            @for (subLink of link.menu; track subLink.label) {
+                            <a mat-list-item [routerLink]="[subLink.route]" routerLinkActive="active-link"
+                                (click)="onMenuClick()" class="subnav-link-item">
+                                <mat-icon matListItemIcon class="subnav-link-icon">{{ subLink.icon }}</mat-icon>
+                                <span matListItemTitle class="subnav-link-title">{{ subLink.label | translate }}</span>
+                            </a>
+                            }
+                        </div>
+                        }
                         }
                     </div>
                     }
-                    }
-                </div>
-                }
+                </mat-nav-list>
 
-                <div style="margin-top: auto; padding: 12px;">
-                    <a mat-list-item (click)="showAbout()"
-                        style="border-radius: 8px; background: rgba(37, 99, 235, 0.05);">
-                        <mat-icon matListItemIcon style="color: var(--primary-color)">info</mat-icon>
-                        <span matListItemTitle style="font-weight: 600; color: var(--primary-color)">{{ 'nav.about' | translate }} NXGUARD</span>
-                    </a>
+                <div class="sidenav-footer">
+                    <button mat-button class="about-discreet-btn" (click)="showAbout()" id="sidenav-about-btn">
+                        <mat-icon class="about-icon">info_outline</mat-icon>
+                        <span>{{ 'nav.about' | translate }} NXGUARD</span>
+                    </button>
                 </div>
-            </mat-nav-list>
+            </div>
         </mat-sidenav>
 
         <!-- Main content -->
@@ -105,10 +99,9 @@
                 <router-outlet></router-outlet>
             </div>
 
-            <footer
-                style="padding: 20px; text-align: center; color: var(--text-muted); border-top: 1px solid var(--surface-border); font-size: 0.8rem;">
-                <div [innerHTML]="'content.copy' |translate"></div>
-                <div style="margin-top: 4px;">NXGUARD Engine v{{ version }} </div>
+            <footer class="admin-footer">
+                <div [innerHTML]="'content.copy' | translate"></div>
+                <div class="engine-version-text">NXGUARD Engine {{ version }}</div>
             </footer>
         </mat-sidenav-content>
     </mat-sidenav-container>

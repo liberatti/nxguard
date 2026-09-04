@@ -23,19 +23,25 @@ class ConfigPurgeSchema(Schema):
     purge_after = fields.Integer()  # days
 
 
+class ConfigIpxaSchema(Schema):
+    url = fields.String(allow_none=True)
+    key = fields.String(allow_none=True)
+
+
 class ConfigSchema(Schema):
     class Meta:
         unknown = EXCLUDE
 
     _id = fields.Integer()
     cluster_id = fields.String()
-    maxmind_key = fields.String()
-    ca_certificate = fields.String()
-    ca_private = fields.String()
-    acme_directory_url = fields.String()
-    active_scn = fields.String()
-    archive = fields.Nested(ConfigArchiveSchema)
-    purge = fields.Nested(ConfigPurgeSchema)
+    ca_certificate = fields.String(allow_none=True)
+    ca_private = fields.String(allow_none=True)
+    acme_directory_url = fields.String(allow_none=True)
+    dns_resolver = fields.String(allow_none=True)
+    active_scn = fields.String(allow_none=True)
+    archive = fields.Nested(ConfigArchiveSchema, allow_none=True)
+    purge = fields.Nested(ConfigPurgeSchema, allow_none=True)
+    ipxa = fields.Nested(ConfigIpxaSchema, allow_none=True)
 
 
 class ConfigBackupSchema(Schema):
@@ -45,7 +51,7 @@ class ConfigBackupSchema(Schema):
     _id = fields.Integer()
     scn = fields.String()
     created_at = fields.DateTime()
-    data = fields.String()
+    data = fields.Raw()
 
 
 class ConfigBackupDao(DuckDAO):
@@ -69,16 +75,26 @@ class ConfigBackupDao(DuckDAO):
         )
 
     def to_dict(self, row):
-        if row and "data" in row and isinstance(row["data"], str):
-            try:
-                for s in row["data"]["services"]:
-                    c = s.pop("certificate", None)
-                    if c:
-                        s.update({"certificate": {"name": c["name"]}})
-
-                row["data"] = json.loads(row["data"])
-            except Exception:
-                pass
+        if row and "data" in row:
+            if isinstance(row["data"], str):
+                try:
+                    row["data"] = json.loads(row["data"])
+                except Exception:
+                    pass
+            if isinstance(row["data"], dict) and "services" in row["data"]:
+                try:
+                    for s in row["data"]["services"]:
+                        c = s.pop("certificate", None)
+                        if c:
+                            s.update(
+                                {
+                                    "certificate": {
+                                        "name": c["name"] if isinstance(c, dict) else c
+                                    }
+                                }
+                            )
+                except Exception:
+                    pass
         return super().to_dict(row)
 
     def get_latest(self) -> Optional[Dict[str, Any]]:
@@ -106,6 +122,8 @@ class ConfigBackupDao(DuckDAO):
 
         if "created_at" not in vo:
             vo.update({"created_at": datetime.datetime.now()})
+        if "data" in vo and isinstance(vo["data"], dict):
+            vo["data"] = json.dumps(vo["data"], default=str)
         return super().from_dict(vo)
 
 
@@ -121,7 +139,6 @@ class ConfigDao(DuckDAO):
             CREATE TABLE IF NOT EXISTS {self.table_name} (
                 _id INTEGER PRIMARY KEY AUTOINCREMENT,
                 cluster_id TEXT,
-                maxmind_key TEXT,
                 ca_certificate TEXT,
                 ca_private TEXT,
                 acme_directory_url TEXT,
@@ -137,13 +154,13 @@ class ConfigDao(DuckDAO):
 
     def from_dict(self, vo):
         if "archive" in vo:
-            vo.update({"archive_json": json.dumps(vo.pop("archive"))})
+            vo.update({"archive_json": json.dumps(vo.pop("archive"), default=str)})
         if "purge" in vo:
-            vo.update({"purge_json": json.dumps(vo.pop("purge"))})
+            vo.update({"purge_json": json.dumps(vo.pop("purge"), default=str)})
         if "cache" in vo:
-            vo.update({"cache_json": json.dumps(vo.pop("cache"))})
+            vo.update({"cache_json": json.dumps(vo.pop("cache"), default=str)})
         if "ipxa" in vo:
-            vo.update({"ipxa_json": json.dumps(vo.pop("ipxa"))})
+            vo.update({"ipxa_json": json.dumps(vo.pop("ipxa"), default=str)})
         return super().from_dict(vo)
 
     def to_dict(self, row):
@@ -199,3 +216,12 @@ class ChangeDao(DuckDAO):
             );
         """
         )
+
+    def has_certificate_change(self) -> bool:
+        try:
+            query = f"SELECT COUNT(*) as count FROM {self.table_name} WHERE name = 'certificate'"
+            rs = self._query(query, fetch=True)
+            return rs[0]["count"] > 0
+        except Exception as e:
+            logger.error(f"Error checking for certificate change: {str(e)}")
+            return False

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -33,6 +33,7 @@ import {
 import {
     ServiceRouteFormDialogComponent
 } from 'app/components/service-route-form-dialog/service-route-form-dialog.component';
+import { ErrorDetailsDialogComponent } from 'app/components/error-details-dialog/error-details-dialog.component';
 import { Upstream } from 'app/models/upstream';
 import { Sensor } from 'app/models/sensor';
 import { Bind, Header, ProtocolType, Route, RouteType, Service } from 'app/models/service';
@@ -58,10 +59,11 @@ import { minArrayLength } from '../../validators/min-array-length.validator';
         MatTooltipModule, MatSelectModule, MatPaginatorModule, MatSlideToggleModule, MatCheckboxModule,
         MatFormFieldModule, MatChipsModule, MatStepperModule],
     templateUrl: './service-form.component.html',
-    styleUrls: ['./service-form.component.css']
+    styleUrl: './service-form.component.css'
 })
 export class ServiceFormComponent implements OnInit {
 
+    selectedTabIndex: number = 0;
     _certificates: Certificate[];
     basicHeaders = [
         <Header>{ name: "X-Powered-By", content: "NXGuard" },
@@ -114,7 +116,6 @@ export class ServiceFormComponent implements OnInit {
         buffer: new FormControl<number>(256),
         compression_types: new FormControl<Array<string>>([
             'text/plain',
-            'text/html',
             'text/css',
             'application/json',
             'application/xml',
@@ -140,6 +141,7 @@ export class ServiceFormComponent implements OnInit {
         private serviceService: ServiceService,
         private certificateService: CertificateService,
         protected oauth: OAuthService,
+        private cdr: ChangeDetectorRef,
     ) {
         this.headerDS = new MatTableDataSource<Header>;
         this.routeDS = new MatTableDataSource<Route>;
@@ -214,12 +216,13 @@ export class ServiceFormComponent implements OnInit {
     }
 
     moveRoute(event: any) {
-        const currentRoutes = (this.form.get('routes')?.value || []).slice();
+        const currentRoutes = (this.routeDS.data || []).slice();
         const element = currentRoutes[event.previousIndex];
         currentRoutes.splice(event.previousIndex, 1);
         currentRoutes.splice(event.currentIndex, 0, element);
         this.form.get('routes')?.setValue(currentRoutes);
         this.routeDS.data = currentRoutes;
+        this.cdr.detectChanges();
     }
 
     onNextDetails(stepper: MatStepper) {
@@ -228,22 +231,32 @@ export class ServiceFormComponent implements OnInit {
 
     onSubmit() {
         if (this.form.status === "INVALID") {
-            let errors = [] as Array<string>;
+            let detailsObj: any = {};
             Object.keys(this.form.controls)
                 .forEach(k => {
                     let control = this.form.get(k) as FormControl;
-                    if (control.status !== "VALID") {
-                        errors.push(" Invalid value on " + k);
+                    if (control && control.status !== "VALID") {
+                        detailsObj[k] = ["Invalid value on " + k];
                     }
                 });
 
-            if (errors.length > 0) {
-                console.log(this.form.value);
-                this.notificationService.openSnackBar(errors);
+            if (Object.keys(detailsObj).length > 0) {
+                this.confirmDialog.open(ErrorDetailsDialogComponent, {
+                    data: {
+                        code: 400,
+                        message: 'Validation Error',
+                        method: this.isAddMode ? 'POST' : 'PUT',
+                        url: '/api/v1/service',
+                        details: detailsObj
+                    },
+                    width: '650px',
+                    maxWidth: '90vw'
+                });
             }
             return;
         }
         let _data: Service = JSON.parse(JSON.stringify(this.form.value));
+        _data.routes = JSON.parse(JSON.stringify(this.routeDS.data || []));
 
         if (_data._id === "") {
             Reflect.deleteProperty(_data, '_id');
@@ -290,9 +303,11 @@ export class ServiceFormComponent implements OnInit {
     }
 
     onBindRemove(index: number) {
-        const data = this.bindingDS.data;
+        const data = (this.bindingDS.data || []).slice();
         data.splice(index, 1);
         this.bindingDS.data = data;
+        this.form.get('bindings')?.setValue(data);
+        this.cdr.detectChanges();
     }
 
     onAddBind() {
@@ -310,10 +325,10 @@ export class ServiceFormComponent implements OnInit {
 
         dialogRef.afterClosed().subscribe(result => {
             if (result) {
-                const data = this.bindingDS.data;
-                data.push(result);
+                const data = [...(this.bindingDS.data || []), result];
                 this.bindingDS.data = data;
                 this.form.get('bindings')?.setValue(data);
+                this.cdr.detectChanges();
             }
         });
     }
@@ -321,25 +336,28 @@ export class ServiceFormComponent implements OnInit {
     onEditBind(index: number) {
         const dialogRef = this.confirmDialog.open(ServiceBindFormDialogComponent,
             {
-                maxWidth: undefined,
+                width: '450px',
+                maxWidth: '95vw',
                 data: this.bindingDS.data[index]
             });
 
         dialogRef.afterClosed().subscribe(result => {
             if (result) {
                 this.onBindRemove(index);
-                const data = this.bindingDS.data;
-                data.push(result);
+                const data = [...(this.bindingDS.data || []), result];
                 this.bindingDS.data = data;
                 this.form.get('bindings')?.setValue(data);
+                this.cdr.detectChanges();
             }
         });
     }
 
     onRemoveHeader(selectedIndex: number) {
-        const data = this.headerDS.data;
+        const data = (this.headerDS.data || []).slice();
         data.splice(selectedIndex, 1);
         this.headerDS.data = data;
+        this.form.get('headers')?.setValue(data);
+        this.cdr.detectChanges();
     }
 
     onAddHeader() {
@@ -349,70 +367,57 @@ export class ServiceFormComponent implements OnInit {
 
         dialogRef.afterClosed().subscribe(result => {
             if (result) {
-                const data = this.headerDS.data;
-                data.push(result);
+                const data = [...(this.headerDS.data || []), result];
                 this.headerDS.data = data;
                 this.form.get('headers')?.reset(data);
+                this.cdr.detectChanges();
             }
         });
     }
 
     onRemoveRoute(index: number) {
-        const currentRoutes = (this.form.get('routes')?.value || []).slice();
+        const currentRoutes = (this.routeDS.data || []).slice();
         currentRoutes.splice(index, 1);
         this.form.get('routes')?.setValue(currentRoutes);
         this.routeDS.data = currentRoutes;
+        this.cdr.detectChanges();
     }
 
     onAddRoute() {
-        const dialogRef = this.confirmDialog.open(ServiceRouteFormDialogComponent,
-            {
-                maxWidth: undefined
-            });
+        const dialogRef = this.confirmDialog.open(ServiceRouteFormDialogComponent, {
+            width: '780px',
+            maxWidth: '95vw'
+        });
 
         dialogRef.afterClosed().subscribe(result => {
             if (result) {
-                if (result.upstream && result.upstream._id) {
-                    result.upstream = <Upstream>{ _id: result.upstream._id };
-                }
-                if (result.sensor && result.sensor._id) {
-                    result.sensor = <Sensor>{ _id: result.sensor._id };
-                } else {
-                    Reflect.deleteProperty(result, 'sensor');
-                }
-                const currentRoutes = this.form.get('routes')?.value || [];
+                const currentRoutes = (this.routeDS.data || []).slice();
                 const newRoutes = [...currentRoutes, result];
                 this.form.get('routes')?.setValue(newRoutes);
                 this.routeDS.data = newRoutes;
+                this.cdr.detectChanges();
             }
         });
     }
 
     onEditRoute(index: number) {
         const targetRoute = this.routeDS.data[index];
-        const dialogRef = this.confirmDialog.open(ServiceRouteFormDialogComponent,
-            {
-                maxWidth: undefined,
-                data: targetRoute
-            });
+        const dialogRef = this.confirmDialog.open(ServiceRouteFormDialogComponent, {
+            width: '780px',
+            maxWidth: '95vw',
+            data: targetRoute
+        });
 
         dialogRef.afterClosed().subscribe(result => {
             if (result) {
-                if (result.upstream && result.upstream._id) {
-                    result.upstream = <Upstream>{ _id: result.upstream._id };
-                }
-                if (result.sensor && result.sensor._id) {
-                    result.sensor = <Sensor>{ _id: result.sensor._id };
-                } else {
-                    Reflect.deleteProperty(result, 'sensor');
-                }
                 if (targetRoute && targetRoute._id) {
                     result._id = targetRoute._id;
                 }
-                const currentRoutes = (this.form.get('routes')?.value || []).slice();
+                const currentRoutes = (this.routeDS.data || []).slice();
                 currentRoutes[index] = result;
                 this.form.get('routes')?.setValue(currentRoutes);
                 this.routeDS.data = currentRoutes;
+                this.cdr.detectChanges();
             }
         });
     }

@@ -33,6 +33,7 @@ TELEMETRY_INTERVAL = int(
 TELEMETRY_URL = os.environ.get("TELEMETRY_URL", "https://nxguard.app.br")
 
 MAINTENANCE_WINDOW = "01:00"
+CERTIFICATE_RENEW = int(os.environ.get("CERTIFICATE_RENEW", "7"))
 
 LOGLEVEL = os.environ.get("LOGLEVEL", "INFO").upper()
 
@@ -69,3 +70,11 @@ CORS = {
         "max_age": 3600,
     }
 }
+
+MASKED_HEADERS = [
+    "Authorization",
+    "X-Requested-With",
+    "Account-ID",
+    "Refresh-Token",
+    "Cookie",
+]

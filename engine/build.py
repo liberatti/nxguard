@@ -13,7 +13,7 @@ from api.model.oauth_model import UserDao
 from api.model.sensor_model import SensorDao
 from api.model.service_model import ServiceDao
 from api.model.route_model import RouteDao
-from api.model.upstream_model import UpstreamDao, NodeStatusDao
+from api.model.upstream_model import UpstreamDao, NodeStatusDao, UpstreamStatesDao
 from api.model.transaction_model import TransactionDao
 from api.tools.network_tool import NetworkTool
 from nxcore.middleware.logging_manager import logger
@@ -97,26 +97,62 @@ def create_db():
         dao.create_schema()
     with NodeStatusDao() as dao:
         dao.create_schema()
+    with UpstreamStatesDao() as dao:
+        dao.create_schema()
     with ChangeDao() as dao:
         dao.create_schema()
     with ChallengeDao() as dao:
         dao.create_schema()
 
 
-def init_from_data(data_dir, data_file="init-data.json"):
-    """Populates database tables from an initial dataset dictionary."""
+def init_from_data(data_dir=None, data_file="init-data.json", data=None):
+    """Populates database tables from an initial dataset dictionary or JSON file."""
 
-    logger.info(f"Initialize from {data_dir}/{data_file}")
+    if data is None:
+        if data_dir:
+            logger.info(f"Initialize from {data_dir}/{data_file}")
+            data = read_from_json(data_dir, data_file)
+        else:
+            return
 
-    data = read_from_json(data_dir, data_file)
+    if not data:
+        return
+
     if "config" in data:
         with ConfigDao() as dao:
             dao.delete_all()
-            data["config"].update(
-                {"cluster_id": gen_random_string(8), "active_scn": gen_random_string(16)}
+            conf = data["config"]
+            conf.update(
+                {
+                    "cluster_id": gen_random_string(8),
+                    "active_scn": gen_random_string(16),
+                }
             )
-            dao.persist(data["config"])
-            logger.info(f"Config: {data['config']['cluster_id']}")
+            if not conf.get("ca_certificate") or not conf.get("ca_private"):
+                try:
+                    from api.tools.ssl_tool import SSLTool
+
+                    ca_dict = SSLTool.gen_ca("nxguard-CA")
+                    conf["ca_certificate"] = SSLTool.crt_to_pem(ca_dict["certificate"])
+                    conf["ca_private"] = SSLTool.private_to_pem(ca_dict["private_key"])
+                except Exception as e:
+                    logger.error(f"Error generating default CA during init: {e}")
+            if "archive" not in conf or conf.get("archive") is None:
+                conf["archive"] = {
+                    "enabled": False,
+                    "archive_after": 1800,
+                    "type": "opensearch",
+                    "url": "",
+                    "username": "",
+                    "password": "",
+                }
+            if "purge" not in conf or conf.get("purge") is None:
+                conf["purge"] = {
+                    "enabled": False,
+                    "purge_after": 30,
+                }
+            dao.persist(conf)
+            logger.info(f"Config: {conf['cluster_id']}")
 
     if "user" in data:
         with UserDao() as dao:
@@ -136,8 +172,13 @@ def init_from_data(data_dir, data_file="init-data.json"):
     if "upstreams" in data:
         with UpstreamDao() as dao:
             dao.delete_all()
-            dao.persist_many(data["upstreams"])
-            logger.info(f"Upstreams: {len(data['upstreams'])}")
+            cleaned_upstreams = []
+            for u in data["upstreams"]:
+                u_clean = dict(u)
+                u_clean.pop("healthy", None)
+                cleaned_upstreams.append(u_clean)
+            dao.persist_many(cleaned_upstreams)
+            logger.info(f"Upstreams: {len(cleaned_upstreams)}")
 
     if "certificates" in data:
         with CertificateDao() as dao:

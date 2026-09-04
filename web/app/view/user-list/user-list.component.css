@@ -1,3 +1,7 @@
+.toggle-container.no-border {
+    border: none;
+}
+
 .user-card {
     margin-bottom: 24px;
 }

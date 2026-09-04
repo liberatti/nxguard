@@ -18,11 +18,14 @@ export abstract class APIService<T, ID> implements APIOperations<T, ID> {
         this.END_POINT = `${_REST_API_URL}/api/${ctx}`;
     }
 
-    get(pagination?: PageMeta): Observable<Page> {
+    get(pagination?: PageMeta, query?: string): Observable<Page> {
         let params = new HttpParams();
         if (pagination) {
             params = params.append('page', pagination.page);
             params = params.append('size', pagination.per_page);
+        }
+        if (query && query.trim().length > 0) {
+            params = params.append('query', query.trim());
         }
         return this.httpClient.get<Page>(this.END_POINT, { params: params });
     }

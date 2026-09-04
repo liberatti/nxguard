@@ -58,13 +58,15 @@
                             <span class="field-key-badge">({{ currentField.key }})</span>
                         </div>
                     </mat-select-trigger>
-                    <mat-option *ngFor="let f of filteredFields" [value]="f.key">
+                    @for (f of filteredFields; track f.key) {
+                    <mat-option [value]="f.key">
                         <div class="option-content">
                             <mat-icon class="option-icon">{{ f.icon }}</mat-icon>
                             <span class="option-label">{{ f.labelKey | translate }}</span>
                             <span class="option-key">({{ f.key }})</span>
                         </div>
                     </mat-option>
+                    }
                 </mat-select>
             </mat-form-field>
 
@@ -75,9 +77,11 @@
                 <mat-form-field appearance="outline" class="full-width-field" subscriptSizing="dynamic">
                     <mat-label>{{ 'TRANSACTION.FILTER.VALUE_LABEL' | translate }}</mat-label>
                     <mat-select formControlName="value">
-                        <mat-option *ngFor="let opt of currentField.options" [value]="opt">
+                        @for (opt of currentField.options; track opt) {
+                        <mat-option [value]="opt">
                             <span class="enum-badge enum-{{ opt | lowercase }}">{{ opt }}</span>
                         </mat-option>
+                        }
                     </mat-select>
                 </mat-form-field>
                 }
@@ -98,11 +102,12 @@
                 <div class="presets-container">
                     <span class="presets-label">{{ 'TRANSACTION.FILTER.PRESETS' | translate }}:</span>
                     <div class="presets-chips">
+                        @for (preset of currentField.presets; track preset) {
                         <button type="button" mat-stroked-button color="primary" class="preset-chip"
-                            *ngFor="let preset of currentField.presets"
                             (click)="onSelectPreset(preset)">
                             {{ preset }}
                         </button>
+                        }
                     </div>
                 </div>
                 }
@@ -119,15 +124,15 @@
         </form>
     </mat-dialog-content>
 
-    <!-- Dialog Actions (Left-aligned & Color Standards) -->
-    <mat-dialog-actions align="start" class="dialog-actions">
-        <button mat-flat-button color="primary" (click)="onApply()" [disabled]="filterForm.invalid" class="action-btn">
-            <mat-icon>check</mat-icon>
-            {{ 'TRANSACTION.FILTER.APPLY' | translate }}
-        </button>
+    <!-- Dialog Actions -->
+    <mat-dialog-actions align="end" class="dialog-actions">
         <button mat-stroked-button (click)="onCancel()" class="action-btn">
             <mat-icon>keyboard_return</mat-icon>
             {{ 'TRANSACTION.FILTER.CANCEL' | translate }}
+        </button>
+        <button mat-flat-button color="primary" (click)="onApply()" [disabled]="filterForm.invalid" class="action-btn">
+            <mat-icon>check</mat-icon>
+            {{ 'TRANSACTION.FILTER.APPLY' | translate }}
         </button>
     </mat-dialog-actions>
 </div>

@@ -7,7 +7,7 @@
         <div class="vmware-brand-pane">
             <div class="brand-top-content">
                 <div class="brand-icon-wrapper">
-                    <mat-icon class="brand-shield-icon">shield</mat-icon>
+                    <img class="brand-logo-img" src="assets/logo.png" alt="NXGuard Logo">
                 </div>
                 <h1 class="brand-title">{{ 'AUTH.TITLE' | translate }}</h1>
                 <p class="brand-subtitle">{{ 'AUTH.SUBTITLE' | translate }}</p>
@@ -21,8 +21,22 @@
         <!-- Right Login Form Pane (VMware Clarity Clean Form Panel) -->
         <div class="vmware-form-pane">
             <div class="form-header">
-                <h2 class="form-title">{{ 'AUTH.SIGN_IN' | translate }}</h2>
-                <p class="form-subtitle">Enter your credentials to access the console</p>
+                <div class="form-header-row">
+                    <div>
+                        <h2 class="form-title">{{ 'AUTH.SIGN_IN' | translate }}</h2>
+                        <p class="form-subtitle">{{ 'AUTH.SUBTITLE_LOGIN' | translate }}</p>
+                    </div>
+                    <mat-form-field appearance="outline" class="language-select-field" subscriptSizing="dynamic">
+                        <mat-icon matPrefix class="lang-icon">language</mat-icon>
+                        <mat-select [formControl]="form.controls.locale" (selectionChange)="onLocaleChange($event.value)" id="sign-in-language-select">
+                            @for (loc of locales; track loc.id) {
+                            <mat-option [value]="loc.id" id="lang-option-{{loc.id}}">
+                                {{ loc.name }}
+                            </mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                </div>
             </div>
 
             <form [formGroup]="form" id="sign-in-form" class="login-form">
@@ -47,7 +61,7 @@
                 </mat-form-field>
 
                 <!-- Action Button -->
-                <button mat-flat-button id="sign-in-button" color="primary" class="vmware-submit-btn" (click)="login()"
+                <button mat-flat-button id="sign-in-button" class="vmware-submit-btn" (click)="login()"
                     [disabled]="form.invalid">
                     <mat-icon class="btn-icon">login</mat-icon>
                     <span>{{ 'AUTH.SIGN_IN_BTN' | translate }}</span>

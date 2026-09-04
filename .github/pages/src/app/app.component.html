@@ -1,0 +1,357 @@
+<!-- Navigation Header -->
+<mat-toolbar class="header-toolbar">
+  <div class="toolbar-content">
+    <a href="#" class="brand-group">
+      <img src="assets/logo.png" alt="NXGuard Logo" class="brand-logo">
+      <span class="brand-title">{{ title }}</span>
+      <span class="brand-version">{{ version }}</span>
+    </a>
+
+    <span class="toolbar-spacer"></span>
+
+    <nav class="nav-links">
+      <div class="nav-menu-links">
+        <a mat-button href="#features" class="nav-link-item" translate="PAGES.NAV.FEATURES"></a>
+        <a mat-button href="#screenshots" class="nav-link-item" translate="PAGES.NAV.SCREENSHOTS"></a>
+        <a mat-button href="#architecture" class="nav-link-item" translate="PAGES.NAV.ARCHITECTURE"></a>
+        <a mat-button href="#benchmarks" class="nav-link-item" translate="PAGES.NAV.BENCHMARKS"></a>
+        <a mat-button href="#quickstart" class="nav-link-item" translate="PAGES.NAV.QUICKSTART"></a>
+      </div>
+
+      <div class="nav-divider"></div>
+
+      <div class="nav-actions">
+        <!-- Language Selector -->
+        <button mat-button [matMenuTriggerFor]="langMenu" class="lang-select-btn"
+          [matTooltip]="'PAGES.NAV.LANGUAGE' | translate" [attr.aria-label]="'PAGES.NAV.LANGUAGE' | translate">
+          <span class="lang-flag">{{ currentLanguageOption.flag }}</span>
+          <span class="lang-short-label">{{ currentLanguageOption.short }}</span>
+          <mat-icon class="dropdown-arrow">arrow_drop_down</mat-icon>
+        </button>
+        <mat-menu #langMenu="matMenu" class="lang-menu" xPosition="before">
+          @for (lang of supportedLanguages; track lang.code) {
+          <button mat-menu-item (click)="switchLanguage(lang.code)" [class.active-lang]="currentLang === lang.code">
+            <span class="lang-flag">{{ lang.flag }}</span>
+            <span class="lang-item-label">{{ lang.labelKey | translate }}</span>
+            @if (currentLang === lang.code) {
+            <mat-icon class="check-icon">check</mat-icon>
+            }
+          </button>
+          }
+        </mat-menu>
+
+        <div class="nav-icon-group">
+          <a mat-icon-button href="https://github.com/sponsors/liberatti" target="_blank" rel="noopener"
+            class="sponsor-icon-btn" [matTooltip]="'PAGES.NAV.SPONSOR' | translate"
+            [attr.aria-label]="'PAGES.NAV.SPONSOR' | translate">
+            <mat-icon class="heart-icon-sm">favorite</mat-icon>
+          </a>
+          <a mat-icon-button href="https://github.com/liberatti/nxguard" target="_blank" rel="noopener"
+            class="github-icon-btn" [matTooltip]="'PAGES.NAV.GITHUB' | translate"
+            [attr.aria-label]="'PAGES.NAV.GITHUB' | translate">
+            <svg class="github-svg-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+              <path
+                d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </nav>
+  </div>
+</mat-toolbar>
+
+<!-- Main Presentation Page Container -->
+<main class="page-content">
+
+  <!-- Hero Presentation Section -->
+  <section class="hero-section">
+    <div class="hero-tag-wrapper">
+      <span class="hero-tag">
+        <mat-icon inline>verified_user</mat-icon>
+        <span translate="PAGES.HERO.BADGE"></span>
+      </span>
+    </div>
+
+    <h1 class="hero-title">
+      <span translate="PAGES.HERO.TITLE_LINE_1"></span> <br>
+      <span class="gradient-title" translate="PAGES.HERO.TITLE_GRADIENT"></span>
+    </h1>
+
+    <p class="hero-subtitle">
+      <span translate="PAGES.HERO.SUBTITLE_1"></span>
+      <strong> IPXA</strong><span translate="PAGES.HERO.SUBTITLE_2"></span>
+      <strong> DuckDB </strong>
+      <span translate="PAGES.HERO.SUBTITLE_3"></span>
+    </p>
+
+    <!-- Quick Metric Cards -->
+    <div class="metrics-grid">
+      <mat-card *ngFor="let m of metrics" class="minimal-card metric-card">
+        <mat-card-content>
+          <div class="metric-value" [translate]="m.valueKey"></div>
+          <div class="metric-label" [translate]="m.labelKey"></div>
+          <div class="metric-caption" [translate]="m.captionKey"></div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </section>
+
+  <!-- Screenshots & UI Preview Section -->
+  <section class="section-wrapper" id="screenshots">
+    <div class="section-header">
+      <span class="section-badge" translate="PAGES.SCREENSHOTS.BADGE"></span>
+      <h2 translate="PAGES.SCREENSHOTS.TITLE"></h2>
+      <p translate="PAGES.SCREENSHOTS.SUBTITLE"></p>
+    </div>
+
+    <mat-card class="minimal-card gallery-card">
+      <mat-tab-group animationDuration="200ms" mat-stretch-tabs="false">
+        <mat-tab *ngFor="let s of screenshots">
+          <ng-template mat-tab-label>
+            <mat-icon class="tab-icon">photo_camera</mat-icon>
+            <span [translate]="s.titleKey"></span>
+          </ng-template>
+
+          <div class="tab-content-panel">
+            <div class="tab-meta">
+              <h3 [translate]="s.titleKey"></h3>
+              <p class="tab-subtitle" [translate]="s.subtitleKey"></p>
+              <p class="tab-description" [translate]="s.descriptionKey"></p>
+            </div>
+
+            <div class="image-frame">
+              <img [src]="s.image" [alt]="s.titleKey | translate" class="screenshot-img" loading="lazy">
+            </div>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </mat-card>
+  </section>
+
+  <!-- Architecture Section -->
+  <section class="section-wrapper" id="architecture">
+    <div class="section-header">
+      <span class="section-badge" translate="PAGES.ARCHITECTURE.BADGE"></span>
+      <h2 translate="PAGES.ARCHITECTURE.TITLE"></h2>
+      <p translate="PAGES.ARCHITECTURE.SUBTITLE"></p>
+    </div>
+
+    <div class="architecture-grid">
+      <mat-card class="minimal-card diagram-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar color="primary">account_tree</mat-icon>
+          <mat-card-title translate="PAGES.ARCHITECTURE.DIAGRAM_TITLE"></mat-card-title>
+          <mat-card-subtitle translate="PAGES.ARCHITECTURE.DIAGRAM_SUBTITLE"></mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content class="diagram-container">
+          <img src="assets/architecture_diagram.png" [alt]="'PAGES.ARCHITECTURE.DIAGRAM_TITLE' | translate"
+            class="diagram-img">
+        </mat-card-content>
+      </mat-card>
+
+      <div class="architecture-steps">
+        <mat-card class="minimal-card step-card">
+          <mat-card-header>
+            <div mat-card-avatar class="step-badge">1</div>
+            <mat-card-title translate="PAGES.ARCHITECTURE.STEP_1_TITLE"></mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <p translate="PAGES.ARCHITECTURE.STEP_1_DESC"></p>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="minimal-card step-card">
+          <mat-card-header>
+            <div mat-card-avatar class="step-badge">2</div>
+            <mat-card-title translate="PAGES.ARCHITECTURE.STEP_2_TITLE"></mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <p translate="PAGES.ARCHITECTURE.STEP_2_DESC"></p>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="minimal-card step-card">
+          <mat-card-header>
+            <div mat-card-avatar class="step-badge">3</div>
+            <mat-card-title translate="PAGES.ARCHITECTURE.STEP_3_TITLE"></mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <p translate="PAGES.ARCHITECTURE.STEP_3_DESC"></p>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+  </section>
+
+  <!-- Core Features Grid -->
+  <section class="section-wrapper" id="features">
+    <div class="section-header">
+      <span class="section-badge" translate="PAGES.FEATURES.BADGE"></span>
+      <h2 translate="PAGES.FEATURES.TITLE"></h2>
+      <p translate="PAGES.FEATURES.SUBTITLE"></p>
+    </div>
+
+    <div class="features-grid">
+      <mat-card *ngFor="let f of features" class="minimal-card feature-card">
+        <mat-card-header>
+          <div mat-card-avatar class="feature-icon-wrapper">
+            <mat-icon color="primary">{{ f.icon }}</mat-icon>
+          </div>
+          <mat-card-title [translate]="f.titleKey"></mat-card-title>
+          <mat-card-subtitle>
+            <mat-chip class="feature-badge" [translate]="f.badgeKey"></mat-chip>
+          </mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <p [translate]="f.descriptionKey"></p>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </section>
+
+  <!-- GoTestWAF Validation & Benchmarks -->
+  <section class="section-wrapper" id="benchmarks">
+    <div class="section-header">
+      <span class="section-badge" translate="PAGES.BENCHMARKS.BADGE"></span>
+      <h2 translate="PAGES.BENCHMARKS.TITLE"></h2>
+      <p translate="PAGES.BENCHMARKS.SUBTITLE"></p>
+    </div>
+
+    <div class="benchmarks-grid-layout">
+      <mat-card class="minimal-card benchmark-report-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar color="accent">assessment</mat-icon>
+          <mat-card-title translate="PAGES.BENCHMARKS.REPORT_TITLE"></mat-card-title>
+          <mat-card-subtitle translate="PAGES.BENCHMARKS.REPORT_SUBTITLE"></mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content class="bench-image-wrapper">
+          <img src="assets/benchmarks.png" [alt]="'PAGES.BENCHMARKS.REPORT_TITLE' | translate" class="benchmark-img">
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="minimal-card benchmark-runner-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar color="primary">terminal</mat-icon>
+          <mat-card-title translate="PAGES.BENCHMARKS.RUNNER_TITLE"></mat-card-title>
+          <mat-card-subtitle translate="PAGES.BENCHMARKS.RUNNER_SUBTITLE"></mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <p class="runner-desc" translate="PAGES.BENCHMARKS.RUNNER_DESC"></p>
+          <pre class="terminal-block"><code>{{ gotestwafCode }}</code></pre>
+        </mat-card-content>
+        <mat-card-actions align="end">
+          <button mat-icon-button (click)="copyGotestwaf()" class="card-copy-icon-btn" [class.copied]="copiedGotestwaf"
+            [matTooltip]="(copiedGotestwaf ? 'PAGES.BENCHMARKS.COPIED_BTN' : 'PAGES.BENCHMARKS.COPY_BTN') | translate"
+            [attr.aria-label]="(copiedGotestwaf ? 'PAGES.BENCHMARKS.COPIED_BTN' : 'PAGES.BENCHMARKS.COPY_BTN') | translate">
+            <mat-icon>{{ copiedGotestwaf ? 'check' : 'content_copy' }}</mat-icon>
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+  </section>
+
+  <!-- Quick Start & Compose Section -->
+  <section class="section-wrapper" id="quickstart">
+    <div class="section-header">
+      <span class="section-badge" translate="PAGES.QUICKSTART.BADGE"></span>
+      <h2 translate="PAGES.QUICKSTART.TITLE"></h2>
+      <p translate="PAGES.QUICKSTART.SUBTITLE"></p>
+    </div>
+
+    <div class="quickstart-grid">
+      <mat-card class="minimal-card compose-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar color="primary">docker</mat-icon>
+          <mat-card-title translate="PAGES.QUICKSTART.COMPOSE_TITLE"></mat-card-title>
+          <mat-card-subtitle translate="PAGES.QUICKSTART.COMPOSE_SUBTITLE"></mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <pre class="terminal-block compose-pre"><code>{{ composeCode }}</code></pre>
+        </mat-card-content>
+        <mat-card-actions align="end">
+          <button mat-icon-button (click)="copyCompose()" class="card-copy-icon-btn" [class.copied]="copiedCompose"
+            [matTooltip]="(copiedCompose ? 'PAGES.QUICKSTART.COPIED_BTN' : 'PAGES.QUICKSTART.COPY_COMPOSE_BTN') | translate"
+            [attr.aria-label]="(copiedCompose ? 'PAGES.QUICKSTART.COPIED_BTN' : 'PAGES.QUICKSTART.COPY_COMPOSE_BTN') | translate">
+            <mat-icon>{{ copiedCompose ? 'check' : 'content_copy' }}</mat-icon>
+          </button>
+        </mat-card-actions>
+      </mat-card>
+
+      <div class="sidebar-cards">
+        <mat-card class="minimal-card access-card">
+          <mat-card-header>
+            <mat-icon mat-card-avatar color="accent">lock_open</mat-icon>
+            <mat-card-title translate="PAGES.QUICKSTART.CREDS_TITLE"></mat-card-title>
+          </mat-card-header>
+          <mat-card-content class="creds-list">
+            <div class="cred-row">
+              <span class="cred-name" translate="PAGES.QUICKSTART.DASHBOARD_URL"></span>
+              <code class="cred-code">http://localhost:5000/nxg</code>
+            </div>
+            <mat-divider></mat-divider>
+            <div class="cred-row">
+              <span class="cred-name" translate="PAGES.QUICKSTART.USERNAME"></span>
+              <code class="cred-code">admin&#64;nxguard.local</code>
+            </div>
+            <mat-divider></mat-divider>
+            <div class="cred-row">
+              <span class="cred-name" translate="PAGES.QUICKSTART.PASSWORD"></span>
+              <code class="cred-code">admin</code>
+            </div>
+            <mat-divider></mat-divider>
+            <div class="cred-row">
+              <span class="cred-name" translate="PAGES.QUICKSTART.INGRESS_PORTS"></span>
+              <code class="cred-code">80 (HTTP) / 443 (HTTPS)</code>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="minimal-card privacy-card">
+          <mat-card-header>
+            <mat-icon mat-card-avatar color="primary">privacy_tip</mat-icon>
+            <mat-card-title translate="PAGES.QUICKSTART.PRIVACY_TITLE"></mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <p>
+              <span translate="PAGES.QUICKSTART.PRIVACY_DESC"></span>
+              <strong translate="PAGES.QUICKSTART.PRIVACY_STRONG"></strong>
+            </p>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- Footer -->
+<footer class="page-footer">
+  <div class="footer-inner">
+    <div class="footer-brand-side">
+      <div class="footer-logo">
+        <img src="assets/logo.png" alt="NXGuard" class="footer-brand-logo">
+        <span class="footer-title">NXGuard</span>
+      </div>
+      <p class="footer-desc" translate="PAGES.FOOTER.DESC"></p>
+    </div>
+
+    <div class="footer-author-side">
+      <p>
+        <span translate="PAGES.FOOTER.DEVELOPED_WITH"></span> <span class="heart-icon">❤️</span> <span
+          translate="PAGES.FOOTER.BY"></span> <strong>Gustavo Liberatti</strong>
+      </p>
+    </div>
+
+    <div class="footer-actions">
+      <a mat-button href="https://github.com/liberatti/nxguard" target="_blank" rel="noopener">
+        <mat-icon>code</mat-icon> <span translate="PAGES.FOOTER.GITHUB"></span>
+      </a>
+      <a mat-button href="https://github.com/liberatti/ipxa" target="_blank" rel="noopener">
+        <mat-icon>hub</mat-icon> <span translate="PAGES.FOOTER.IPXA"></span>
+      </a>
+      <a mat-button color="warn" href="https://github.com/sponsors/liberatti" target="_blank" rel="noopener">
+        <mat-icon>favorite</mat-icon> <span translate="PAGES.FOOTER.SPONSOR"></span>
+      </a>
+    </div>
+  </div>
+</footer>

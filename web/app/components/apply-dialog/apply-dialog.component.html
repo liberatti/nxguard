@@ -5,58 +5,76 @@
 
 <mat-dialog-content class="dialog-content">
     <!-- Loading Changes State -->
-    <div *ngIf="loadingChanges" class="state-container">
+    @if (loadingChanges) {
+    <div class="state-container">
         <mat-progress-bar mode="indeterminate"></mat-progress-bar>
         <p class="state-text">{{ 'APPLY_DIALOG.LOADING' | translate }}</p>
     </div>
+    }
 
     <!-- Applying Configuration State -->
-    <div *ngIf="applying" class="state-container" id="apply-loading-box">
+    @if (applying) {
+    <div class="state-container" id="apply-loading-box">
         <div class="spinner" id="apply-spinner"></div>
         <p class="state-text">{{ 'APPLY_DIALOG.APPLYING' | translate }}</p>
     </div>
+    }
 
     <!-- Results State -->
-    <div *ngIf="applied && !applying" id="apply-result">
-        <div *ngIf="success" class="result-message success-message" id="apply-success-message">
+    @if (applied && !applying) {
+    <div id="apply-result">
+        @if (success) {
+        <div class="result-message success-message" id="apply-success-message">
             <mat-icon color="primary">check_circle</mat-icon>
             <div>
                 <strong>{{ 'APPLY_DIALOG.SUCCESS_TITLE' | translate }}</strong>
                 <p>{{ 'APPLY_DIALOG.SUCCESS_MSG' | translate }}</p>
             </div>
         </div>
-        <div *ngIf="!success" class="result-message error-message" id="apply-error-message">
+        }
+        @if (!success) {
+        <div class="result-message error-message" id="apply-error-message">
             <mat-icon color="warn">error</mat-icon>
             <div>
                 <strong>{{ 'APPLY_DIALOG.ERROR_TITLE' | translate }}</strong>
                 <p>{{ error }}</p>
             </div>
         </div>
+        }
     </div>
+    }
 
     <!-- Changes List (when not applying and not applied) -->
-    <div *ngIf="!loadingChanges && !applying && !applied">
+    @if (!loadingChanges && !applying && !applied) {
+    <div>
         <p class="section-description">{{ 'APPLY_DIALOG.DESCRIPTION' | translate }}</p>
 
-        <div *ngIf="changes.length > 0" class="changes-list">
+        @if (changes.length > 0) {
+        <div class="changes-list">
             <mat-list>
-                <mat-list-item *ngFor="let c of changes" class="change-item">
+                @for (c of changes; track c.name) {
+                <mat-list-item class="change-item">
                     <mat-icon matListItemIcon class="change-icon">{{ getModuleIcon(c.name) }}</mat-icon>
                     <span matListItemTitle class="change-title">{{ ('view.' + c.name + '.title') | translate }}</span>
                     <span matListItemLine class="change-subtitle">{{ 'APPLY_DIALOG.PENDING_CHANGE' | translate }}</span>
                 </mat-list-item>
+                }
             </mat-list>
         </div>
+        }
 
-        <div *ngIf="changes.length === 0" class="empty-state">
+        @if (changes.length === 0) {
+        <div class="empty-state">
             <mat-icon class="empty-icon">check_circle_outline</mat-icon>
             <p class="empty-text">{{ 'APPLY_DIALOG.NO_CHANGES' | translate }}</p>
         </div>
+        }
     </div>
+    }
 </mat-dialog-content>
 
 <mat-dialog-actions align="end" class="dialog-actions">
-    <ng-container *ngIf="!applying && !applied">
+    @if (!applying && !applied) {
         <button mat-stroked-button (click)="closeDialog()" id="apply-cancel-btn">
             {{ 'actions.cancel' | translate }}
         </button>
@@ -64,15 +82,17 @@
             <mat-icon>play_arrow</mat-icon>
             {{ 'actions.apply' | translate }}
         </button>
-    </ng-container>
+    }
 
-    <ng-container *ngIf="applied && !applying">
+    @if (applied && !applying) {
         <button mat-stroked-button (click)="closeDialog()" id="apply-close-btn">
             {{ 'actions.close' | translate }}
         </button>
-        <button *ngIf="!success" mat-flat-button color="primary" (click)="onApply()" id="apply-retry-btn">
+        @if (!success) {
+        <button mat-flat-button color="primary" (click)="onApply()" id="apply-retry-btn">
             <mat-icon>refresh</mat-icon>
             {{ 'actions.refresh' | translate }}
         </button>
-    </ng-container>
+        }
+    }
 </mat-dialog-actions>

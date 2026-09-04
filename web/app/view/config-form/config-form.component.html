@@ -23,10 +23,10 @@
                         <div class="panel-content-body">
                             <div class="fields-grid">
                                 <mat-form-field class="full-width">
-                                    <mat-label>{{ 'CONFIG_PAGE.MAXMIND_KEY' | translate }}</mat-label>
-                                    <input matInput formControlName="maxmind_key" id="maxmind-key-input">
-                                    <mat-icon matSuffix class="field-icon">vpn_key</mat-icon>
-                                    <mat-hint>{{ 'CONFIG_PAGE.MAXMIND_HINT' | translate }}</mat-hint>
+                                    <mat-label>{{ 'CONFIG_PAGE.DNS_RESOLVER' | translate }}</mat-label>
+                                    <input matInput formControlName="dns_resolver" id="dns-resolver-input" placeholder="1.1.1.1">
+                                    <mat-icon matSuffix class="field-icon">dns</mat-icon>
+                                    <mat-hint>{{ 'CONFIG_PAGE.DNS_RESOLVER_HINT' | translate }}</mat-hint>
                                 </mat-form-field>
 
                                 <mat-form-field class="full-width">
@@ -39,7 +39,38 @@
                         </div>
                     </mat-expansion-panel>
 
-                    <!-- Panel 2: Certification Authority -->
+                    <!-- Panel 2: IPXA Integration -->
+                    <mat-expansion-panel [expanded]="true" id="ipxa-config-panel" class="custom-panel" formGroupName="ipxa">
+                        <mat-expansion-panel-header>
+                            <mat-panel-title class="panel-title-group">
+                                <mat-icon class="panel-icon">security</mat-icon>
+                                <span>{{ 'CONFIG_PAGE.PANEL_IPXA' | translate }}</span>
+                            </mat-panel-title>
+                            <mat-panel-description class="panel-desc">
+                                {{ 'CONFIG_PAGE.PANEL_IPXA_DESC' | translate }}
+                            </mat-panel-description>
+                        </mat-expansion-panel-header>
+
+                        <div class="panel-content-body">
+                            <div class="fields-grid">
+                                <mat-form-field class="full-width">
+                                    <mat-label>{{ 'CONFIG_PAGE.IPXA_URL' | translate }}</mat-label>
+                                    <input matInput formControlName="url" id="ipxa-url-input" placeholder="http://ipxa:5000">
+                                    <mat-icon matSuffix class="field-icon">link</mat-icon>
+                                    <mat-hint>{{ 'CONFIG_PAGE.IPXA_URL_HINT' | translate }}</mat-hint>
+                                </mat-form-field>
+
+                                <mat-form-field class="full-width">
+                                    <mat-label>{{ 'CONFIG_PAGE.IPXA_KEY' | translate }}</mat-label>
+                                    <input matInput type="password" formControlName="key" id="ipxa-key-input">
+                                    <mat-icon matSuffix class="field-icon">vpn_key</mat-icon>
+                                    <mat-hint>{{ 'CONFIG_PAGE.IPXA_KEY_HINT' | translate }}</mat-hint>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </mat-expansion-panel>
+
+                    <!-- Panel 3: Certification Authority -->
                     <mat-expansion-panel id="ca-config-panel" class="custom-panel">
                         <mat-expansion-panel-header>
                             <mat-panel-title class="panel-title-group">
@@ -74,7 +105,7 @@
                         </div>
                     </mat-expansion-panel>
 
-                    <!-- Panel 3: Transaction Policy -->
+                    <!-- Panel 4: Transaction Policy -->
                     <mat-expansion-panel [expanded]="true" id="transaction-policy-panel" class="custom-panel">
                         <mat-expansion-panel-header>
                             <mat-panel-title class="panel-title-group">
@@ -102,7 +133,8 @@
                                 <mat-card-content class="policy-body">
                                     <p class="policy-desc">{{ 'CONFIG_PAGE.ARCHIVE_DESC' | translate }}</p>
 
-                                    <div class="policy-fields" *ngIf="form.get('archive.enabled')?.value">
+                                    @if (form.get('archive.enabled')?.value) {
+                                    <div class="policy-fields">
                                         <div class="fields-grid-3">
                                             <mat-form-field class="full-width">
                                                 <mat-label>{{ 'CONFIG_PAGE.ARCHIVE_AFTER' | translate }}</mat-label>
@@ -131,6 +163,7 @@
                                             </mat-form-field>
                                         </div>
                                     </div>
+                                    }
                                 </mat-card-content>
                             </mat-card>
 
@@ -149,7 +182,8 @@
                                 <mat-card-content class="policy-body">
                                     <p class="policy-desc">{{ 'CONFIG_PAGE.PURGE_DESC' | translate }}</p>
 
-                                    <div class="policy-fields" *ngIf="form.get('purge.enabled')?.value">
+                                    @if (form.get('purge.enabled')?.value) {
+                                    <div class="policy-fields">
                                         <div class="fields-grid-single">
                                             <mat-form-field class="max-w-md">
                                                 <mat-label>{{ 'CONFIG_PAGE.PURGE_AFTER' | translate }}</mat-label>
@@ -158,6 +192,7 @@
                                             </mat-form-field>
                                         </div>
                                     </div>
+                                    }
                                 </mat-card-content>
                             </mat-card>
                         </div>
@@ -166,12 +201,14 @@
             </form>
         </mat-card-content>
 
-        <mat-card-actions align="end" class="bottom-actions">
-            <button id="save-btn" type="button" (click)="onSubmit()" mat-flat-button color="primary"
-                *ngIf="oauth.isRole('superuser')" class="action-btn">
+        <mat-card-actions align="end" class="mat-mdc-card-actions bottom-actions">
+            @if (oauth.isRole('superuser')) {
+            <button type="button" mat-flat-button color="primary" (click)="onSubmit()"
+                id="save-btn">
                 <mat-icon>save</mat-icon>
-                <span>{{ 'actions.save' | translate }}</span>
+                {{ 'ACTIONS.SAVE' | translate }}
             </button>
+            }
         </mat-card-actions>
     </mat-card>
 </ng-container>

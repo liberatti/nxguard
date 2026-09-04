@@ -39,12 +39,13 @@ import {OAuthService} from "../../services/oauth.service";
         MatTableModule, MatMenuModule, MatSortModule,
         MatTooltipModule, MatSelectModule, MatPaginatorModule,
         MatFormFieldModule, MatChipsModule],
-    templateUrl: './certificate-list.component.html'
+    templateUrl: './certificate-list.component.html',
+    styleUrl: './certificate-list.component.css'
 })
 
 export class CertificateListComponent implements OnInit {
 
-    certificateDC: string[] = ['status', 'name', 'provider', 'subjects', 'action'];
+    certificateDC: string[] = ['status', 'name', 'provider', 'subjects', 'force_renew', 'action'];
     certificateDS: MatTableDataSource<Certificate>;
     certificatePA: PageMeta;
 
@@ -118,6 +119,8 @@ export class CertificateListComponent implements OnInit {
                 force_renew: true
             } as Certificate;
             this.certificateService.patch(hostname_id, ph).subscribe(data => {
+                this.updateGridTable();
+                this.notificationService.openSnackBar(this.translateService.instant('CERTIFICATE.RENEW_SCHEDULED'));
             });
         });
     }

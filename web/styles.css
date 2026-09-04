@@ -1,13 +1,30 @@
 @import 'material-icons/iconfont/material-icons.css';
 @import 'flag-icons/css/flag-icons.css';
 
+/* Flag Icons Global Styling */
+.fi {
+    display: inline-block;
+    width: 20px;
+    height: 15px;
+    min-width: 20px;
+    min-height: 15px;
+    flex-shrink: 0;
+    line-height: 15px;
+    vertical-align: middle;
+    border-radius: 2px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
 /* -------------------------------------------------------------------------- */
 /* 1. Layout Utilities                                                        */
 /* -------------------------------------------------------------------------- */
 .full-width { width: 100%; }
-.mt-1 { margin-top: 10px; }
-.mt-2 { margin-top: 20px; }
-.p-2 { padding: 20px; }
+.mt-1 { margin-top: 8px; }
+.mt-2 { margin-top: 12px; }
+.p-2 { padding: 14px; }
 
 .flex-center {
     display: flex;
@@ -23,7 +40,7 @@
 div.mat-row {
     display: flex;
     flex-wrap: wrap;
-    gap: 16px;
+    gap: 12px;
     align-items: flex-start;
     width: 100%;
     margin-bottom: 12px;
@@ -109,6 +126,14 @@ div.mat-row {
     color: var(--text-main);
 }
 
+.text-dim {
+    color: var(--text-dim) !important;
+}
+
+.text-muted {
+    color: var(--text-muted) !important;
+}
+
 /* -------------------------------------------------------------------------- */
 /* 5. Reusable Components                                                     */
 /* -------------------------------------------------------------------------- */
@@ -137,4 +162,66 @@ div.mat-row {
     letter-spacing: 0.5px;
     color: var(--text-dim);
     font-weight: 600;
+}
+
+/* -------------------------------------------------------------------------- */
+/* 6. Form Fields & Inputs Standardization (Angular Material MDC)             */
+/* -------------------------------------------------------------------------- */
+.mat-mdc-form-field {
+    font-size: 0.875rem !important;
+    font-family: var(--font-family, 'Inter', -apple-system, BlinkMacSystemFont, sans-serif) !important;
+    --mdc-outlined-text-field-container-shape: 8px;
+    --mdc-outlined-text-field-outline-color: var(--border-dim, #e2e8f0);
+    --mdc-outlined-text-field-hover-outline-color: var(--border-bright, #cbd5e1);
+    --mdc-outlined-text-field-focus-outline-color: var(--primary, #2563eb);
+    --mdc-outlined-text-field-focus-label-text-color: var(--primary, #2563eb);
+    --mdc-outlined-text-field-label-text-color: var(--text-dim, #475569);
+    --mdc-outlined-text-field-hover-label-text-color: var(--text-dim, #475569);
+}
+
+/* Background for outlined form fields */
+.mat-mdc-text-field-wrapper.mdc-text-field--outlined {
+    background-color: #f8fafc;
+}
+
+/* Ensure notched outline notch has transparent top border when notched so label isn't crossed by a border line */
+.mdc-notched-outline--notched .mdc-notched-outline__notch {
+    border-top: none !important;
+}
+
+/* Typography & Colors for Inputs and Selects */
+.mat-mdc-input-element,
+.mat-mdc-select-value {
+    font-size: 0.875rem !important;
+    font-family: var(--font-family, 'Inter', -apple-system, BlinkMacSystemFont, sans-serif) !important;
+    color: var(--text-main, #0f172a) !important;
+    font-weight: 500 !important;
+}
+
+.mat-mdc-input-element::placeholder {
+    color: var(--text-muted, #94a3b8) !important;
+    font-size: 0.875rem !important;
+    font-weight: 400 !important;
+}
+
+/* Floating labels alignment */
+.mat-mdc-form-field .mdc-floating-label {
+    font-family: var(--font-family, 'Inter', -apple-system, BlinkMacSystemFont, sans-serif) !important;
+    font-size: 0.875rem;
+}
+
+.mat-mdc-form-field.mat-focused .mdc-floating-label {
+    color: var(--primary, #2563eb) !important;
+}
+
+/* Subscript wrapper for errors and hints */
+.mat-mdc-form-field-subscript-wrapper {
+    font-size: 0.75rem !important;
+}
+
+.chip-mono {
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace !important;
+    font-size: 0.8125rem !important;
+    background-color: #f1f5f9 !important;
+    border: 1px solid var(--border-dim, #e2e8f0) !important;
 }

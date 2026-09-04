@@ -3,7 +3,7 @@ upstream acme {
 }
 
 {%- for u in upstreams %}
-upstream {{ u.name }} {
+upstream {{ u.render_name if u.render_name else u.name }} {
   check interval=5000 fall=3 rise=1 default_down=true type=tcp;
   {%- if u.persist %}
   {%- if u.persist.type == 'COOKIE' %}
