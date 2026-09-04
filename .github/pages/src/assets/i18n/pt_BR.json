@@ -2,9 +2,9 @@
   "PAGES": {
     "NAV": {
       "FEATURES": "Recursos",
-      "SCREENSHOTS": "Telas",
+      "SCREENSHOTS": "Capturas de Tela",
       "ARCHITECTURE": "Arquitetura",
-      "BENCHMARKS": "Testes de Segurança",
+      "BENCHMARKS": "Benchmarks",
       "QUICKSTART": "Início Rápido",
       "SPONSOR": "Patrocinar",
       "GITHUB": "GitHub",
@@ -13,28 +13,28 @@
       "LANG_PT": "Português"
     },
     "HERO": {
-      "BADGE": "API Gateway de Alta Performance & Proxy Reverso Seguro",
+      "BADGE": "API Gateway de Alta Performance & Proxy Reverso de Segurança",
       "TITLE_LINE_1": "Defesa de Camada 7 de Próxima Geração com",
       "TITLE_GRADIENT": "OpenResty & ModSecurity v3",
       "SUBTITLE_1": "O NXGuard oferece inspeção de requisições em sub-milissegundos via LuaJIT, inteligência de ameaças em tempo real sincronizada com o",
-      "SUBTITLE_2": ", telemetria e análises integradas com",
+      "SUBTITLE_2": ", análises de telemetria integradas com",
       "SUBTITLE_3": "e automação SSL ACME sem intervenção manual.",
       "CHIP_LICENSE": "Apache 2.0",
       "CHIP_DOCKER": "Pronto para Docker",
-      "CHIP_LATENCY": "Latência < 0.4ms",
+      "CHIP_LATENCY": "Latência Sub-0.4ms",
       "CHIP_OWASP": "OWASP CRS 4.25+",
       "CTA_QUICKSTART": "Início Rápido",
-      "CTA_PREVIEW": "Ver Telas da UI",
+      "CTA_PREVIEW": "Ver Prévia da UI",
       "CTA_GITHUB": "Favoritar no GitHub"
     },
     "METRICS": {
       "LATENCY": {
         "LABEL": "Sobrecarga de Latência",
         "VALUE": "< 0.4ms",
-        "CAPTION": "Inspeção de Camada 7 em sub-milissegundo"
+        "CAPTION": "Inspeção de Camada 7 em sub-milissegundos"
       },
       "CRS": {
-        "LABEL": "Conjunto de Regras Core",
+        "LABEL": "Core Rule Set",
         "VALUE": "CRS 4.25+",
         "CAPTION": "Regras de ameaças OWASP mais recentes"
       },
@@ -46,32 +46,32 @@
       "ANALYTICS": {
         "LABEL": "Banco de Telemetria",
         "VALUE": "DuckDB",
-        "CAPTION": "SQL embutido de sobrecarga zero"
+        "CAPTION": "SQL embutido com zero sobrecarga"
       }
     },
     "SCREENSHOTS": {
       "BADGE": "UI & Observabilidade",
       "TITLE": "Interface Intuitiva de Gestão e Inspeção",
-      "SUBTITLE": "Dashboard limpo e corporativo projetado para total visibilidade e rápida gestão de políticas.",
+      "SUBTITLE": "Dashboard limpo e corporativo projetado para visibilidade total e rápida gestão de políticas.",
       "DASHBOARD": {
         "TITLE": "Dashboard Executivo de Segurança",
-        "SUBTITLE": "Visão em tempo real de ameaças, requisições bloqueadas e integridade do sistema",
-        "DESCRIPTION": "Interface intuitiva com métricas ao vivo, contagem de transações, alertas WAF e controles operacionais."
+        "SUBTITLE": "Visão em tempo real de ameaças, requisições bloqueadas e saúde do sistema",
+        "DESCRIPTION": "Interface intuitiva de gerenciamento com métricas ao vivo, contagem de transações, alertas WAF e controles operacionais."
       },
       "TRANSACTIONS": {
         "TITLE": "Fluxo de Transações & Monitoramento",
         "SUBTITLE": "Registro de transações em tempo real e inspeção de tráfego",
-        "DESCRIPTION": "Pesquise, filtre e inspecione requisições por serviço, status, IP, país e pontuação de risco."
+        "DESCRIPTION": "Pesquise, filtre e inspecione requisições por serviço, status, IP, país e pontuação de ameaça."
       },
       "RAW_INSPECTION": {
-        "TITLE": "Inspeção Detalhada de Requisições e Payloads",
-        "SUBTITLE": "Detalhamento de cabeçalhos, parâmetros de query e payloads do body",
-        "DESCRIPTION": "Inspeção completa de transações HTTP puras para investigar ataques e diagnosticar anomalias de tráfego."
+        "TITLE": "Inspeção Bruta de Requisições e Payloads",
+        "SUBTITLE": "Análise profunda de cabeçalhos, parâmetros de query e payloads do body",
+        "DESCRIPTION": "Inspeção completa de transações HTTP brutas para investigar ataques e depurar anomalias de tráfego."
       },
       "RULE_DETAILS": {
-        "TITLE": "Detalhes de Regras ModSecurity Acionadas",
-        "SUBTITLE": "Gatilhos de regras granulares e padrões identificados",
-        "DESCRIPTION": "Análise detalhada de IDs de regras do ModSecurity acionadas, tags, níveis de severidade e trechos identificados."
+        "TITLE": "Detalhes de Correspondência de Regras ModSecurity",
+        "SUBTITLE": "Gatilhos de regras granulares e padrões correspondentes",
+        "DESCRIPTION": "Análise detalhada de IDs de regras do ModSecurity correspondentes, tags, níveis de severidade e trechos identificados."
       }
     },
     "ARCHITECTURE": {
@@ -81,11 +81,11 @@
       "DIAGRAM_TITLE": "Diagrama do Pipeline",
       "DIAGRAM_SUBTITLE": "Fluxo de Entrada, Inspeção e Telemetria",
       "STEP_1_TITLE": "Entrada & Pré-validação LuaJIT",
-      "STEP_1_DESC": "O tráfego chega aos processos do OpenResty. Sensores Lua customizados realizam bypass dinâmico ultra rápido, geo-filtro e validação inicial antes de acionar a inspeção.",
+      "STEP_1_DESC": "O tráfego chega às threads de trabalho do OpenResty. Sensores Lua customizados realizam bypass dinâmico rápido, geofiltragem e validação inicial antes de acionar a inspeção.",
       "STEP_2_TITLE": "Regras ModSecurity v3 & CRS",
       "STEP_2_DESC": "Análise completa de payload e avaliação regex contra o OWASP Core Rule Set 4.25+. Políticas granulares por rota permitem ajustes dinâmicos sem reinicialização.",
       "STEP_3_TITLE": "Feeds IPXA & Telemetria DuckDB",
-      "STEP_3_DESC": "Inteligência de ameaças sincronizada continuamente com o IPXA. Todos os logs de auditoria e transações bloqueadas são salvos no DuckDB embutido para relatórios imediatos."
+      "STEP_3_DESC": "Inteligência de ameaças contínua sincronizada com o IPXA. Todos os logs de auditoria e transações bloqueadas são salvos no DuckDB embutido para relatórios e análises imediatos."
     },
     "FEATURES": {
       "BADGE": "Capacidades",
@@ -99,7 +99,7 @@
       "LUAJIT": {
         "TITLE": "Núcleo LuaJIT de Alta Performance",
         "BADGE": "Sub-milissegundo",
-        "DESCRIPTION": "Sensores Lua executados diretamente nos processos do OpenResty para filtragem rápida, sanitização de cabeçalhos e limitação de taxa."
+        "DESCRIPTION": "Sensores Lua executados diretamente nas threads do OpenResty para filtragem rápida, sanitização de cabeçalhos e limitação de taxa."
       },
       "IPXA": {
         "TITLE": "Inteligência de Ameaças IPXA",
@@ -108,8 +108,8 @@
       },
       "DUCKDB": {
         "TITLE": "Telemetria Embutida DuckDB",
-        "BADGE": "Zero DB Externo",
-        "DESCRIPTION": "Mecanismo colunar embutido diretamente no backend de administração para consultas, agregações e auditoria instantâneas."
+        "BADGE": "Zero BD Externo",
+        "DESCRIPTION": "Mecanismo colunar embutido diretamente no backend de administração para consultas, agregações e auditoria instantâneas de transações em tempo real."
       },
       "ACME": {
         "TITLE": "Automação ACME & SSL",
@@ -119,7 +119,7 @@
       "ROUTING": {
         "TITLE": "Proxy Reverso Inteligente & Roteamento",
         "BADGE": "Controle de Tráfego",
-        "DESCRIPTION": "Verificação de integridade de upstreams, persistência de sessão, filtragem de métodos HTTP, validação de content-type e políticas de segurança por rota."
+        "DESCRIPTION": "Verificação de integridade de upstreams, persistência de sessão, filtragem de métodos HTTP, validação de content-type permitidos e políticas de segurança por rota."
       }
     },
     "BENCHMARKS": {
