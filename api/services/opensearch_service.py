@@ -132,6 +132,10 @@ class OpenSearchService:
 
     def _get_dashboard_url(self) -> Optional[str]:
         dash_url = self.logging_conf.get("dashboard_url")
+        if not dash_url and self.logging_conf.get("url"):
+            u = self.logging_conf.get("url", "")
+            if ":9200" in u:
+                dash_url = u.replace(":9200", ":5601")
         return dash_url.rstrip("/") if dash_url else None
 
     def _post_saved_object(
@@ -143,6 +147,9 @@ class OpenSearchService:
     ) -> bool:
         dash_url = self._get_dashboard_url()
         if not dash_url:
+            logger.warning(
+                f"OpenSearch Dashboards URL could not be resolved for {obj_type} '{obj_id}'"
+            )
             return False
 
         auth = self._get_auth()
@@ -167,7 +174,7 @@ class OpenSearchService:
             )
             if res.status_code in (200, 201, 409):
                 logger.info(
-                    f"OpenSearch Dashboards {obj_type} '{obj_id}' created/updated at {dash_url}"
+                    f"OpenSearch Dashboards {obj_type} '{obj_id}' created/updated successfully at {dash_url}"
                 )
                 return True
             else:
@@ -175,26 +182,31 @@ class OpenSearchService:
                     f"OpenSearch Dashboards returned status {res.status_code} for {obj_type} '{obj_id}': {res.text}"
                 )
         except Exception as e:
-            logger.debug(f"Failed to create {obj_type} '{obj_id}' at {endpoint}: {e}")
+            logger.warning(f"Failed to create {obj_type} '{obj_id}' at {endpoint}: {e}")
         return False
 
-    def ensure_structures(self) -> bool:
-        """Provisions index template, index pattern, visualizations, dashboard, and default daily index."""
+    def ensure_structures(self, force: bool = False) -> bool:
+        """Provisions index template, daily index, index pattern, visualizations, and dashboard."""
         if not self.is_configured():
+            logger.warning("OpenSearch logging is not configured; skipping structure provisioning.")
             return False
 
-        if OpenSearchService._structures_initialized:
+        if not force and OpenSearchService._structures_initialized:
             return True
 
-        self.create_index_template()
-        self.create_index_pattern()
-        self.create_visualizations()
-        self.create_dashboard()
+        logger.info("Initializing OpenSearch templates, indices, and Dashboards objects...")
+        tmpl_ok = self.create_index_template()
         today_idx = self.get_target_index()
-        self.create_index_if_not_exists(today_idx)
+        idx_ok = self.create_index_if_not_exists(today_idx)
+        pat_ok = self.create_index_pattern()
+        vis_ok = self.create_visualizations()
+        dash_ok = self.create_dashboard()
 
         OpenSearchService._structures_initialized = True
-        return True
+        logger.info(
+            f"OpenSearch structure initialization complete: template={tmpl_ok}, index={idx_ok}, index_pattern={pat_ok}, visualizations={vis_ok}, dashboard={dash_ok}"
+        )
+        return tmpl_ok and idx_ok
 
     def create_index_template(self, template_name: str = INDEX_TEMPLATE_NAME) -> bool:
         """Creates composable or legacy index template in OpenSearch / Elasticsearch."""
@@ -294,14 +306,17 @@ class OpenSearchService:
         base_prefix = self._get_base_index_prefix()
         vis_items = get_default_visualizations(base_prefix)
 
-        ok = True
+        created_count = 0
         for vis_id, vis_attrs, ref in vis_items:
             res = self._post_saved_object(
                 "visualization", vis_id, vis_attrs, references=ref
             )
-            if not res:
-                ok = False
-        return ok
+            if res:
+                created_count += 1
+        logger.info(
+            f"OpenSearch Dashboards {created_count}/{len(vis_items)} visualizations initialized successfully"
+        )
+        return created_count == len(vis_items)
 
     def create_dashboard(self, dashboard_title: Optional[str] = None) -> bool:
         """Creates the NxGuard overview dashboard in OpenSearch Dashboards."""
@@ -335,6 +350,7 @@ class OpenSearchService:
                 verify=False,
             )
             if check_res.status_code == 200:
+                logger.info(f"OpenSearch index '{idx}' is ready (already exists)")
                 return True
         except Exception as e:
             logger.debug(f"Index existence check failed for {idx}: {e}")
@@ -354,12 +370,13 @@ class OpenSearchService:
                 verify=False,
             )
             if res.status_code in (200, 201):
-                logger.info(f"OpenSearch index '{idx}' initialized successfully")
+                logger.info(f"OpenSearch index '{idx}' created successfully")
                 return True
             elif (
                 res.status_code == 400
                 and "resource_already_exists_exception" in res.text
             ):
+                logger.info(f"OpenSearch index '{idx}' is ready (already exists)")
                 return True
             else:
                 logger.warning(
