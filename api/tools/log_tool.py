@@ -13,8 +13,12 @@ try:
 except ImportError:
     ua_parse = None
 
+import requests
+
 from nxcore.middleware.logging_manager import logger
 from api.model.transaction_model import TransactionDao
+from api.model.config_model import ConfigDao
+import config
 from config import MASKED_HEADERS
 
 
@@ -250,12 +254,87 @@ class LogParserTool:
                         f"Merged {len(merged_records)} transactions for {service_name}"
                     )
 
+                    try:
+                        cls._send_to_opensearch(merged_records)
+                    except Exception as e:
+                        logger.error(
+                            f"Error sending transactions to OpenSearch: {e}"
+                        )
+
             except Exception as e:
                 logger.error(
                     f"Error merging transactions for {service_name}: {e} {traceback.format_exc()}"
                 )
 
         logger.info(f"Merge transaction stopped for {service_name}")
+
+    @classmethod
+    def _send_to_opensearch(cls, records: List[Dict[str, Any]]):
+        if not records:
+            return
+        try:
+            with ConfigDao() as config_dao:
+                active = config_dao.get_active()
+        except Exception as e:
+            logger.error(f"Error fetching config for OpenSearch logging: {e}")
+            return
+
+        if not active or not isinstance(active, dict):
+            return
+
+        logging_conf = active.get("logging")
+        if not logging_conf or not isinstance(logging_conf, dict):
+            return
+
+        if logging_conf.get("mode") != "opensearch":
+            return
+
+        url = logging_conf.get("url")
+        if not url:
+            return
+
+        index_name = logging_conf.get("index") or "nxguard_trn"
+        username = logging_conf.get("username")
+        password = logging_conf.get("password")
+
+        endpoint = url.rstrip("/") + "/_bulk"
+        headers = {"Content-Type": "application/x-ndjson"}
+        auth = (username, password) if username and password else None
+
+        bulk_lines = []
+        for record in records:
+            doc = dict(record)
+            doc.pop("_id", None)
+            if isinstance(doc.get("logtime"), datetime):
+                doc["logtime"] = doc["logtime"].strftime(config.DATETIME_FMT)
+
+            action_meta = {"index": {"_index": index_name}}
+            if doc.get("unique_id"):
+                action_meta["index"]["_id"] = doc["unique_id"]
+            bulk_lines.append(json.dumps(action_meta))
+            bulk_lines.append(json.dumps(doc, default=str))
+
+        payload = "\n".join(bulk_lines) + "\n"
+
+        try:
+            res = requests.post(
+                endpoint,
+                data=payload,
+                headers=headers,
+                auth=auth,
+                timeout=5,
+                verify=False,
+            )
+            if res.status_code in (200, 201):
+                logger.debug(
+                    f"Successfully sent {len(records)} records to OpenSearch ({endpoint})"
+                )
+            else:
+                logger.error(
+                    f"OpenSearch bulk flush returned status {res.status_code}: {res.text}"
+                )
+        except Exception as e:
+            logger.error(f"Failed to send logs to remote OpenSearch ({endpoint}): {e}")
 
     @classmethod
     def _combine_access_and_audit(
