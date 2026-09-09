@@ -245,19 +245,23 @@
     line-height: 1;
 }
 
-.score_chip.passed {
+.score_chip.passed,
+.score_chip.allowed {
     background: #ecfdf5 !important;
     color: #059669 !important;
     border: 1px solid #a7f3d0;
 }
 
-.score_chip.deny {
+.score_chip.deny,
+.score_chip.block,
+.score_chip.blocked {
     background: #fef2f2 !important;
     color: #dc2626 !important;
     border: 1px solid #fecaca;
 }
 
 .score_chip.warn,
+.score_chip.warning,
 .score_chip.rejected {
     background: #fffbeb !important;
     color: #d97706 !important;
@@ -323,15 +327,19 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
-.exp-panel.passed {
+.exp-panel.passed,
+.exp-panel.allowed {
     border-left-color: #10b981;
 }
 
-.exp-panel.deny {
+.exp-panel.deny,
+.exp-panel.block,
+.exp-panel.blocked {
     border-left-color: #ef4444;
 }
 
 .exp-panel.warn,
+.exp-panel.warning,
 .exp-panel.rejected {
     border-left-color: #f59e0b;
 }

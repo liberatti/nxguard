@@ -4,6 +4,9 @@
     "ipxa": {
       "url": "http://ipxa:5000",
       "key": "tZzDBUSnoy76LLSvu1Vg3e9vdFJINMT2"
+    },
+    "logging": {
+      "mode": "local"
     }
   },
   "user": {
@@ -427,8 +430,8 @@
           "monitor_only": false,
           "name": "graphql-route",
           "paths": [
-            "^/(nxg/graphql.*)",
-            "^/(graphql.*)"
+            "^/nxg/graphql/(.*)",
+            "^/graphql/(.*)"
           ],
           "sensor": {
             "name": "NXGuard_API_Sensor"
@@ -460,8 +463,8 @@
           "monitor_only": false,
           "name": "api-req",
           "paths": [
-            "^/(nxg/api.*)",
-            "^/(nxg/socket.io.*)"
+            "^/nxg/api/(.*)",
+            "^/nxg/socket.io/(.*)"
           ],
           "sensor": {
             "name": "NXGuard_API_Sensor"
@@ -488,7 +491,7 @@
           "monitor_only": false,
           "name": "front-req",
           "paths": [
-            "^/(nxg/.*)"
+            "^/nxg/(.*)"
           ],
           "sensor": {
             "name": "Default"

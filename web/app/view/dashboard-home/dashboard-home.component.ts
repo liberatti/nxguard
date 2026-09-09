@@ -239,7 +239,7 @@ export class DashboardHomeComponent implements OnInit, AfterViewInit, OnDestroy 
 
         this.transactionService
             .search(
-                { start, end, filters: ['{"action": "DENY"}'] },
+                { start, end, filters: [{ action: ['blocked', 'DENY', 'block', 'BLOCKED'] }] },
                 { page: 1, per_page: 1 } as any
             )
             .subscribe({
@@ -257,7 +257,7 @@ export class DashboardHomeComponent implements OnInit, AfterViewInit, OnDestroy 
 
         this.transactionService
             .search(
-                { start, end, filters: ['{"action": "WARN"}'] },
+                { start, end, filters: [{ action: ['warn', 'WARN', 'warning'] }] },
                 { page: 1, per_page: 1 } as any
             )
             .subscribe({
@@ -287,11 +287,11 @@ export class DashboardHomeComponent implements OnInit, AfterViewInit, OnDestroy 
                     const list = res?.data || [];
                     this.threatLogs = list;
                     this.criticalIncidents = list.filter(
-                        (t: TransactionLog) => t.action === 'DENY'
+                        (t: TransactionLog) => ['blocked', 'deny', 'block'].includes(String(t.action || '').toLowerCase())
                     ).length;
                     this.highIncidents = list.filter(
                         (t: TransactionLog) =>
-                            t.action === 'WARN' || t.action === 'REJECTED'
+                            ['warn', 'warning', 'rejected'].includes(String(t.action || '').toLowerCase())
                     ).length;
                     this.cdr.markForCheck();
                 },

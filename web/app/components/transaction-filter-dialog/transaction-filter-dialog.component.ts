@@ -53,7 +53,7 @@ export class TransactionFilterDialogComponent implements OnInit {
             category: 'GENERAL',
             icon: 'security',
             type: 'enum',
-            options: ['DENY', 'ALLOW', 'WARN', 'REJECTED', 'PASSED'],
+            options: ['allowed', 'blocked', 'warn', 'rejected', 'delayed'],
         },
         {
             key: 'score',
@@ -105,6 +105,14 @@ export class TransactionFilterDialogComponent implements OnInit {
             icon: 'dns',
             type: 'text',
             placeholder: 'e.g. NXGuard_Frontend',
+        },
+        {
+            key: 'sensor._id',
+            labelKey: 'TRANSACTION.FILTER.FIELDS.SENSOR_ID',
+            category: 'ROUTING',
+            icon: 'sensors',
+            type: 'text',
+            placeholder: 'e.g. sensor-default',
         },
 
         // NETWORK
@@ -209,7 +217,7 @@ export class TransactionFilterDialogComponent implements OnInit {
             category: 'SECURITY',
             icon: 'public',
             type: 'enum',
-            options: ['ALLOW', 'DENY'],
+            options: ['allowed', 'blocked'],
         },
         {
             key: 'rbl_status',
@@ -217,7 +225,7 @@ export class TransactionFilterDialogComponent implements OnInit {
             category: 'SECURITY',
             icon: 'gavel',
             type: 'enum',
-            options: ['ALLOW', 'DENY'],
+            options: ['allowed', 'blocked'],
         },
         {
             key: 'ipxa',

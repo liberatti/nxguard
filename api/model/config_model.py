@@ -18,6 +18,14 @@ class ConfigArchiveSchema(Schema):
     password = fields.String()
 
 
+class ConfigLoggingSchema(Schema):
+    mode = fields.String()  # local, opensearch
+    type = fields.String(allow_none=True)
+    url = fields.String(allow_none=True)
+    username = fields.String(allow_none=True)
+    password = fields.String(allow_none=True)
+
+
 class ConfigPurgeSchema(Schema):
     enabled = fields.Boolean()
     purge_after = fields.Integer()  # days
@@ -40,6 +48,7 @@ class ConfigSchema(Schema):
     dns_resolver = fields.String(allow_none=True)
     active_scn = fields.String(allow_none=True)
     archive = fields.Nested(ConfigArchiveSchema, allow_none=True)
+    logging = fields.Nested(ConfigLoggingSchema, allow_none=True)
     purge = fields.Nested(ConfigPurgeSchema, allow_none=True)
     ipxa = fields.Nested(ConfigIpxaSchema, allow_none=True)
 
@@ -143,6 +152,7 @@ class ConfigDao(DuckDAO):
                 ca_private TEXT,
                 acme_directory_url TEXT,
                 archive_json TEXT,
+                logging_json TEXT,
                 cache_json TEXT,
                 purge_json TEXT,
                 dns_resolver TEXT,
@@ -151,10 +161,16 @@ class ConfigDao(DuckDAO):
             );
         """
         )
+        try:
+            self.ddl(f"ALTER TABLE {self.table_name} ADD COLUMN IF NOT EXISTS logging_json TEXT;")
+        except Exception:
+            pass
 
     def from_dict(self, vo):
         if "archive" in vo:
             vo.update({"archive_json": json.dumps(vo.pop("archive"), default=str)})
+        if "logging" in vo:
+            vo.update({"logging_json": json.dumps(vo.pop("logging"), default=str)})
         if "purge" in vo:
             vo.update({"purge_json": json.dumps(vo.pop("purge"), default=str)})
         if "cache" in vo:
@@ -168,6 +184,9 @@ class ConfigDao(DuckDAO):
             if "archive_json" in row:
                 val = row.pop("archive_json")
                 row.update({"archive": json.loads(val) if val else None})
+            if "logging_json" in row:
+                val = row.pop("logging_json")
+                row.update({"logging": json.loads(val) if val else None})
             if "purge_json" in row:
                 val = row.pop("purge_json")
                 row.update({"purge": json.loads(val) if val else None})

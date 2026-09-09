@@ -357,19 +357,23 @@
     display: inline-block;
 }
 
-.status-chip.passed {
+.status-chip.passed,
+.status-chip.allowed {
     background: #ecfdf5;
     color: #059669;
     border: 1px solid #a7f3d0;
 }
 
-.status-chip.deny {
+.status-chip.deny,
+.status-chip.block,
+.status-chip.blocked {
     background: #fef2f2;
     color: #dc2626;
     border: 1px solid #fecaca;
 }
 
 .status-chip.warn,
+.status-chip.warning,
 .status-chip.rejected {
     background: #fffbeb;
     color: #d97706;

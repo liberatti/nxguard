@@ -1,11 +1,10 @@
 
-export interface ConfigArchive {
-    enabled: boolean;
-    archive_after: number;
-    type: string;
-    url: string;
-    username: string;
-    password: string;
+export interface ConfigLogging {
+    mode: 'local' | 'opensearch' | string;
+    type?: string;
+    url?: string;
+    username?: string;
+    password?: string;
 }
 
 export interface ConfigPurge {
@@ -24,7 +23,7 @@ export interface Config {
     ca_private: string;
     acme_directory_url: string;
     dns_resolver?: string;
-    archive: ConfigArchive;
+    logging?: ConfigLogging;
     purge: ConfigPurge;
     ipxa?: ConfigIpxa;
 }

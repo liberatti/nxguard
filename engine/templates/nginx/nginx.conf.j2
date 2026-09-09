@@ -22,7 +22,16 @@ http {
 
   init_worker_by_lua_block {
     local flush = require "nxguard.log_flush"
-    flush.start("{{BASE_PATH}}", 2)  -- flush by 2s
+    {% if config.logging and config.logging.mode == "opensearch" %}
+    flush.start_remote({
+      url = "{{config.logging.url}}",
+      username = "{{config.logging.username}}",
+      password = "{{config.logging.password}}",
+      index = "{{config.logging.index if config.logging.index else 'nxguard_trn'}}"
+    }, 2)
+    {% else %}
+    flush.start("{{BASE_PATH}}", 2)
+    {% endif %}
   }
 
   client_body_temp_path {{BASE_PATH}}/temp/client_body;

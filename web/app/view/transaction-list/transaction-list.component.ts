@@ -110,10 +110,15 @@ export class TransactionListComponent implements OnInit {
     expandedElement: TransactionLog | null = null;
 
     actionColors: Record<string, { border: string; bg: string; point: string }> = {
+        ALLOWED: { border: '#10b981', bg: 'rgba(16, 185, 129, 0.12)', point: '#10b981' },
+        allowed: { border: '#10b981', bg: 'rgba(16, 185, 129, 0.12)', point: '#10b981' },
+        BLOCKED: { border: '#ef4444', bg: 'rgba(239, 68, 68, 0.12)', point: '#ef4444' },
+        blocked: { border: '#ef4444', bg: 'rgba(239, 68, 68, 0.12)', point: '#ef4444' },
+        WARN: { border: '#f59e0b', bg: 'rgba(245, 158, 11, 0.12)', point: '#f59e0b' },
+        warn: { border: '#f59e0b', bg: 'rgba(245, 158, 11, 0.12)', point: '#f59e0b' },
         PASSED: { border: '#10b981', bg: 'rgba(16, 185, 129, 0.12)', point: '#10b981' },
         ALLOW: { border: '#06b6d4', bg: 'rgba(6, 182, 212, 0.12)', point: '#06b6d4' },
         PASS: { border: '#10b981', bg: 'rgba(16, 185, 129, 0.12)', point: '#10b981' },
-        WARN: { border: '#f59e0b', bg: 'rgba(245, 158, 11, 0.12)', point: '#f59e0b' },
         DENY: { border: '#ef4444', bg: 'rgba(239, 68, 68, 0.12)', point: '#ef4444' },
         BLOCK: { border: '#dc2626', bg: 'rgba(220, 38, 38, 0.12)', point: '#dc2626' },
         REJECTED: { border: '#f97316', bg: 'rgba(249, 115, 22, 0.12)', point: '#f97316' },
@@ -347,7 +352,7 @@ export class TransactionListComponent implements OnInit {
             }
 
             if (actionSet.size > 0) {
-                const order = ['PASSED', 'ALLOW', 'WARN', 'REJECTED', 'DENY', 'BLOCK'];
+                const order = ['ALLOWED', 'BLOCKED', 'WARN', 'allowed', 'blocked', 'warn', 'PASSED', 'ALLOW', 'REJECTED', 'DENY', 'BLOCK'];
                 const sortedActions = Array.from(actionSet).sort((a, b) => {
                     const idxA = order.indexOf(a);
                     const idxB = order.indexOf(b);

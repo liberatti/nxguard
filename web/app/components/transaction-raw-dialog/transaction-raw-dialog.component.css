@@ -84,17 +84,21 @@
     font-weight: 700;
 }
 
-.meta-badge.action-passed {
+.meta-badge.action-passed,
+.meta-badge.action-allowed {
     background: #ecfdf5;
     color: #059669;
 }
 
-.meta-badge.action-deny {
+.meta-badge.action-deny,
+.meta-badge.action-block,
+.meta-badge.action-blocked {
     background: #fef2f2;
     color: #dc2626;
 }
 
-.meta-badge.action-warn {
+.meta-badge.action-warn,
+.meta-badge.action-warning {
     background: #fffbeb;
     color: #d97706;
 }

@@ -398,6 +398,7 @@
         "SERVICE_ID": "Service (service._id)",
         "ROUTE_NAME": "Route Name (route_name)",
         "UPSTREAM_ID": "Upstream (upstream._id)",
+        "SENSOR_ID": "Sensor (sensor._id)",
         "SOURCE_IP": "Source IP (source.ip)",
         "SOURCE_PORT": "Source Port (source.port)",
         "GEOIP_COUNTRY": "Source Country (geoip.country_code)",

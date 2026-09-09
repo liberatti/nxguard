@@ -9,6 +9,10 @@ local TRUSTED = utils.parse_list("{{trusted}}")
 
 local ip = utils.get_client_ip()
 
+ngx.ctx.sensor = {
+    name = "{{name}}",
+    _id = "{{name}}"
+}
 ngx.ctx.country_code = "--"
 ngx.ctx.risk_score = 0
 ngx.ctx.trusted = false

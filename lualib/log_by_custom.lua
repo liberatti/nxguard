@@ -32,7 +32,9 @@ local log_data = {
     urt = tonumber(ngx.var.upstream_response_time) or 0,
     referer = ngx.var.http_referer or "-",
     user_agent = ngx.var.http_user_agent or "-",
-    sensor = ngx.ctx.sensor,
+    sensor = {
+        name = ngx.var.sensor or "-"
+    },
     rate_limit = {
         action = rate_limit_action
     },
@@ -60,12 +62,3 @@ local ok, err = log_buffer:set(key, json_line)
 if not ok then
     ngx.log(ngx.ERR, "log buffer set failed: ", err)
 end
-
--- (Opcional) enviar para API de monitoramento
--- local http = require "resty.http"
--- local httpc = http.new()
--- httpc:request_uri("http://metrics.nxguard.local/ingest", {
---     method = "POST",
---     body = msg,
---     headers = { ["Content-Type"] = "application/json" },
--- })

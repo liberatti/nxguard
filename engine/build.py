@@ -137,10 +137,9 @@ def init_from_data(data_dir=None, data_file="init-data.json", data=None):
                     conf["ca_private"] = SSLTool.private_to_pem(ca_dict["private_key"])
                 except Exception as e:
                     logger.error(f"Error generating default CA during init: {e}")
-            if "archive" not in conf or conf.get("archive") is None:
-                conf["archive"] = {
-                    "enabled": False,
-                    "archive_after": 1800,
+            if "logging" not in conf or conf.get("logging") is None:
+                conf["logging"] = {
+                    "mode": "local",
                     "type": "opensearch",
                     "url": "",
                     "username": "",

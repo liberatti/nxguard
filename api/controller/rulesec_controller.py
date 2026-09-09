@@ -28,7 +28,7 @@ def get(rule_code: int) -> Response:
             return response_data({
                 "code": 12,
                 "phase": 1,
-                "action": "DENY",
+                "action": "blocked",
                 "msg": "'Method is not allowed by route'"
             },)
         case _:

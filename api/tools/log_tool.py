@@ -47,14 +47,14 @@ class LogParserTool:
         try:
             c = int(code)
         except (ValueError, TypeError):
-            return "PASSED"
+            return "allowed"
         if c == 403:
-            return "DENY"
+            return "blocked"
         elif c in [404, 401, 500, 502, 503, 504]:
-            return "WARN"
+            return "warn"
         elif c in [200, 201, 204, 301, 302, 304]:
-            return "PASSED"
-        return "PASSED"
+            return "allowed"
+        return "allowed"
 
     @classmethod
     def parse_agent(cls, user_agent_str):
@@ -267,18 +267,20 @@ class LogParserTool:
         if "score" in audit and audit["score"]:
             merged["score"] = max(merged.get("score", 0), audit["score"])
 
-        # Determine action (DENY takes precedence over WARN over PASSED)
-        if audit.get("action") == "DENY" or merged.get("action") == "DENY":
-            merged["action"] = "DENY"
-        elif audit.get("action") == "WARN" or merged.get("action") == "WARN":
-            merged["action"] = "WARN"
+        # Determine action (blocked takes precedence over warn over allowed)
+        audit_act = str(audit.get("action") or "").lower()
+        merged_act = str(merged.get("action") or "").lower()
+        if audit_act in ["deny", "blocked", "block"] or merged_act in ["deny", "blocked", "block"]:
+            merged["action"] = "blocked"
+        elif audit_act in ["warn", "warning"] or merged_act in ["warn", "warning"]:
+            merged["action"] = "warn"
 
         # Check status code for blocking
         status_code = merged.get("http", {}).get("response", {}).get("status_code")
         if not status_code and "http" in audit:
             status_code = audit.get("http", {}).get("response", {}).get("status_code")
         if status_code in [403, 406]:
-            merged["action"] = "DENY"
+            merged["action"] = "blocked"
 
         if service_name and (
             not merged.get("service") or not merged["service"].get("name")
@@ -335,7 +337,15 @@ class LogParserTool:
         geo_info = {"ip": remote_ip, "country": "--"}
 
         status_code = audit.get("http", {}).get("response", {}).get("status_code", 403)
-        action = audit.get("action") or cls.resolve_status_code(status_code)
+        raw_action = str(audit.get("action") or "").lower()
+        if raw_action in ["deny", "block", "blocked"]:
+            action = "blocked"
+        elif raw_action in ["warn", "warning"]:
+            action = "warn"
+        elif raw_action in ["allow", "allowed", "pass", "passed"]:
+            action = "allowed"
+        else:
+            action = cls.resolve_status_code(status_code)
 
         clean_name = service_name.rsplit("_", 1)[0] if ("_" in service_name and service_name.rsplit("_", 1)[1].isdigit()) else service_name
         http_data = audit.get("http", {})
@@ -542,7 +552,7 @@ class LogParserTool:
                 "headers": cls.parse_headers(request_raw.get("headers", {})),
             }
 
-        action = "PASSED"
+        action = "allowed"
         if "response" in trn:
             response_raw = trn.pop("response")
             status_code = response_raw.get("http_code", 200)
@@ -573,9 +583,9 @@ class LogParserTool:
             if "score" not in record and messages:
                 record["score"] = cls._calculate_fallback_score(messages)
 
-            if record.get("action") != "DENY":
+            if str(record.get("action") or "").lower() not in ["blocked", "deny", "block"]:
                 if any(str(m.get("severity") or "") in ["2", "3"] for m in messages):
-                    record["action"] = "DENY"
+                    record["action"] = "blocked"
 
         record.update({"audit": audit})
         return record
@@ -641,9 +651,13 @@ class LogParserTool:
 
                 sensor_val = dto.get("sensor") or dto.get("sensor_id")
                 if isinstance(sensor_val, dict):
-                    sensor_obj = sensor_val
+                    sensor_obj = dict(sensor_val)
+                    if "name" in sensor_obj and "_id" not in sensor_obj:
+                        sensor_obj["_id"] = sensor_obj["name"]
+                    elif "_id" in sensor_obj and "name" not in sensor_obj:
+                        sensor_obj["name"] = sensor_obj["_id"]
                 elif sensor_val and sensor_val != "-":
-                    sensor_obj = {"name": sensor_val, "_id": sensor_val}
+                    sensor_obj = {"name": str(sensor_val), "_id": str(sensor_val)}
                 else:
                     sensor_obj = None
 

@@ -56,8 +56,6 @@ class TransactionDao(DuckDAO):
         "rbl_status",
         "ipxa",
         "route_name",
-        "sensor_id",
-        "upstream_id",
         "score",
         "archived",
         "user_agent_json",
@@ -98,8 +96,6 @@ class TransactionDao(DuckDAO):
                 rbl_status TEXT,
                 ipxa TEXT,
                 route_name TEXT,
-                sensor_id TEXT,
-                upstream_id TEXT,
                 score INTEGER,
                 archived BOOLEAN DEFAULT 0,
                 user_agent_json JSON,
@@ -163,12 +159,16 @@ class TransactionDao(DuckDAO):
         "service._id": "service_id",
         "service.id": "service_id",
         "service.name": "service_id",
-        "sensor_id": "sensor_id",
-        "sensor._id": "sensor_id",
-        "sensor.id": "sensor_id",
-        "upstream_id": "upstream_id",
-        "upstream._id": "upstream_id",
-        "upstream.id": "upstream_id",
+        "sensor": "COALESCE(json_extract_string(CAST(sensor_json AS JSON), '$._id'), json_extract_string(CAST(sensor_json AS JSON), '$.name'))",
+        "sensor_id": "COALESCE(json_extract_string(CAST(sensor_json AS JSON), '$._id'), json_extract_string(CAST(sensor_json AS JSON), '$.name'))",
+        "sensor._id": "COALESCE(json_extract_string(CAST(sensor_json AS JSON), '$._id'), json_extract_string(CAST(sensor_json AS JSON), '$.name'))",
+        "sensor.id": "COALESCE(json_extract_string(CAST(sensor_json AS JSON), '$._id'), json_extract_string(CAST(sensor_json AS JSON), '$.name'))",
+        "sensor.name": "COALESCE(json_extract_string(CAST(sensor_json AS JSON), '$.name'), json_extract_string(CAST(sensor_json AS JSON), '$._id'))",
+        "upstream": "COALESCE(json_extract_string(CAST(upstream_json AS JSON), '$._id'), json_extract_string(CAST(upstream_json AS JSON), '$.name'))",
+        "upstream_id": "COALESCE(json_extract_string(CAST(upstream_json AS JSON), '$._id'), json_extract_string(CAST(upstream_json AS JSON), '$.name'))",
+        "upstream._id": "COALESCE(json_extract_string(CAST(upstream_json AS JSON), '$._id'), json_extract_string(CAST(upstream_json AS JSON), '$.name'))",
+        "upstream.id": "COALESCE(json_extract_string(CAST(upstream_json AS JSON), '$._id'), json_extract_string(CAST(upstream_json AS JSON), '$.name'))",
+        "upstream.name": "COALESCE(json_extract_string(CAST(upstream_json AS JSON), '$.name'), json_extract_string(CAST(upstream_json AS JSON), '$._id'))",
         "rbl_status": "rbl_status",
         "geoip_status": "geoip_status",
         "ipxa": "ipxa",
@@ -285,26 +285,36 @@ class TransactionDao(DuckDAO):
 
         if "sensor" in data and data["sensor"]:
             if isinstance(data["sensor"], dict):
-                data["sensor_id"] = str(
-                    data["sensor"].get("_id")
-                    or data["sensor"].get("id")
-                    or data["sensor"].get("name")
+                sns = dict(data["sensor"])
+                sns_id = str(
+                    sns.get("_id")
+                    or sns.get("id")
+                    or sns.get("name")
                     or ""
                 )
+                if not sns.get("_id") and sns_id:
+                    sns["_id"] = sns_id
+                if not sns.get("name") and sns_id:
+                    sns["name"] = sns_id
+                data["sensor"] = sns
             else:
-                data["sensor_id"] = str(data["sensor"])
                 data["sensor"] = {"_id": str(data["sensor"]), "name": str(data["sensor"])}
 
         if "upstream" in data and data["upstream"]:
             if isinstance(data["upstream"], dict):
-                data["upstream_id"] = str(
-                    data["upstream"].get("_id")
-                    or data["upstream"].get("id")
-                    or data["upstream"].get("name")
+                ups = dict(data["upstream"])
+                ups_id = str(
+                    ups.get("_id")
+                    or ups.get("id")
+                    or ups.get("name")
                     or ""
                 )
+                if not ups.get("_id") and ups_id:
+                    ups["_id"] = ups_id
+                if not ups.get("name") and ups_id:
+                    ups["name"] = ups_id
+                data["upstream"] = ups
             else:
-                data["upstream_id"] = str(data["upstream"])
                 data["upstream"] = {
                     "_id": str(data["upstream"]),
                     "name": str(data["upstream"]),
@@ -370,19 +380,14 @@ class TransactionDao(DuckDAO):
                 elif isinstance(row["service"], dict) and svc_id and "_id" not in row["service"]:
                     row["service"]["_id"] = svc_id
 
-            if "sensor_id" in row:
-                sns_id = row.pop("sensor_id", None)
-                if not row.get("sensor"):
-                    row["sensor"] = {"_id": sns_id, "name": sns_id} if sns_id else None
-                elif isinstance(row["sensor"], dict) and sns_id and "_id" not in row["sensor"]:
-                    row["sensor"]["_id"] = sns_id
+            # Legacy column fallback if present in pre-existing DB
+            sns_id = row.pop("sensor_id", None)
+            if sns_id and not row.get("sensor"):
+                row["sensor"] = {"_id": sns_id, "name": sns_id}
 
-            if "upstream_id" in row:
-                ups_id = row.pop("upstream_id", None)
-                if not row.get("upstream"):
-                    row["upstream"] = {"_id": ups_id, "name": ups_id} if ups_id else None
-                elif isinstance(row["upstream"], dict) and ups_id and "_id" not in row["upstream"]:
-                    row["upstream"]["_id"] = ups_id
+            ups_id = row.pop("upstream_id", None)
+            if ups_id and not row.get("upstream"):
+                row["upstream"] = {"_id": ups_id, "name": ups_id}
 
         return super().to_dict(row)
 
@@ -477,13 +482,13 @@ class TransactionDao(DuckDAO):
                 EXTRACT(day FROM CAST(logtime AS TIMESTAMP)) AS day,
                 EXTRACT(hour FROM CAST(logtime AS TIMESTAMP)) AS hour,
                 EXTRACT(minute FROM CAST(logtime AS TIMESTAMP)) AS minute,
-                COALESCE(UPPER(action), 'PASSED') AS action,
+                COALESCE(UPPER(action), 'ALLOWED') AS action,
                 COUNT(*) AS count,
                 COALESCE(SUM(TRY_CAST(json_extract_string(CAST(http_json AS JSON), '$.request.bytes') AS UBIGINT)), 0) AS bytes_in,
                 COALESCE(SUM(TRY_CAST(json_extract_string(CAST(http_json AS JSON), '$.response.bytes') AS UBIGINT)), 0) AS bytes_out
             FROM {self.table_name}
             {where_sql}
-            GROUP BY year, month, day, hour, minute, COALESCE(UPPER(action), 'PASSED')
+            GROUP BY year, month, day, hour, minute, COALESCE(UPPER(action), 'ALLOWED')
             ORDER BY year, month, day, hour, minute
         """
         rs = self._query(query, params, fetch=True)
@@ -497,7 +502,7 @@ class TransactionDao(DuckDAO):
                     int(r["hour"]) if r["hour"] is not None else 0,
                     int(r["minute"]) if r["minute"] is not None else 0,
                 )
-                action = str(r["action"]).upper() if r.get("action") else "PASSED"
+                action = str(r["action"]).upper() if r.get("action") else "ALLOWED"
                 count = int(r["count"]) if r["count"] is not None else 0
                 bytes_in = int(r["bytes_in"]) if r.get("bytes_in") is not None else 0
                 bytes_out = int(r["bytes_out"]) if r.get("bytes_out") is not None else 0

@@ -54,6 +54,13 @@ export class ConfigFormComponent implements OnInit {
         ca_private: new FormControl<string>(''),
         acme_directory_url: new FormControl<string>(''),
         dns_resolver: new FormControl<string>(''),
+        logging: new FormGroup({
+            mode: new FormControl<string>('local'),
+            type: new FormControl<string>('opensearch'),
+            url: new FormControl<string>(''),
+            username: new FormControl<string>(''),
+            password: new FormControl<string>(''),
+        }),
         archive: new FormGroup({
             enabled: new FormControl<boolean>(false),
             archive_after: new FormControl<number>(1800),
@@ -94,6 +101,7 @@ export class ConfigFormComponent implements OnInit {
                 ca_private: c.ca_private,
                 acme_directory_url: c.acme_directory_url,
                 dns_resolver: c.dns_resolver,
+                logging: c.logging || { mode: 'local', type: 'opensearch', url: '', username: '', password: '' },
                 archive: c.archive || {},
                 purge: c.purge || {},
                 ipxa: c.ipxa || {}

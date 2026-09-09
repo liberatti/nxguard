@@ -110,6 +110,8 @@
 }
 
 .enum-deny,
+.enum-block,
+.enum-blocked,
 .enum-rejected,
 .enum-failed {
     background: rgba(239, 68, 68, 0.15);
@@ -126,6 +128,7 @@
 }
 
 .enum-warn,
+.enum-warning,
 .enum-delayed {
     background: rgba(245, 158, 11, 0.15);
     color: #f59e0b;
