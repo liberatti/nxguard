@@ -13,7 +13,7 @@ class TransactionSchema(Schema):
     class Meta:
         unknown = EXCLUDE
 
-    _id = fields.Integer(required=False)
+    _id = fields.Raw(required=False)
     logtime = fields.Raw(required=False)
     unique_id = fields.String(required=False)
     server_id = fields.String(required=False)
@@ -35,8 +35,8 @@ class TransactionSchema(Schema):
     sensor = fields.Dict(required=False)
     upstream = fields.Dict(required=False)
     audit = fields.Dict(required=False)
-    score = fields.Integer(required=False)
-    archived = fields.Boolean(required=False)
+    score = fields.Integer(required=False, allow_none=True)
+    archived = fields.Boolean(required=False, allow_none=True)
 
 
 class TransactionDao(DuckDAO):
@@ -390,6 +390,15 @@ class TransactionDao(DuckDAO):
                 row["upstream"] = {"_id": ups_id, "name": ups_id}
 
         return super().to_dict(row)
+
+    def get_by_id(self, _id) -> Optional[Dict[str, Any]]:
+        if not _id:
+            return None
+        if isinstance(_id, int) or (isinstance(_id, str) and _id.isdigit()):
+            res = super().get_by_id(int(_id))
+            if res:
+                return res
+        return self.get_by_unique_id(str(_id))
 
     def get_by_unique_id(self, unique_id: str) -> Optional[Dict[str, Any]]:
         if not unique_id:

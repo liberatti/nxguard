@@ -84,8 +84,8 @@
       "STEP_1_DESC": "O tráfego chega às threads de trabalho do OpenResty. Sensores Lua customizados realizam bypass dinâmico rápido, geofiltragem e validação inicial antes de acionar a inspeção.",
       "STEP_2_TITLE": "Regras ModSecurity v3 & CRS",
       "STEP_2_DESC": "Análise completa de payload e avaliação regex contra o OWASP Core Rule Set 4.25+. Políticas granulares por rota permitem ajustes dinâmicos sem reinicialização.",
-      "STEP_3_TITLE": "Feeds IPXA & Telemetria DuckDB",
-      "STEP_3_DESC": "Inteligência de ameaças contínua sincronizada com o IPXA. Todos os logs de auditoria e transações bloqueadas são salvos no DuckDB embutido para relatórios e análises imediatos."
+      "STEP_3_TITLE": "Feeds IPXA & Telemetria DuckDB / OpenSearch",
+      "STEP_3_DESC": "Inteligência de ameaças contínua sincronizada com o IPXA. Logs de auditoria e transações são processados para análise local via DuckDB ou transmitidos em lote para clusters OpenSearch/Elasticsearch com index templates automatizados."
     },
     "FEATURES": {
       "BADGE": "Capacidades",
@@ -110,6 +110,11 @@
         "TITLE": "Telemetria Embutida DuckDB",
         "BADGE": "Zero BD Externo",
         "DESCRIPTION": "Mecanismo colunar embutido diretamente no backend de administração para consultas, agregações e auditoria instantâneas de transações em tempo real."
+      },
+      "OPENSEARCH": {
+        "TITLE": "Integração OpenSearch & SIEM",
+        "BADGE": "Index Templates & Bulk",
+        "DESCRIPTION": "Exportação contínua de logs e auditoria WAF via Bulk API, com provisionamento automático de index templates (nxguard_trn*) e mappings tipados."
       },
       "ACME": {
         "TITLE": "Automação ACME & SSL",

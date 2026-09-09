@@ -10,10 +10,24 @@ from nxcore.controllers.base_controller import (
 
 from nxcore.common_utils import replace_tz
 from api.model.transaction_model import TransactionDao
+from api.model.config_model import ConfigDao
+from api.services.opensearch_service import OpenSearchService
 import config as env_config
 from config import DATETIME_FMT
 
 routes = Blueprint("trn", __name__)
+
+
+def get_transaction_storage():
+    try:
+        with ConfigDao() as config_dao:
+            active = config_dao.get_active()
+            logging_conf = active.get("logging") if active else {}
+            if logging_conf and logging_conf.get("mode") == "opensearch":
+                return OpenSearchService(logging_conf)
+    except Exception:
+        pass
+    return TransactionDao()
 
 
 def parse_date(date_str, fallback):
@@ -46,7 +60,7 @@ def st_tpm():
     ed_date = parse_date(ed_val, datetime.now(env_config.TZ))
 
     filters = req.get("filters")
-    with TransactionDao() as dao:
+    with get_transaction_storage() as dao:
         tpm = dao.get_tpm(st_date, ed_date, filters=filters)
         if tpm:
             for s in tpm:
@@ -68,7 +82,7 @@ def st_tpm():
 @routes.route("/<trn_id>", methods=["GET"])
 @has_any_authority(authorities=["viewer", "superuser"])
 def get(trn_id):
-    with TransactionDao() as dao:
+    with get_transaction_storage() as dao:
         trn = dao.get_by_id(trn_id)
         if trn:
             return response_data(trn, dao.schema)
@@ -86,7 +100,7 @@ def search():
 
     filters = req.get("filters")
     _pagination = get_pagination()
-    with TransactionDao() as dao:
+    with get_transaction_storage() as dao:
         result = dao.get_all(
             _pagination,
             dt_start=st_date,

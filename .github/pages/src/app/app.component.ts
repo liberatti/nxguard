@@ -135,6 +135,12 @@ export class AppComponent {
       descriptionKey: 'PAGES.FEATURES.DUCKDB.DESCRIPTION'
     },
     {
+      icon: 'storage',
+      titleKey: 'PAGES.FEATURES.OPENSEARCH.TITLE',
+      badgeKey: 'PAGES.FEATURES.OPENSEARCH.BADGE',
+      descriptionKey: 'PAGES.FEATURES.OPENSEARCH.DESCRIPTION'
+    },
+    {
       icon: 'vpn_key',
       titleKey: 'PAGES.FEATURES.ACME.TITLE',
       badgeKey: 'PAGES.FEATURES.ACME.BADGE',

@@ -3,6 +3,7 @@ export interface ConfigLogging {
     mode: 'local' | 'opensearch' | string;
     type?: string;
     url?: string;
+    dashboard_url?: string;
     username?: string;
     password?: string;
 }

@@ -22,6 +22,7 @@ class ConfigLoggingSchema(Schema):
     mode = fields.String()  # local, opensearch
     type = fields.String(allow_none=True)
     url = fields.String(allow_none=True)
+    dashboard_url = fields.String(allow_none=True)
     username = fields.String(allow_none=True)
     password = fields.String(allow_none=True)
 

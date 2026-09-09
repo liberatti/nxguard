@@ -162,6 +162,15 @@
                                             </mat-form-field>
                                         </div>
 
+                                        <div class="fields-grid-single">
+                                            <mat-form-field class="full-width">
+                                                <mat-label>{{ 'CONFIG_PAGE.DASHBOARD_URL' | translate }}</mat-label>
+                                                <input matInput formControlName="dashboard_url" id="logging-dashboard-url-input" placeholder="http://opensearch-dashboards:5601">
+                                                <mat-icon matSuffix class="field-icon">dashboard</mat-icon>
+                                                <mat-hint>{{ 'CONFIG_PAGE.DASHBOARD_URL_HINT' | translate }}</mat-hint>
+                                            </mat-form-field>
+                                        </div>
+
                                         <div class="fields-grid">
                                             <mat-form-field class="full-width">
                                                 <mat-label>{{ 'CONFIG_PAGE.CLUSTER_USER' | translate }}</mat-label>

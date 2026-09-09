@@ -84,17 +84,17 @@
       "STEP_1_DESC": "Traffic arrives on OpenResty worker threads. Custom Lua sensors perform rapid dynamic bypass, geo-filtering, and initial validation before invoking inspection.",
       "STEP_2_TITLE": "ModSecurity v3 & CRS Rules",
       "STEP_2_DESC": "Comprehensive payload parsing and regex evaluation against OWASP Core Rule Set 4.25+. Granular per-route sensor policies enable dynamic rule tailoring without reloads.",
-      "STEP_3_TITLE": "IPXA Feeds & DuckDB Telemetry",
-      "STEP_3_DESC": "Continuous threat intelligence synchronized with IPXA. All audit logs and blocked transactions are saved in embedded DuckDB for instant analytics and reporting."
+      "STEP_3_TITLE": "IPXA Feeds & DuckDB / OpenSearch Telemetry",
+      "STEP_3_DESC": "Continuous threat intelligence synchronized with IPXA. Audit logs and transactions are merged for local analytics via DuckDB or streamed in bulk to OpenSearch/Elasticsearch clusters with automated index templates."
     },
     "FEATURES": {
       "BADGE": "Capabilities",
       "TITLE": "Core Engine Features",
-      "SUBTITLE": "Engineered for high-throughput APIs and enterprise security compliance.",
+      "SUBTITLE": "Engineered for high-throughput APIs and enterprise compliance standards.",
       "MODSECURITY": {
         "TITLE": "Advanced ModSecurity v3 WAF",
-        "BADGE": "Layer 7 Protection",
-        "DESCRIPTION": "Native integration with ModSecurity v3 and OWASP Core Rule Set 4.25+ protecting against SQLi, XSS, RCE, LFI/RFI, and zero-day vulnerabilities."
+        "BADGE": "Layer 7 Defense",
+        "DESCRIPTION": "Native ModSecurity v3 and OWASP Core Rule Set 4.25+ integration defending against SQLi, XSS, RCE, LFI/RFI, and zero-day exploits."
       },
       "LUAJIT": {
         "TITLE": "High-Performance LuaJIT Core",
@@ -110,6 +110,11 @@
         "TITLE": "DuckDB Embedded Analytics",
         "BADGE": "Zero External DB",
         "DESCRIPTION": "Columnar storage engine embedded directly in the admin backend for rapid real-time transaction query, aggregation, and auditing."
+      },
+      "OPENSEARCH": {
+        "TITLE": "OpenSearch & SIEM Integration",
+        "BADGE": "Index Templates & Bulk",
+        "DESCRIPTION": "Continuous WAF transaction and audit log streaming via Bulk API, with automatic provisioning of typed mappings and index templates (nxguard_trn*)."
       },
       "ACME": {
         "TITLE": "ACME & SSL Automation",

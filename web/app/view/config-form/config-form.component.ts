@@ -58,6 +58,7 @@ export class ConfigFormComponent implements OnInit {
             mode: new FormControl<string>('local'),
             type: new FormControl<string>('opensearch'),
             url: new FormControl<string>(''),
+            dashboard_url: new FormControl<string>(''),
             username: new FormControl<string>(''),
             password: new FormControl<string>(''),
         }),
@@ -93,7 +94,7 @@ export class ConfigFormComponent implements OnInit {
                 ca_private: c.ca_private,
                 acme_directory_url: c.acme_directory_url,
                 dns_resolver: c.dns_resolver,
-                logging: c.logging || { mode: 'local', type: 'opensearch', url: '', username: '', password: '' },
+                logging: c.logging || { mode: 'local', type: 'opensearch', url: '', dashboard_url: '', username: '', password: '' },
                 purge: c.purge || {},
                 ipxa: c.ipxa || {}
             });

@@ -318,6 +318,8 @@
     "LOGGING_TYPE": "Engine Type",
     "LOGGING_URL_HINT": "Cluster endpoint URL (e.g. http://opensearch:9200)",
     "CLUSTER_URL": "Cluster URL",
+    "DASHBOARD_URL": "Dashboards URL",
+    "DASHBOARD_URL_HINT": "OpenSearch / Kibana Dashboards endpoint URL (e.g. http://opensearch-dashboards:5601)",
     "CLUSTER_USER": "Username",
     "CLUSTER_PASS": "Password",
     "PURGE_TITLE": "Transaction Purging",

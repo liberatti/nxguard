@@ -18,6 +18,7 @@ import requests
 from nxcore.middleware.logging_manager import logger
 from api.model.transaction_model import TransactionDao
 from api.model.config_model import ConfigDao
+from api.services.opensearch_service import OpenSearchService
 import config
 from config import MASKED_HEADERS
 
@@ -159,16 +160,70 @@ class LogParserTool:
         return results
 
     @classmethod
+    def _get_service_info(cls, service_name: str) -> Dict[str, str]:
+        clean_name = (
+            service_name.rsplit("_", 1)[0]
+            if ("_" in service_name and service_name.rsplit("_", 1)[1].isdigit())
+            else service_name
+        )
+        return {"_id": service_name, "name": clean_name}
+
+    @classmethod
+    def _flush_merged(
+        cls,
+        records: List[Dict[str, Any]],
+        service_name: str,
+        mode: str,
+        conf: Dict[str, Any],
+    ):
+        if not records:
+            return
+        if mode == "opensearch":
+            try:
+                with OpenSearchService(conf) as os_service:
+                    os_service.persist_many(records)
+            except Exception as e:
+                logger.error(f"Error sending transactions to OpenSearch: {e}")
+        else:
+            try:
+                with TransactionDao() as model:
+                    for record in records:
+                        try:
+                            model.upsert_by_unique_id(record)
+                        except Exception as e:
+                            logger.error(f"Error persisting merged transaction: {e}")
+            except Exception as e:
+                logger.error(f"Error opening TransactionDao for {service_name}: {e}")
+        logger.debug(
+            f"Processed {len(records)} merged transactions for {service_name} (mode: {mode})"
+        )
+
+    @classmethod
     def merge_transactions(cls, service_name, cache):
         cur_thread = threading.current_thread()
         setattr(cur_thread, "active", True)
         logger.info(f"Start merge transaction for {service_name}")
 
+        default_service = cls._get_service_info(service_name)
         pending_access: Dict[str, tuple[Dict[str, Any], float]] = {}
         pending_audit: Dict[str, tuple[Dict[str, Any], float]] = {}
+        logging_mode = "local"
+        logging_conf = None
+        last_config_check = 0.0
 
         while getattr(cur_thread, "active", True):
-            time.sleep(2)
+            now = time.time()
+            if now - last_config_check >= 2.0:
+                try:
+                    with ConfigDao() as config_dao:
+                        active = config_dao.get_active()
+                        if active and isinstance(active, dict):
+                            logging_conf = active.get("logging") or {}
+                            logging_mode = logging_conf.get("mode", "local")
+                except Exception as e:
+                    logger.debug(f"Error reading logging config: {e}")
+                last_config_check = now
+
             try:
                 access_records = []
                 audit_records = []
@@ -181,11 +236,11 @@ class LogParserTool:
                         audit_records = list(cache.audit_log)
                         cache.audit_log.clear()
 
-                now = time.time()
                 merged_records = []
-                logger.debug(
-                    f"\n\n{ service_name} Access records: {len(access_records)}, Audit records: {len(audit_records)}"
-                )
+                if access_records or audit_records:
+                    logger.debug(
+                        f"[{service_name}] Ingesting Access: {len(access_records)}, Audit: {len(audit_records)}"
+                    )
 
                 # Correlate incoming access records
                 for acc in access_records:
@@ -201,8 +256,7 @@ class LogParserTool:
                             pending_access[uid] = (acc, now)
                     else:
                         if not acc.get("service") or not acc["service"].get("name"):
-                            clean_name = service_name.rsplit("_", 1)[0] if ("_" in service_name and service_name.rsplit("_", 1)[1].isdigit()) else service_name
-                            acc["service"] = {"_id": service_name, "name": clean_name}
+                            acc["service"] = default_service
                         merged_records.append(acc)
 
                 # Correlate incoming audit records
@@ -228,8 +282,7 @@ class LogParserTool:
                 for uid in expired_access_uids:
                     acc, _ = pending_access.pop(uid)
                     if not acc.get("service") or not acc["service"].get("name"):
-                        clean_name = service_name.rsplit("_", 1)[0] if ("_" in service_name and service_name.rsplit("_", 1)[1].isdigit()) else service_name
-                        acc["service"] = {"_id": service_name, "name": clean_name}
+                        acc["service"] = default_service
                     merged_records.append(acc)
 
                 # Flush pending audit records older than 4 seconds
@@ -242,99 +295,54 @@ class LogParserTool:
                     merged_records.append(standalone)
 
                 if merged_records:
-                    with TransactionDao() as model:
-                        for record in merged_records:
-                            try:
-                                model.upsert_by_unique_id(record)
-                            except Exception as e:
-                                logger.error(
-                                    f"Error persisting merged transaction: {e}"
-                                )
-                    logger.debug(
-                        f"Merged {len(merged_records)} transactions for {service_name}"
+                    cls._flush_merged(
+                        merged_records, service_name, logging_mode, logging_conf
                     )
-
-                    try:
-                        cls._send_to_opensearch(merged_records)
-                    except Exception as e:
-                        logger.error(
-                            f"Error sending transactions to OpenSearch: {e}"
-                        )
 
             except Exception as e:
                 logger.error(
                     f"Error merging transactions for {service_name}: {e} {traceback.format_exc()}"
                 )
 
-        logger.info(f"Merge transaction stopped for {service_name}")
+            time.sleep(2)
 
-    @classmethod
-    def _send_to_opensearch(cls, records: List[Dict[str, Any]]):
-        if not records:
-            return
+        # Graceful final flush upon thread exit
         try:
-            with ConfigDao() as config_dao:
-                active = config_dao.get_active()
+            final_records = []
+            with cache.lock:
+                if cache.access_log:
+                    for acc in cache.access_log:
+                        if not acc.get("service") or not acc["service"].get("name"):
+                            acc["service"] = default_service
+                        final_records.append(acc)
+                    cache.access_log.clear()
+                if cache.audit_log:
+                    for aud in cache.audit_log:
+                        final_records.append(
+                            cls._audit_to_transaction(aud, service_name)
+                        )
+                    cache.audit_log.clear()
+
+            for uid, (acc, _) in pending_access.items():
+                if not acc.get("service") or not acc["service"].get("name"):
+                    acc["service"] = default_service
+                final_records.append(acc)
+            pending_access.clear()
+
+            for uid, (aud, _) in pending_audit.items():
+                final_records.append(cls._audit_to_transaction(aud, service_name))
+            pending_audit.clear()
+
+            if final_records:
+                cls._flush_merged(
+                    final_records, service_name, logging_mode, logging_conf
+                )
         except Exception as e:
-            logger.error(f"Error fetching config for OpenSearch logging: {e}")
-            return
-
-        if not active or not isinstance(active, dict):
-            return
-
-        logging_conf = active.get("logging")
-        if not logging_conf or not isinstance(logging_conf, dict):
-            return
-
-        if logging_conf.get("mode") != "opensearch":
-            return
-
-        url = logging_conf.get("url")
-        if not url:
-            return
-
-        index_name = logging_conf.get("index") or "nxguard_trn"
-        username = logging_conf.get("username")
-        password = logging_conf.get("password")
-
-        endpoint = url.rstrip("/") + "/_bulk"
-        headers = {"Content-Type": "application/x-ndjson"}
-        auth = (username, password) if username and password else None
-
-        bulk_lines = []
-        for record in records:
-            doc = dict(record)
-            doc.pop("_id", None)
-            if isinstance(doc.get("logtime"), datetime):
-                doc["logtime"] = doc["logtime"].strftime(config.DATETIME_FMT)
-
-            action_meta = {"index": {"_index": index_name}}
-            if doc.get("unique_id"):
-                action_meta["index"]["_id"] = doc["unique_id"]
-            bulk_lines.append(json.dumps(action_meta))
-            bulk_lines.append(json.dumps(doc, default=str))
-
-        payload = "\n".join(bulk_lines) + "\n"
-
-        try:
-            res = requests.post(
-                endpoint,
-                data=payload,
-                headers=headers,
-                auth=auth,
-                timeout=5,
-                verify=False,
+            logger.error(
+                f"Error during final transaction flush for {service_name}: {e}"
             )
-            if res.status_code in (200, 201):
-                logger.debug(
-                    f"Successfully sent {len(records)} records to OpenSearch ({endpoint})"
-                )
-            else:
-                logger.error(
-                    f"OpenSearch bulk flush returned status {res.status_code}: {res.text}"
-                )
-        except Exception as e:
-            logger.error(f"Failed to send logs to remote OpenSearch ({endpoint}): {e}")
+
+        logger.info(f"Merge transaction stopped for {service_name}")
 
     @classmethod
     def _combine_access_and_audit(
@@ -349,7 +357,11 @@ class LogParserTool:
         # Determine action (blocked takes precedence over warn over allowed)
         audit_act = str(audit.get("action") or "").lower()
         merged_act = str(merged.get("action") or "").lower()
-        if audit_act in ["deny", "blocked", "block"] or merged_act in ["deny", "blocked", "block"]:
+        if audit_act in ["deny", "blocked", "block"] or merged_act in [
+            "deny",
+            "blocked",
+            "block",
+        ]:
             merged["action"] = "blocked"
         elif audit_act in ["warn", "warning"] or merged_act in ["warn", "warning"]:
             merged["action"] = "warn"
@@ -364,8 +376,7 @@ class LogParserTool:
         if service_name and (
             not merged.get("service") or not merged["service"].get("name")
         ):
-            clean_name = service_name.rsplit("_", 1)[0] if ("_" in service_name and service_name.rsplit("_", 1)[1].isdigit()) else service_name
-            merged["service"] = {"_id": service_name, "name": clean_name}
+            merged["service"] = cls._get_service_info(service_name)
 
         if "http" in audit and audit["http"]:
             aud_http = audit["http"]
@@ -393,8 +404,8 @@ class LogParserTool:
                     "headers" in aud_http["response"]
                     and aud_http["response"]["headers"]
                 ):
-                    acc_http.setdefault("response", {})["headers"] = cls._filter_headers(
-                        aud_http["response"]["headers"]
+                    acc_http.setdefault("response", {})["headers"] = (
+                        cls._filter_headers(aud_http["response"]["headers"])
                     )
                 if "status_code" in aud_http["response"] and not acc_http.get(
                     "response", {}
@@ -426,7 +437,6 @@ class LogParserTool:
         else:
             action = cls.resolve_status_code(status_code)
 
-        clean_name = service_name.rsplit("_", 1)[0] if ("_" in service_name and service_name.rsplit("_", 1)[1].isdigit()) else service_name
         http_data = audit.get("http", {})
         if "request" in http_data and "headers" in http_data["request"]:
             http_data["request"]["headers"] = cls._filter_headers(
@@ -441,7 +451,7 @@ class LogParserTool:
             "logtime": audit.get("logtime") or datetime.now(),
             "unique_id": audit.get("unique_id", ""),
             "server_id": audit.get("server_id") or server_id,
-            "service": {"_id": service_name, "name": clean_name},
+            "service": cls._get_service_info(service_name),
             "route_name": "-",
             "upstream": None,
             "sensor": None,
@@ -662,7 +672,11 @@ class LogParserTool:
             if "score" not in record and messages:
                 record["score"] = cls._calculate_fallback_score(messages)
 
-            if str(record.get("action") or "").lower() not in ["blocked", "deny", "block"]:
+            if str(record.get("action") or "").lower() not in [
+                "blocked",
+                "deny",
+                "block",
+            ]:
                 if any(str(m.get("severity") or "") in ["2", "3"] for m in messages):
                     record["action"] = "blocked"
 
