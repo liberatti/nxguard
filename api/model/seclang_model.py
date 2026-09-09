@@ -124,7 +124,7 @@ class RuleCategoryDao(DuckDAO):
         vo.pop("rules", None)
         return super().from_dict(vo)
 
-    def to_dict(self, row, dependents=True):
+    def to_dict(self, row, dependents=False):
         if row:
             row = row.copy()
             if "exclusions_json" in row:
@@ -136,13 +136,18 @@ class RuleCategoryDao(DuckDAO):
                     row["rules"] = rule_dao.get_by_category(row["_id"])
         return super().to_dict(row)
 
-    def get_by_name(self, name: str) -> Optional[Dict[str, Any]]:
+    def get_by_id(self, cat_id: str, dependents: bool = True) -> Optional[Dict[str, Any]]:
+        sql = f"SELECT * FROM {self.table_name} WHERE _id = ? LIMIT 1"
+        rs = self._query(sql, (cat_id,), fetch=True)
+        return self.to_dict(rs[0], dependents=dependents) if rs else None
+
+    def get_by_name(self, name: str, dependents: bool = True) -> Optional[Dict[str, Any]]:
         sql = f"SELECT * FROM {self.table_name} WHERE name = ? LIMIT 1"
         rs = self._query(sql, (name,), fetch=True)
-        return self.to_dict(rs[0]) if rs else None
+        return self.to_dict(rs[0], dependents=dependents) if rs else None
 
     def get_by_name_and_phases(
-        self, name: str, phases: List[int]
+        self, name: str, phases: List[int], dependents: bool = False
     ) -> List[Dict[str, Any]]:
         if not phases:
             sql = f"SELECT * FROM {self.table_name} WHERE (system IS NULL OR system = FALSE) AND name LIKE ?"
@@ -152,9 +157,9 @@ class RuleCategoryDao(DuckDAO):
             sql = f"SELECT * FROM {self.table_name} WHERE (system IS NULL OR system = FALSE) AND name LIKE ? AND phase IN ({placeholders})"
             params = [f"%{name}%"] + phases
         rs = self._query(sql, params, fetch=True)
-        return [self.to_dict(row, dependents=False) for row in rs]
+        return [self.to_dict(row, dependents=dependents) for row in rs]
 
-    def get_by_phases(self, phases: List[int]) -> List[Dict[str, Any]]:
+    def get_by_phases(self, phases: List[int], dependents: bool = False) -> List[Dict[str, Any]]:
         if not phases:
             sql = f"SELECT * FROM {self.table_name} WHERE (system IS NULL OR system = FALSE)"
             rs = self._query(sql, fetch=True)
@@ -162,4 +167,4 @@ class RuleCategoryDao(DuckDAO):
             placeholders = ", ".join(["?"] * len(phases))
             sql = f"SELECT * FROM {self.table_name} WHERE (system IS NULL OR system = FALSE) AND phase IN ({placeholders})"
             rs = self._query(sql, phases, fetch=True)
-        return [self.to_dict(row, dependents=False) for row in rs]
+        return [self.to_dict(row, dependents=dependents) for row in rs]

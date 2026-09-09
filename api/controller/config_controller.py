@@ -117,7 +117,7 @@ def update(_id=None) -> Response:
 @routes.route("/backup", methods=["GET"])
 @has_any_authority(authorities=["viewer", "superuser"])
 def backup_export() -> Response:
-    conf = c_builder.get_config()
+    conf = c_builder.get_config(dependents=False)
     upstreams = []
     for u in conf.get("upstreams", []):
         u_copy = dict(u)
@@ -134,44 +134,12 @@ def backup_export() -> Response:
             u_copy["targets"] = clean_targets
         upstreams.append(u_copy)
 
-    services = []
-    for s in conf.get("services", []):
-        s_copy = dict(s)
-        if "certificate" in s_copy and isinstance(s_copy["certificate"], dict):
-            cert_obj = s_copy["certificate"]
-            s_copy["certificate"] = {
-                k: cert_obj[k]
-                for k in ["_id", "name"]
-                if k in cert_obj
-            }
-        if "routes" in s_copy and isinstance(s_copy["routes"], list):
-            clean_routes = []
-            for r in s_copy["routes"]:
-                r_copy = dict(r)
-                if "sensor" in r_copy and isinstance(r_copy["sensor"], dict):
-                    sensor_obj = r_copy["sensor"]
-                    r_copy["sensor"] = {
-                        k: sensor_obj[k]
-                        for k in ["_id", "name"]
-                        if k in sensor_obj
-                    }
-                if "upstream" in r_copy and isinstance(r_copy["upstream"], dict):
-                    upstream_obj = r_copy["upstream"]
-                    r_copy["upstream"] = {
-                        k: upstream_obj[k]
-                        for k in ["_id", "name"]
-                        if k in upstream_obj
-                    }
-                clean_routes.append(r_copy)
-            s_copy["routes"] = clean_routes
-        services.append(s_copy)
-
     export_data = {
         "config": conf.get("config", {}),
         "certificates": conf.get("certificates", []),
         "sensors": conf.get("sensors", []),
         "upstreams": upstreams,
-        "services": services,
+        "services": conf.get("services", []),
     }
     return Response(
         json.dumps(

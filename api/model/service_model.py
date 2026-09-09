@@ -122,14 +122,22 @@ class ServiceDao(DuckDAO):
                 vo["certificate_id"] = None
         return super().from_dict(vo)
 
-    def to_dict(self, vo: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+    def to_dict(
+        self, vo: Optional[Dict[str, Any]], dependents: bool = True
+    ) -> Optional[Dict[str, Any]]:
         if not vo:
             return vo
         super().to_dict(vo)
 
         if "certificate_id" in vo:
             crt_id = vo.pop("certificate_id")
-            vo["certificate"] = self.certificateDao.get_by_id(crt_id)
+            if crt_id:
+                if dependents:
+                    vo["certificate"] = self.certificateDao.get_by_id(crt_id)
+                else:
+                    vo["certificate"] = self.certificateDao.get_desc_by_id(crt_id) or {
+                        "_id": crt_id
+                    }
 
         vo["bindings"] = (
             json.loads(vo.get("bindings", "[]"))
@@ -156,8 +164,34 @@ class ServiceDao(DuckDAO):
             if isinstance(vo.get("ssl_protocols"), str)
             else vo.get("ssl_protocols", [])
         )
-        vo["routes"] = self.routeDao.get_all_by_service_id(vo["_id"])
+        vo["routes"] = self.routeDao.get_all_by_service_id(
+            vo["_id"], dependents=dependents
+        )
         return vo
+
+    def get_all(
+        self, pagination=None, order_by=None, dependents: bool = True
+    ) -> Dict[str, Any]:
+        sql = f"SELECT * FROM {self.table_name}"
+        if order_by:
+            sql += f" ORDER BY {order_by}"
+
+        count_sql = f"SELECT COUNT(*) as total FROM {self.table_name}"
+        total = self._query(count_sql, fetch=True)[0]["total"]
+
+        if pagination:
+            page = pagination.get("page", 1)
+            per_page = pagination.get("per_page", 10)
+            offset = (page - 1) * per_page
+            sql += f" LIMIT {per_page} OFFSET {offset}"
+            pagination["total_elements"] = total
+        else:
+            pagination = {"total_elements": total, "page": 1, "per_page": total}
+
+        rs = self._query(sql, fetch=True)
+        rows = [self.to_dict(row, dependents=dependents) for row in rs] if rs else []
+
+        return {"metadata": pagination, "data": rows}
 
     def persist(self, vo: Dict[str, Any]) -> Optional[Any]:
         routes = vo.pop("routes", None)

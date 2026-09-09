@@ -20,7 +20,7 @@ from nxcore.middleware.logging_manager import logger
 from api.model.acme_model import ChallengeDao
 
 
-def get_config():
+def get_config(dependents: bool = False):
     """Assembles active configuration from DAOs into a single dictionary."""
     c = dict()
     with ConfigDao() as dao:
@@ -33,7 +33,7 @@ def get_config():
         c.update({"certificates": dao.get_all()["data"]})
 
     with ServiceDao() as s_dao:
-        c.update({"services": s_dao.get_all()["data"]})
+        c.update({"services": s_dao.get_all(dependents=dependents)["data"]})
 
     with SensorDao() as dao:
         c.update({"sensors": dao.get_all()["data"]})

@@ -118,47 +118,60 @@
                         </mat-expansion-panel-header>
 
                         <div class="panel-content-body policy-stack">
-                            <!-- Archiving Card -->
-                            <mat-card appearance="outlined" formGroupName="archive" class="policy-card">
+                            <!-- Logging Card -->
+                            <mat-card appearance="outlined" formGroupName="logging" class="policy-card">
                                 <mat-card-header class="policy-header">
                                     <div class="policy-title-group">
-                                        <mat-icon class="policy-icon">archive</mat-icon>
-                                        <span class="policy-title">{{ 'CONFIG_PAGE.ARCHIVE_TITLE' | translate }}</span>
+                                        <mat-icon class="policy-icon">receipt_long</mat-icon>
+                                        <span class="policy-title">{{ 'CONFIG_PAGE.LOGGING_TITLE' | translate }}</span>
                                     </div>
-                                    <mat-slide-toggle labelPosition="before" formControlName="enabled" id="archive-toggle" color="primary">
-                                        {{ 'CONFIG_PAGE.ARCHIVE_TOGGLE' | translate }}
-                                    </mat-slide-toggle>
                                 </mat-card-header>
 
                                 <mat-card-content class="policy-body">
-                                    <p class="policy-desc">{{ 'CONFIG_PAGE.ARCHIVE_DESC' | translate }}</p>
+                                    <p class="policy-desc">{{ 'CONFIG_PAGE.LOGGING_DESC' | translate }}</p>
 
-                                    @if (form.get('archive.enabled')?.value) {
+                                    <div class="fields-grid">
+                                        <mat-form-field class="full-width">
+                                            <mat-label>{{ 'CONFIG_PAGE.LOGGING_MODE' | translate }}</mat-label>
+                                            <mat-select formControlName="mode" id="logging-mode-select">
+                                                <mat-option value="local">{{ 'CONFIG_PAGE.LOGGING_MODE_LOCAL' | translate }}</mat-option>
+                                                <mat-option value="opensearch">{{ 'CONFIG_PAGE.LOGGING_MODE_OPENSEARCH' | translate }}</mat-option>
+                                            </mat-select>
+                                            <mat-icon matSuffix class="field-icon">tune</mat-icon>
+                                            <mat-hint>{{ 'CONFIG_PAGE.LOGGING_MODE_HINT' | translate }}</mat-hint>
+                                        </mat-form-field>
+                                    </div>
+
+                                    @if (form.get('logging.mode')?.value === 'opensearch') {
                                     <div class="policy-fields">
-                                        <div class="fields-grid-3">
+                                        <div class="fields-grid">
                                             <mat-form-field class="full-width">
-                                                <mat-label>{{ 'CONFIG_PAGE.ARCHIVE_AFTER' | translate }}</mat-label>
-                                                <input matInput type="number" formControlName="archive_after" id="archive-after-input">
-                                                <mat-icon matSuffix class="field-icon">timer</mat-icon>
+                                                <mat-label>{{ 'CONFIG_PAGE.CLUSTER_URL' | translate }}</mat-label>
+                                                <input matInput formControlName="url" id="logging-url-input" placeholder="http://opensearch:9200">
+                                                <mat-icon matSuffix class="field-icon">dns</mat-icon>
+                                                <mat-hint>{{ 'CONFIG_PAGE.LOGGING_URL_HINT' | translate }}</mat-hint>
                                             </mat-form-field>
 
-                                            <mat-form-field class="full-width span-2">
-                                                <mat-label>{{ 'CONFIG_PAGE.CLUSTER_URL' | translate }}</mat-label>
-                                                <input matInput formControlName="url" id="elasticsearch-url-input" placeholder="http://elasticsearch:9200">
-                                                <mat-icon matSuffix class="field-icon">dns</mat-icon>
+                                            <mat-form-field class="full-width">
+                                                <mat-label>{{ 'CONFIG_PAGE.LOGGING_TYPE' | translate }}</mat-label>
+                                                <mat-select formControlName="type" id="logging-type-select">
+                                                    <mat-option value="opensearch">OpenSearch</mat-option>
+                                                    <mat-option value="elasticsearch">Elasticsearch</mat-option>
+                                                </mat-select>
+                                                <mat-icon matSuffix class="field-icon">category</mat-icon>
                                             </mat-form-field>
                                         </div>
 
                                         <div class="fields-grid">
                                             <mat-form-field class="full-width">
                                                 <mat-label>{{ 'CONFIG_PAGE.CLUSTER_USER' | translate }}</mat-label>
-                                                <input matInput formControlName="username" id="elasticsearch-username-input">
+                                                <input matInput formControlName="username" id="logging-username-input">
                                                 <mat-icon matSuffix class="field-icon">person</mat-icon>
                                             </mat-form-field>
 
                                             <mat-form-field class="full-width">
                                                 <mat-label>{{ 'CONFIG_PAGE.CLUSTER_PASS' | translate }}</mat-label>
-                                                <input matInput type="password" formControlName="password" id="elasticsearch-password-input">
+                                                <input matInput type="password" formControlName="password" id="logging-password-input">
                                                 <mat-icon matSuffix class="field-icon">lock</mat-icon>
                                             </mat-form-field>
                                         </div>

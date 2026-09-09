@@ -61,14 +61,6 @@ export class ConfigFormComponent implements OnInit {
             username: new FormControl<string>(''),
             password: new FormControl<string>(''),
         }),
-        archive: new FormGroup({
-            enabled: new FormControl<boolean>(false),
-            archive_after: new FormControl<number>(1800),
-            type: new FormControl<string>('opensearch'),
-            url: new FormControl<string>(''),
-            username: new FormControl<string>(''),
-            password: new FormControl<string>(''),
-        }),
         purge: new FormGroup({
             enabled: new FormControl<boolean>(false),
             purge_after: new FormControl<number>(1800)
@@ -102,7 +94,6 @@ export class ConfigFormComponent implements OnInit {
                 acme_directory_url: c.acme_directory_url,
                 dns_resolver: c.dns_resolver,
                 logging: c.logging || { mode: 'local', type: 'opensearch', url: '', username: '', password: '' },
-                archive: c.archive || {},
                 purge: c.purge || {},
                 ipxa: c.ipxa || {}
             });

@@ -189,6 +189,13 @@ div.mat-row {
     border-top: none !important;
 }
 
+.mat-mdc-form-field .mdc-floating-label--float-above {
+    background-color: #f8fafc;
+    padding: 0 4px;
+    margin-left: -4px;
+    z-index: 1;
+}
+
 /* Typography & Colors for Inputs and Selects */
 .mat-mdc-input-element,
 .mat-mdc-select-value {

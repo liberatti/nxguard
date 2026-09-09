@@ -22,27 +22,26 @@ services:
 
   opensearch:
     image: opensearchproject/opensearch:latest
-    container_name: opensearch
     environment:
       - discovery.type=single-node
       - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
-      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Admin@NxGuard2026!
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=NxGuard@2026
     volumes:
       - opensearch_data:/usr/share/opensearch/data
     ports:
       - "9200:9200"
       - "9600:9600"
 
-  opensearch-dashboards:
+  dashboard:
     image: opensearchproject/opensearch-dashboards:latest
-    container_name: opensearch-dashboards
     ports:
       - "5601:5601"
     environment:
       - 'OPENSEARCH_HOSTS=["https://opensearch:9200"]'
       - OPENSEARCH_USERNAME=admin
-      - OPENSEARCH_PASSWORD=Admin@NxGuard2026!
+      - OPENSEARCH_PASSWORD=NxGuard@2026
       - OPENSEARCH_SSL_VERIFICATIONMODE=none
+      - DATA_SOURCE_ENABLED=true
     depends_on:
       - opensearch
 

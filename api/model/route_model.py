@@ -106,7 +106,7 @@ class RouteDao(DuckDAO):
 
         return super().from_dict(vo)
 
-    def to_dict(self, vo: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+    def to_dict(self, vo: Optional[Dict[str, Any]], dependents: bool = True) -> Optional[Dict[str, Any]]:
         if not vo:
             return vo
         super().to_dict(vo)
@@ -124,19 +124,25 @@ class RouteDao(DuckDAO):
                     pass
         upstream_id = vo.pop("upstream_id", None)
         if upstream_id:
-            vo["upstream"] = self.upstreamDao.get_by_id(upstream_id)
+            if dependents:
+                vo["upstream"] = self.upstreamDao.get_by_id(upstream_id)
+            else:
+                vo["upstream"] = self.upstreamDao.get_desc_by_id(upstream_id) or {"_id": upstream_id}
         sensor_id = vo.pop("sensor_id", None)
         if sensor_id:
-            vo["sensor"] = self.sensorDao.get_by_id(sensor_id)
+            if dependents:
+                vo["sensor"] = self.sensorDao.get_by_id(sensor_id)
+            else:
+                vo["sensor"] = self.sensorDao.get_desc_by_id(sensor_id) or {"_id": sensor_id}
         vo.pop("service_id", None)
         return vo
 
-    def get_all_by_service_id(self, service_id: Any) -> List[Dict[str, Any]]:
+    def get_all_by_service_id(self, service_id: Any, dependents: bool = True) -> List[Dict[str, Any]]:
         try:
             query = f"SELECT * FROM {self.table_name} WHERE service_id = ?"
             logger.debug(query)
             rows = self._query(query, (int(service_id),), fetch=True)
-            return [self.to_dict(r) for r in rows] if rows else []
+            return [self.to_dict(r, dependents=dependents) for r in rows] if rows else []
         except Exception as e:
             logger.error(f"Error retrieving routes by service_id: {str(e)}")
             raise
