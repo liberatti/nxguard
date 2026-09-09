@@ -5,8 +5,6 @@ from datetime import datetime
 from typing import Dict, Any, List, Optional
 from marshmallow import Schema, fields
 
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
 from nxcore.middleware.logging_manager import logger
 from nxcore.repository.schemas.page_meta_schema import PageMetaSchema
 from nxcore.common_utils import replace_tz
@@ -30,6 +28,8 @@ from api.services.transaction_schema_opensearch import (
     get_default_visualizations,
     get_default_dashboard,
 )
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 class OpenSearchService:
@@ -414,68 +414,53 @@ class OpenSearchService:
         return []
 
     @classmethod
-    def _format_doc(cls, record: Dict[str, Any]) -> Dict[str, Any]:
-        doc = dict(record)
-        doc.pop("_id", None)
-        if isinstance(doc.get("logtime"), datetime):
-            doc["logtime"] = doc["logtime"].strftime(config.DATETIME_FMT)
+    def _normalize_http_headers(cls, doc: Dict[str, Any]):
+        if "http" not in doc or not isinstance(doc["http"], dict):
+            return
+        http_copy = dict(doc["http"])
+        for part in ("request", "response"):
+            if part in http_copy and isinstance(http_copy[part], dict):
+                part_copy = dict(http_copy[part])
+                if "headers" in part_copy:
+                    part_copy["headers"] = cls._headers_to_list(part_copy["headers"])
+                http_copy[part] = part_copy
+        doc["http"] = http_copy
 
-        if "http" in doc and isinstance(doc["http"], dict):
-            http_copy = dict(doc["http"])
-            if "request" in http_copy and isinstance(http_copy["request"], dict):
-                req_copy = dict(http_copy["request"])
-                if "headers" in req_copy:
-                    req_copy["headers"] = cls._headers_to_list(req_copy["headers"])
-                http_copy["request"] = req_copy
+    @classmethod
+    def _normalize_service_info(cls, doc: Dict[str, Any]):
+        if "service" not in doc:
+            return
+        if isinstance(doc["service"], dict):
+            svc = dict(doc["service"])
+            svc_id = str(svc.get("_id") or svc.get("id") or svc.get("name") or "")
+            if svc_id:
+                svc.setdefault("_id", svc_id)
+                svc.setdefault("name", svc_id)
+            doc["service"] = svc
+        elif doc["service"]:
+            s = str(doc["service"])
+            doc["service"] = {"_id": s, "name": s}
 
-            if "response" in http_copy and isinstance(http_copy["response"], dict):
-                res_copy = dict(http_copy["response"])
-                if "headers" in res_copy:
-                    res_copy["headers"] = cls._headers_to_list(res_copy["headers"])
-                http_copy["response"] = res_copy
-
-            doc["http"] = http_copy
-
-        # Normalize service
-        if "service" in doc:
-            if isinstance(doc["service"], dict):
-                svc = dict(doc["service"])
-                svc_id = str(svc.get("_id") or svc.get("id") or svc.get("name") or "")
-                if svc_id:
-                    if "_id" not in svc or not svc["_id"]:
-                        svc["_id"] = svc_id
-                    if "name" not in svc or not svc["name"]:
-                        svc["name"] = svc_id
-                doc["service"] = svc
-            elif doc["service"]:
-                s = str(doc["service"])
-                doc["service"] = {"_id": s, "name": s}
-
-        # Normalize route / route_name
+    @classmethod
+    def _normalize_route_and_rep(cls, doc: Dict[str, Any]):
         route_name = (
             doc.get("route_name")
-            or (
-                doc.get("route", {}).get("name")
-                if isinstance(doc.get("route"), dict)
-                else None
-            )
+            or (doc.get("route", {}).get("name") if isinstance(doc.get("route"), dict) else None)
             or ""
         )
         if route_name:
             doc["route_name"] = route_name
             if "route" not in doc or not isinstance(doc["route"], dict):
                 doc["route"] = {"name": route_name}
-            elif isinstance(doc["route"], dict) and "name" not in doc["route"]:
-                doc["route"]["name"] = route_name
+            else:
+                doc["route"].setdefault("name", route_name)
 
-        # Normalize geo / geoip
         if "geoip" in doc:
-            if isinstance(doc["geoip"], dict):
-                doc["geoip"] = dict(doc["geoip"])
-            elif isinstance(doc["geoip"], str):
+            if isinstance(doc["geoip"], str):
                 doc["geoip"] = {"action": "", "country_code": doc["geoip"]}
+            elif isinstance(doc["geoip"], dict):
+                doc["geoip"] = dict(doc["geoip"])
 
-        # Normalize reputation
         if "reputation" in doc:
             if isinstance(doc["reputation"], dict):
                 rep_obj = dict(doc["reputation"])
@@ -488,6 +473,16 @@ class OpenSearchService:
             elif isinstance(doc["reputation"], (int, float)):
                 doc["reputation"] = {"action": "", "score": int(doc["reputation"])}
 
+    @classmethod
+    def _format_doc(cls, record: Dict[str, Any]) -> Dict[str, Any]:
+        doc = dict(record)
+        doc.pop("_id", None)
+        if isinstance(doc.get("logtime"), datetime):
+            doc["logtime"] = doc["logtime"].strftime(config.DATETIME_FMT)
+
+        cls._normalize_http_headers(doc)
+        cls._normalize_service_info(doc)
+        cls._normalize_route_and_rep(doc)
         return doc
 
     def persist(self, record: Dict[str, Any]) -> bool:

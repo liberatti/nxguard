@@ -16,7 +16,6 @@ import engine.seclang.seclang_indexer as seclang_indexer
 from api.repository.config_repository import ConfigBackupDao, ConfigDao
 from api.repository.upstream_repository import NodeStatusDao, UpstreamDao, UpstreamStatesDao
 from api.repository.certificate_repository import CertificateDao
-from api.repository.service_repository import ServiceDao
 from api.tools.acme_tool import AcmeTool
 
 
@@ -202,7 +201,7 @@ def install():
 
 
 def renew_certificates():
-    with CertificateDao() as dao_c, ServiceDao() as dao_s:
+    with CertificateDao() as dao_c:
         crt_c1 = 0
         crt_c2 = 0
         certificates = dao_c.get_all()["data"]

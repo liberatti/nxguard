@@ -46,7 +46,7 @@ def register(app, bp):
         if context_prefix and (
             rel_path == context_prefix or rel_path.startswith(f"{context_prefix}/")
         ):
-            rel_path = rel_path[len(context_prefix) :].lstrip("/")
+            rel_path = rel_path[len(context_prefix):].lstrip("/")
 
         if "." in rel_path and not rel_path.endswith("/"):
             try:

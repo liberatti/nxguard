@@ -172,4 +172,3 @@ def geoip_info(ipaddr: str) -> Response:
     geo = GeoService.geo_info(ipaddr)
     ip_info = {"country": geo["country"]}
     return response_data(ip_info)
-

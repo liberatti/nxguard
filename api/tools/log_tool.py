@@ -18,10 +18,8 @@ from api.repository.transaction_repository import TransactionDao
 from api.repository.config_repository import ConfigDao
 from api.repository.upstream_repository import NodeStatusDao
 from api.services.opensearch_service import OpenSearchService
-import config
 from config import (
     COMMON_LOG_FORMATS,
-    MASKED_HEADERS,
     MASKED_HEADERS_SET,
     SCORE_REGEX,
     SEVERITY_WEIGHTS,
@@ -224,6 +222,73 @@ class LogParserTool:
         )
 
     @classmethod
+    def _correlate_access_batch(
+        cls,
+        access_records: List[Dict[str, Any]],
+        pending_access: Dict[str, tuple[Dict[str, Any], float]],
+        pending_audit: Dict[str, tuple[Dict[str, Any], float]],
+        service_name: str,
+        default_service: Dict[str, str],
+        now: float,
+        merged_records: List[Dict[str, Any]],
+    ):
+        for acc in access_records:
+            uid = acc.get("unique_id")
+            if uid:
+                if uid in pending_audit:
+                    aud, _ = pending_audit.pop(uid)
+                    merged_records.append(cls._combine_access_and_audit(acc, aud, service_name))
+                else:
+                    pending_access[uid] = (acc, now)
+            else:
+                if not acc.get("service") or not acc["service"].get("name"):
+                    acc["service"] = default_service
+                merged_records.append(acc)
+
+    @classmethod
+    def _correlate_audit_batch(
+        cls,
+        audit_records: List[Dict[str, Any]],
+        pending_access: Dict[str, tuple[Dict[str, Any], float]],
+        pending_audit: Dict[str, tuple[Dict[str, Any], float]],
+        service_name: str,
+        now: float,
+        merged_records: List[Dict[str, Any]],
+    ):
+        for aud in audit_records:
+            uid = aud.get("unique_id")
+            if uid:
+                if uid in pending_access:
+                    acc, _ = pending_access.pop(uid)
+                    merged_records.append(cls._combine_access_and_audit(acc, aud, service_name))
+                else:
+                    pending_audit[uid] = (aud, now)
+            else:
+                merged_records.append(cls._audit_to_transaction(aud, service_name))
+
+    @classmethod
+    def _flush_expired_pending(
+        cls,
+        pending_access: Dict[str, tuple[Dict[str, Any], float]],
+        pending_audit: Dict[str, tuple[Dict[str, Any], float]],
+        service_name: str,
+        default_service: Dict[str, str],
+        now: float,
+        merged_records: List[Dict[str, Any]],
+    ):
+        expired_access = [uid for uid, (_, t) in pending_access.items() if now - t > 4.0]
+        for uid in expired_access:
+            acc, _ = pending_access.pop(uid)
+            if not acc.get("service") or not acc["service"].get("name"):
+                acc["service"] = default_service
+            merged_records.append(acc)
+
+        expired_audit = [uid for uid, (_, t) in pending_audit.items() if now - t > 4.0]
+        for uid in expired_audit:
+            aud, _ = pending_audit.pop(uid)
+            merged_records.append(cls._audit_to_transaction(aud, service_name))
+
+    @classmethod
     def merge_transactions(cls, service_name: str, cache):
         """Worker thread correlating access and audit logs by unique_id into transactions."""
         cur_thread = threading.current_thread()
@@ -250,84 +315,28 @@ class LogParserTool:
                     logger.debug(f"Error reading logging config: {e}")
                 last_config_check = now
 
-            access_records = []
-            audit_records = []
+            access_records = cache.drain("ACCESS", max_items=2500)
+            audit_records = cache.drain("AUDIT", max_items=2500)
 
             try:
-                if hasattr(cache, "drain"):
-                    access_records = cache.drain("ACCESS", max_items=2500)
-                    audit_records = cache.drain("AUDIT", max_items=2500)
-                else:
-                    with cache.lock:
-                        if cache.access_log:
-                            access_records = list(cache.access_log)
-                            cache.access_log.clear()
-                        if cache.audit_log:
-                            audit_records = list(cache.audit_log)
-                            cache.audit_log.clear()
-
                 merged_records = []
                 if access_records or audit_records:
                     logger.debug(
                         f"[{service_name}] Ingesting Access: {len(access_records)}, Audit: {len(audit_records)}"
                     )
 
-                # Correlate incoming access records
-                for acc in access_records:
-                    uid = acc.get("unique_id")
-                    if uid:
-                        if uid in pending_audit:
-                            aud, _ = pending_audit.pop(uid)
-                            merged = cls._combine_access_and_audit(
-                                acc, aud, service_name
-                            )
-                            merged_records.append(merged)
-                        else:
-                            pending_access[uid] = (acc, now)
-                    else:
-                        if not acc.get("service") or not acc["service"].get("name"):
-                            acc["service"] = default_service
-                        merged_records.append(acc)
-
-                # Correlate incoming audit records
-                for aud in audit_records:
-                    uid = aud.get("unique_id")
-                    if uid:
-                        if uid in pending_access:
-                            acc, _ = pending_access.pop(uid)
-                            merged = cls._combine_access_and_audit(
-                                acc, aud, service_name
-                            )
-                            merged_records.append(merged)
-                        else:
-                            pending_audit[uid] = (aud, now)
-                    else:
-                        standalone = cls._audit_to_transaction(aud, service_name)
-                        merged_records.append(standalone)
-
-                # Flush pending access records older than 4 seconds
-                expired_access_uids = [
-                    uid for uid, (_, t) in pending_access.items() if now - t > 4.0
-                ]
-                for uid in expired_access_uids:
-                    acc, _ = pending_access.pop(uid)
-                    if not acc.get("service") or not acc["service"].get("name"):
-                        acc["service"] = default_service
-                    merged_records.append(acc)
-
-                # Flush pending audit records older than 4 seconds
-                expired_audit_uids = [
-                    uid for uid, (_, t) in pending_audit.items() if now - t > 4.0
-                ]
-                for uid in expired_audit_uids:
-                    aud, _ = pending_audit.pop(uid)
-                    standalone = cls._audit_to_transaction(aud, service_name)
-                    merged_records.append(standalone)
+                cls._correlate_access_batch(
+                    access_records, pending_access, pending_audit, service_name, default_service, now, merged_records
+                )
+                cls._correlate_audit_batch(
+                    audit_records, pending_access, pending_audit, service_name, now, merged_records
+                )
+                cls._flush_expired_pending(
+                    pending_access, pending_audit, service_name, default_service, now, merged_records
+                )
 
                 if merged_records:
-                    cls._flush_merged(
-                        merged_records, service_name, logging_mode, logging_conf
-                    )
+                    cls._flush_merged(merged_records, service_name, logging_mode, logging_conf)
 
             except Exception as e:
                 logger.error(
@@ -358,13 +367,9 @@ class LogParserTool:
             pending_audit.clear()
 
             if final_records:
-                cls._flush_merged(
-                    final_records, service_name, logging_mode, logging_conf
-                )
+                cls._flush_merged(final_records, service_name, logging_mode, logging_conf)
         except Exception as e:
-            logger.error(
-                f"Error during final transaction flush for {service_name}: {e}"
-            )
+            logger.error(f"Error during final transaction flush for {service_name}: {e}")
 
         logger.info(f"Merge transaction stopped for {service_name}")
 
@@ -578,9 +583,9 @@ class LogParserTool:
                                     cls._parse_and_cache_lines(
                                         log_type,
                                         [
-                                            l.strip()
-                                            for l in remaining_lines
-                                            if l.strip()
+                                            line.strip()
+                                            for line in remaining_lines
+                                            if line.strip()
                                         ],
                                         cache,
                                     )

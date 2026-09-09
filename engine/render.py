@@ -11,7 +11,6 @@ from api.model.route_model import RouteType
 from api.services.feed_service import FeedService
 
 
-
 def _remove_file(file_path: str) -> None:
     """Removes a file safely if it exists, logging an error on failure."""
     try:
@@ -154,7 +153,7 @@ def _generate_sensors(
         exclusion_lists = [
             ",".join(
                 f"ctl:ruleRemoveById={str(x).strip()}"
-                for x in exclusions[i : i + chunk_size]
+                for x in exclusions[i:i + chunk_size]
             )
             for i in range(0, len(exclusions), chunk_size)
         ]

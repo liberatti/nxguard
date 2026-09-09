@@ -64,4 +64,3 @@ def search() -> Response:
         "data": feeds,
     }
     return response_data(result, feed_service.pageSchema)
-

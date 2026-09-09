@@ -107,5 +107,3 @@ SCORE_REGEX = re.compile(
     r"(?:Total\s*(?:Anomaly\s*)?Score|Score|Matched Data):\s*(\d+)",
     re.IGNORECASE,
 )
-
-

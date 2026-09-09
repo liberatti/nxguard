@@ -47,7 +47,6 @@ def parse_date(date_str, fallback):
     return fallback
 
 
-
 @routes.route("/stats/tpm", methods=["POST"])
 @has_any_authority(authorities=["viewer", "superuser"])
 def st_tpm():

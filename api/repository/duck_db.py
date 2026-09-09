@@ -304,7 +304,7 @@ class DuckDAO:
 
         Args:
             vo (dict): Dictionary with record data.
-            
+
         Returns:
             any: The last inserted ID.
         """

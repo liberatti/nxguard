@@ -1,5 +1,4 @@
 import json
-import threading
 from flask import Blueprint, Response, request
 from marshmallow import ValidationError
 from nxcore.controllers.base_controller import (
