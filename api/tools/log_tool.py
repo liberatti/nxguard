@@ -28,6 +28,7 @@ from config import (
     TZ,
     UA_REGEX,
 )
+from api.tools.type_parse_tool import to_int as _to_int, to_float as _to_float
 
 _JSON_DECODER = json.JSONDecoder()
 _SERVER_ID = socket.gethostname()
@@ -36,67 +37,6 @@ _SERVER_ID = socket.gethostname()
 def get_server_id() -> str:
     """Returns the cached hostname identifier for the current node."""
     return _SERVER_ID
-
-
-def _to_int(val: Any, default: int = 0) -> int:
-    """Safely converts a value (which may be '-', None, or string) to an int."""
-    if val is None or val == "-":
-        return default
-    try:
-        return int(val)
-    except (ValueError, TypeError):
-        return default
-
-
-def _to_float(val: Any, default: float = 0.0) -> float:
-    """Safely converts a value (which may be '-', None, or string) to a float."""
-    if val is None or val == "-":
-        return default
-    try:
-        return float(val)
-    except (ValueError, TypeError):
-        return default
-
-
-@lru_cache(maxsize=4096)
-def _parse_agent_cached(user_agent_str: str) -> Dict[str, Any]:
-    """Parses user agent string with LRU caching for high performance."""
-    if not user_agent_str or user_agent_str == "-":
-        return {"family": "Unknown", "major": 0, "minor": 0}
-
-    if ua_parse is not None:
-        try:
-            ua = ua_parse(user_agent_str)
-            return {
-                "family": ua.browser.family or "Unknown",
-                "major": (
-                    int(ua.browser.version[0])
-                    if ua.browser.version and len(ua.browser.version) > 0
-                    else 0
-                ),
-                "minor": (
-                    int(ua.browser.version[1])
-                    if ua.browser.version and len(ua.browser.version) > 1
-                    else 0
-                ),
-            }
-        except Exception:
-            pass
-
-    try:
-        family = "Unknown"
-        major = 0
-        minor = 0
-        match = UA_REGEX.search(user_agent_str)
-        if match:
-            family = match.group(1)
-            major = int(match.group(2))
-            minor = int(match.group(3)) if match.group(3) else 0
-        elif "Mozilla" in user_agent_str:
-            family = "Mozilla"
-        return {"family": family, "major": major, "minor": minor}
-    except Exception:
-        return {"family": "Unknown", "major": 0, "minor": 0}
 
 
 class LogParserTool:
@@ -125,8 +65,9 @@ class LogParserTool:
                 continue
         return datetime.now()
 
-    @classmethod
-    def resolve_status_code(cls, code: Any) -> str:
+    @staticmethod
+    @lru_cache(maxsize=128)
+    def resolve_status_code(code: Any) -> str:
         """Categorizes HTTP status codes into action categories (blocked, warn, allowed)."""
         c = _to_int(code, default=200)
         if c == 403:
@@ -137,10 +78,46 @@ class LogParserTool:
             return "allowed"
         return "allowed"
 
-    @classmethod
-    def parse_agent(cls, user_agent_str: Optional[str]) -> Dict[str, Any]:
-        """Extracts browser family and version from user agent strings."""
-        return _parse_agent_cached(user_agent_str or "")
+    @staticmethod
+    @lru_cache(maxsize=100)
+    def parse_agent(user_agent_str: Optional[str]) -> Dict[str, Any]:
+        """Parses user agent string with LRU caching for high performance."""
+        if not user_agent_str or user_agent_str == "-":
+            return {"family": "Unknown", "major": 0, "minor": 0}
+
+        if ua_parse is not None:
+            try:
+                ua = ua_parse(user_agent_str)
+                return {
+                    "family": ua.browser.family or "Unknown",
+                    "major": (
+                        int(ua.browser.version[0])
+                        if ua.browser.version and len(ua.browser.version) > 0
+                        else 0
+                    ),
+                    "minor": (
+                        int(ua.browser.version[1])
+                        if ua.browser.version and len(ua.browser.version) > 1
+                        else 0
+                    ),
+                }
+            except Exception:
+                pass
+
+        try:
+            family = "Unknown"
+            major = 0
+            minor = 0
+            match = UA_REGEX.search(user_agent_str)
+            if match:
+                family = match.group(1)
+                major = int(match.group(2))
+                minor = int(match.group(3)) if match.group(3) else 0
+            elif "Mozilla" in user_agent_str:
+                family = "Mozilla"
+            return {"family": family, "major": major, "minor": minor}
+        except Exception:
+            return {"family": "Unknown", "major": 0, "minor": 0}
 
     @classmethod
     def parse_headers(
@@ -277,13 +254,17 @@ class LogParserTool:
             audit_records = []
 
             try:
-                with cache.lock:
-                    if cache.access_log:
-                        access_records = list(cache.access_log)
-                        cache.access_log.clear()
-                    if cache.audit_log:
-                        audit_records = list(cache.audit_log)
-                        cache.audit_log.clear()
+                if hasattr(cache, "drain"):
+                    access_records = cache.drain("ACCESS", max_items=2500)
+                    audit_records = cache.drain("AUDIT", max_items=2500)
+                else:
+                    with cache.lock:
+                        if cache.access_log:
+                            access_records = list(cache.access_log)
+                            cache.access_log.clear()
+                        if cache.audit_log:
+                            audit_records = list(cache.audit_log)
+                            cache.audit_log.clear()
 
                 merged_records = []
                 if access_records or audit_records:
@@ -359,19 +340,27 @@ class LogParserTool:
         # Graceful final flush upon thread exit
         try:
             final_records = []
-            with cache.lock:
-                if cache.access_log:
-                    for acc in cache.access_log:
-                        if not acc.get("service") or not acc["service"].get("name"):
-                            acc["service"] = default_service
-                        final_records.append(acc)
-                    cache.access_log.clear()
-                if cache.audit_log:
-                    for aud in cache.audit_log:
-                        final_records.append(
-                            cls._audit_to_transaction(aud, service_name)
-                        )
-                    cache.audit_log.clear()
+            if hasattr(cache, "drain_all"):
+                for acc in cache.drain_all("ACCESS"):
+                    if not acc.get("service") or not acc["service"].get("name"):
+                        acc["service"] = default_service
+                    final_records.append(acc)
+                for aud in cache.drain_all("AUDIT"):
+                    final_records.append(cls._audit_to_transaction(aud, service_name))
+            else:
+                with cache.lock:
+                    if cache.access_log:
+                        for acc in cache.access_log:
+                            if not acc.get("service") or not acc["service"].get("name"):
+                                acc["service"] = default_service
+                            final_records.append(acc)
+                        cache.access_log.clear()
+                    if cache.audit_log:
+                        for aud in cache.audit_log:
+                            final_records.append(
+                                cls._audit_to_transaction(aud, service_name)
+                            )
+                        cache.audit_log.clear()
 
             for uid, (acc, _) in pending_access.items():
                 if not acc.get("service") or not acc["service"].get("name"):
@@ -562,13 +551,16 @@ class LogParserTool:
                 logger.error(f"Error parsing {log_type} line: {e}")
 
         if all_records:
-            with cache.lock:
-                if log_type == "ERROR":
-                    cache.error_log.extend(all_records)
-                elif log_type == "ACCESS":
-                    cache.access_log.extend(all_records)
-                elif log_type == "AUDIT":
-                    cache.audit_log.extend(all_records)
+            if hasattr(cache, "push_many"):
+                cache.push_many(log_type, all_records)
+            else:
+                with cache.lock:
+                    if log_type == "ERROR":
+                        cache.error_log.extend(all_records)
+                    elif log_type == "ACCESS":
+                        cache.access_log.extend(all_records)
+                    elif log_type == "AUDIT":
+                        cache.audit_log.extend(all_records)
 
     @classmethod
     def follow_file(cls, file_path: str, log_type: str, cache):

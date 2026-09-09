@@ -8,7 +8,8 @@ from nxcore.middleware.logging_manager import logger
 import config
 from api.repository.seclang_repository import RuleCategoryDao
 from api.model.route_model import RouteType
-from api.services.ipxa_services import FeedService
+from api.services.feed_service import FeedService
+
 
 
 def _remove_file(file_path: str) -> None:

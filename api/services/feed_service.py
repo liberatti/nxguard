@@ -3,47 +3,40 @@ from datetime import datetime
 from typing import Dict, Any
 from nxcore.middleware.logging_manager import logger
 from api.repository.config_repository import ConfigDao
-from marshmallow import EXCLUDE, Schema, fields
+from marshmallow import Schema, fields
 from nxcore.repository.schemas.page_meta_schema import PageMetaSchema
+from api.model.ipxa_model import FeedSchema
+from api.tools.type_parse_tool import parse_dt
 import config
 
 
-# Define Schemas
-class FeedSchema(Schema):
-    class Meta:
-        unknown = EXCLUDE
-
-    _id = fields.String()
-    name = fields.String()
-    slug = fields.String()
-    provider = fields.String()
-    version = fields.String()
-    type = fields.String()
-    content = fields.List(fields.String())
-    action = fields.String()
-    scope = fields.String()
-    source = fields.String()
-    description = fields.String()
-    update_interval = fields.String()
-    updated_on = fields.DateTime(
-        format=config.DATETIME_FMT, allow_none=True, required=False
-    )
-
-
-def _parse_dt(val):
-    if not val:
-        return None
-    if isinstance(val, datetime):
-        return val
-    if isinstance(val, str):
-        try:
-            return datetime.fromisoformat(val)
-        except Exception:
-            pass
-    return None
-
-
 class FeedService:
+    @staticmethod
+    def get_api_config(path: str = ""):
+        url = None
+        key = None
+        try:
+            with ConfigDao() as dao:
+                conf = dao.get_active()
+                if conf and "ipxa" in conf:
+                    ipxa_conf = conf["ipxa"]
+                    url = ipxa_conf.get("url")
+                    key = ipxa_conf.get("key")
+        except Exception as e:
+            logger.debug(f"Could not read IPXA config from database: {e}")
+
+        if url and not url.startswith("http"):
+            url = f"http://{url}"
+
+        if url:
+            url = url.rstrip("/")
+
+        headers = {"Content-Type": "application/json"}
+        if key:
+            headers["x-api-key"] = key
+
+        return f"{url}{path}", headers
+
     def __init__(self):
         self.schema = FeedSchema()
         page_class = type(
@@ -67,7 +60,7 @@ class FeedService:
 
     def get_all(self, pagination=None):
         try:
-            url, headers = IPXAService.get_api_config("/api/feed")
+            url, headers = self.get_api_config("/api/feed")
             params = {}
             if pagination:
                 params = {
@@ -115,7 +108,7 @@ class FeedService:
                             "action": f.get("action", "deny"),
                             "scope": f.get("scope", "system"),
                             "update_interval": f.get("update_interval", "daily"),
-                            "updated_on": _parse_dt(f.get("updated_on")),
+                            "updated_on": parse_dt(f.get("updated_on")),
                         }
                     )
 
@@ -133,7 +126,7 @@ class FeedService:
 
     def get_by_type(self, t):
         try:
-            url, headers = IPXAService.get_api_config(f"/api/feed?type={t}")
+            url, headers = self.get_api_config(f"/api/feed?type={t}")
             response = requests.get(url, headers=headers, timeout=5)
             if response.status_code == 200:
                 res_data = response.json()
@@ -173,7 +166,7 @@ class FeedService:
                             "action": f.get("action", "deny"),
                             "scope": f.get("scope", "system"),
                             "update_interval": f.get("update_interval", "daily"),
-                            "updated_on": _parse_dt(f.get("updated_on")),
+                            "updated_on": parse_dt(f.get("updated_on")),
                         }
                     )
 
@@ -185,7 +178,7 @@ class FeedService:
 
     def get_by_id(self, _id):
         try:
-            url, headers = IPXAService.get_api_config(f"/api/feed/{_id}")
+            url, headers = self.get_api_config(f"/api/feed/{_id}")
             response = requests.get(url, headers=headers, timeout=5)
             if response.status_code == 200:
                 f_data = response.json()
@@ -203,7 +196,7 @@ class FeedService:
                         "action": f.get("action", "deny"),
                         "scope": f.get("scope", "system"),
                         "update_interval": f.get("update_interval", "daily"),
-                        "updated_on": _parse_dt(f.get("updated_on")),
+                        "updated_on": parse_dt(f.get("updated_on")),
                     }
             return None
         except Exception as e:
@@ -212,7 +205,7 @@ class FeedService:
 
     def persist(self, vo):
         try:
-            url, headers = IPXAService.get_api_config("/api/feed/")
+            url, headers = self.get_api_config("/api/feed/")
             ipxa_feed = {
                 "name": vo.get("name"),
                 "slug": vo.get("slug") or vo.get("name"),
@@ -235,7 +228,7 @@ class FeedService:
 
     def update_by_id(self, _id, vo):
         try:
-            url, headers = IPXAService.get_api_config(f"/api/feed/{_id}")
+            url, headers = self.get_api_config(f"/api/feed/{_id}")
             ipxa_feed = {
                 "name": vo.get("name"),
                 "slug": vo.get("slug") or vo.get("name"),
@@ -254,7 +247,7 @@ class FeedService:
 
     def delete_by_id(self, _id):
         try:
-            url, headers = IPXAService.get_api_config(f"/api/feed/{_id}")
+            url, headers = self.get_api_config(f"/api/feed/{_id}")
             response = requests.delete(url, headers=headers, timeout=5)
             return response.status_code in [200, 204]
         except Exception as e:
@@ -262,40 +255,12 @@ class FeedService:
             return False
 
 
-class IPXAService:
-    feeds = FeedService()
-
-    @classmethod
-    def get_api_config(cls, path=""):
-        url = None
-        key = None
-        try:
-            with ConfigDao() as dao:
-                conf = dao.get_active()
-                if conf and "ipxa" in conf:
-                    ipxa_conf = conf["ipxa"]
-                    url = ipxa_conf.get("url")
-                    key = ipxa_conf.get("key")
-        except Exception as e:
-            logger.debug(f"Could not read IPXA config from database: {e}")
-
-        if url and not url.startswith("http"):
-            url = f"http://{url}"
-
-        if url:
-            url = url.rstrip("/")
-
-        headers = {"Content-Type": "application/json"}
-        if key:
-            headers["x-api-key"] = key
-
-        return f"{url}{path}", headers
-
+class GeoService:
     @classmethod
     def geo_info(cls, ip: str) -> dict:
         ip_info = {}
         try:
-            url, headers = cls.get_api_config(f"/api/ip/info/{ip}")
+            url, headers = FeedService.get_api_config(f"/api/ip/info/{ip}")
             logger.debug(f"Fetching GeoIP info from IPXA: {url}")
             response = requests.get(url, headers=headers, timeout=5)
             if response.status_code in [200, 201]:
@@ -343,7 +308,7 @@ class IPXAService:
     @classmethod
     def rbl_check(cls, ip: str, sensor: Dict[str, Any] = None) -> Dict[str, bool]:
         try:
-            url, headers = cls.get_api_config(f"/api/ip/check/{ip}")
+            url, headers = FeedService.get_api_config(f"/api/ip/check/{ip}")
             logger.debug(f"Checking IP block status on IPXA: {url}")
             response = requests.get(url, headers=headers, timeout=5)
             if response.status_code in [200, 201]:

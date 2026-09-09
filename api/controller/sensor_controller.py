@@ -16,7 +16,7 @@ from nxcore.middleware.socket_manager import emit_event
 from api.repository.config_repository import ChangeDao
 from api.repository.sensor_repository import SensorDao
 from api.repository.service_repository import ServiceDao
-from api.services.ipxa_services import IPXAService
+from api.services.feed_service import GeoService
 
 routes = Blueprint("sensor", __name__)
 
@@ -169,6 +169,7 @@ def geoip_info(ipaddr: str) -> Response:
     Returns:
         Response: JSON response containing GeoIP information or error response
     """
-    geo = IPXAService.geo_info(ipaddr)
+    geo = GeoService.geo_info(ipaddr)
     ip_info = {"country": geo["country"]}
     return response_data(ip_info)
+
