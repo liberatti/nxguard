@@ -1,19 +1,17 @@
 import os
 import json
-import re
 import socket
 import time
 import threading
 import traceback
 from datetime import datetime, timedelta
-from typing import Dict, Any, List
+from functools import lru_cache
+from typing import Dict, Any, List, Optional
 
 try:
     from user_agents import parse as ua_parse
 except ImportError:
     ua_parse = None
-
-import requests
 
 from nxcore.middleware.logging_manager import logger
 from api.repository.transaction_repository import TransactionDao
@@ -21,27 +19,106 @@ from api.repository.config_repository import ConfigDao
 from api.repository.upstream_repository import NodeStatusDao
 from api.services.opensearch_service import OpenSearchService
 import config
-from config import MASKED_HEADERS, TZ
+from config import (
+    COMMON_LOG_FORMATS,
+    MASKED_HEADERS,
+    MASKED_HEADERS_SET,
+    SCORE_REGEX,
+    SEVERITY_WEIGHTS,
+    TZ,
+    UA_REGEX,
+)
+
+_JSON_DECODER = json.JSONDecoder()
+_SERVER_ID = socket.gethostname()
 
 
-def get_server_id():
-    return socket.gethostname()
+def get_server_id() -> str:
+    """Returns the cached hostname identifier for the current node."""
+    return _SERVER_ID
+
+
+def _to_int(val: Any, default: int = 0) -> int:
+    """Safely converts a value (which may be '-', None, or string) to an int."""
+    if val is None or val == "-":
+        return default
+    try:
+        return int(val)
+    except (ValueError, TypeError):
+        return default
+
+
+def _to_float(val: Any, default: float = 0.0) -> float:
+    """Safely converts a value (which may be '-', None, or string) to a float."""
+    if val is None or val == "-":
+        return default
+    try:
+        return float(val)
+    except (ValueError, TypeError):
+        return default
+
+
+@lru_cache(maxsize=4096)
+def _parse_agent_cached(user_agent_str: str) -> Dict[str, Any]:
+    """Parses user agent string with LRU caching for high performance."""
+    if not user_agent_str or user_agent_str == "-":
+        return {"family": "Unknown", "major": 0, "minor": 0}
+
+    if ua_parse is not None:
+        try:
+            ua = ua_parse(user_agent_str)
+            return {
+                "family": ua.browser.family or "Unknown",
+                "major": (
+                    int(ua.browser.version[0])
+                    if ua.browser.version and len(ua.browser.version) > 0
+                    else 0
+                ),
+                "minor": (
+                    int(ua.browser.version[1])
+                    if ua.browser.version and len(ua.browser.version) > 1
+                    else 0
+                ),
+            }
+        except Exception:
+            pass
+
+    try:
+        family = "Unknown"
+        major = 0
+        minor = 0
+        match = UA_REGEX.search(user_agent_str)
+        if match:
+            family = match.group(1)
+            major = int(match.group(2))
+            minor = int(match.group(3)) if match.group(3) else 0
+        elif "Mozilla" in user_agent_str:
+            family = "Mozilla"
+        return {"family": family, "major": major, "minor": minor}
+    except Exception:
+        return {"family": "Unknown", "major": 0, "minor": 0}
 
 
 class LogParserTool:
+    """High-performance log parsing, normalization, file watching, and correlation tool."""
 
     @classmethod
-    def parse_logtime(cls, time_str):
+    def parse_logtime(cls, time_str: Optional[str]) -> datetime:
+        """Parses timestamp strings into datetime objects with fast-path ISO 8601 support."""
         if not time_str:
             return datetime.now()
-        for fmt in (
-            "%Y-%m-%d %H:%M:%S",
-            "%d/%b/%Y:%H:%M:%S %z",
-            "%a %b %d %H:%M:%S %Y",
-            "%Y-%m-%dT%H:%M:%S",
-            "%Y-%m-%dT%H:%M:%S.%fZ",
-            "%Y-%m-%dT%H:%M:%S%z",
+
+        # Fast path for ISO 8601 strings (standard in Nginx/ModSecurity JSON logs)
+        if "T" in time_str or (
+            len(time_str) >= 10 and time_str[4] == "-" and time_str[7] == "-"
         ):
+            try:
+                clean_str = time_str.replace("Z", "+00:00")
+                return datetime.fromisoformat(clean_str)
+            except (ValueError, TypeError):
+                pass
+
+        for fmt in COMMON_LOG_FORMATS:
             try:
                 return datetime.strptime(time_str, fmt)
             except (ValueError, TypeError):
@@ -49,88 +126,56 @@ class LogParserTool:
         return datetime.now()
 
     @classmethod
-    def resolve_status_code(cls, code):
-        try:
-            c = int(code)
-        except (ValueError, TypeError):
-            return "allowed"
+    def resolve_status_code(cls, code: Any) -> str:
+        """Categorizes HTTP status codes into action categories (blocked, warn, allowed)."""
+        c = _to_int(code, default=200)
         if c == 403:
             return "blocked"
-        elif c in [404, 401, 500, 502, 503, 504]:
+        elif c in (404, 401, 500, 502, 503, 504):
             return "warn"
-        elif c in [200, 201, 204, 301, 302, 304]:
+        elif c in (200, 201, 204, 301, 302, 304):
             return "allowed"
         return "allowed"
 
     @classmethod
-    def parse_agent(cls, user_agent_str):
-        if not user_agent_str or user_agent_str == "-":
-            return {"family": "Unknown", "major": 0, "minor": 0}
-
-        if ua_parse is not None:
-            try:
-                ua = ua_parse(user_agent_str)
-                return {
-                    "family": ua.browser.family or "Unknown",
-                    "major": (
-                        int(ua.browser.version[0])
-                        if ua.browser.version and len(ua.browser.version) > 0
-                        else 0
-                    ),
-                    "minor": (
-                        int(ua.browser.version[1])
-                        if ua.browser.version and len(ua.browser.version) > 1
-                        else 0
-                    ),
-                }
-            except Exception:
-                pass
-
-        try:
-            family = "Unknown"
-            major = 0
-            minor = 0
-            match = re.search(
-                r"(Firefox|Chrome|Safari|Edg(?:e)?|OPR|Opera|PostmanRuntime|curl|Python-requests|Wget)/(\d+)(?:\.(\d+))?",
-                user_agent_str,
-                re.IGNORECASE,
-            )
-            if match:
-                family = match.group(1)
-                major = int(match.group(2))
-                minor = int(match.group(3)) if match.group(3) else 0
-            elif "Mozilla" in user_agent_str:
-                family = "Mozilla"
-            return {"family": family, "major": major, "minor": minor}
-        except Exception:
-            return {"family": "Unknown", "major": 0, "minor": 0}
+    def parse_agent(cls, user_agent_str: Optional[str]) -> Dict[str, Any]:
+        """Extracts browser family and version from user agent strings."""
+        return _parse_agent_cached(user_agent_str or "")
 
     @classmethod
-    def parse_headers(cls, headers_dict):
+    def parse_headers(
+        cls, headers_dict: Optional[Dict[str, Any]]
+    ) -> List[Dict[str, str]]:
+        """Converts header dictionary into an array of name-content mappings."""
         if not headers_dict or not isinstance(headers_dict, dict):
             return []
-        headers_list = []
-        for k, v in headers_dict.items():
-            headers_list.append({"name": str(k), "content": str(v)})
-        return headers_list
+        return [{"name": str(k), "content": str(v)} for k, v in headers_dict.items()]
 
     @classmethod
-    def _filter_headers(cls, headers):
+    def _filter_headers(cls, headers: Any) -> Any:
+        """Strips masked sensitive headers from lists or dictionaries."""
         if not headers:
             return headers
-        masked = {h.lower() for h in MASKED_HEADERS}
         if isinstance(headers, list):
             return [
                 h
                 for h in headers
-                if not (isinstance(h, dict) and h.get("name", "").lower() in masked)
+                if not (
+                    isinstance(h, dict)
+                    and str(h.get("name", "")).lower() in MASKED_HEADERS_SET
+                )
             ]
         if isinstance(headers, dict):
-            return {k: v for k, v in headers.items() if k.lower() not in masked}
+            return {
+                k: v
+                for k, v in headers.items()
+                if str(k).lower() not in MASKED_HEADERS_SET
+            }
         return headers
 
     @classmethod
     def _extract_json_objects(cls, line: str) -> List[Dict[str, Any]]:
+        """Extracts one or more JSON objects from a single line of log text."""
         line = line.strip()
         if not line:
             return []
@@ -143,7 +188,6 @@ class LogParserTool:
         except json.JSONDecodeError:
             pass
 
-        decoder = json.JSONDecoder()
         pos = 0
         length = len(line)
         results = []
@@ -152,7 +196,7 @@ class LogParserTool:
             if idx == -1:
                 break
             try:
-                obj, end_pos = decoder.raw_decode(line, idx)
+                obj, end_pos = _JSON_DECODER.raw_decode(line, idx)
                 if isinstance(obj, dict):
                     results.append(obj)
                 pos = max(end_pos, idx + 1)
@@ -161,7 +205,9 @@ class LogParserTool:
         return results
 
     @classmethod
+    @lru_cache(maxsize=128)
     def _get_service_info(cls, service_name: str) -> Dict[str, str]:
+        """Resolves raw service identifier to sanitized service metadata."""
         clean_name = (
             service_name.rsplit("_", 1)[0]
             if ("_" in service_name and service_name.rsplit("_", 1)[1].isdigit())
@@ -177,6 +223,7 @@ class LogParserTool:
         mode: str,
         conf: Dict[str, Any],
     ):
+        """Flushes correlated transaction records to DuckDB or OpenSearch."""
         if not records:
             return
         if mode == "opensearch":
@@ -200,7 +247,8 @@ class LogParserTool:
         )
 
     @classmethod
-    def merge_transactions(cls, service_name, cache):
+    def merge_transactions(cls, service_name: str, cache):
+        """Worker thread correlating access and audit logs by unique_id into transactions."""
         cur_thread = threading.current_thread()
         setattr(cur_thread, "active", True)
         logger.info(f"Start merge transaction for {service_name}")
@@ -225,10 +273,10 @@ class LogParserTool:
                     logger.debug(f"Error reading logging config: {e}")
                 last_config_check = now
 
-            try:
-                access_records = []
-                audit_records = []
+            access_records = []
+            audit_records = []
 
+            try:
                 with cache.lock:
                     if cache.access_log:
                         access_records = list(cache.access_log)
@@ -305,7 +353,8 @@ class LogParserTool:
                     f"Error merging transactions for {service_name}: {e} {traceback.format_exc()}"
                 )
 
-            time.sleep(2)
+            # Adaptive sleeping: 0.25s when processing active traffic, 1.5s when idle
+            time.sleep(0.25 if (access_records or audit_records) else 1.5)
 
         # Graceful final flush upon thread exit
         try:
@@ -349,6 +398,7 @@ class LogParserTool:
     def _combine_access_and_audit(
         cls, access: Dict[str, Any], audit: Dict[str, Any], service_name: str = None
     ) -> Dict[str, Any]:
+        """Combines correlated access and audit records into a single transaction."""
         merged = dict(access)
         if "audit" in audit and audit["audit"]:
             merged["audit"] = audit["audit"]
@@ -358,20 +408,24 @@ class LogParserTool:
         # Determine action (blocked takes precedence over warn over allowed)
         audit_act = str(audit.get("action") or "").lower()
         merged_act = str(merged.get("action") or "").lower()
-        if audit_act in ["deny", "blocked", "block"] or merged_act in [
+        if audit_act in ("deny", "blocked", "block") or merged_act in (
             "deny",
             "blocked",
             "block",
-        ]:
+        ):
             merged["action"] = "blocked"
-        elif audit_act in ["warn", "warning"] or merged_act in ["warn", "warning"]:
+        elif audit_act in ("warn", "warning") or merged_act in ("warn", "warning"):
             merged["action"] = "warn"
 
         # Check status code for blocking
-        status_code = merged.get("http", {}).get("response", {}).get("status_code")
+        status_code = _to_int(
+            merged.get("http", {}).get("response", {}).get("status_code"), 0
+        )
         if not status_code and "http" in audit:
-            status_code = audit.get("http", {}).get("response", {}).get("status_code")
-        if status_code in [403, 406]:
+            status_code = _to_int(
+                audit.get("http", {}).get("response", {}).get("status_code"), 0
+            )
+        if status_code in (403, 406):
             merged["action"] = "blocked"
 
         if service_name and (
@@ -411,9 +465,9 @@ class LogParserTool:
                 if "status_code" in aud_http["response"] and not acc_http.get(
                     "response", {}
                 ).get("status_code"):
-                    acc_http.setdefault("response", {})["status_code"] = aud_http[
-                        "response"
-                    ]["status_code"]
+                    acc_http.setdefault("response", {})["status_code"] = _to_int(
+                        aud_http["response"]["status_code"], 200
+                    )
 
             merged["http"] = acc_http
 
@@ -423,17 +477,20 @@ class LogParserTool:
     def _audit_to_transaction(
         cls, audit: Dict[str, Any], service_name: str
     ) -> Dict[str, Any]:
+        """Converts an unmatched standalone audit record into a full transaction."""
         server_id = get_server_id()
         remote_ip = audit.get("source", {}).get("ip", "")
         geo_info = {"ip": remote_ip, "country": "--"}
 
-        status_code = audit.get("http", {}).get("response", {}).get("status_code", 403)
+        status_code = _to_int(
+            audit.get("http", {}).get("response", {}).get("status_code"), 403
+        )
         raw_action = str(audit.get("action") or "").lower()
-        if raw_action in ["deny", "block", "blocked"]:
+        if raw_action in ("deny", "block", "blocked"):
             action = "blocked"
-        elif raw_action in ["warn", "warning"]:
+        elif raw_action in ("warn", "warning"):
             action = "warn"
-        elif raw_action in ["allow", "allowed", "pass", "passed"]:
+        elif raw_action in ("allow", "allowed", "pass", "passed"):
             action = "allowed"
         else:
             action = cls.resolve_status_code(status_code)
@@ -464,16 +521,16 @@ class LogParserTool:
             "geoip": {},
             "reputation": {},
             "mtls": {},
-            "score": audit.get("score", 0),
+            "score": _to_int(audit.get("score", 0)),
             "user_agent": {"family": "Unknown", "major": 0, "minor": 0},
             "source": {
                 "ip": remote_ip,
-                "port": audit.get("source", {}).get("port", 0),
+                "port": _to_int(audit.get("source", {}).get("port", 0)),
                 "geo": geo_info,
             },
             "destination": {
                 "ip": audit.get("destination", {}).get("ip", ""),
-                "port": audit.get("destination", {}).get("port", 443),
+                "port": _to_int(audit.get("destination", {}).get("port", 443), 443),
                 "host": "",
             },
             "http": http_data,
@@ -482,34 +539,40 @@ class LogParserTool:
         return record
 
     @classmethod
-    def _parse_and_cache_line(cls, log_type: str, line: str, cache):
-        records = []
-        try:
-            if log_type == "ERROR":
-                r = cls.error_log(line)
-            elif log_type == "ACCESS":
-                r = cls.access_log(line)
-            elif log_type == "AUDIT":
-                r = cls.audit_log(line)
-            else:
-                r = None
+    def _parse_and_cache_lines(cls, log_type: str, lines: List[str], cache):
+        """Parses a batch of lines and updates the shared memory cache atomically."""
+        all_records = []
+        for line in lines:
+            try:
+                if log_type == "ERROR":
+                    r = cls.error_log(line)
+                elif log_type == "ACCESS":
+                    r = cls.access_log(line)
+                elif log_type == "AUDIT":
+                    r = cls.audit_log(line)
+                else:
+                    r = None
 
-            if r:
-                records = [r] if not isinstance(r, list) else r
-        except Exception as e:
-            logger.error(f"Error parsing {log_type} line: {e}")
+                if r:
+                    if isinstance(r, list):
+                        all_records.extend(r)
+                    else:
+                        all_records.append(r)
+            except Exception as e:
+                logger.error(f"Error parsing {log_type} line: {e}")
 
-        if records:
+        if all_records:
             with cache.lock:
                 if log_type == "ERROR":
-                    cache.error_log.extend(records)
+                    cache.error_log.extend(all_records)
                 elif log_type == "ACCESS":
-                    cache.access_log.extend(records)
+                    cache.access_log.extend(all_records)
                 elif log_type == "AUDIT":
-                    cache.audit_log.extend(records)
+                    cache.audit_log.extend(all_records)
 
     @classmethod
-    def follow_file(cls, file_path, log_type, cache):
+    def follow_file(cls, file_path: str, log_type: str, cache):
+        """Continuously tails a log file with rotation draining and line batching."""
         cur_thread = threading.current_thread()
         setattr(cur_thread, "active", True)
         logger.info(f"Starting continuous watcher on {file_path} for {log_type}")
@@ -531,28 +594,42 @@ class LogParserTool:
                             st = os.stat(file_path)
                             if st.st_ino != last_ino or file.tell() > st.st_size:
                                 logger.info(
-                                    f"File {file_path} rotated or truncated, reopening"
+                                    f"File {file_path} rotated or truncated, draining remaining content"
                                 )
+                                remaining_lines = file.read().splitlines()
+                                if remaining_lines:
+                                    cls._parse_and_cache_lines(
+                                        log_type,
+                                        [
+                                            l.strip()
+                                            for l in remaining_lines
+                                            if l.strip()
+                                        ],
+                                        cache,
+                                    )
                                 break
                         except Exception:
                             pass
 
-                        chunk = file.readline()
-                        if not chunk:
-                            time.sleep(0.3)
-                            continue
+                        lines_batch = []
+                        # Read up to 250 lines before acquiring lock to minimize contention
+                        for _ in range(250):
+                            chunk = file.readline()
+                            if not chunk:
+                                break
+                            if not chunk.endswith("\n"):
+                                buffer += chunk
+                                time.sleep(0.02)
+                                break
+                            line = (buffer + chunk).strip()
+                            buffer = ""
+                            if line:
+                                lines_batch.append(line)
 
-                        if not chunk.endswith("\n"):
-                            buffer += chunk
-                            time.sleep(0.05)
-                            continue
-
-                        line = (buffer + chunk).strip()
-                        buffer = ""
-                        if not line:
-                            continue
-
-                        cls._parse_and_cache_line(log_type, line, cache)
+                        if lines_batch:
+                            cls._parse_and_cache_lines(log_type, lines_batch, cache)
+                        else:
+                            time.sleep(0.2)
 
             except Exception as e:
                 logger.error(f"Continuous tailing exception on {file_path}: {e}")
@@ -561,14 +638,13 @@ class LogParserTool:
         logger.info(f"Continuous watcher on {file_path} stopped")
 
     @classmethod
-    def error_log(cls, line):
-        try:
-            return line
-        except Exception as e:
-            logger.error(f"Error parsing log {e}")
+    def error_log(cls, line: str):
+        """Processes raw error log lines."""
+        return line
 
     @classmethod
-    def _parse_audit_message_item(cls, m, record: dict) -> dict:
+    def _parse_audit_message_item(cls, m: Any, record: dict) -> dict:
+        """Parses a single ModSecurity audit log message item and extracts rule scores."""
         d = m.get("details", {}) if isinstance(m, dict) else {}
         rule_id = str(d.get("ruleId") or "")
         msg = {
@@ -589,13 +665,9 @@ class LogParserTool:
             "accuracy": str(d.get("accuracy") or ""),
         }
 
-        if rule_id in ["949110", "959100", "980130", "99"]:
+        if rule_id in ("949110", "959100", "980130", "99"):
             data_str = str(d.get("data") or m.get("message") or "")
-            score_match = re.search(
-                r"(?:Total\s*(?:Anomaly\s*)?Score|Score|Matched Data):\s*(\d+)",
-                data_str,
-                re.IGNORECASE,
-            )
+            score_match = SCORE_REGEX.search(data_str)
             if score_match:
                 try:
                     record["score"] = max(
@@ -610,11 +682,14 @@ class LogParserTool:
 
     @classmethod
     def _calculate_fallback_score(cls, messages: list) -> int:
-        sev_weights = {"2": 5, "3": 4, "4": 3, "5": 2, "1": 2}
-        return sum(sev_weights.get(str(m.get("severity") or ""), 0) for m in messages)
+        """Calculates fallback anomaly score from message severities when no explicit score exists."""
+        return sum(
+            SEVERITY_WEIGHTS.get(str(m.get("severity") or ""), 0) for m in messages
+        )
 
     @classmethod
     def _parse_audit_transaction(cls, trn: dict, server_id: str) -> dict:
+        """Parses a raw ModSecurity transaction dictionary into normalized format."""
         trn_server_id = trn.get("server_id") or server_id
         unique_id = trn.get("unique_id") or trn.get("uniqueid")
 
@@ -624,11 +699,11 @@ class LogParserTool:
             "unique_id": unique_id,
             "destination": {
                 "ip": trn.get("host_ip", ""),
-                "port": trn.get("host_port", 443),
+                "port": _to_int(trn.get("host_port", 443), 443),
             },
             "source": {
                 "ip": trn.get("client_ip", ""),
-                "port": trn.get("client_port", 0),
+                "port": _to_int(trn.get("client_port", 0), 0),
             },
         }
 
@@ -637,15 +712,15 @@ class LogParserTool:
             request_raw = trn.pop("request")
             http["version"] = str(request_raw.get("http_version", "1.1"))
             http["request"] = {
-                "method": request_raw.get("method", "GET"),
-                "uri": request_raw.get("uri", ""),
+                "method": str(request_raw.get("method", "GET")),
+                "uri": str(request_raw.get("uri", "")),
                 "headers": cls.parse_headers(request_raw.get("headers", {})),
             }
 
         action = "allowed"
         if "response" in trn:
             response_raw = trn.pop("response")
-            status_code = response_raw.get("http_code", 200)
+            status_code = _to_int(response_raw.get("http_code", 200), 200)
             http["response"] = {
                 "status_code": status_code,
                 "headers": cls.parse_headers(response_raw.get("headers", {})),
@@ -673,19 +748,20 @@ class LogParserTool:
             if "score" not in record and messages:
                 record["score"] = cls._calculate_fallback_score(messages)
 
-            if str(record.get("action") or "").lower() not in [
+            if str(record.get("action") or "").lower() not in (
                 "blocked",
                 "deny",
                 "block",
-            ]:
-                if any(str(m.get("severity") or "") in ["2", "3"] for m in messages):
+            ):
+                if any(str(m.get("severity") or "") in ("2", "3") for m in messages):
                     record["action"] = "blocked"
 
         record.update({"audit": audit})
         return record
 
     @classmethod
-    def audit_log(cls, line):
+    def audit_log(cls, line: str) -> Optional[List[Dict[str, Any]]]:
+        """Parses a line containing ModSecurity audit log JSON objects."""
         dtos = cls._extract_json_objects(line)
         if not dtos:
             return None
@@ -704,7 +780,8 @@ class LogParserTool:
         return records if records else None
 
     @classmethod
-    def access_log(cls, line):
+    def access_log(cls, line: str) -> Optional[List[Dict[str, Any]]]:
+        """Parses a line containing Nginx access log JSON objects."""
         dtos = cls._extract_json_objects(line)
         if not dtos:
             return None
@@ -720,7 +797,7 @@ class LogParserTool:
                 elif isinstance(dto.get("geoip"), str):
                     country_code = dto.get("geoip") or "--"
 
-                if country_code in ["None", "null", ""]:
+                if country_code in ("None", "null", ""):
                     country_code = "--"
 
                 geo_info = {
@@ -728,10 +805,12 @@ class LogParserTool:
                     "country": country_code,
                 }
 
-                status_code = dto.get("status", 200)
+                status_code = _to_int(dto.get("status", 200), 200)
                 service_val = dto.get("service") or dto.get("service_id")
                 service_obj = (
-                    {"_id": service_val, "name": service_val} if service_val else None
+                    {"_id": str(service_val), "name": str(service_val)}
+                    if service_val
+                    else None
                 )
 
                 route_name = dto.get("route") or dto.get("route_name") or "-"
@@ -739,7 +818,7 @@ class LogParserTool:
                 if isinstance(upstream_val, dict):
                     upstream_obj = upstream_val
                 elif upstream_val and upstream_val != "-":
-                    upstream_obj = {"name": upstream_val, "_id": upstream_val}
+                    upstream_obj = {"name": str(upstream_val), "_id": str(upstream_val)}
                 else:
                     upstream_obj = None
 
@@ -776,7 +855,7 @@ class LogParserTool:
                     else (dto.get("rbl_status") or "")
                 )
                 score = (
-                    reputation_dto.get("score", 0)
+                    _to_int(reputation_dto.get("score", 0))
                     if isinstance(reputation_dto, dict)
                     else 0
                 )
@@ -823,28 +902,28 @@ class LogParserTool:
                     "user_agent": cls.parse_agent(dto.get("user_agent", "")),
                     "source": {
                         "ip": remote_ip,
-                        "port": dto.get("remote_port", 0),
+                        "port": _to_int(dto.get("remote_port", 0)),
                         "geo": geo_info,
                     },
                     "destination": {
                         "ip": host_ip,
-                        "port": dto.get("server_port", 443),
+                        "port": _to_int(dto.get("server_port", 443), 443),
                         "host": host_header,
                     },
                     "http": {
-                        "duration": dto.get("duration", 0.0),
-                        "uht": dto.get("uht", 0.0),
-                        "urt": dto.get("urt", 0.0),
+                        "duration": _to_float(dto.get("duration", 0.0)),
+                        "uht": _to_float(dto.get("uht", 0.0)),
+                        "urt": _to_float(dto.get("urt", 0.0)),
                         "referer": dto.get("referer", ""),
                         "request_line": dto.get("request_line", ""),
                         "request": {
                             "method": req_method,
                             "uri": req_uri,
-                            "bytes": dto.get("bytes_in", 0),
+                            "bytes": _to_int(dto.get("bytes_in", 0)),
                         },
                         "response": {
                             "status_code": status_code,
-                            "bytes": dto.get("bytes_out", 0),
+                            "bytes": _to_int(dto.get("bytes_out", 0)),
                         },
                     },
                 }
@@ -855,26 +934,19 @@ class LogParserTool:
 
     @classmethod
     def clean(cls):
+        """Purges expired node statuses and transaction records according to config."""
         now = datetime.now(TZ)
-        with NodeStatusDao() as node_dao, TransactionDao() as trn_dao, ConfigDao() as config_dao:
-            node_dao.purge_before_date(now - timedelta(hours=1))
-            active = config_dao.get_active()
-            config_dict = active.get("config", {}) if active else {}
-            purge_config = active.get("purge") if active and "purge" in active else config_dict.get("purge")
-            if (
-                purge_config
-                and purge_config.get("enabled")
-            ):
-                try:
-                    purge_after = purge_config.get("purge_after", 30)
+        try:
+            with NodeStatusDao() as node_dao, TransactionDao() as trn_dao, ConfigDao() as config_dao:
+                node_dao.purge_before_date(now - timedelta(hours=1))
+                active = config_dao.get_active()
+                purge_config = (active.get("purge") or {}) if active else {}
+                if purge_config.get("enabled"):
+                    purge_after = _to_int(purge_config.get("purge_after", 30), 30)
                     t_purged = trn_dao.purge_before_date(
                         now - timedelta(days=purge_after)
                     )
                     if t_purged > 0:
                         logger.info(f"Purged {t_purged} transactions")
-                except Exception as e:
-                    logger.error(f"Error purging transactions: {e}")
-
-
-LogArchiverTool = LogParserTool
-
+        except Exception as e:
+            logger.error(f"Error during log cleaning / purge: {e}")

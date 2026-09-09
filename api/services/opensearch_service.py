@@ -101,26 +101,20 @@ class OpenSearchService:
             if isinstance(logtime_val, datetime):
                 target_dt = logtime_val
             elif isinstance(logtime_val, str):
-                for fmt in (
-                    config.DATETIME_FMT,
-                    "%Y-%m-%d %H:%M:%S",
-                    "%Y-%m-%dT%H:%M:%S",
-                    "%Y-%m-%dT%H:%M:%S.%fZ",
-                    "%Y-%m-%dT%H:%M:%S%z",
-                    "%Y-%m-%d",
-                ):
-                    try:
-                        target_dt = datetime.strptime(logtime_val, fmt)
-                        break
-                    except (ValueError, TypeError):
-                        continue
-                if not target_dt:
+                if "T" in logtime_val or (len(logtime_val) >= 10 and logtime_val[4] == "-" and logtime_val[7] == "-"):
                     try:
                         target_dt = datetime.fromisoformat(
                             logtime_val.replace("Z", "+00:00")
                         )
                     except Exception:
                         pass
+                if not target_dt:
+                    for fmt in config.COMMON_LOG_FORMATS:
+                        try:
+                            target_dt = datetime.strptime(logtime_val, fmt)
+                            break
+                        except (ValueError, TypeError):
+                            continue
 
         if not target_dt:
             target_dt = datetime.now(config.TZ)

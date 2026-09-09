@@ -2,6 +2,7 @@
 
 import json
 import os
+import re
 import secrets
 
 import pytz
@@ -78,3 +79,33 @@ MASKED_HEADERS = [
     "Refresh-Token",
     "Cookie",
 ]
+MASKED_HEADERS_SET = frozenset(h.lower() for h in MASKED_HEADERS)
+
+COMMON_LOG_FORMATS = (
+    "%d/%b/%Y:%H:%M:%S %z",
+    "%Y-%m-%d %H:%M:%S",
+    "%Y-%m-%dT%H:%M:%S%z",
+    "%Y-%m-%dT%H:%M:%S.%fZ",
+    "%Y-%m-%dT%H:%M:%S",
+    "%a %b %d %H:%M:%S %Y",
+)
+
+SEVERITY_WEIGHTS = {
+    "2": 5,
+    "3": 4,
+    "4": 3,
+    "5": 2,
+    "1": 2,
+}
+
+UA_REGEX = re.compile(
+    r"(Firefox|Chrome|Safari|Edg(?:e)?|OPR|Opera|PostmanRuntime|curl|Python-requests|Wget)/(\d+)(?:\.(\d+))?",
+    re.IGNORECASE,
+)
+
+SCORE_REGEX = re.compile(
+    r"(?:Total\s*(?:Anomaly\s*)?Score|Score|Matched Data):\s*(\d+)",
+    re.IGNORECASE,
+)
+
+

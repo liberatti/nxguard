@@ -13,7 +13,7 @@ from api.repository.transaction_repository import TransactionDao
 from api.repository.config_repository import ConfigDao
 from api.services.opensearch_service import OpenSearchService
 import config as env_config
-from config import DATETIME_FMT
+from config import DATETIME_FMT, COMMON_LOG_FORMATS
 
 routes = Blueprint("trn", __name__)
 
@@ -33,21 +33,19 @@ def get_transaction_storage():
 def parse_date(date_str, fallback):
     if not date_str:
         return fallback
-    for fmt in (
-        DATETIME_FMT,
-        "%Y-%m-%d %H:%M:%S",
-        "%Y-%m-%dT%H:%M:%S",
-        "%Y-%m-%dT%H:%M:%S.%fZ",
-        "%Y-%m-%dT%H:%M:%S%z",
-    ):
+    # Fast path for ISO-8601 strings
+    if "T" in date_str or (len(date_str) >= 10 and date_str[4] == "-" and date_str[7] == "-"):
+        try:
+            return replace_tz(datetime.fromisoformat(date_str.replace("Z", "+00:00")))
+        except Exception:
+            pass
+    for fmt in COMMON_LOG_FORMATS:
         try:
             return replace_tz(datetime.strptime(date_str, fmt))
         except (ValueError, TypeError):
             continue
-    try:
-        return replace_tz(datetime.fromisoformat(date_str))
-    except Exception:
-        return fallback
+    return fallback
+
 
 
 @routes.route("/stats/tpm", methods=["POST"])
