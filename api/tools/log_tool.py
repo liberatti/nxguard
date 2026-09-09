@@ -66,7 +66,7 @@ class LogParserTool:
         return datetime.now()
 
     @staticmethod
-    @lru_cache(maxsize=128)
+    @lru_cache(maxsize=100)
     def resolve_status_code(code: Any) -> str:
         """Categorizes HTTP status codes into action categories (blocked, warn, allowed)."""
         c = _to_int(code, default=200)
@@ -79,7 +79,7 @@ class LogParserTool:
         return "allowed"
 
     @staticmethod
-    @lru_cache(maxsize=100)
+    @lru_cache(maxsize=4096)
     def parse_agent(user_agent_str: Optional[str]) -> Dict[str, Any]:
         """Parses user agent string with LRU caching for high performance."""
         if not user_agent_str or user_agent_str == "-":
@@ -181,9 +181,9 @@ class LogParserTool:
                 pos = idx + 1
         return results
 
-    @classmethod
+    @staticmethod
     @lru_cache(maxsize=128)
-    def _get_service_info(cls, service_name: str) -> Dict[str, str]:
+    def _get_service_info(service_name: str) -> Dict[str, str]:
         """Resolves raw service identifier to sanitized service metadata."""
         clean_name = (
             service_name.rsplit("_", 1)[0]
@@ -340,27 +340,12 @@ class LogParserTool:
         # Graceful final flush upon thread exit
         try:
             final_records = []
-            if hasattr(cache, "drain_all"):
-                for acc in cache.drain_all("ACCESS"):
-                    if not acc.get("service") or not acc["service"].get("name"):
-                        acc["service"] = default_service
-                    final_records.append(acc)
-                for aud in cache.drain_all("AUDIT"):
-                    final_records.append(cls._audit_to_transaction(aud, service_name))
-            else:
-                with cache.lock:
-                    if cache.access_log:
-                        for acc in cache.access_log:
-                            if not acc.get("service") or not acc["service"].get("name"):
-                                acc["service"] = default_service
-                            final_records.append(acc)
-                        cache.access_log.clear()
-                    if cache.audit_log:
-                        for aud in cache.audit_log:
-                            final_records.append(
-                                cls._audit_to_transaction(aud, service_name)
-                            )
-                        cache.audit_log.clear()
+            for acc in cache.drain_all("ACCESS"):
+                if not acc.get("service") or not acc["service"].get("name"):
+                    acc["service"] = default_service
+                final_records.append(acc)
+            for aud in cache.drain_all("AUDIT"):
+                final_records.append(cls._audit_to_transaction(aud, service_name))
 
             for uid, (acc, _) in pending_access.items():
                 if not acc.get("service") or not acc["service"].get("name"):

@@ -60,6 +60,8 @@ services:
     volumes:
       - "./api:/opt/nxguard/admin/api"
       - "./engine:/opt/nxguard/admin/engine"
+      - "./config.py:/opt/nxguard/admin/config.py"
+      - "./main.py:/opt/nxguard/admin/main.py"
       - "./lualib:/opt/nxguard/luajit/share/lua/5.1/nxguard"
       - "./data:/data"
       - "./logs:/opt/nxguard/logs"
