@@ -13,8 +13,8 @@ from nxcore.middleware.logging_manager import logger
 
 import engine.admin as c_admin
 import engine.build as c_builder
-from api.model.config_model import ChangeDao, ConfigDao
-from api.model.upstream_model import NodeStatusDao
+from api.repository.config_repository import ChangeDao, ConfigDao
+from api.repository.upstream_repository import NodeStatusDao
 from api.tasks import renew_certificates
 
 routes = Blueprint("config", __name__)

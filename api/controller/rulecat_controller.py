@@ -7,7 +7,7 @@ from nxcore.controllers.base_controller import (
 )
 
 
-from api.model.seclang_model import RuleCategoryDao
+from api.repository.seclang_repository import RuleCategoryDao
 from engine.seclang.seclang_schema import RuleCategorySchema
 
 routes = Blueprint("rulecat", __name__)

@@ -6,7 +6,7 @@ from jinja2 import Environment, FileSystemLoader
 from nxcore.middleware.logging_manager import logger
 
 import config
-from api.model.seclang_model import RuleCategoryDao
+from api.repository.seclang_repository import RuleCategoryDao
 from api.model.route_model import RouteType
 from api.services.ipxa_services import FeedService
 

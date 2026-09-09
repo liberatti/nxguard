@@ -14,8 +14,8 @@ from nxcore.controllers.base_controller import (
 
 
 from nxcore.middleware.socket_manager import emit_event
-from api.model.config_model import ChangeDao
-from api.model.service_model import ServiceDao
+from api.repository.config_repository import ChangeDao
+from api.repository.service_repository import ServiceDao
 
 routes = Blueprint("service", __name__)
 

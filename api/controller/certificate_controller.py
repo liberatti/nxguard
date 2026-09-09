@@ -15,9 +15,9 @@ from nxcore.controllers.base_controller import (
 from nxcore.middleware.socket_manager import emit_event
 
 from nxcore.common_utils import deep_merge, replace_tz
-from api.model.certificate_model import CertificateDao
-from api.model.config_model import ChangeDao
-from api.model.service_model import ServiceDao
+from api.repository.certificate_repository import CertificateDao
+from api.repository.config_repository import ChangeDao
+from api.repository.service_repository import ServiceDao
 from api.tools.ssl_tool import SSLTool
 from config import TZ
 

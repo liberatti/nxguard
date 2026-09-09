@@ -2,7 +2,7 @@ import bcrypt
 from flask import Blueprint, request
 from marshmallow import ValidationError
 
-from api.model.oauth_model import UserDao
+from api.repository.oauth_repository import UserDao
 from nxcore.controllers.base_controller import (
     response_data,
     response_error_404,

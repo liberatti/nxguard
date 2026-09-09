@@ -6,7 +6,7 @@ from nxcore.controllers.base_controller import (
     has_any_authority
 )
 
-from api.model.seclang_model import RuleDao
+from api.repository.seclang_repository import RuleDao
 
 routes = Blueprint("rulesec", __name__)
 

@@ -7,17 +7,17 @@ import bcrypt
 from nxcore.common_utils import gen_random_string
 
 import config
-from api.model.certificate_model import CertificateDao
-from api.model.config_model import ConfigDao, ConfigBackupDao, ChangeDao
-from api.model.oauth_model import UserDao
-from api.model.sensor_model import SensorDao
-from api.model.service_model import ServiceDao
-from api.model.route_model import RouteDao
-from api.model.upstream_model import UpstreamDao, NodeStatusDao, UpstreamStatesDao
-from api.model.transaction_model import TransactionDao
+from api.repository.certificate_repository import CertificateDao
+from api.repository.config_repository import ConfigDao, ConfigBackupDao, ChangeDao
+from api.repository.oauth_repository import UserDao
+from api.repository.sensor_repository import SensorDao
+from api.repository.service_repository import ServiceDao
+from api.repository.route_repository import RouteDao
+from api.repository.upstream_repository import UpstreamDao, NodeStatusDao, UpstreamStatesDao
+from api.repository.transaction_repository import TransactionDao
 from api.tools.network_tool import NetworkTool
 from nxcore.middleware.logging_manager import logger
-from api.model.acme_model import ChallengeDao
+from api.repository.acme_repository import ChallengeDao
 
 
 def get_config(dependents: bool = False):

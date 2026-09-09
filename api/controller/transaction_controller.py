@@ -9,8 +9,8 @@ from nxcore.controllers.base_controller import (
 )
 
 from nxcore.common_utils import replace_tz
-from api.model.transaction_model import TransactionDao
-from api.model.config_model import ConfigDao
+from api.repository.transaction_repository import TransactionDao
+from api.repository.config_repository import ConfigDao
 from api.services.opensearch_service import OpenSearchService
 import config as env_config
 from config import DATETIME_FMT

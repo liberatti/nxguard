@@ -1,6 +1,6 @@
-import duckdb
 import os
 import re
+import duckdb
 
 from marshmallow import Schema, fields
 
@@ -304,7 +304,7 @@ class DuckDAO:
 
         Args:
             vo (dict): Dictionary with record data.
-
+            
         Returns:
             any: The last inserted ID.
         """

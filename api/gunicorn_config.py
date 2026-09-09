@@ -19,7 +19,7 @@ import config as _config
 
 import engine.admin as c_admin
 import engine.build as c_builder
-from api.model.upstream_model import UpstreamStatesDao
+from api.repository.upstream_repository import UpstreamStatesDao
 from api.tasks import (
     update_node_status,
     update_upstream_states,

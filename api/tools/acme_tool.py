@@ -7,10 +7,10 @@ from nxcore.middleware.logging_manager import logger
 
 # noinspection PyPep8Naming
 from nxcore.common_utils import replace_tz
-from api.model.acme_model import ChallengeDao
-from api.model.certificate_model import CertificateDao
-from api.model.service_model import ServiceDao
-from api.model.config_model import ConfigDao
+from api.repository.acme_repository import ChallengeDao
+from api.repository.certificate_repository import CertificateDao
+from api.repository.service_repository import ServiceDao
+from api.repository.config_repository import ConfigDao
 from api.tools.ssl_tool import SSLLetsEncryptTool, SSLTool
 
 

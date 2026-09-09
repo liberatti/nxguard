@@ -7,7 +7,7 @@ from nxcore.controllers.base_controller import (
     has_any_authority,
     response_error_500,
 )
-from api.model.config_model import ConfigDao, ConfigBackupDao
+from api.repository.config_repository import ConfigDao, ConfigBackupDao
 
 routes = Blueprint("replica", __name__)
 

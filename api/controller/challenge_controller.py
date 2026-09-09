@@ -4,7 +4,7 @@ from nxcore.controllers.base_controller import (
     response_error_404
 )
 
-from api.model.acme_model import ChallengeDao
+from api.repository.acme_repository import ChallengeDao
 
 routes = Blueprint("acme", __name__)
 

@@ -10,7 +10,7 @@ from nxcore.common_utils import gen_random_string
 from nxcore.middleware.logging_manager import logger
 
 import engine.render as c_render
-from api.model.config_model import ConfigBackupDao, ConfigDao
+from api.repository.config_repository import ConfigBackupDao, ConfigDao
 from api.tools.service_watcher import ServiceWatcher
 from config import BASE_PATH
 

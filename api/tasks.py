@@ -13,10 +13,10 @@ import config
 import engine.admin as c_admin
 import engine.build as c_builder
 import engine.seclang.seclang_indexer as seclang_indexer
-from api.model.config_model import ConfigBackupDao, ConfigDao
-from api.model.upstream_model import NodeStatusDao, UpstreamDao, UpstreamStatesDao
-from api.model.certificate_model import CertificateDao
-from api.model.service_model import ServiceDao
+from api.repository.config_repository import ConfigBackupDao, ConfigDao
+from api.repository.upstream_repository import NodeStatusDao, UpstreamDao, UpstreamStatesDao
+from api.repository.certificate_repository import CertificateDao
+from api.repository.service_repository import ServiceDao
 from api.tools.acme_tool import AcmeTool
 
 

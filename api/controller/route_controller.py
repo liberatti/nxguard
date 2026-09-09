@@ -10,7 +10,7 @@ from nxcore.controllers.base_controller import (
     response_data_removed,
 )
 
-from api.model.route_model import RouteDao
+from api.repository.route_repository import RouteDao
 
 routes = Blueprint("route", __name__)
 

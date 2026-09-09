@@ -10,7 +10,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 from nxcore.middleware.logging_manager import logger
 from nxcore.repository.schemas.page_meta_schema import PageMetaSchema
 from nxcore.common_utils import replace_tz
-from api.model.config_model import ConfigDao
+from api.repository.config_repository import ConfigDao
 from api.model.transaction_model import TransactionSchema
 import config
 from api.services.transaction_schema_opensearch import (

@@ -2,7 +2,7 @@ import json
 
 import config
 from engine.seclang.seclang_parser import RuleSetParser
-from api.model.seclang_model import RuleCategoryDao, RuleDao
+from api.repository.seclang_repository import RuleCategoryDao, RuleDao
 
 
 def get_default_vars(

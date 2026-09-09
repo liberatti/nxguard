@@ -2,7 +2,7 @@ import requests
 from datetime import datetime
 from typing import Dict, Any
 from nxcore.middleware.logging_manager import logger
-from api.model.config_model import ConfigDao
+from api.repository.config_repository import ConfigDao
 from marshmallow import EXCLUDE, Schema, fields
 from nxcore.repository.schemas.page_meta_schema import PageMetaSchema
 import config

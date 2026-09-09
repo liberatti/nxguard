@@ -15,8 +15,8 @@ from cryptography.x509.oid import NameOID
 from nxcore.middleware.logging_manager import logger
 
 from nxcore.common_utils import replace_tz
-from api.model.acme_model import ChallengeDao
-from api.model.config_model import ConfigDao
+from api.repository.acme_repository import ChallengeDao
+from api.repository.config_repository import ConfigDao
 from config import APP_BASE, KEY_SIZE, TZ
 
 

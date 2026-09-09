@@ -3,9 +3,9 @@ import json
 from flask import Blueprint, request
 from marshmallow import ValidationError
 
-from api.model.config_model import ChangeDao
-from api.model.upstream_model import UpstreamDao, UpstreamStatesDao
-from api.model.service_model import ServiceDao
+from api.repository.config_repository import ChangeDao
+from api.repository.upstream_repository import UpstreamDao, UpstreamStatesDao
+from api.repository.service_repository import ServiceDao
 from nxcore.controllers.base_controller import (
     response_data,
     response_error,

@@ -5,7 +5,7 @@ import socket
 import time
 import threading
 import traceback
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Dict, Any, List
 
 try:
@@ -16,11 +16,12 @@ except ImportError:
 import requests
 
 from nxcore.middleware.logging_manager import logger
-from api.model.transaction_model import TransactionDao
-from api.model.config_model import ConfigDao
+from api.repository.transaction_repository import TransactionDao
+from api.repository.config_repository import ConfigDao
+from api.repository.upstream_repository import NodeStatusDao
 from api.services.opensearch_service import OpenSearchService
 import config
-from config import MASKED_HEADERS
+from config import MASKED_HEADERS, TZ
 
 
 def get_server_id():
@@ -851,3 +852,29 @@ class LogParserTool:
             except Exception as e:
                 logger.error(f"Error parsing access log item: {e}")
         return records if records else None
+
+    @classmethod
+    def clean(cls):
+        now = datetime.now(TZ)
+        with NodeStatusDao() as node_dao, TransactionDao() as trn_dao, ConfigDao() as config_dao:
+            node_dao.purge_before_date(now - timedelta(hours=1))
+            active = config_dao.get_active()
+            config_dict = active.get("config", {}) if active else {}
+            purge_config = active.get("purge") if active and "purge" in active else config_dict.get("purge")
+            if (
+                purge_config
+                and purge_config.get("enabled")
+            ):
+                try:
+                    purge_after = purge_config.get("purge_after", 30)
+                    t_purged = trn_dao.purge_before_date(
+                        now - timedelta(days=purge_after)
+                    )
+                    if t_purged > 0:
+                        logger.info(f"Purged {t_purged} transactions")
+                except Exception as e:
+                    logger.error(f"Error purging transactions: {e}")
+
+
+LogArchiverTool = LogParserTool
+
