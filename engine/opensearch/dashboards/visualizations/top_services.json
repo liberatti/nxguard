@@ -1,0 +1,19 @@
+{
+  "attributes": {
+    "title": "[Logs] Top Services and Routes",
+    "visState": "{\"title\": \"[Logs] Top Services and Routes\", \"type\": \"table\", \"params\": {\"perPage\": 10, \"showPartialRows\": false, \"showMeticsAtAllLevels\": false, \"sort\": {\"columnIndex\": null, \"direction\": null}, \"showTotal\": true, \"totalFunc\": \"sum\"}, \"aggs\": [{\"id\": \"1\", \"enabled\": true, \"type\": \"count\", \"schema\": \"metric\", \"params\": {}}, {\"id\": \"2\", \"enabled\": true, \"type\": \"terms\", \"schema\": \"bucket\", \"params\": {\"field\": \"service.name\", \"size\": 10, \"order\": \"desc\", \"orderBy\": \"1\"}}, {\"id\": \"3\", \"enabled\": true, \"type\": \"terms\", \"schema\": \"bucket\", \"params\": {\"field\": \"route_name\", \"size\": 10, \"order\": \"desc\", \"orderBy\": \"1\"}}]}",
+    "uiStateJSON": "{}",
+    "description": "Top serviços e rotas com maior volume de tráfego",
+    "version": 1,
+    "kibanaSavedObjectMeta": {
+      "searchSourceJSON": "{\"query\": {\"query\": \"\", \"language\": \"kuery\"}, \"filter\": [], \"indexRefName\": \"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+    }
+  },
+  "references": [
+    {
+      "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+      "type": "index-pattern",
+      "id": "nxguard_trn"
+    }
+  ]
+}

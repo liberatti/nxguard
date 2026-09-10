@@ -1,0 +1,19 @@
+{
+  "attributes": {
+    "title": "[Logs] Host, Visits and Bytes Table",
+    "visState": "{\"title\": \"[Logs] Host, Visits and Bytes Table\", \"type\": \"table\", \"params\": {\"perPage\": 10, \"showPartialRows\": false, \"showMeticsAtAllLevels\": false, \"sort\": {\"columnIndex\": null, \"direction\": null}, \"showTotal\": true, \"totalFunc\": \"sum\"}, \"aggs\": [{\"id\": \"1\", \"enabled\": true, \"type\": \"count\", \"schema\": \"metric\", \"params\": {\"customLabel\": \"Visits\"}}, {\"id\": \"2\", \"enabled\": true, \"type\": \"sum\", \"schema\": \"metric\", \"params\": {\"field\": \"http.response.bytes\", \"customLabel\": \"Bytes Out\"}}, {\"id\": \"3\", \"enabled\": true, \"type\": \"sum\", \"schema\": \"metric\", \"params\": {\"field\": \"http.request.bytes\", \"customLabel\": \"Bytes In\"}}, {\"id\": \"4\", \"enabled\": true, \"type\": \"terms\", \"schema\": \"bucket\", \"params\": {\"field\": \"destination.host\", \"size\": 10, \"order\": \"desc\", \"orderBy\": \"1\", \"customLabel\": \"Host\"}}]}",
+    "uiStateJSON": "{}",
+    "description": "Tabela de hosts de destino, quantidade de visitas e volume de bytes trafegados",
+    "version": 1,
+    "kibanaSavedObjectMeta": {
+      "searchSourceJSON": "{\"query\": {\"query\": \"\", \"language\": \"kuery\"}, \"filter\": [], \"indexRefName\": \"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+    }
+  },
+  "references": [
+    {
+      "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+      "type": "index-pattern",
+      "id": "nxguard_trn"
+    }
+  ]
+}

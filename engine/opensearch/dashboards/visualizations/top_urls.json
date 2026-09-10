@@ -1,0 +1,19 @@
+{
+  "attributes": {
+    "title": "[Logs] Top URLs and Pages",
+    "visState": "{\"title\": \"[Logs] Top URLs and Pages\", \"type\": \"table\", \"params\": {\"perPage\": 10, \"showPartialRows\": false, \"showMeticsAtAllLevels\": false, \"sort\": {\"columnIndex\": null, \"direction\": null}, \"showTotal\": true, \"totalFunc\": \"sum\"}, \"aggs\": [{\"id\": \"1\", \"enabled\": true, \"type\": \"count\", \"schema\": \"metric\", \"params\": {\"customLabel\": \"Hits\"}}, {\"id\": \"2\", \"enabled\": true, \"type\": \"avg\", \"schema\": \"metric\", \"params\": {\"field\": \"http.duration\", \"customLabel\": \"Avg Duration (s)\"}}, {\"id\": \"3\", \"enabled\": true, \"type\": \"terms\", \"schema\": \"bucket\", \"params\": {\"field\": \"http.request.uri\", \"size\": 10, \"order\": \"desc\", \"orderBy\": \"1\", \"customLabel\": \"URI / Path\"}}]}",
+    "uiStateJSON": "{}",
+    "description": "URLs e caminhos com maior volume de requisições",
+    "version": 1,
+    "kibanaSavedObjectMeta": {
+      "searchSourceJSON": "{\"query\": {\"query\": \"\", \"language\": \"kuery\"}, \"filter\": [], \"indexRefName\": \"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+    }
+  },
+  "references": [
+    {
+      "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+      "type": "index-pattern",
+      "id": "nxguard_trn"
+    }
+  ]
+}

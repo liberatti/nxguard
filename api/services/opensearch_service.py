@@ -1,4 +1,5 @@
 import json
+import os
 import requests
 import urllib3
 from datetime import datetime
@@ -11,25 +12,37 @@ from nxcore.common_utils import replace_tz
 from api.repository.config_repository import ConfigDao
 from api.model.transaction_model import TransactionSchema
 import config
-from api.services.transaction_schema_opensearch import (
-    INDEX_TEMPLATE_NAME,
-    DEFAULT_SETTINGS,
-    DEFAULT_MAPPINGS,
-    build_index_template_payload,
-    build_index_pattern_fields,
-    build_index_pattern_attributes,
-    build_action_timeline_vis,
-    build_action_pie_vis,
-    build_status_timeline_vis,
-    build_top_services_vis,
-    build_visitors_by_user_agent_vis,
-    build_host_visits_bytes_table_vis,
-    build_visitors_map_vis,
-    get_default_visualizations,
-    get_default_dashboard,
-)
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+INDEX_TEMPLATE_NAME = "nxguard_trn_template"
+OPENSEARCH_SEED_DIR = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..", "..", "engine", "opensearch")
+)
+
+
+def _load_seed_json(relative_path: str) -> Optional[Dict[str, Any]]:
+    """Loads a JSON seed file from engine/opensearch directory."""
+    path = os.path.join(OPENSEARCH_SEED_DIR, relative_path)
+    if os.path.isfile(path):
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception as e:
+            logger.error(f"Failed to load seed JSON from {path}: {e}")
+    else:
+        logger.warning(f"Seed JSON file not found at {path}")
+    return None
+
+
+DEFAULT_SETTINGS: Dict[str, Any] = _load_seed_json("index_settings.json") or {
+    "index": {
+        "number_of_shards": 1,
+        "number_of_replicas": 0,
+        "refresh_interval": "5s",
+    }
+}
+DEFAULT_MAPPINGS: Dict[str, Any] = _load_seed_json("index_mappings.json") or {}
 
 
 class OpenSearchService:
@@ -185,8 +198,60 @@ class OpenSearchService:
             logger.warning(f"Failed to create {obj_type} '{obj_id}' at {endpoint}: {e}")
         return False
 
+    def import_dashboards_bundle(self) -> bool:
+        """Imports the complete Dashboards saved objects bundle from NDJSON seed file."""
+        dash_url = self._get_dashboard_url()
+        if not dash_url:
+            return False
+
+        ndjson_path = os.path.join(
+            OPENSEARCH_SEED_DIR, "dashboards", "dashboards_export.ndjson"
+        )
+        if not os.path.isfile(ndjson_path):
+            logger.warning(f"Dashboards NDJSON seed file not found at {ndjson_path}")
+            return False
+
+        base_prefix = self._get_base_index_prefix()
+        auth = self._get_auth()
+        headers = {
+            "osd-xsrf": "true",
+            "kbn-xsrf": "true",
+        }
+        endpoint = f"{dash_url}/api/saved_objects/_import?overwrite=true"
+
+        try:
+            with open(ndjson_path, "r", encoding="utf-8") as f:
+                content = f.read()
+
+            if base_prefix != "nxguard_trn":
+                content = content.replace('"nxguard_trn', f'"{base_prefix}')
+
+            files = {
+                "file": ("dashboards_export.ndjson", content.encode("utf-8"), "application/ndjson")
+            }
+            res = requests.post(
+                endpoint,
+                headers=headers,
+                files=files,
+                auth=auth,
+                timeout=10,
+                verify=False,
+            )
+            if res.status_code in (200, 201):
+                logger.info(
+                    f"OpenSearch Dashboards saved objects bundle imported successfully at {dash_url}"
+                )
+                return True
+            else:
+                logger.warning(
+                    f"OpenSearch Dashboards _import returned status {res.status_code}: {res.text}"
+                )
+        except Exception as e:
+            logger.warning(f"Failed to import Dashboards bundle at {endpoint}: {e}")
+        return False
+
     def ensure_structures(self, force: bool = False) -> bool:
-        """Provisions index template, daily index, index pattern, visualizations, and dashboard."""
+        """Provisions index template, daily index, and Dashboards objects from seed definitions."""
         if not self.is_configured():
             logger.warning("OpenSearch logging is not configured; skipping structure provisioning.")
             return False
@@ -194,22 +259,26 @@ class OpenSearchService:
         if not force and OpenSearchService._structures_initialized:
             return True
 
-        logger.info("Initializing OpenSearch templates, indices, and Dashboards objects...")
+        logger.info("Initializing OpenSearch templates, indices, and Dashboards objects from seeds...")
         tmpl_ok = self.create_index_template()
         today_idx = self.get_target_index()
         idx_ok = self.create_index_if_not_exists(today_idx)
-        pat_ok = self.create_index_pattern()
-        vis_ok = self.create_visualizations()
-        dash_ok = self.create_dashboard()
+
+        # Import all Dashboards objects via bundle, or fallback to individual saved object imports
+        dash_ok = self.import_dashboards_bundle()
+        if not dash_ok:
+            pat_ok = self.create_index_pattern()
+            vis_ok = self.create_visualizations()
+            dash_ok = self.create_dashboard()
 
         OpenSearchService._structures_initialized = True
         logger.info(
-            f"OpenSearch structure initialization complete: template={tmpl_ok}, index={idx_ok}, index_pattern={pat_ok}, visualizations={vis_ok}, dashboard={dash_ok}"
+            f"OpenSearch structure initialization complete: template={tmpl_ok}, index={idx_ok}, dashboards={dash_ok}"
         )
         return tmpl_ok and idx_ok
 
     def create_index_template(self, template_name: str = INDEX_TEMPLATE_NAME) -> bool:
-        """Creates composable or legacy index template in OpenSearch / Elasticsearch."""
+        """Creates composable or legacy index template in OpenSearch / Elasticsearch from seed files."""
         if not self.is_configured():
             return False
 
@@ -218,122 +287,143 @@ class OpenSearchService:
         auth = self._get_auth()
         headers = {"Content-Type": "application/json"}
 
-        # Try composable index template API (OpenSearch 1+, Elasticsearch 7.8+)
-        composable_payload = build_index_template_payload(base_prefix, composable=True)
-        try:
-            res = requests.put(
-                f"{url}/_index_template/{template_name}",
-                json=composable_payload,
-                headers=headers,
-                auth=auth,
-                timeout=5,
-                verify=False,
-            )
-            if res.status_code in (200, 201):
-                logger.info(
-                    f"OpenSearch index template '{template_name}' created successfully"
+        # 1. Try composable index template API (_index_template/name)
+        composable_payload = _load_seed_json("index_template.json")
+        if composable_payload:
+            composable_payload["index_patterns"] = [f"{base_prefix}*", f"{base_prefix}-*"]
+            try:
+                res = requests.put(
+                    f"{url}/_index_template/{template_name}",
+                    json=composable_payload,
+                    headers=headers,
+                    auth=auth,
+                    timeout=5,
+                    verify=False,
                 )
-                return True
-        except Exception as e:
-            logger.debug(f"Failed to create composable template {template_name}: {e}")
+                if res.status_code in (200, 201):
+                    logger.info(
+                        f"OpenSearch index template '{template_name}' created successfully"
+                    )
+                    return True
+            except Exception as e:
+                logger.debug(f"Failed to create composable template {template_name}: {e}")
 
-        # Fallback to legacy index template API (_template/name)
-        legacy_payload = build_index_template_payload(base_prefix, composable=False)
-        try:
-            res = requests.put(
-                f"{url}/_template/{template_name}",
-                json=legacy_payload,
-                headers=headers,
-                auth=auth,
-                timeout=5,
-                verify=False,
-            )
-            if res.status_code in (200, 201):
-                logger.info(
-                    f"OpenSearch legacy index template '{template_name}' created successfully"
+        # 2. Fallback to legacy index template API (_template/name)
+        legacy_payload = _load_seed_json("index_template_legacy.json")
+        if legacy_payload:
+            legacy_payload["index_patterns"] = [f"{base_prefix}*", f"{base_prefix}-*"]
+            try:
+                res = requests.put(
+                    f"{url}/_template/{template_name}",
+                    json=legacy_payload,
+                    headers=headers,
+                    auth=auth,
+                    timeout=5,
+                    verify=False,
                 )
-                return True
-            else:
-                logger.warning(
-                    f"Failed to create index template on OpenSearch: {res.status_code} {res.text}"
-                )
+                if res.status_code in (200, 201):
+                    logger.info(
+                        f"OpenSearch legacy index template '{template_name}' created successfully"
+                    )
+                    return True
+                else:
+                    logger.warning(
+                        f"Failed to create index template on OpenSearch: {res.status_code} {res.text}"
+                    )
+                    return False
+            except Exception as e:
+                logger.error(f"Error creating index template on OpenSearch: {e}")
                 return False
-        except Exception as e:
-            logger.error(f"Error creating index template on OpenSearch: {e}")
-            return False
-
-    def _build_index_pattern_fields(self) -> str:
-        """Generates the field schema definition required by OpenSearch Dashboards index patterns."""
-        return build_index_pattern_fields()
+        return False
 
     def create_index_pattern(self, pattern_title: Optional[str] = None) -> bool:
-        """Creates an index-pattern saved object in OpenSearch Dashboards."""
+        """Creates an index-pattern saved object in OpenSearch Dashboards from seed file."""
         if not self.is_configured():
             return False
 
         base_prefix = self._get_base_index_prefix()
-        title = pattern_title or f"{base_prefix}*"
+        pattern_data = _load_seed_json(os.path.join("dashboards", "index_pattern.json"))
+        if not pattern_data:
+            return False
+
+        attributes = dict(pattern_data.get("attributes", {}))
+        attributes["title"] = pattern_title or f"{base_prefix}*"
         pattern_id = base_prefix
-        attributes = build_index_pattern_attributes(title)
         return self._post_saved_object("index-pattern", pattern_id, attributes)
 
-    def _build_action_timeline_vis(self, pattern_id: str) -> Dict[str, Any]:
-        return build_action_timeline_vis(pattern_id)
-
-    def _build_action_pie_vis(self, pattern_id: str) -> Dict[str, Any]:
-        return build_action_pie_vis(pattern_id)
-
-    def _build_status_timeline_vis(self, pattern_id: str) -> Dict[str, Any]:
-        return build_status_timeline_vis(pattern_id)
-
-    def _build_top_services_vis(self, pattern_id: str) -> Dict[str, Any]:
-        return build_top_services_vis(pattern_id)
-
-    def _build_visitors_by_user_agent_vis(self, pattern_id: str) -> Dict[str, Any]:
-        return build_visitors_by_user_agent_vis(pattern_id)
-
-    def _build_host_visits_bytes_table_vis(self, pattern_id: str) -> Dict[str, Any]:
-        return build_host_visits_bytes_table_vis(pattern_id)
-
-    def _build_visitors_map_vis(self, pattern_id: str) -> Dict[str, Any]:
-        return build_visitors_map_vis(pattern_id)
-
     def create_visualizations(self) -> bool:
-        """Creates the default set of visualizations in OpenSearch Dashboards."""
+        """Creates the default set of visualizations in OpenSearch Dashboards from seed files."""
         if not self.is_configured():
             return False
 
         base_prefix = self._get_base_index_prefix()
-        vis_items = get_default_visualizations(base_prefix)
+        vis_dir = os.path.join(OPENSEARCH_SEED_DIR, "dashboards", "visualizations")
+        if not os.path.isdir(vis_dir):
+            logger.warning(f"Visualizations seed dir not found: {vis_dir}")
+            return False
 
         created_count = 0
-        for vis_id, vis_attrs, ref in vis_items:
+        total_count = 0
+        for fname in os.listdir(vis_dir):
+            if not fname.endswith(".json"):
+                continue
+            total_count += 1
+            vis_data = _load_seed_json(os.path.join("dashboards", "visualizations", fname))
+            if not vis_data:
+                continue
+
+            vis_base_name = fname.replace(".json", "")
+            vis_id = f"{base_prefix}_{vis_base_name}"
+            attributes = vis_data.get("attributes", {})
+            references = vis_data.get("references", [])
+
+            # Update index-pattern reference to match active base prefix
+            adapted_refs = []
+            for ref in references:
+                ref_copy = dict(ref)
+                if ref_copy.get("type") == "index-pattern":
+                    ref_copy["id"] = base_prefix
+                adapted_refs.append(ref_copy)
+
             res = self._post_saved_object(
-                "visualization", vis_id, vis_attrs, references=ref
+                "visualization", vis_id, attributes, references=adapted_refs
             )
             if res:
                 created_count += 1
+
         logger.info(
-            f"OpenSearch Dashboards {created_count}/{len(vis_items)} visualizations initialized successfully"
+            f"OpenSearch Dashboards {created_count}/{total_count} visualizations initialized successfully"
         )
-        return created_count == len(vis_items)
+        return total_count > 0 and created_count == total_count
 
     def create_dashboard(self, dashboard_title: Optional[str] = None) -> bool:
-        """Creates the NxGuard overview dashboard in OpenSearch Dashboards."""
+        """Creates the NxGuard overview dashboard in OpenSearch Dashboards from seed file."""
         if not self.is_configured():
             return False
 
         base_prefix = self._get_base_index_prefix()
-        dash_id, attributes, references = get_default_dashboard(
-            base_prefix, title=dashboard_title
-        )
+        dash_data = _load_seed_json(os.path.join("dashboards", "dashboard.json"))
+        if not dash_data:
+            return False
+
+        dash_id = f"{base_prefix}_dashboard"
+        attributes = dict(dash_data.get("attributes", {}))
+        if dashboard_title:
+            attributes["title"] = dashboard_title
+
+        references = []
+        for ref in dash_data.get("references", []):
+            ref_copy = dict(ref)
+            if base_prefix != "nxguard_trn" and ref_copy.get("id", "").startswith("nxguard_trn_"):
+                ref_copy["id"] = ref_copy["id"].replace("nxguard_trn_", f"{base_prefix}_")
+            references.append(ref_copy)
 
         return self._post_saved_object(
             "dashboard", dash_id, attributes, references=references
         )
 
     def create_index_if_not_exists(self, index_name: Optional[str] = None) -> bool:
-        """Checks if index exists; creates it with settings and mappings if missing."""
+        """Checks if index exists; creates it with settings and mappings from seed files if missing."""
         if not self.is_configured():
             return False
 

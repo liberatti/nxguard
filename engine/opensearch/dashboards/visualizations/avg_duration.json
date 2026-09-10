@@ -1,0 +1,19 @@
+{
+  "attributes": {
+    "title": "[Logs] Average Duration",
+    "visState": "{\"title\": \"[Logs] Average Duration\", \"type\": \"metric\", \"params\": {\"metric\": {\"percentageMode\": false, \"useRanges\": false, \"colorSchema\": \"Green to Red\", \"metricColorMode\": \"None\", \"style\": {\"bgFill\": \"#000\", \"bgColor\": false, \"labelColor\": false, \"subText\": \"\", \"fontSize\": 48}}}, \"aggs\": [{\"id\": \"1\", \"enabled\": true, \"type\": \"avg\", \"schema\": \"metric\", \"params\": {\"field\": \"http.duration\", \"customLabel\": \"Avg Duration (s)\"}}]}",
+    "uiStateJSON": "{}",
+    "description": "Tempo médio de resposta (latência) das requisições",
+    "version": 1,
+    "kibanaSavedObjectMeta": {
+      "searchSourceJSON": "{\"query\": {\"query\": \"\", \"language\": \"kuery\"}, \"filter\": [], \"indexRefName\": \"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+    }
+  },
+  "references": [
+    {
+      "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+      "type": "index-pattern",
+      "id": "nxguard_trn"
+    }
+  ]
+}

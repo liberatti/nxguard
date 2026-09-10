@@ -1,0 +1,19 @@
+{
+  "attributes": {
+    "title": "[Logs] Response Codes",
+    "visState": "{\"title\": \"[Logs] Response Codes\", \"type\": \"pie\", \"params\": {\"type\": \"pie\", \"addTooltip\": true, \"addLegend\": true, \"legendPosition\": \"right\", \"isDonut\": true}, \"aggs\": [{\"id\": \"1\", \"enabled\": true, \"type\": \"count\", \"schema\": \"metric\", \"params\": {}}, {\"id\": \"2\", \"enabled\": true, \"type\": \"terms\", \"schema\": \"segment\", \"params\": {\"field\": \"http.response.status_code\", \"size\": 10, \"order\": \"desc\", \"orderBy\": \"1\"}}]}",
+    "uiStateJSON": "{}",
+    "description": "Proporção de respostas HTTP por código de status",
+    "version": 1,
+    "kibanaSavedObjectMeta": {
+      "searchSourceJSON": "{\"query\": {\"query\": \"\", \"language\": \"kuery\"}, \"filter\": [], \"indexRefName\": \"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+    }
+  },
+  "references": [
+    {
+      "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+      "type": "index-pattern",
+      "id": "nxguard_trn"
+    }
+  ]
+}

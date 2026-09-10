@@ -1,0 +1,19 @@
+{
+  "attributes": {
+    "title": "[Logs] Visitors by user agent",
+    "visState": "{\"title\": \"[Logs] Visitors by user agent\", \"type\": \"pie\", \"params\": {\"type\": \"pie\", \"addTooltip\": true, \"addLegend\": true, \"legendPosition\": \"right\", \"isDonut\": true, \"labels\": {\"show\": false, \"values\": true, \"last_level\": true, \"truncate\": 100}}, \"aggs\": [{\"id\": \"1\", \"enabled\": true, \"type\": \"count\", \"schema\": \"metric\", \"params\": {}}, {\"id\": \"2\", \"enabled\": true, \"type\": \"terms\", \"schema\": \"segment\", \"params\": {\"field\": \"user_agent.family\", \"size\": 10, \"order\": \"desc\", \"orderBy\": \"1\", \"otherBucket\": true, \"otherBucketLabel\": \"Other\", \"missingBucket\": false}}]}",
+    "uiStateJSON": "{}",
+    "description": "Distribuição de acessos por família de User Agent / Navegador",
+    "version": 1,
+    "kibanaSavedObjectMeta": {
+      "searchSourceJSON": "{\"query\": {\"query\": \"\", \"language\": \"kuery\"}, \"filter\": [], \"indexRefName\": \"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+    }
+  },
+  "references": [
+    {
+      "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+      "type": "index-pattern",
+      "id": "nxguard_trn"
+    }
+  ]
+}

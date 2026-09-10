@@ -1,0 +1,297 @@
+{
+  "properties": {
+    "logtime": {
+      "type": "date",
+      "format": "strict_date_optional_time||epoch_millis||yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ||yyyy-MM-dd HH:mm:ss||yyyy-MM-dd'T'HH:mm:ssZ"
+    },
+    "unique_id": {
+      "type": "keyword"
+    },
+    "server_id": {
+      "type": "keyword"
+    },
+    "action": {
+      "type": "keyword"
+    },
+    "limit_req_status": {
+      "type": "keyword"
+    },
+    "geoip_status": {
+      "type": "keyword"
+    },
+    "rbl_status": {
+      "type": "keyword"
+    },
+    "ipxa": {
+      "type": "keyword"
+    },
+    "route_name": {
+      "type": "keyword"
+    },
+    "route": {
+      "properties": {
+        "_id": {
+          "type": "keyword"
+        },
+        "name": {
+          "type": "keyword"
+        }
+      }
+    },
+    "score": {
+      "type": "integer"
+    },
+    "service": {
+      "properties": {
+        "_id": {
+          "type": "keyword"
+        },
+        "name": {
+          "type": "keyword"
+        }
+      }
+    },
+    "sensor": {
+      "properties": {
+        "_id": {
+          "type": "keyword"
+        },
+        "name": {
+          "type": "keyword"
+        }
+      }
+    },
+    "upstream": {
+      "properties": {
+        "_id": {
+          "type": "keyword"
+        },
+        "name": {
+          "type": "keyword"
+        }
+      }
+    },
+    "user_agent": {
+      "properties": {
+        "family": {
+          "type": "keyword"
+        },
+        "major": {
+          "type": "integer"
+        },
+        "minor": {
+          "type": "integer"
+        }
+      }
+    },
+    "source": {
+      "properties": {
+        "ip": {
+          "type": "ip"
+        },
+        "port": {
+          "type": "integer"
+        },
+        "geo": {
+          "properties": {
+            "ip": {
+              "type": "ip"
+            },
+            "country": {
+              "type": "keyword"
+            }
+          }
+        }
+      }
+    },
+    "destination": {
+      "properties": {
+        "ip": {
+          "type": "ip"
+        },
+        "port": {
+          "type": "integer"
+        },
+        "host": {
+          "type": "keyword"
+        }
+      }
+    },
+    "rate_limit": {
+      "properties": {
+        "action": {
+          "type": "keyword"
+        },
+        "zone": {
+          "type": "keyword"
+        }
+      }
+    },
+    "geoip": {
+      "properties": {
+        "action": {
+          "type": "keyword"
+        },
+        "country_code": {
+          "type": "keyword"
+        }
+      }
+    },
+    "reputation": {
+      "properties": {
+        "action": {
+          "type": "keyword"
+        },
+        "score": {
+          "type": "integer"
+        }
+      }
+    },
+    "mtls": {
+      "properties": {
+        "verified": {
+          "type": "boolean"
+        },
+        "fingerprint": {
+          "type": "keyword"
+        },
+        "subject_dn": {
+          "type": "keyword"
+        },
+        "issuer_dn": {
+          "type": "keyword"
+        }
+      }
+    },
+    "http": {
+      "properties": {
+        "duration": {
+          "type": "float"
+        },
+        "uht": {
+          "type": "float"
+        },
+        "urt": {
+          "type": "float"
+        },
+        "referer": {
+          "type": "keyword"
+        },
+        "request_line": {
+          "type": "text"
+        },
+        "request": {
+          "properties": {
+            "method": {
+              "type": "keyword"
+            },
+            "uri": {
+              "type": "keyword"
+            },
+            "bytes": {
+              "type": "long"
+            },
+            "headers": {
+              "type": "nested",
+              "properties": {
+                "name": {
+                  "type": "keyword"
+                },
+                "value": {
+                  "type": "keyword"
+                }
+              }
+            }
+          }
+        },
+        "response": {
+          "properties": {
+            "status_code": {
+              "type": "integer"
+            },
+            "bytes": {
+              "type": "long"
+            },
+            "headers": {
+              "type": "nested",
+              "properties": {
+                "name": {
+                  "type": "keyword"
+                },
+                "value": {
+                  "type": "keyword"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "audit": {
+      "properties": {
+        "engine": {
+          "type": "keyword"
+        },
+        "connector": {
+          "type": "keyword"
+        },
+        "mode": {
+          "type": "keyword"
+        },
+        "components": {
+          "type": "keyword"
+        },
+        "messages": {
+          "type": "nested",
+          "properties": {
+            "rule_code": {
+              "type": "keyword"
+            },
+            "ruleId": {
+              "type": "keyword"
+            },
+            "message": {
+              "type": "text"
+            },
+            "text": {
+              "type": "text"
+            },
+            "severity": {
+              "type": "keyword"
+            },
+            "data": {
+              "type": "text"
+            },
+            "match": {
+              "type": "text"
+            },
+            "reference": {
+              "type": "text"
+            },
+            "file": {
+              "type": "keyword"
+            },
+            "lineNumber": {
+              "type": "keyword"
+            },
+            "tags": {
+              "type": "keyword"
+            },
+            "ver": {
+              "type": "keyword"
+            },
+            "rev": {
+              "type": "keyword"
+            },
+            "maturity": {
+              "type": "keyword"
+            },
+            "accuracy": {
+              "type": "keyword"
+            }
+          }
+        }
+      }
+    }
+  }
+}
