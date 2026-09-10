@@ -4,6 +4,7 @@ import json
 import os
 import re
 import secrets
+import socket
 
 import pytz
 
@@ -15,10 +16,13 @@ except Exception:
     APP_VERSION = "develop"
 
 API_HEADERS = {"User-Agent": f"NXGuard/{APP_VERSION}"}
+SERVER_ID = socket.gethostname()
+_SERVER_ID = SERVER_ID
 
 BASE_PATH = "/opt/nxguard"
 LUA_LIBS_PATH = f"{BASE_PATH}/luajit/share/lua/5.1"
 DB_PATH = os.environ.get("BASE_PATH", "/data")
+INDEX_TEMPLATE_NAME = "nxguard_trn_template"
 
 ENGINE_BASE = f"{BASE_PATH}/nginx"
 ENGINE_VERSION = "1.27.1"

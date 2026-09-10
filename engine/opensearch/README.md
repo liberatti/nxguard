@@ -9,7 +9,6 @@ Este diretório contém os arquivos JSON e NDJSON de inicialização (seeds) par
 ```text
 engine/opensearch/
 ├── index_template.json           # Template composable do índice (_index_template/nxguard_trn_template)
-├── index_template_legacy.json    # Template legado do índice (_template/nxguard_trn_template)
 ├── index_settings.json           # Definição isolada de settings (shards, replicas, refresh)
 ├── index_mappings.json           # Definição isolada de mappings dos campos
 └── dashboards/
@@ -40,21 +39,14 @@ engine/opensearch/
 
 ### 1. OpenSearch (Cluster / Engine na porta `9200`)
 
-#### A) Criar o Index Template Composable (Recomendado para OpenSearch 1.x / 2.x):
+#### A) Criar o Index Template Composable (OpenSearch 1.x / 2.x):
 ```bash
 curl -k -u "admin:NxGuard@2026" -X PUT "https://localhost:9200/_index_template/nxguard_trn_template" \
   -H "Content-Type: application/json" \
   -d @index_template.json
 ```
 
-#### B) Criar o Index Template Legado (Compatibilidade):
-```bash
-curl -k -u "admin:NxGuard@2026" -X PUT "https://localhost:9200/_template/nxguard_trn_template" \
-  -H "Content-Type: application/json" \
-  -d @index_template_legacy.json
-```
-
-#### C) Criar um Índice Inicial Diretamente:
+#### B) Criar um Índice Inicial Diretamente:
 ```bash
 curl -k -u "admin:NxGuard@2026" -X PUT "https://localhost:9200/nxguard_trn-$(date +%Y.%m.%d)" \
   -H "Content-Type: application/json" \

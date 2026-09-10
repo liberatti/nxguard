@@ -12,37 +12,21 @@ from nxcore.common_utils import replace_tz
 from api.repository.config_repository import ConfigDao
 from api.model.transaction_model import TransactionSchema
 import config
+from config import BASE_PATH, INDEX_TEMPLATE_NAME
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-INDEX_TEMPLATE_NAME = "nxguard_trn_template"
-OPENSEARCH_SEED_DIR = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "..", "engine", "opensearch")
+OPENSEARCH_SEED_DIR = (
+    os.path.join(BASE_PATH, "admin", "engine", "opensearch")
+    if os.path.isdir(os.path.join(BASE_PATH, "admin", "engine", "opensearch"))
+    else (
+        os.path.join(BASE_PATH, "engine", "opensearch")
+        if os.path.isdir(os.path.join(BASE_PATH, "engine", "opensearch"))
+        else os.path.abspath(
+            os.path.join(os.path.dirname(__file__), "..", "..", "engine", "opensearch")
+        )
+    )
 )
-
-
-def _load_seed_json(relative_path: str) -> Optional[Dict[str, Any]]:
-    """Loads a JSON seed file from engine/opensearch directory."""
-    path = os.path.join(OPENSEARCH_SEED_DIR, relative_path)
-    if os.path.isfile(path):
-        try:
-            with open(path, "r", encoding="utf-8") as f:
-                return json.load(f)
-        except Exception as e:
-            logger.error(f"Failed to load seed JSON from {path}: {e}")
-    else:
-        logger.warning(f"Seed JSON file not found at {path}")
-    return None
-
-
-DEFAULT_SETTINGS: Dict[str, Any] = _load_seed_json("index_settings.json") or {
-    "index": {
-        "number_of_shards": 1,
-        "number_of_replicas": 0,
-        "refresh_interval": "5s",
-    }
-}
-DEFAULT_MAPPINGS: Dict[str, Any] = _load_seed_json("index_mappings.json") or {}
 
 
 class OpenSearchService:
@@ -50,8 +34,31 @@ class OpenSearchService:
 
     _structures_initialized: bool = False
 
-    DEFAULT_SETTINGS = DEFAULT_SETTINGS
-    DEFAULT_MAPPINGS = DEFAULT_MAPPINGS
+    @staticmethod
+    def _load_seed_json(relative_path: str) -> Optional[Dict[str, Any]]:
+        """Loads a JSON seed file from engine/opensearch directory."""
+        candidates = [
+            os.path.join(OPENSEARCH_SEED_DIR, relative_path),
+            os.path.join(BASE_PATH, "admin", "engine", "opensearch", relative_path),
+            os.path.join(BASE_PATH, "engine", "opensearch", relative_path),
+            os.path.abspath(
+                os.path.join(
+                    os.path.dirname(__file__), "..", "..", "engine", "opensearch", relative_path
+                )
+            ),
+        ]
+        for path in candidates:
+            if os.path.isfile(path):
+                try:
+                    with open(path, "r", encoding="utf-8") as f:
+                        return json.load(f)
+                except Exception as e:
+                    logger.error(f"Failed to load seed JSON from {path}: {e}")
+                    return None
+        logger.warning(
+            f"Seed JSON file not found at {os.path.join(OPENSEARCH_SEED_DIR, relative_path)}"
+        )
+        return None
 
     def __init__(self, logging_conf: Optional[Dict[str, Any]] = None):
         self.logging_conf = logging_conf
@@ -64,6 +71,19 @@ class OpenSearchService:
             except Exception as e:
                 logger.error(f"Error fetching config for OpenSearch: {e}")
                 self.logging_conf = {}
+
+        self.DEFAULT_SETTINGS: Dict[str, Any] = self._load_seed_json(
+            "index_settings.json"
+        ) or {
+            "index": {
+                "number_of_shards": 1,
+                "number_of_replicas": 0,
+                "refresh_interval": "5s",
+            }
+        }
+        self.DEFAULT_MAPPINGS: Dict[str, Any] = (
+            self._load_seed_json("index_mappings.json") or {}
+        )
 
         self.schema = TransactionSchema()
         page_class = type(
@@ -114,7 +134,11 @@ class OpenSearchService:
             if isinstance(logtime_val, datetime):
                 target_dt = logtime_val
             elif isinstance(logtime_val, str):
-                if "T" in logtime_val or (len(logtime_val) >= 10 and logtime_val[4] == "-" and logtime_val[7] == "-"):
+                if "T" in logtime_val or (
+                    len(logtime_val) >= 10
+                    and logtime_val[4] == "-"
+                    and logtime_val[7] == "-"
+                ):
                     try:
                         target_dt = datetime.fromisoformat(
                             logtime_val.replace("Z", "+00:00")
@@ -208,8 +232,43 @@ class OpenSearchService:
             OPENSEARCH_SEED_DIR, "dashboards", "dashboards_export.ndjson"
         )
         if not os.path.isfile(ndjson_path):
-            logger.warning(f"Dashboards NDJSON seed file not found at {ndjson_path}")
-            return False
+            candidates = [
+                os.path.join(
+                    BASE_PATH,
+                    "admin",
+                    "engine",
+                    "opensearch",
+                    "dashboards",
+                    "dashboards_export.ndjson",
+                ),
+                os.path.join(
+                    BASE_PATH,
+                    "engine",
+                    "opensearch",
+                    "dashboards",
+                    "dashboards_export.ndjson",
+                ),
+                os.path.abspath(
+                    os.path.join(
+                        os.path.dirname(__file__),
+                        "..",
+                        "..",
+                        "engine",
+                        "opensearch",
+                        "dashboards",
+                        "dashboards_export.ndjson",
+                    )
+                ),
+            ]
+            for candidate in candidates:
+                if os.path.isfile(candidate):
+                    ndjson_path = candidate
+                    break
+            else:
+                logger.warning(
+                    f"Dashboards NDJSON seed file not found at {ndjson_path}"
+                )
+                return False
 
         base_prefix = self._get_base_index_prefix()
         auth = self._get_auth()
@@ -227,7 +286,11 @@ class OpenSearchService:
                 content = content.replace('"nxguard_trn', f'"{base_prefix}')
 
             files = {
-                "file": ("dashboards_export.ndjson", content.encode("utf-8"), "application/ndjson")
+                "file": (
+                    "dashboards_export.ndjson",
+                    content.encode("utf-8"),
+                    "application/ndjson",
+                )
             }
             res = requests.post(
                 endpoint,
@@ -253,13 +316,17 @@ class OpenSearchService:
     def ensure_structures(self, force: bool = False) -> bool:
         """Provisions index template, daily index, and Dashboards objects from seed definitions."""
         if not self.is_configured():
-            logger.warning("OpenSearch logging is not configured; skipping structure provisioning.")
+            logger.warning(
+                "OpenSearch logging is not configured; skipping structure provisioning."
+            )
             return False
 
         if not force and OpenSearchService._structures_initialized:
             return True
 
-        logger.info("Initializing OpenSearch templates, indices, and Dashboards objects from seeds...")
+        logger.info(
+            "Initializing OpenSearch templates, indices, and Dashboards objects from seeds..."
+        )
         tmpl_ok = self.create_index_template()
         today_idx = self.get_target_index()
         idx_ok = self.create_index_if_not_exists(today_idx)
@@ -278,7 +345,7 @@ class OpenSearchService:
         return tmpl_ok and idx_ok
 
     def create_index_template(self, template_name: str = INDEX_TEMPLATE_NAME) -> bool:
-        """Creates composable or legacy index template in OpenSearch / Elasticsearch from seed files."""
+        """Creates composable index template in OpenSearch from seed files."""
         if not self.is_configured():
             return False
 
@@ -287,54 +354,37 @@ class OpenSearchService:
         auth = self._get_auth()
         headers = {"Content-Type": "application/json"}
 
-        # 1. Try composable index template API (_index_template/name)
-        composable_payload = _load_seed_json("index_template.json")
-        if composable_payload:
-            composable_payload["index_patterns"] = [f"{base_prefix}*", f"{base_prefix}-*"]
-            try:
-                res = requests.put(
-                    f"{url}/_index_template/{template_name}",
-                    json=composable_payload,
-                    headers=headers,
-                    auth=auth,
-                    timeout=5,
-                    verify=False,
-                )
-                if res.status_code in (200, 201):
-                    logger.info(
-                        f"OpenSearch index template '{template_name}' created successfully"
-                    )
-                    return True
-            except Exception as e:
-                logger.debug(f"Failed to create composable template {template_name}: {e}")
+        composable_payload = self._load_seed_json("index_template.json")
+        if not composable_payload:
+            logger.warning("OpenSearch seed index_template.json not found.")
+            return False
 
-        # 2. Fallback to legacy index template API (_template/name)
-        legacy_payload = _load_seed_json("index_template_legacy.json")
-        if legacy_payload:
-            legacy_payload["index_patterns"] = [f"{base_prefix}*", f"{base_prefix}-*"]
-            try:
-                res = requests.put(
-                    f"{url}/_template/{template_name}",
-                    json=legacy_payload,
-                    headers=headers,
-                    auth=auth,
-                    timeout=5,
-                    verify=False,
+        composable_payload["index_patterns"] = [
+            f"{base_prefix}*",
+            f"{base_prefix}-*",
+        ]
+        try:
+            res = requests.put(
+                f"{url}/_index_template/{template_name}",
+                json=composable_payload,
+                headers=headers,
+                auth=auth,
+                timeout=5,
+                verify=False,
+            )
+            if res.status_code in (200, 201):
+                logger.info(
+                    f"OpenSearch index template '{template_name}' created successfully"
                 )
-                if res.status_code in (200, 201):
-                    logger.info(
-                        f"OpenSearch legacy index template '{template_name}' created successfully"
-                    )
-                    return True
-                else:
-                    logger.warning(
-                        f"Failed to create index template on OpenSearch: {res.status_code} {res.text}"
-                    )
-                    return False
-            except Exception as e:
-                logger.error(f"Error creating index template on OpenSearch: {e}")
+                return True
+            else:
+                logger.warning(
+                    f"Failed to create index template on OpenSearch: {res.status_code} {res.text}"
+                )
                 return False
-        return False
+        except Exception as e:
+            logger.error(f"Error creating index template on OpenSearch: {e}")
+            return False
 
     def create_index_pattern(self, pattern_title: Optional[str] = None) -> bool:
         """Creates an index-pattern saved object in OpenSearch Dashboards from seed file."""
@@ -342,7 +392,9 @@ class OpenSearchService:
             return False
 
         base_prefix = self._get_base_index_prefix()
-        pattern_data = _load_seed_json(os.path.join("dashboards", "index_pattern.json"))
+        pattern_data = self._load_seed_json(
+            os.path.join("dashboards", "index_pattern.json")
+        )
         if not pattern_data:
             return False
 
@@ -359,8 +411,40 @@ class OpenSearchService:
         base_prefix = self._get_base_index_prefix()
         vis_dir = os.path.join(OPENSEARCH_SEED_DIR, "dashboards", "visualizations")
         if not os.path.isdir(vis_dir):
-            logger.warning(f"Visualizations seed dir not found: {vis_dir}")
-            return False
+            for candidate in (
+                os.path.join(
+                    BASE_PATH,
+                    "admin",
+                    "engine",
+                    "opensearch",
+                    "dashboards",
+                    "visualizations",
+                ),
+                os.path.join(
+                    BASE_PATH,
+                    "engine",
+                    "opensearch",
+                    "dashboards",
+                    "visualizations",
+                ),
+                os.path.abspath(
+                    os.path.join(
+                        os.path.dirname(__file__),
+                        "..",
+                        "..",
+                        "engine",
+                        "opensearch",
+                        "dashboards",
+                        "visualizations",
+                    )
+                ),
+            ):
+                if os.path.isdir(candidate):
+                    vis_dir = candidate
+                    break
+            else:
+                logger.warning(f"Visualizations seed dir not found: {vis_dir}")
+                return False
 
         created_count = 0
         total_count = 0
@@ -368,7 +452,9 @@ class OpenSearchService:
             if not fname.endswith(".json"):
                 continue
             total_count += 1
-            vis_data = _load_seed_json(os.path.join("dashboards", "visualizations", fname))
+            vis_data = self._load_seed_json(
+                os.path.join("dashboards", "visualizations", fname)
+            )
             if not vis_data:
                 continue
 
@@ -402,7 +488,7 @@ class OpenSearchService:
             return False
 
         base_prefix = self._get_base_index_prefix()
-        dash_data = _load_seed_json(os.path.join("dashboards", "dashboard.json"))
+        dash_data = self._load_seed_json(os.path.join("dashboards", "dashboard.json"))
         if not dash_data:
             return False
 
@@ -414,8 +500,12 @@ class OpenSearchService:
         references = []
         for ref in dash_data.get("references", []):
             ref_copy = dict(ref)
-            if base_prefix != "nxguard_trn" and ref_copy.get("id", "").startswith("nxguard_trn_"):
-                ref_copy["id"] = ref_copy["id"].replace("nxguard_trn_", f"{base_prefix}_")
+            if base_prefix != "nxguard_trn" and ref_copy.get("id", "").startswith(
+                "nxguard_trn_"
+            ):
+                ref_copy["id"] = ref_copy["id"].replace(
+                    "nxguard_trn_", f"{base_prefix}_"
+                )
             references.append(ref_copy)
 
         return self._post_saved_object(
@@ -477,42 +567,51 @@ class OpenSearchService:
             logger.error(f"Error creating OpenSearch index {idx}: {e}")
             return False
 
-    @staticmethod
-    def _headers_to_list(headers: Any) -> List[Dict[str, str]]:
-        if isinstance(headers, dict):
-            return [{"name": str(k), "value": str(v)} for k, v in headers.items()]
-        elif isinstance(headers, list):
-            formatted = []
-            for item in headers:
-                if isinstance(item, dict) and "name" in item and "value" in item:
-                    formatted.append(
-                        {"name": str(item["name"]), "value": str(item["value"])}
-                    )
-                elif isinstance(item, dict):
-                    for k, v in item.items():
-                        formatted.append({"name": str(k), "value": str(v)})
-            return formatted
-        elif isinstance(headers, str):
-            try:
-                parsed = json.loads(headers)
-                if isinstance(parsed, dict):
-                    return [
-                        {"name": str(k), "value": str(v)} for k, v in parsed.items()
-                    ]
-            except Exception:
-                pass
-        return []
-
     @classmethod
     def _normalize_http_headers(cls, doc: Dict[str, Any]):
+        """Normalizes http.request.headers and http.response.headers into [{name, value}] array."""
         if "http" not in doc or not isinstance(doc["http"], dict):
             return
         http_copy = dict(doc["http"])
         for part in ("request", "response"):
             if part in http_copy and isinstance(http_copy[part], dict):
                 part_copy = dict(http_copy[part])
-                if "headers" in part_copy:
-                    part_copy["headers"] = cls._headers_to_list(part_copy["headers"])
+                headers = part_copy.get("headers")
+                if headers is not None:
+                    formatted = []
+                    if isinstance(headers, dict):
+                        formatted = [
+                            {"name": str(k), "value": str(v)}
+                            for k, v in headers.items()
+                        ]
+                    elif isinstance(headers, list):
+                        for item in headers:
+                            if isinstance(item, dict):
+                                if "name" in item:
+                                    val = (
+                                        item["value"]
+                                        if "value" in item
+                                        else item.get("content", "")
+                                    )
+                                    formatted.append(
+                                        {"name": str(item["name"]), "value": str(val)}
+                                    )
+                                else:
+                                    for k, v in item.items():
+                                        formatted.append(
+                                            {"name": str(k), "value": str(v)}
+                                        )
+                    elif isinstance(headers, str):
+                        try:
+                            parsed = json.loads(headers)
+                            if isinstance(parsed, dict):
+                                formatted = [
+                                    {"name": str(k), "value": str(v)}
+                                    for k, v in parsed.items()
+                                ]
+                        except Exception:
+                            pass
+                    part_copy["headers"] = formatted
                 http_copy[part] = part_copy
         doc["http"] = http_copy
 
@@ -532,10 +631,15 @@ class OpenSearchService:
             doc["service"] = {"_id": s, "name": s}
 
     @classmethod
-    def _normalize_route_and_rep(cls, doc: Dict[str, Any]):
+    def _normalize_route(cls, doc: Dict[str, Any]):
+        """Normalizes route and route_name fields."""
         route_name = (
             doc.get("route_name")
-            or (doc.get("route", {}).get("name") if isinstance(doc.get("route"), dict) else None)
+            or (
+                doc.get("route", {}).get("name")
+                if isinstance(doc.get("route"), dict)
+                else None
+            )
             or ""
         )
         if route_name:
@@ -545,12 +649,18 @@ class OpenSearchService:
             else:
                 doc["route"].setdefault("name", route_name)
 
+    @classmethod
+    def _normalize_geo(cls, doc: Dict[str, Any]):
+        """Normalizes geoip dictionary structure."""
         if "geoip" in doc:
             if isinstance(doc["geoip"], str):
                 doc["geoip"] = {"action": "", "country_code": doc["geoip"]}
             elif isinstance(doc["geoip"], dict):
                 doc["geoip"] = dict(doc["geoip"])
 
+    @classmethod
+    def _normalize_reputation(cls, doc: Dict[str, Any]):
+        """Normalizes reputation object and score integer conversion."""
         if "reputation" in doc:
             if isinstance(doc["reputation"], dict):
                 rep_obj = dict(doc["reputation"])
@@ -563,6 +673,10 @@ class OpenSearchService:
             elif isinstance(doc["reputation"], (int, float)):
                 doc["reputation"] = {"action": "", "score": int(doc["reputation"])}
 
+    normalize_route = _normalize_route
+    normalize_geo = _normalize_geo
+    normalize_reputation = _normalize_reputation
+
     @classmethod
     def _format_doc(cls, record: Dict[str, Any]) -> Dict[str, Any]:
         doc = dict(record)
@@ -572,7 +686,9 @@ class OpenSearchService:
 
         cls._normalize_http_headers(doc)
         cls._normalize_service_info(doc)
-        cls._normalize_route_and_rep(doc)
+        cls._normalize_route(doc)
+        cls._normalize_geo(doc)
+        cls._normalize_reputation(doc)
         return doc
 
     def persist(self, record: Dict[str, Any]) -> bool:

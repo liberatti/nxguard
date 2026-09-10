@@ -1,6 +1,5 @@
 import os
 import json
-import socket
 import time
 import threading
 import traceback
@@ -8,145 +7,33 @@ from datetime import datetime, timedelta
 from functools import lru_cache
 from typing import Dict, Any, List, Optional
 
-try:
-    from user_agents import parse as ua_parse
-except ImportError:
-    ua_parse = None
-
 from nxcore.middleware.logging_manager import logger
 from api.repository.transaction_repository import TransactionDao
 from api.repository.config_repository import ConfigDao
 from api.repository.upstream_repository import NodeStatusDao
 from api.services.opensearch_service import OpenSearchService
 from config import (
-    COMMON_LOG_FORMATS,
-    MASKED_HEADERS_SET,
     SCORE_REGEX,
     SEVERITY_WEIGHTS,
     TZ,
-    UA_REGEX,
+    _SERVER_ID,
 )
-from api.tools.type_parse_tool import to_int as _to_int, to_float as _to_float
+from api.tools.type_parse_tool import (
+    to_int as _to_int,
+    to_float as _to_float,
+    parse_logtime as _parse_logtime,
+)
+from api.tools.http_parse_tool import (
+    resolve_status_code as _resolve_status_code,
+    parse_agent as _parse_agent,
+    parse_headers as _parse_headers,
+)
 
 _JSON_DECODER = json.JSONDecoder()
-_SERVER_ID = socket.gethostname()
-
-
-def get_server_id() -> str:
-    """Returns the cached hostname identifier for the current node."""
-    return _SERVER_ID
 
 
 class LogParserTool:
     """High-performance log parsing, normalization, file watching, and correlation tool."""
-
-    @classmethod
-    def parse_logtime(cls, time_str: Optional[str]) -> datetime:
-        """Parses timestamp strings into datetime objects with fast-path ISO 8601 support."""
-        if not time_str:
-            return datetime.now()
-
-        # Fast path for ISO 8601 strings (standard in Nginx/ModSecurity JSON logs)
-        if "T" in time_str or (
-            len(time_str) >= 10 and time_str[4] == "-" and time_str[7] == "-"
-        ):
-            try:
-                clean_str = time_str.replace("Z", "+00:00")
-                return datetime.fromisoformat(clean_str)
-            except (ValueError, TypeError):
-                pass
-
-        for fmt in COMMON_LOG_FORMATS:
-            try:
-                return datetime.strptime(time_str, fmt)
-            except (ValueError, TypeError):
-                continue
-        return datetime.now()
-
-    @staticmethod
-    @lru_cache(maxsize=100)
-    def resolve_status_code(code: Any) -> str:
-        """Categorizes HTTP status codes into action categories (blocked, warn, allowed)."""
-        c = _to_int(code, default=200)
-        if c == 403:
-            return "blocked"
-        elif c in (404, 401, 500, 502, 503, 504):
-            return "warn"
-        elif c in (200, 201, 204, 301, 302, 304):
-            return "allowed"
-        return "allowed"
-
-    @staticmethod
-    @lru_cache(maxsize=4096)
-    def parse_agent(user_agent_str: Optional[str]) -> Dict[str, Any]:
-        """Parses user agent string with LRU caching for high performance."""
-        if not user_agent_str or user_agent_str == "-":
-            return {"family": "Unknown", "major": 0, "minor": 0}
-
-        if ua_parse is not None:
-            try:
-                ua = ua_parse(user_agent_str)
-                return {
-                    "family": ua.browser.family or "Unknown",
-                    "major": (
-                        int(ua.browser.version[0])
-                        if ua.browser.version and len(ua.browser.version) > 0
-                        else 0
-                    ),
-                    "minor": (
-                        int(ua.browser.version[1])
-                        if ua.browser.version and len(ua.browser.version) > 1
-                        else 0
-                    ),
-                }
-            except Exception:
-                pass
-
-        try:
-            family = "Unknown"
-            major = 0
-            minor = 0
-            match = UA_REGEX.search(user_agent_str)
-            if match:
-                family = match.group(1)
-                major = int(match.group(2))
-                minor = int(match.group(3)) if match.group(3) else 0
-            elif "Mozilla" in user_agent_str:
-                family = "Mozilla"
-            return {"family": family, "major": major, "minor": minor}
-        except Exception:
-            return {"family": "Unknown", "major": 0, "minor": 0}
-
-    @classmethod
-    def parse_headers(
-        cls, headers_dict: Optional[Dict[str, Any]]
-    ) -> List[Dict[str, str]]:
-        """Converts header dictionary into an array of name-content mappings."""
-        if not headers_dict or not isinstance(headers_dict, dict):
-            return []
-        return [{"name": str(k), "content": str(v)} for k, v in headers_dict.items()]
-
-    @classmethod
-    def _filter_headers(cls, headers: Any) -> Any:
-        """Strips masked sensitive headers from lists or dictionaries."""
-        if not headers:
-            return headers
-        if isinstance(headers, list):
-            return [
-                h
-                for h in headers
-                if not (
-                    isinstance(h, dict)
-                    and str(h.get("name", "")).lower() in MASKED_HEADERS_SET
-                )
-            ]
-        if isinstance(headers, dict):
-            return {
-                k: v
-                for k, v in headers.items()
-                if str(k).lower() not in MASKED_HEADERS_SET
-            }
-        return headers
 
     @classmethod
     def _extract_json_objects(cls, line: str) -> List[Dict[str, Any]]:
@@ -202,21 +89,15 @@ class LogParserTool:
         if not records:
             return
         if mode == "opensearch":
-            try:
-                with OpenSearchService(conf) as os_service:
-                    os_service.persist_many(records)
-            except Exception as e:
-                logger.error(f"Error sending transactions to OpenSearch: {e}")
+            with OpenSearchService(conf) as os_service:
+                os_service.persist_many(records)
         else:
-            try:
-                with TransactionDao() as model:
-                    for record in records:
-                        try:
-                            model.upsert_by_unique_id(record)
-                        except Exception as e:
-                            logger.error(f"Error persisting merged transaction: {e}")
-            except Exception as e:
-                logger.error(f"Error opening TransactionDao for {service_name}: {e}")
+            with TransactionDao() as model:
+                for record in records:
+                    try:
+                        model.upsert_by_unique_id(record)
+                    except Exception as e:
+                        logger.error(f"Error persisting merged transaction: {e}")
         logger.debug(
             f"Processed {len(records)} merged transactions for {service_name} (mode: {mode})"
         )
@@ -237,7 +118,9 @@ class LogParserTool:
             if uid:
                 if uid in pending_audit:
                     aud, _ = pending_audit.pop(uid)
-                    merged_records.append(cls._combine_access_and_audit(acc, aud, service_name))
+                    merged_records.append(
+                        cls._combine_access_and_audit(acc, aud, service_name)
+                    )
                 else:
                     pending_access[uid] = (acc, now)
             else:
@@ -260,7 +143,9 @@ class LogParserTool:
             if uid:
                 if uid in pending_access:
                     acc, _ = pending_access.pop(uid)
-                    merged_records.append(cls._combine_access_and_audit(acc, aud, service_name))
+                    merged_records.append(
+                        cls._combine_access_and_audit(acc, aud, service_name)
+                    )
                 else:
                     pending_audit[uid] = (aud, now)
             else:
@@ -276,7 +161,9 @@ class LogParserTool:
         now: float,
         merged_records: List[Dict[str, Any]],
     ):
-        expired_access = [uid for uid, (_, t) in pending_access.items() if now - t > 4.0]
+        expired_access = [
+            uid for uid, (_, t) in pending_access.items() if now - t > 4.0
+        ]
         for uid in expired_access:
             acc, _ = pending_access.pop(uid)
             if not acc.get("service") or not acc["service"].get("name"):
@@ -326,17 +213,35 @@ class LogParserTool:
                     )
 
                 cls._correlate_access_batch(
-                    access_records, pending_access, pending_audit, service_name, default_service, now, merged_records
+                    access_records,
+                    pending_access,
+                    pending_audit,
+                    service_name,
+                    default_service,
+                    now,
+                    merged_records,
                 )
                 cls._correlate_audit_batch(
-                    audit_records, pending_access, pending_audit, service_name, now, merged_records
+                    audit_records,
+                    pending_access,
+                    pending_audit,
+                    service_name,
+                    now,
+                    merged_records,
                 )
                 cls._flush_expired_pending(
-                    pending_access, pending_audit, service_name, default_service, now, merged_records
+                    pending_access,
+                    pending_audit,
+                    service_name,
+                    default_service,
+                    now,
+                    merged_records,
                 )
 
                 if merged_records:
-                    cls._flush_merged(merged_records, service_name, logging_mode, logging_conf)
+                    cls._flush_merged(
+                        merged_records, service_name, logging_mode, logging_conf
+                    )
 
             except Exception as e:
                 logger.error(
@@ -367,9 +272,13 @@ class LogParserTool:
             pending_audit.clear()
 
             if final_records:
-                cls._flush_merged(final_records, service_name, logging_mode, logging_conf)
+                cls._flush_merged(
+                    final_records, service_name, logging_mode, logging_conf
+                )
         except Exception as e:
-            logger.error(f"Error during final transaction flush for {service_name}: {e}")
+            logger.error(
+                f"Error during final transaction flush for {service_name}: {e}"
+            )
 
         logger.info(f"Merge transaction stopped for {service_name}")
 
@@ -417,7 +326,7 @@ class LogParserTool:
             acc_http = merged.get("http", {})
             if "request" in aud_http and aud_http["request"]:
                 if "headers" in aud_http["request"] and aud_http["request"]["headers"]:
-                    acc_http.setdefault("request", {})["headers"] = cls._filter_headers(
+                    acc_http.setdefault("request", {})["headers"] = _parse_headers(
                         aud_http["request"]["headers"]
                     )
                 if "method" in aud_http["request"] and not acc_http.get(
@@ -438,8 +347,8 @@ class LogParserTool:
                     "headers" in aud_http["response"]
                     and aud_http["response"]["headers"]
                 ):
-                    acc_http.setdefault("response", {})["headers"] = (
-                        cls._filter_headers(aud_http["response"]["headers"])
+                    acc_http.setdefault("response", {})["headers"] = _parse_headers(
+                        aud_http["response"]["headers"]
                     )
                 if "status_code" in aud_http["response"] and not acc_http.get(
                     "response", {}
@@ -457,7 +366,6 @@ class LogParserTool:
         cls, audit: Dict[str, Any], service_name: str
     ) -> Dict[str, Any]:
         """Converts an unmatched standalone audit record into a full transaction."""
-        server_id = get_server_id()
         remote_ip = audit.get("source", {}).get("ip", "")
         geo_info = {"ip": remote_ip, "country": "--"}
 
@@ -472,22 +380,22 @@ class LogParserTool:
         elif raw_action in ("allow", "allowed", "pass", "passed"):
             action = "allowed"
         else:
-            action = cls.resolve_status_code(status_code)
+            action = _resolve_status_code(status_code)
 
         http_data = audit.get("http", {})
         if "request" in http_data and "headers" in http_data["request"]:
-            http_data["request"]["headers"] = cls._filter_headers(
+            http_data["request"]["headers"] = _parse_headers(
                 http_data["request"]["headers"]
             )
         if "response" in http_data and "headers" in http_data["response"]:
-            http_data["response"]["headers"] = cls._filter_headers(
+            http_data["response"]["headers"] = _parse_headers(
                 http_data["response"]["headers"]
             )
 
         record = {
             "logtime": audit.get("logtime") or datetime.now(),
             "unique_id": audit.get("unique_id", ""),
-            "server_id": audit.get("server_id") or server_id,
+            "server_id": audit.get("server_id") or _SERVER_ID,
             "service": cls._get_service_info(service_name),
             "route_name": "-",
             "upstream": None,
@@ -670,13 +578,13 @@ class LogParserTool:
         )
 
     @classmethod
-    def _parse_audit_transaction(cls, trn: dict, server_id: str) -> dict:
+    def _parse_audit_transaction(cls, trn: dict) -> dict:
         """Parses a raw ModSecurity transaction dictionary into normalized format."""
-        trn_server_id = trn.get("server_id") or server_id
+        trn_server_id = trn.get("server_id") or _SERVER_ID
         unique_id = trn.get("unique_id") or trn.get("uniqueid")
 
         record = {
-            "logtime": cls.parse_logtime(trn.get("time_stamp")),
+            "logtime": _parse_logtime(trn.get("time_stamp")),
             "server_id": trn_server_id,
             "unique_id": unique_id,
             "destination": {
@@ -696,7 +604,7 @@ class LogParserTool:
             http["request"] = {
                 "method": str(request_raw.get("method", "GET")),
                 "uri": str(request_raw.get("uri", "")),
-                "headers": cls.parse_headers(request_raw.get("headers", {})),
+                "headers": _parse_headers(request_raw.get("headers", {})),
             }
 
         action = "allowed"
@@ -705,9 +613,9 @@ class LogParserTool:
             status_code = _to_int(response_raw.get("http_code", 200), 200)
             http["response"] = {
                 "status_code": status_code,
-                "headers": cls.parse_headers(response_raw.get("headers", {})),
+                "headers": _parse_headers(response_raw.get("headers", {})),
             }
-            action = cls.resolve_status_code(status_code)
+            action = _resolve_status_code(status_code)
         record.update({"http": http, "action": action})
 
         audit = {}
@@ -748,14 +656,11 @@ class LogParserTool:
         if not dtos:
             return None
 
-        server_id = get_server_id()
         records = []
         for dto in dtos:
             try:
                 if "transaction" in dto:
-                    record = cls._parse_audit_transaction(
-                        dto.pop("transaction"), server_id
-                    )
+                    record = cls._parse_audit_transaction(dto.pop("transaction"))
                     records.append(record)
             except Exception as e:
                 logger.error(f"Error parsing audit log item: {e}")
@@ -768,7 +673,6 @@ class LogParserTool:
         if not dtos:
             return None
 
-        server_id = get_server_id()
         records = []
         for dto in dtos:
             try:
@@ -858,14 +762,14 @@ class LogParserTool:
                     req_method = "GET"
 
                 record = {
-                    "logtime": cls.parse_logtime(dto.get("time")),
+                    "logtime": _parse_logtime(dto.get("time")),
                     "unique_id": dto.get("uniqueid") or dto.get("unique_id"),
-                    "server_id": dto.get("server_id") or server_id,
+                    "server_id": dto.get("server_id") or _SERVER_ID,
                     "service": service_obj,
                     "route_name": route_name,
                     "upstream": upstream_obj,
                     "sensor": sensor_obj,
-                    "action": cls.resolve_status_code(status_code),
+                    "action": _resolve_status_code(status_code),
                     "limit_req_status": limit_req_status,
                     "geoip_status": geoip_status,
                     "rbl_status": rbl_status,
@@ -881,7 +785,7 @@ class LogParserTool:
                         dto.get("mtls", {}) if isinstance(dto.get("mtls"), dict) else {}
                     ),
                     "score": score,
-                    "user_agent": cls.parse_agent(dto.get("user_agent", "")),
+                    "user_agent": _parse_agent(dto.get("user_agent", "")),
                     "source": {
                         "ip": remote_ip,
                         "port": _to_int(dto.get("remote_port", 0)),
