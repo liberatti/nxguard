@@ -33,6 +33,7 @@ local log_data = {
     referer = ngx.var.http_referer or "-",
     user_agent = ngx.var.http_user_agent or "-",
     sensor = {
+        _id = ngx.var.sensor or "-",
         name = ngx.var.sensor or "-"
     },
     rate_limit = {

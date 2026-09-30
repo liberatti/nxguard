@@ -17,23 +17,13 @@ except Exception:
 
 API_HEADERS = {"User-Agent": f"NXGuard/{APP_VERSION}"}
 SERVER_ID = socket.gethostname()
-_SERVER_ID = SERVER_ID
 
 BASE_PATH = "/opt/nxguard"
 LUA_LIBS_PATH = f"{BASE_PATH}/luajit/share/lua/5.1"
-DB_PATH = os.environ.get("BASE_PATH", "/data")
+DB_PATH = "/data"
+LOGS_PATH = f"{BASE_PATH}/logs"
 INDEX_TEMPLATE_NAME = "nxguard_trn_template"
-ELASTICSEARCH_SEED_DIR = (
-    os.path.join(BASE_PATH, "admin", "engine", "elasticsearch")
-    if os.path.isdir(os.path.join(BASE_PATH, "admin", "engine", "elasticsearch"))
-    else (
-        os.path.join(BASE_PATH, "engine", "elasticsearch")
-        if os.path.isdir(os.path.join(BASE_PATH, "engine", "elasticsearch"))
-        else os.path.abspath(
-            os.path.join(os.path.dirname(__file__), "engine", "elasticsearch")
-        )
-    )
-)
+ELASTICSEARCH_SEED_DIR = f"{BASE_PATH}/admin/engine/elasticsearch"
 
 ENGINE_BASE = f"{BASE_PATH}/nginx"
 ENGINE_VERSION = "1.27.1"
@@ -41,12 +31,6 @@ ENGINE_VERSION = "1.27.1"
 REPLICATE_MAX_RETRIES = 3
 DATETIME_FMT = "%Y-%m-%dT%H:%M:%S.%fZ"
 TZ = pytz.timezone("UTC")
-
-TELEMETRY_ENABLE = bool(os.environ.get("TELEMETRY_ENABLE", "false"))
-TELEMETRY_INTERVAL = int(
-    os.environ.get("TELEMETRY_INTERVAL", "60")
-)  # in transaction merge (10 minutes)
-TELEMETRY_URL = os.environ.get("TELEMETRY_URL", "https://nxguard.app.br")
 
 MAINTENANCE_WINDOW = "01:00"
 CERTIFICATE_RENEW = int(os.environ.get("CERTIFICATE_RENEW", "7"))

@@ -240,54 +240,8 @@ class TransactionDao(DuckDAO):
             elif isinstance(data["logtime"], str):
                 data["logtime"] = data["logtime"]
 
-        if "service" in data and data["service"]:
-            if isinstance(data["service"], dict):
-                data["service_id"] = str(
-                    data["service"].get("_id")
-                    or data["service"].get("id")
-                    or data["service"].get("name")
-                    or ""
-                )
-            else:
-                data["service_id"] = str(data["service"])
-                data["service"] = {"_id": str(data["service"]), "name": str(data["service"])}
-
-        if "sensor" in data and data["sensor"]:
-            if isinstance(data["sensor"], dict):
-                sns = dict(data["sensor"])
-                sns_id = str(
-                    sns.get("_id")
-                    or sns.get("id")
-                    or sns.get("name")
-                    or ""
-                )
-                if not sns.get("_id") and sns_id:
-                    sns["_id"] = sns_id
-                if not sns.get("name") and sns_id:
-                    sns["name"] = sns_id
-                data["sensor"] = sns
-            else:
-                data["sensor"] = {"_id": str(data["sensor"]), "name": str(data["sensor"])}
-
-        if "upstream" in data and data["upstream"]:
-            if isinstance(data["upstream"], dict):
-                ups = dict(data["upstream"])
-                ups_id = str(
-                    ups.get("_id")
-                    or ups.get("id")
-                    or ups.get("name")
-                    or ""
-                )
-                if not ups.get("_id") and ups_id:
-                    ups["_id"] = ups_id
-                if not ups.get("name") and ups_id:
-                    ups["name"] = ups_id
-                data["upstream"] = ups
-            else:
-                data["upstream"] = {
-                    "_id": str(data["upstream"]),
-                    "name": str(data["upstream"]),
-                }
+        if "service" in data and isinstance(data["service"], dict):
+            data["service_id"] = str(data["service"].get("_id") or "")
 
         def datetime_handler(obj):
             if isinstance(obj, datetime):
@@ -349,14 +303,6 @@ class TransactionDao(DuckDAO):
                 elif isinstance(row["service"], dict) and svc_id and "_id" not in row["service"]:
                     row["service"]["_id"] = svc_id
 
-            # Legacy column fallback if present in pre-existing DB
-            sns_id = row.pop("sensor_id", None)
-            if sns_id and not row.get("sensor"):
-                row["sensor"] = {"_id": sns_id, "name": sns_id}
-
-            ups_id = row.pop("upstream_id", None)
-            if ups_id and not row.get("upstream"):
-                row["upstream"] = {"_id": ups_id, "name": ups_id}
 
         return super().to_dict(row)
 

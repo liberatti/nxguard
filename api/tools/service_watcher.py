@@ -2,7 +2,7 @@ import threading
 from nxcore.middleware.logging_manager import logger
 from api.tools.log_tool import LogParserTool
 from api.model.log_model import LogCache
-from config import BASE_PATH
+from config import LOGS_PATH
 
 
 class ServiceWatcher:
@@ -41,7 +41,7 @@ class ServiceWatcher:
         access_log = threading.Thread(
             target=LogParserTool.follow_file,
             args=(
-                f"{BASE_PATH}/logs/access-{service_name}.log",
+                f"{LOGS_PATH}/access-{service_name}.log",
                 "ACCESS",
                 cache,
             ),
@@ -52,7 +52,7 @@ class ServiceWatcher:
         error_log = threading.Thread(
             target=LogParserTool.follow_file,
             args=(
-                f"{BASE_PATH}/logs/error-{service_name}.log",
+                f"{LOGS_PATH}/error-{service_name}.log",
                 "ERROR",
                 cache,
             ),
@@ -63,7 +63,7 @@ class ServiceWatcher:
         audit_log = threading.Thread(
             target=LogParserTool.follow_file,
             args=(
-                f"{BASE_PATH}/logs/audit-{service_name}.log",
+                f"{LOGS_PATH}/audit-{service_name}.log",
                 "AUDIT",
                 cache,
             ),

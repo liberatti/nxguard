@@ -10,6 +10,7 @@ services:
       - LOGLEVEL=INFO
       - SECURITY_ENABLED=false
       - API_KEY=tZzDBUSnoy76LLSvu1Vg3e9vdFJINMT2
+      - TZ=UTC
     volumes:
       - ipxa_data:/data
     ports:
@@ -21,13 +22,14 @@ services:
       replicas: 1
 
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.5.4
     environment:
       - discovery.type=single-node
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
       - xpack.security.enabled=true
       - xpack.security.http.ssl.enabled=false
       - ELASTIC_PASSWORD=NxGuard@2026
+      - TZ=UTC
     volumes:
       - elasticsearch_data:/usr/share/elasticsearch/data
     ports:
@@ -40,7 +42,7 @@ services:
       retries: 30
 
 #  kibana-setup:
-#    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+#    image: docker.elastic.co/elasticsearch/elasticsearch:9.5.4
 #    command: >
 #      bash -c '
 #        echo "Waiting for Elasticsearch to become ready...";
@@ -57,13 +59,14 @@ services:
 #    restart: "no"
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:8.11.0
+    image: docker.elastic.co/kibana/kibana:9.5.4
     ports:
       - "5601:5601"
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
       - ELASTICSEARCH_USERNAME=kibana_system
       - ELASTICSEARCH_PASSWORD=NxGuard@2026
+      - TZ=UTC
     depends_on:
       elasticsearch:
         condition: service_healthy
@@ -79,9 +82,9 @@ services:
       - elasticsearch
       - kibana
     environment:
-      - TELEMETRY_ENABLE=false
       - SECURITY_ENABLED=false
       - NXGUARD_ROLE=main
+      - TZ=UTC
     ports:
       - 5000:5000
       - 8080:80
@@ -103,5 +106,8 @@ services:
     command: sh -c "npm install --legacy-peer-deps && npm run container"
     ports:
       - "4200:4200"
+    environment:
+      - TZ=UTC
     volumes:
-      - "./web:/app" 
+      - "./web:/app"
+ 

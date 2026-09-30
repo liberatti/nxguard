@@ -330,16 +330,11 @@ class ElasticsearchService:
                 rule_val = str(val)
                 must_clauses.append(
                     {
-                        "nested": {
-                            "path": "audit.messages",
-                            "query": {
-                                "bool": {
-                                    "should": [
-                                        {"term": {"audit.messages.rule_code": rule_val}},
-                                        {"term": {"audit.messages.ruleId": rule_val}},
-                                    ]
-                                }
-                            },
+                        "bool": {
+                            "should": [
+                                {"term": {"audit.messages.rule_code": rule_val}},
+                                {"term": {"audit.messages.ruleId": rule_val}},
+                            ]
                         }
                     }
                 )

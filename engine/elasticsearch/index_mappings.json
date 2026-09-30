@@ -302,7 +302,6 @@
           "type": "keyword"
         },
         "messages": {
-          "type": "nested",
           "properties": {
             "rule_code": {
               "type": "keyword"
