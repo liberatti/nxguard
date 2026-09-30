@@ -12,7 +12,10 @@ engine/elasticsearch/
 ├── index_settings.json           # Definição isolada de settings (shards, replicas, refresh)
 ├── index_mappings.json           # Definição isolada de mappings dos campos
 └── dashboards/
-    └── dashboards_export.ndjson  # Pacote consolidado NDJSON com todas as visualizações, index pattern e dashboard
+    └── dashboards_export.ndjson  # Pacote consolidado NDJSON com visualizações, buscas e dashboards:
+                                  #  1. NxGuard - [Logs] Web Traffic
+                                  #  2. NxGuard - [Security] Inspection, GeoIP & RBL Intelligence
+                                  #  3. NxGuard - [Transactions] Raw Events Stream
 ```
 
 ---

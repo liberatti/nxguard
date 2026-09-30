@@ -227,3 +227,4 @@ def renew_certificates():
             f"{crt_c1} SELF certificates renewed, {crt_c2} MANAGED certificates renewed"
         )
         update_main_config()
+

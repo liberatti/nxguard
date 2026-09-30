@@ -86,6 +86,9 @@ class LogParserTool:
         conf: Dict[str, Any],
     ):
         """Flushes correlated transaction records to DuckDB or Elasticsearch."""
+        logger.info(
+            f"[{service_name}] Flushing {len(records)} merged transactions to {mode}"
+        )
         if not records:
             return
         if mode in ["elasticsearch"]:
@@ -103,77 +106,178 @@ class LogParserTool:
         )
 
     @classmethod
-    def _correlate_access_batch(
+    def _get_logging_config(cls) -> tuple[str, Optional[Dict[str, Any]]]:
+        """Fetches active logging mode and configuration."""
+        try:
+            with ConfigDao() as config_dao:
+                active = config_dao.get_active()
+                if active and isinstance(active, dict):
+                    logging_conf = active.get("logging") or {}
+                    return logging_conf.get("mode", "local"), logging_conf
+        except Exception as e:
+            logger.debug(f"Error reading logging config: {e}")
+        return "local", None
+
+    @classmethod
+    def _combine(
+        cls,
+        access: Optional[Dict[str, Any]],
+        audit: Optional[Dict[str, Any]],
+        default_service: Dict[str, str],
+    ) -> Dict[str, Any]:
+        """Combines correlated access and audit records, or formats standalone logs into transactions."""
+        if not access:
+            if not audit:
+                return {}
+            remote_ip = audit.get("source", {}).get("ip", "")
+            status_code = _to_int(
+                audit.get("http", {}).get("response", {}).get("status_code"), 403
+            )
+            raw_action = str(audit.get("action") or "").lower()
+            if raw_action in ("deny", "block", "blocked"):
+                action = "blocked"
+            elif raw_action in ("warn", "warning"):
+                action = "warn"
+            elif raw_action in ("allow", "allowed", "pass", "passed"):
+                action = "allowed"
+            else:
+                action = _resolve_status_code(status_code)
+
+            merged = {
+                "logtime": audit.get("logtime") or datetime.now(),
+                "unique_id": audit.get("unique_id", ""),
+                "server_id": audit.get("server_id") or _SERVER_ID,
+                "service": default_service,
+                "route_name": "-",
+                "upstream": None,
+                "sensor": None,
+                "action": action,
+                "limit_req_status": "",
+                "geoip_status": "",
+                "rbl_status": "",
+                "rate_limit": {},
+                "geoip": {},
+                "reputation": {},
+                "mtls": {},
+                "score": _to_int(audit.get("score", 0)),
+                "user_agent": {"family": "Unknown", "major": 0, "minor": 0},
+                "source": {
+                    "ip": remote_ip,
+                    "port": _to_int(audit.get("source", {}).get("port", 0)),
+                    "geo": {"ip": remote_ip, "country": "--"},
+                },
+                "destination": {
+                    "ip": audit.get("destination", {}).get("ip", ""),
+                    "port": _to_int(audit.get("destination", {}).get("port", 443), 443),
+                    "host": "",
+                },
+                "http": {},
+                "audit": audit.get("audit", {}),
+            }
+        else:
+            merged = dict(access)
+            if not merged.get("service") or not merged["service"].get("name"):
+                merged["service"] = default_service
+
+            if not audit:
+                return merged
+
+            if audit.get("audit"):
+                merged["audit"] = audit["audit"]
+            if audit.get("score"):
+                merged["score"] = max(merged.get("score", 0), audit["score"])
+
+            audit_act = str(audit.get("action") or "").lower()
+            merged_act = str(merged.get("action") or "").lower()
+            if audit_act in ("deny", "blocked", "block") or merged_act in (
+                "deny",
+                "blocked",
+                "block",
+            ):
+                merged["action"] = "blocked"
+            elif audit_act in ("warn", "warning") or merged_act in ("warn", "warning"):
+                merged["action"] = "warn"
+
+            status_code = _to_int(
+                merged.get("http", {}).get("response", {}).get("status_code"), 0
+            ) or _to_int(
+                audit.get("http", {}).get("response", {}).get("status_code"), 0
+            )
+            if status_code in (403, 406):
+                merged["action"] = "blocked"
+
+        if audit and audit.get("http"):
+            aud_http = audit["http"]
+            acc_http = merged.setdefault("http", {})
+            aud_req = aud_http.get("request") or {}
+            if aud_req:
+                acc_req = acc_http.setdefault("request", {})
+                if aud_req.get("headers"):
+                    acc_req["headers"] = _parse_headers(aud_req["headers"])
+                if aud_req.get("method") and not acc_req.get("method"):
+                    acc_req["method"] = aud_req["method"]
+                if aud_req.get("uri") and not acc_req.get("uri"):
+                    acc_req["uri"] = aud_req["uri"]
+
+            aud_resp = aud_http.get("response") or {}
+            if aud_resp:
+                acc_resp = acc_http.setdefault("response", {})
+                if aud_resp.get("headers"):
+                    acc_resp["headers"] = _parse_headers(aud_resp["headers"])
+                if aud_resp.get("status_code") and not acc_resp.get("status_code"):
+                    acc_resp["status_code"] = _to_int(aud_resp["status_code"], 200)
+
+        return merged
+
+    @classmethod
+    def _correlate(
         cls,
         access_records: List[Dict[str, Any]],
-        pending_access: Dict[str, tuple[Dict[str, Any], float]],
-        pending_audit: Dict[str, tuple[Dict[str, Any], float]],
+        audit_records: List[Dict[str, Any]],
+        pending_access: Dict[str, tuple[Dict[str, Any], int]],
+        pending_audit: Dict[str, tuple[Dict[str, Any], int]],
         service_name: str,
         default_service: Dict[str, str],
-        now: float,
         merged_records: List[Dict[str, Any]],
+        max_retries: int = 30,
     ):
+        """Correlates access and audit logs, increments retry counter, and flushes items exceeding max_retries."""
         for acc in access_records:
             uid = acc.get("unique_id")
-            if uid:
-                if uid in pending_audit:
-                    aud, _ = pending_audit.pop(uid)
-                    merged_records.append(
-                        cls._combine_access_and_audit(acc, aud, service_name)
-                    )
-                else:
-                    pending_access[uid] = (acc, now)
+            if not uid:
+                merged_records.append(cls._combine(acc, None, default_service))
+            elif uid in pending_audit:
+                aud, _ = pending_audit.pop(uid)
+                merged_records.append(cls._combine(acc, aud, default_service))
             else:
-                if not acc.get("service") or not acc["service"].get("name"):
-                    acc["service"] = default_service
-                merged_records.append(acc)
+                pending_access[uid] = (acc, 0)
 
-    @classmethod
-    def _correlate_audit_batch(
-        cls,
-        audit_records: List[Dict[str, Any]],
-        pending_access: Dict[str, tuple[Dict[str, Any], float]],
-        pending_audit: Dict[str, tuple[Dict[str, Any], float]],
-        service_name: str,
-        now: float,
-        merged_records: List[Dict[str, Any]],
-    ):
         for aud in audit_records:
             uid = aud.get("unique_id")
-            if uid:
-                if uid in pending_access:
-                    acc, _ = pending_access.pop(uid)
-                    merged_records.append(
-                        cls._combine_access_and_audit(acc, aud, service_name)
-                    )
-                else:
-                    pending_audit[uid] = (aud, now)
+            if not uid:
+                merged_records.append(cls._combine(None, aud, default_service))
+            elif uid in pending_access:
+                acc, _ = pending_access.pop(uid)
+                merged_records.append(cls._combine(acc, aud, default_service))
             else:
-                merged_records.append(cls._audit_to_transaction(aud, service_name))
+                pending_audit[uid] = (aud, 0)
 
-    @classmethod
-    def _flush_expired_pending(
-        cls,
-        pending_access: Dict[str, tuple[Dict[str, Any], float]],
-        pending_audit: Dict[str, tuple[Dict[str, Any], float]],
-        service_name: str,
-        default_service: Dict[str, str],
-        now: float,
-        merged_records: List[Dict[str, Any]],
-    ):
-        expired_access = [
-            uid for uid, (_, t) in pending_access.items() if now - t > 4.0
-        ]
-        for uid in expired_access:
-            acc, _ = pending_access.pop(uid)
-            if not acc.get("service") or not acc["service"].get("name"):
-                acc["service"] = default_service
-            merged_records.append(acc)
+        # Increment retry counter and flush items exceeding max_retries
+        for uid, (acc, count) in list(pending_access.items()):
+            new_count = count + 1
+            if new_count > max_retries:
+                pending_access.pop(uid)
+                merged_records.append(cls._combine(acc, None, default_service))
+            else:
+                pending_access[uid] = (acc, new_count)
 
-        expired_audit = [uid for uid, (_, t) in pending_audit.items() if now - t > 4.0]
-        for uid in expired_audit:
-            aud, _ = pending_audit.pop(uid)
-            merged_records.append(cls._audit_to_transaction(aud, service_name))
+        for uid, (aud, count) in list(pending_audit.items()):
+            new_count = count + 1
+            if new_count > max_retries:
+                pending_audit.pop(uid)
+                merged_records.append(cls._combine(None, aud, default_service))
+            else:
+                pending_audit[uid] = (aud, new_count)
 
     @classmethod
     def merge_transactions(cls, service_name: str, cache):
@@ -183,23 +287,15 @@ class LogParserTool:
         logger.info(f"Start merge transaction for {service_name}")
 
         default_service = cls._get_service_info(service_name)
-        pending_access: Dict[str, tuple[Dict[str, Any], float]] = {}
-        pending_audit: Dict[str, tuple[Dict[str, Any], float]] = {}
-        logging_mode = "local"
-        logging_conf = None
+        pending_access: Dict[str, tuple[Dict[str, Any], int]] = {}
+        pending_audit: Dict[str, tuple[Dict[str, Any], int]] = {}
+        logging_mode, logging_conf = "local", None
         last_config_check = 0.0
 
         while getattr(cur_thread, "active", True):
             now = time.time()
             if now - last_config_check >= 2.0:
-                try:
-                    with ConfigDao() as config_dao:
-                        active = config_dao.get_active()
-                        if active and isinstance(active, dict):
-                            logging_conf = active.get("logging") or {}
-                            logging_mode = logging_conf.get("mode", "local")
-                except Exception as e:
-                    logger.debug(f"Error reading logging config: {e}")
+                logging_mode, logging_conf = cls._get_logging_config()
                 last_config_check = now
 
             access_records = cache.drain("ACCESS", max_items=2500)
@@ -212,30 +308,15 @@ class LogParserTool:
                         f"[{service_name}] Ingesting Access: {len(access_records)}, Audit: {len(audit_records)}"
                     )
 
-                cls._correlate_access_batch(
+                cls._correlate(
                     access_records,
-                    pending_access,
-                    pending_audit,
-                    service_name,
-                    default_service,
-                    now,
-                    merged_records,
-                )
-                cls._correlate_audit_batch(
                     audit_records,
                     pending_access,
                     pending_audit,
                     service_name,
-                    now,
-                    merged_records,
-                )
-                cls._flush_expired_pending(
-                    pending_access,
-                    pending_audit,
-                    service_name,
                     default_service,
-                    now,
                     merged_records,
+                    max_retries=30,
                 )
 
                 if merged_records:
@@ -253,22 +334,25 @@ class LogParserTool:
 
         # Graceful final flush upon thread exit
         try:
-            final_records = []
-            for acc in cache.drain_all("ACCESS"):
-                if not acc.get("service") or not acc["service"].get("name"):
-                    acc["service"] = default_service
-                final_records.append(acc)
-            for aud in cache.drain_all("AUDIT"):
-                final_records.append(cls._audit_to_transaction(aud, service_name))
-
-            for uid, (acc, _) in pending_access.items():
-                if not acc.get("service") or not acc["service"].get("name"):
-                    acc["service"] = default_service
-                final_records.append(acc)
+            final_records = (
+                [
+                    cls._combine(acc, None, default_service)
+                    for acc in cache.drain_all("ACCESS")
+                ]
+                + [
+                    cls._combine(None, aud, default_service)
+                    for aud in cache.drain_all("AUDIT")
+                ]
+                + [
+                    cls._combine(acc, None, default_service)
+                    for acc, _ in pending_access.values()
+                ]
+                + [
+                    cls._combine(None, aud, default_service)
+                    for aud, _ in pending_audit.values()
+                ]
+            )
             pending_access.clear()
-
-            for uid, (aud, _) in pending_audit.items():
-                final_records.append(cls._audit_to_transaction(aud, service_name))
             pending_audit.clear()
 
             if final_records:
@@ -281,149 +365,6 @@ class LogParserTool:
             )
 
         logger.info(f"Merge transaction stopped for {service_name}")
-
-    @classmethod
-    def _combine_access_and_audit(
-        cls, access: Dict[str, Any], audit: Dict[str, Any], service_name: str = None
-    ) -> Dict[str, Any]:
-        """Combines correlated access and audit records into a single transaction."""
-        merged = dict(access)
-        if "audit" in audit and audit["audit"]:
-            merged["audit"] = audit["audit"]
-        if "score" in audit and audit["score"]:
-            merged["score"] = max(merged.get("score", 0), audit["score"])
-
-        # Determine action (blocked takes precedence over warn over allowed)
-        audit_act = str(audit.get("action") or "").lower()
-        merged_act = str(merged.get("action") or "").lower()
-        if audit_act in ("deny", "blocked", "block") or merged_act in (
-            "deny",
-            "blocked",
-            "block",
-        ):
-            merged["action"] = "blocked"
-        elif audit_act in ("warn", "warning") or merged_act in ("warn", "warning"):
-            merged["action"] = "warn"
-
-        # Check status code for blocking
-        status_code = _to_int(
-            merged.get("http", {}).get("response", {}).get("status_code"), 0
-        )
-        if not status_code and "http" in audit:
-            status_code = _to_int(
-                audit.get("http", {}).get("response", {}).get("status_code"), 0
-            )
-        if status_code in (403, 406):
-            merged["action"] = "blocked"
-
-        if service_name and (
-            not merged.get("service") or not merged["service"].get("name")
-        ):
-            merged["service"] = cls._get_service_info(service_name)
-
-        if "http" in audit and audit["http"]:
-            aud_http = audit["http"]
-            acc_http = merged.get("http", {})
-            if "request" in aud_http and aud_http["request"]:
-                if "headers" in aud_http["request"] and aud_http["request"]["headers"]:
-                    acc_http.setdefault("request", {})["headers"] = _parse_headers(
-                        aud_http["request"]["headers"]
-                    )
-                if "method" in aud_http["request"] and not acc_http.get(
-                    "request", {}
-                ).get("method"):
-                    acc_http.setdefault("request", {})["method"] = aud_http["request"][
-                        "method"
-                    ]
-                if "uri" in aud_http["request"] and not acc_http.get("request", {}).get(
-                    "uri"
-                ):
-                    acc_http.setdefault("request", {})["uri"] = aud_http["request"][
-                        "uri"
-                    ]
-
-            if "response" in aud_http and aud_http["response"]:
-                if (
-                    "headers" in aud_http["response"]
-                    and aud_http["response"]["headers"]
-                ):
-                    acc_http.setdefault("response", {})["headers"] = _parse_headers(
-                        aud_http["response"]["headers"]
-                    )
-                if "status_code" in aud_http["response"] and not acc_http.get(
-                    "response", {}
-                ).get("status_code"):
-                    acc_http.setdefault("response", {})["status_code"] = _to_int(
-                        aud_http["response"]["status_code"], 200
-                    )
-
-            merged["http"] = acc_http
-
-        return merged
-
-    @classmethod
-    def _audit_to_transaction(
-        cls, audit: Dict[str, Any], service_name: str
-    ) -> Dict[str, Any]:
-        """Converts an unmatched standalone audit record into a full transaction."""
-        remote_ip = audit.get("source", {}).get("ip", "")
-        geo_info = {"ip": remote_ip, "country": "--"}
-
-        status_code = _to_int(
-            audit.get("http", {}).get("response", {}).get("status_code"), 403
-        )
-        raw_action = str(audit.get("action") or "").lower()
-        if raw_action in ("deny", "block", "blocked"):
-            action = "blocked"
-        elif raw_action in ("warn", "warning"):
-            action = "warn"
-        elif raw_action in ("allow", "allowed", "pass", "passed"):
-            action = "allowed"
-        else:
-            action = _resolve_status_code(status_code)
-
-        http_data = audit.get("http", {})
-        if "request" in http_data and "headers" in http_data["request"]:
-            http_data["request"]["headers"] = _parse_headers(
-                http_data["request"]["headers"]
-            )
-        if "response" in http_data and "headers" in http_data["response"]:
-            http_data["response"]["headers"] = _parse_headers(
-                http_data["response"]["headers"]
-            )
-
-        record = {
-            "logtime": audit.get("logtime") or datetime.now(),
-            "unique_id": audit.get("unique_id", ""),
-            "server_id": audit.get("server_id") or _SERVER_ID,
-            "service": cls._get_service_info(service_name),
-            "route_name": "-",
-            "upstream": None,
-            "sensor": None,
-            "action": action,
-            "limit_req_status": "",
-            "geoip_status": "",
-            "rbl_status": "",
-            "rate_limit": {},
-            "geoip": {},
-            "reputation": {},
-            "mtls": {},
-            "score": _to_int(audit.get("score", 0)),
-            "user_agent": {"family": "Unknown", "major": 0, "minor": 0},
-            "source": {
-                "ip": remote_ip,
-                "port": _to_int(audit.get("source", {}).get("port", 0)),
-                "geo": geo_info,
-            },
-            "destination": {
-                "ip": audit.get("destination", {}).get("ip", ""),
-                "port": _to_int(audit.get("destination", {}).get("port", 443), 443),
-                "host": "",
-            },
-            "http": http_data,
-            "audit": audit.get("audit", {}),
-        }
-        return record
 
     @classmethod
     def _parse_and_cache_lines(cls, log_type: str, lines: List[str], cache):
@@ -533,123 +474,6 @@ class LogParserTool:
         return line
 
     @classmethod
-    def _parse_audit_message_item(cls, m: Any, record: dict) -> dict:
-        """Parses a single ModSecurity audit log message item and extracts rule scores."""
-        d = m.get("details", {}) if isinstance(m, dict) else {}
-        rule_id = str(d.get("ruleId") or "")
-        msg = {
-            "text": m.get("message", ""),
-            "message": m.get("message", ""),
-            "rule_code": rule_id,
-            "ruleId": rule_id,
-            "match": d.get("match", ""),
-            "reference": d.get("reference", ""),
-            "data": d.get("data", ""),
-            "severity": str(d.get("severity") or ""),
-            "file": d.get("file", ""),
-            "lineNumber": str(d.get("lineNumber") or ""),
-            "tags": d.get("tags", []),
-            "ver": d.get("ver", ""),
-            "rev": d.get("rev", ""),
-            "maturity": str(d.get("maturity") or ""),
-            "accuracy": str(d.get("accuracy") or ""),
-        }
-
-        if rule_id in ("949110", "959100", "980130", "99"):
-            data_str = str(d.get("data") or m.get("message") or "")
-            score_match = SCORE_REGEX.search(data_str)
-            if score_match:
-                try:
-                    record["score"] = max(
-                        record.get("score", 0),
-                        int(score_match.group(1)),
-                    )
-                except (ValueError, TypeError):
-                    pass
-            elif data_str.isdigit():
-                record["score"] = max(record.get("score", 0), int(data_str))
-        return msg
-
-    @classmethod
-    def _calculate_fallback_score(cls, messages: list) -> int:
-        """Calculates fallback anomaly score from message severities when no explicit score exists."""
-        return sum(
-            SEVERITY_WEIGHTS.get(str(m.get("severity") or ""), 0) for m in messages
-        )
-
-    @classmethod
-    def _parse_audit_transaction(cls, trn: dict) -> dict:
-        """Parses a raw ModSecurity transaction dictionary into normalized format."""
-        trn_server_id = trn.get("server_id") or _SERVER_ID
-        unique_id = trn.get("unique_id") or trn.get("uniqueid")
-
-        record = {
-            "logtime": _parse_logtime(trn.get("time_stamp")),
-            "server_id": trn_server_id,
-            "unique_id": unique_id,
-            "destination": {
-                "ip": trn.get("host_ip", ""),
-                "port": _to_int(trn.get("host_port", 443), 443),
-            },
-            "source": {
-                "ip": trn.get("client_ip", ""),
-                "port": _to_int(trn.get("client_port", 0), 0),
-            },
-        }
-
-        http = {}
-        if "request" in trn:
-            request_raw = trn.pop("request")
-            http["version"] = str(request_raw.get("http_version", "1.1"))
-            http["request"] = {
-                "method": str(request_raw.get("method", "GET")),
-                "uri": str(request_raw.get("uri", "")),
-                "headers": _parse_headers(request_raw.get("headers", {})),
-            }
-
-        action = "allowed"
-        if "response" in trn:
-            response_raw = trn.pop("response")
-            status_code = _to_int(response_raw.get("http_code", 200), 200)
-            http["response"] = {
-                "status_code": status_code,
-                "headers": _parse_headers(response_raw.get("headers", {})),
-            }
-            action = _resolve_status_code(status_code)
-        record.update({"http": http, "action": action})
-
-        audit = {}
-        if "producer" in trn:
-            producer_raw = trn.pop("producer")
-            audit.update(
-                {
-                    "engine": producer_raw.get("modsecurity", ""),
-                    "connector": producer_raw.get("connector", ""),
-                    "mode": producer_raw.get("secrules_engine", ""),
-                    "components": producer_raw.get("components", []),
-                }
-            )
-
-        if "messages" in trn:
-            messages_raw = trn.pop("messages") or []
-            messages = [cls._parse_audit_message_item(m, record) for m in messages_raw]
-            audit["messages"] = messages
-
-            if "score" not in record and messages:
-                record["score"] = cls._calculate_fallback_score(messages)
-
-            if str(record.get("action") or "").lower() not in (
-                "blocked",
-                "deny",
-                "block",
-            ):
-                if any(str(m.get("severity") or "") in ("2", "3") for m in messages):
-                    record["action"] = "blocked"
-
-        record.update({"audit": audit})
-        return record
-
-    @classmethod
     def audit_log(cls, line: str) -> Optional[List[Dict[str, Any]]]:
         """Parses a line containing ModSecurity audit log JSON objects."""
         dtos = cls._extract_json_objects(line)
@@ -659,9 +483,121 @@ class LogParserTool:
         records = []
         for dto in dtos:
             try:
-                if "transaction" in dto:
-                    record = cls._parse_audit_transaction(dto.pop("transaction"))
-                    records.append(record)
+                if "transaction" not in dto:
+                    continue
+                trn = dto.pop("transaction")
+                trn_server_id = trn.get("server_id") or _SERVER_ID
+                unique_id = trn.get("unique_id") or trn.get("uniqueid")
+
+                record = {
+                    "logtime": _parse_logtime(trn.get("time_stamp")),
+                    "server_id": trn_server_id,
+                    "unique_id": unique_id,
+                    "destination": {
+                        "ip": trn.get("host_ip", ""),
+                        "port": _to_int(trn.get("host_port", 443), 443),
+                    },
+                    "source": {
+                        "ip": trn.get("client_ip", ""),
+                        "port": _to_int(trn.get("client_port", 0), 0),
+                    },
+                }
+
+                http = {}
+                if "request" in trn:
+                    request_raw = trn.pop("request")
+                    http["version"] = str(request_raw.get("http_version", "1.1"))
+                    http["request"] = {
+                        "method": str(request_raw.get("method", "GET")),
+                        "uri": str(request_raw.get("uri", "")),
+                        "headers": _parse_headers(request_raw.get("headers", {})),
+                    }
+
+                action = "allowed"
+                if "response" in trn:
+                    response_raw = trn.pop("response")
+                    status_code = _to_int(response_raw.get("http_code", 200), 200)
+                    http["response"] = {
+                        "status_code": status_code,
+                        "headers": _parse_headers(response_raw.get("headers", {})),
+                    }
+                    action = _resolve_status_code(status_code)
+                record.update({"http": http, "action": action})
+
+                audit = {}
+                if "producer" in trn:
+                    producer_raw = trn.pop("producer")
+                    audit.update(
+                        {
+                            "engine": producer_raw.get("modsecurity", ""),
+                            "connector": producer_raw.get("connector", ""),
+                            "mode": producer_raw.get("secrules_engine", ""),
+                            "components": producer_raw.get("components", []),
+                        }
+                    )
+
+                if "messages" in trn:
+                    messages_raw = trn.pop("messages") or []
+                    messages = []
+                    for m in messages_raw:
+                        d = m.get("details", {}) if isinstance(m, dict) else {}
+                        rule_id = str(d.get("ruleId") or "")
+                        msg = {
+                            "text": m.get("message", ""),
+                            "message": m.get("message", ""),
+                            "rule_code": rule_id,
+                            "ruleId": rule_id,
+                            "match": d.get("match", ""),
+                            "reference": d.get("reference", ""),
+                            "data": d.get("data", ""),
+                            "severity": str(d.get("severity") or ""),
+                            "file": d.get("file", ""),
+                            "lineNumber": str(d.get("lineNumber") or ""),
+                            "tags": d.get("tags", []),
+                            "ver": d.get("ver", ""),
+                            "rev": d.get("rev", ""),
+                            "maturity": str(d.get("maturity") or ""),
+                            "accuracy": str(d.get("accuracy") or ""),
+                        }
+
+                        if rule_id in ("949110", "959100", "980130", "99"):
+                            data_str = str(d.get("data") or m.get("message") or "")
+                            score_match = SCORE_REGEX.search(data_str)
+                            if score_match:
+                                try:
+                                    record["score"] = max(
+                                        record.get("score", 0),
+                                        int(score_match.group(1)),
+                                    )
+                                except (ValueError, TypeError):
+                                    pass
+                            elif data_str.isdigit():
+                                record["score"] = max(
+                                    record.get("score", 0), int(data_str)
+                                )
+
+                        messages.append(msg)
+
+                    audit["messages"] = messages
+
+                    if "score" not in record and messages:
+                        record["score"] = sum(
+                            SEVERITY_WEIGHTS.get(str(m.get("severity") or ""), 0)
+                            for m in messages
+                        )
+
+                    if str(record.get("action") or "").lower() not in (
+                        "blocked",
+                        "deny",
+                        "block",
+                    ):
+                        if any(
+                            str(m.get("severity") or "") in ("2", "3") for m in messages
+                        ):
+                            record["action"] = "blocked"
+
+                record.update({"audit": audit})
+                records.append(record)
             except Exception as e:
                 logger.error(f"Error parsing audit log item: {e}")
         return records if records else None
