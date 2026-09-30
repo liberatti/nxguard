@@ -11,7 +11,12 @@
       "type": "keyword"
     },
     "action": {
-      "type": "keyword"
+      "type": "keyword",
+      "fields": {
+        "keyword": {
+          "type": "keyword"
+        }
+      }
     },
     "limit_req_status": {
       "type": "keyword"
@@ -26,7 +31,12 @@
       "type": "keyword"
     },
     "route_name": {
-      "type": "keyword"
+      "type": "keyword",
+      "fields": {
+        "keyword": {
+          "type": "keyword"
+        }
+      }
     },
     "route": {
       "properties": {
@@ -34,7 +44,12 @@
           "type": "keyword"
         },
         "name": {
-          "type": "keyword"
+          "type": "keyword",
+          "fields": {
+            "keyword": {
+              "type": "keyword"
+            }
+          }
         }
       }
     },
@@ -47,7 +62,12 @@
           "type": "keyword"
         },
         "name": {
-          "type": "keyword"
+          "type": "keyword",
+          "fields": {
+            "keyword": {
+              "type": "keyword"
+            }
+          }
         }
       }
     },
@@ -57,7 +77,12 @@
           "type": "keyword"
         },
         "name": {
-          "type": "keyword"
+          "type": "keyword",
+          "fields": {
+            "keyword": {
+              "type": "keyword"
+            }
+          }
         }
       }
     },
@@ -67,14 +92,24 @@
           "type": "keyword"
         },
         "name": {
-          "type": "keyword"
+          "type": "keyword",
+          "fields": {
+            "keyword": {
+              "type": "keyword"
+            }
+          }
         }
       }
     },
     "user_agent": {
       "properties": {
         "family": {
-          "type": "keyword"
+          "type": "keyword",
+          "fields": {
+            "keyword": {
+              "type": "keyword"
+            }
+          }
         },
         "major": {
           "type": "integer"
@@ -98,7 +133,12 @@
               "type": "ip"
             },
             "country": {
-              "type": "keyword"
+              "type": "keyword",
+              "fields": {
+                "keyword": {
+                  "type": "keyword"
+                }
+              }
             }
           }
         }
@@ -113,7 +153,12 @@
           "type": "integer"
         },
         "host": {
-          "type": "keyword"
+          "type": "keyword",
+          "fields": {
+            "keyword": {
+              "type": "keyword"
+            }
+          }
         }
       }
     },
@@ -175,7 +220,12 @@
           "type": "float"
         },
         "referer": {
-          "type": "keyword"
+          "type": "keyword",
+          "fields": {
+            "keyword": {
+              "type": "keyword"
+            }
+          }
         },
         "request_line": {
           "type": "text"
@@ -183,10 +233,20 @@
         "request": {
           "properties": {
             "method": {
-              "type": "keyword"
+              "type": "keyword",
+              "fields": {
+                "keyword": {
+                  "type": "keyword"
+                }
+              }
             },
             "uri": {
-              "type": "keyword"
+              "type": "keyword",
+              "fields": {
+                "keyword": {
+                  "type": "keyword"
+                }
+              }
             },
             "bytes": {
               "type": "long"

@@ -11,7 +11,7 @@ from nxcore.controllers.base_controller import (
 from nxcore.common_utils import replace_tz
 from api.repository.transaction_repository import TransactionDao
 from api.repository.config_repository import ConfigDao
-from api.services.opensearch_service import OpenSearchService
+from api.services.elasticsearch_service import ElasticsearchService
 import config as env_config
 from config import DATETIME_FMT, COMMON_LOG_FORMATS
 
@@ -23,8 +23,8 @@ def get_transaction_storage():
         with ConfigDao() as config_dao:
             active = config_dao.get_active()
             logging_conf = active.get("logging") if active else {}
-            if logging_conf and logging_conf.get("mode") == "opensearch":
-                return OpenSearchService(logging_conf)
+            if logging_conf and logging_conf.get("mode") in ["elasticsearch"]:
+                return ElasticsearchService(logging_conf)
     except Exception:
         pass
     return TransactionDao()
@@ -34,7 +34,9 @@ def parse_date(date_str, fallback):
     if not date_str:
         return fallback
     # Fast path for ISO-8601 strings
-    if "T" in date_str or (len(date_str) >= 10 and date_str[4] == "-" and date_str[7] == "-"):
+    if "T" in date_str or (
+        len(date_str) >= 10 and date_str[4] == "-" and date_str[7] == "-"
+    ):
         try:
             return replace_tz(datetime.fromisoformat(date_str.replace("Z", "+00:00")))
         except Exception:

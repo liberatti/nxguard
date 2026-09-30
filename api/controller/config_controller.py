@@ -14,7 +14,7 @@ import engine.admin as c_admin
 import engine.build as c_builder
 from api.repository.config_repository import ChangeDao, ConfigDao
 from api.repository.upstream_repository import NodeStatusDao
-from api.services.opensearch_service import OpenSearchService
+from api.services.elasticsearch_service import ElasticsearchService
 from api.tasks import renew_certificates
 
 routes = Blueprint("config", __name__)
@@ -84,9 +84,9 @@ def apply_config() -> Response:
                 logging_conf = (
                     active_cfg.get("logging") if isinstance(active_cfg, dict) else None
                 )
-                os_service = OpenSearchService(logging_conf=logging_conf)
-                if os_service.is_configured():
-                    os_service.ensure_structures(force=True)
+                es_service = ElasticsearchService(logging_conf=logging_conf)
+                if es_service.is_configured():
+                    es_service.ensure_structures(force=True)
 
                 change_dao.delete_all()
 

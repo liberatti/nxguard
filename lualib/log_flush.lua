@@ -118,7 +118,7 @@ local function flush_to_remote(opts)
     })
 
     if not res then
-        ngx.log(ngx.ERR, "Failed to send logs to remote OpenSearch: ", err)
+        ngx.log(ngx.ERR, "Failed to send logs to remote Elasticsearch: ", err)
         return
     end
 
@@ -127,7 +127,7 @@ local function flush_to_remote(opts)
             log_buffer:delete(key)
         end
     else
-        ngx.log(ngx.ERR, "Remote OpenSearch flush returned status ", res.status, ": ", res.body or "")
+        ngx.log(ngx.ERR, "Remote Elasticsearch flush returned status ", res.status, ": ", res.body or "")
     end
 end
 

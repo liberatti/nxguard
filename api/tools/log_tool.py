@@ -11,7 +11,7 @@ from nxcore.middleware.logging_manager import logger
 from api.repository.transaction_repository import TransactionDao
 from api.repository.config_repository import ConfigDao
 from api.repository.upstream_repository import NodeStatusDao
-from api.services.opensearch_service import OpenSearchService
+from api.services.elasticsearch_service import ElasticsearchService
 from config import (
     SCORE_REGEX,
     SEVERITY_WEIGHTS,
@@ -85,12 +85,12 @@ class LogParserTool:
         mode: str,
         conf: Dict[str, Any],
     ):
-        """Flushes correlated transaction records to DuckDB or OpenSearch."""
+        """Flushes correlated transaction records to DuckDB or Elasticsearch."""
         if not records:
             return
-        if mode == "opensearch":
-            with OpenSearchService(conf) as os_service:
-                os_service.persist_many(records)
+        if mode in ["elasticsearch"]:
+            with ElasticsearchService(conf) as es_service:
+                es_service.persist_many(records)
         else:
             with TransactionDao() as model:
                 for record in records:

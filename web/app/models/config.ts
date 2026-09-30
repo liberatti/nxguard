@@ -1,9 +1,14 @@
 
 export interface ConfigLogging {
-    mode: 'local' | 'opensearch' | string;
+    mode: 'local' | 'elasticsearch' | string;
     type?: string;
-    url?: string;
+    index_url?: string;
+    index_username?: string;
+    index_password?: string;
     dashboard_url?: string;
+    dashboard_username?: string;
+    dashboard_password?: string;
+    url?: string;
     username?: string;
     password?: string;
 }

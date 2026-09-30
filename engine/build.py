@@ -140,7 +140,7 @@ def init_from_data(data_dir=None, data_file="init-data.json", data=None):
             if "logging" not in conf or conf.get("logging") is None:
                 conf["logging"] = {
                     "mode": "local",
-                    "type": "opensearch",
+                    "type": "elasticsearch",
                     "url": "",
                     "username": "",
                     "password": "",

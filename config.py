@@ -23,6 +23,17 @@ BASE_PATH = "/opt/nxguard"
 LUA_LIBS_PATH = f"{BASE_PATH}/luajit/share/lua/5.1"
 DB_PATH = os.environ.get("BASE_PATH", "/data")
 INDEX_TEMPLATE_NAME = "nxguard_trn_template"
+ELASTICSEARCH_SEED_DIR = (
+    os.path.join(BASE_PATH, "admin", "engine", "elasticsearch")
+    if os.path.isdir(os.path.join(BASE_PATH, "admin", "engine", "elasticsearch"))
+    else (
+        os.path.join(BASE_PATH, "engine", "elasticsearch")
+        if os.path.isdir(os.path.join(BASE_PATH, "engine", "elasticsearch"))
+        else os.path.abspath(
+            os.path.join(os.path.dirname(__file__), "engine", "elasticsearch")
+        )
+    )
+)
 
 ENGINE_BASE = f"{BASE_PATH}/nginx"
 ENGINE_VERSION = "1.27.1"

@@ -40,6 +40,7 @@ Output only raw code or standard unified diffs designed for immediate manual rev
 - **Scope Boundary:** Modify exclusively the logic requested. Never reformat, reorder, or rename unrelated code.
 - **Dependency Guard:** Do not introduce third-party dependencies unless explicitly requested.
 - **No Artifacts:** Never leave debug statements (`print`, breakpoint), ad-hoc logging, or extraneous comments.
+- **No Re-exports / Shims:** When moving or refactoring modules/classes, never create re-export shim files for backward compatibility. Update all imports directly across the codebase.
 
 ---
 

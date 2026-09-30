@@ -1,33 +1,33 @@
-import {Component, OnInit} from '@angular/core';
-import {Router, RouterModule} from '@angular/router';
-import {AbstractControl, FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
-import {MatTableModule} from '@angular/material/table';
-import {ConfigService} from 'app/services/config.service';
-import {NotificationService} from 'app/services/notification.service';
-import {CommonModule} from '@angular/common';
-import {MatMomentDateModule} from '@angular/material-moment-adapter';
-import {MatButtonModule} from '@angular/material/button';
-import {MatCardModule} from '@angular/material/card';
-import {MatChipsModule} from '@angular/material/chips';
-import {MatFormFieldModule} from '@angular/material/form-field';
-import {MatIconModule} from '@angular/material/icon';
-import {MatInputModule} from '@angular/material/input';
-import {MatListModule} from '@angular/material/list';
-import {MatMenuModule} from '@angular/material/menu';
-import {MatPaginatorModule} from '@angular/material/paginator';
-import {MatProgressBarModule} from '@angular/material/progress-bar';
-import {MatSelectModule} from '@angular/material/select';
-import {MatSidenavModule} from '@angular/material/sidenav';
-import {MatSortModule} from '@angular/material/sort';
-import {MatTooltipModule} from '@angular/material/tooltip';
-import {TranslatePipe} from '@ngx-translate/core';
-import {MatSlideToggleModule} from '@angular/material/slide-toggle';
-import {Config} from 'app/models/config';
-import {MatTabsModule} from '@angular/material/tabs';
-import {MatExpansionModule} from '@angular/material/expansion';
-import {OAuthService} from "../../services/oauth.service";
+import { Component, OnInit } from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
+import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { MatTableModule } from '@angular/material/table';
+import { ConfigService } from 'app/services/config.service';
+import { NotificationService } from 'app/services/notification.service';
+import { CommonModule } from '@angular/common';
+import { MatMomentDateModule } from '@angular/material-moment-adapter';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatListModule } from '@angular/material/list';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatSortModule } from '@angular/material/sort';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { TranslatePipe } from '@ngx-translate/core';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { Config } from 'app/models/config';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { OAuthService } from "../../services/oauth.service";
 
-import {TextFieldModule} from '@angular/cdk/text-field';
+import { TextFieldModule } from '@angular/cdk/text-field';
 
 @Component({
     selector: 'app-config-form',
@@ -56,11 +56,13 @@ export class ConfigFormComponent implements OnInit {
         dns_resolver: new FormControl<string>(''),
         logging: new FormGroup({
             mode: new FormControl<string>('local'),
-            type: new FormControl<string>('opensearch'),
-            url: new FormControl<string>(''),
+            type: new FormControl<string>('elasticsearch'),
+            index_url: new FormControl<string>(''),
+            index_username: new FormControl<string>(''),
+            index_password: new FormControl<string>(''),
             dashboard_url: new FormControl<string>(''),
-            username: new FormControl<string>(''),
-            password: new FormControl<string>(''),
+            dashboard_username: new FormControl<string>(''),
+            dashboard_password: new FormControl<string>(''),
         }),
         purge: new FormGroup({
             enabled: new FormControl<boolean>(false),
@@ -94,7 +96,25 @@ export class ConfigFormComponent implements OnInit {
                 ca_private: c.ca_private,
                 acme_directory_url: c.acme_directory_url,
                 dns_resolver: c.dns_resolver,
-                logging: c.logging || { mode: 'local', type: 'opensearch', url: '', dashboard_url: '', username: '', password: '' },
+                logging: c.logging ? {
+                    mode: c.logging.mode || 'local',
+                    type: c.logging.type || 'elasticsearch',
+                    index_url: c.logging.index_url ?? c.logging.url ?? '',
+                    index_username: c.logging.index_username ?? c.logging.username ?? '',
+                    index_password: c.logging.index_password ?? c.logging.password ?? '',
+                    dashboard_url: c.logging.dashboard_url ?? '',
+                    dashboard_username: c.logging.dashboard_username ?? '',
+                    dashboard_password: c.logging.dashboard_password ?? ''
+                } : {
+                    mode: 'local',
+                    type: 'elasticsearch',
+                    index_url: '',
+                    index_username: '',
+                    index_password: '',
+                    dashboard_url: '',
+                    dashboard_username: '',
+                    dashboard_password: ''
+                },
                 purge: c.purge || {},
                 ipxa: c.ipxa || {}
             });

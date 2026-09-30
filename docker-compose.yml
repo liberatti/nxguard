@@ -1,6 +1,6 @@
 volumes:
   ipxa_data:
-  opensearch_data:
+  elasticsearch_data:
 
 services:
   ipxa:
@@ -20,35 +20,64 @@ services:
           memory: 256M
       replicas: 1
 
-  opensearch:
-    image: opensearchproject/opensearch:latest
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
     environment:
       - discovery.type=single-node
-      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
-      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=NxGuard@2026
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - xpack.security.enabled=true
+      - xpack.security.http.ssl.enabled=false
+      - ELASTIC_PASSWORD=NxGuard@2026
     volumes:
-      - opensearch_data:/usr/share/opensearch/data
+      - elasticsearch_data:/usr/share/elasticsearch/data
     ports:
       - "9200:9200"
-      - "9600:9600"
+      - "9300:9300"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s -u elastic:NxGuard@2026 http://localhost:9200/_cluster/health | grep -vq '\"status\":\"red\"'"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
 
-  dashboard:
-    image: opensearchproject/opensearch-dashboards:latest
+#  kibana-setup:
+#    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+#    command: >
+#      bash -c '
+#        echo "Waiting for Elasticsearch to become ready...";
+#        until curl -s -u "elastic:NxGuard@2026" "http://elasticsearch:9200" > /dev/null; do
+#          sleep 3;
+#        done;
+#        echo "Configuring kibana_system password...";
+#        curl -s -u "elastic:NxGuard@2026" -X POST "http://elasticsearch:9200/_security/user/kibana_system/_password" -H "Content-Type: application/json" -d "{\"password\":\"NxGuard@2026\"}";
+#        echo "kibana_system password configured successfully.";
+#      '
+#    depends_on:
+#      elasticsearch:
+#        condition: service_healthy
+#    restart: "no"
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.11.0
     ports:
       - "5601:5601"
     environment:
-      - 'OPENSEARCH_HOSTS=["https://opensearch:9200"]'
-      - OPENSEARCH_USERNAME=admin
-      - OPENSEARCH_PASSWORD=NxGuard@2026
-      - OPENSEARCH_SSL_VERIFICATIONMODE=none
-      - DATA_SOURCE_ENABLED=true
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - ELASTICSEARCH_USERNAME=kibana_system
+      - ELASTICSEARCH_PASSWORD=NxGuard@2026
     depends_on:
-      - opensearch
+      elasticsearch:
+        condition: service_healthy
+#      kibana-setup:
+#        condition: service_completed_successfully
 
   api:
     build:
       context: .
     image: liberatti/nxguard:latest
+    depends_on:
+      - ipxa
+      - elasticsearch
+      - kibana
     environment:
       - TELEMETRY_ENABLE=false
       - SECURITY_ENABLED=false

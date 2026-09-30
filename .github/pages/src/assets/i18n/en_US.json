@@ -84,8 +84,8 @@
       "STEP_1_DESC": "Traffic arrives on OpenResty worker threads. Custom Lua sensors perform rapid dynamic bypass, geo-filtering, and initial validation before invoking inspection.",
       "STEP_2_TITLE": "ModSecurity v3 & CRS Rules",
       "STEP_2_DESC": "Comprehensive payload parsing and regex evaluation against OWASP Core Rule Set 4.25+. Granular per-route sensor policies enable dynamic rule tailoring without reloads.",
-      "STEP_3_TITLE": "IPXA Feeds & DuckDB / OpenSearch Telemetry",
-      "STEP_3_DESC": "Continuous threat intelligence synchronized with IPXA. Audit logs and transactions are merged for local analytics via DuckDB or streamed in bulk to OpenSearch/Elasticsearch clusters with automated index templates."
+      "STEP_3_TITLE": "IPXA Feeds & DuckDB / Elasticsearch Telemetry",
+      "STEP_3_DESC": "Continuous threat intelligence synchronized with IPXA. Audit logs and transactions are merged for local analytics via DuckDB or streamed in bulk to Elasticsearch/Kibana clusters with automated index templates."
     },
     "FEATURES": {
       "BADGE": "Capabilities",
@@ -111,8 +111,8 @@
         "BADGE": "Zero External DB",
         "DESCRIPTION": "Columnar storage engine embedded directly in the admin backend for rapid real-time transaction query, aggregation, and auditing."
       },
-      "OPENSEARCH": {
-        "TITLE": "OpenSearch & SIEM Integration",
+      "ELASTICSEARCH": {
+        "TITLE": "Elasticsearch & SIEM Integration",
         "BADGE": "Index Templates & Bulk",
         "DESCRIPTION": "Continuous WAF transaction and audit log streaming via Bulk API, with automatic provisioning of typed mappings and index templates (nxguard_trn*)."
       },

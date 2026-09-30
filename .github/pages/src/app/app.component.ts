@@ -136,9 +136,9 @@ export class AppComponent {
     },
     {
       icon: 'storage',
-      titleKey: 'PAGES.FEATURES.OPENSEARCH.TITLE',
-      badgeKey: 'PAGES.FEATURES.OPENSEARCH.BADGE',
-      descriptionKey: 'PAGES.FEATURES.OPENSEARCH.DESCRIPTION'
+      titleKey: 'PAGES.FEATURES.ELASTICSEARCH.TITLE',
+      badgeKey: 'PAGES.FEATURES.ELASTICSEARCH.BADGE',
+      descriptionKey: 'PAGES.FEATURES.ELASTICSEARCH.DESCRIPTION'
     },
     {
       icon: 'vpn_key',

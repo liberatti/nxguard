@@ -36,7 +36,7 @@ api/
 - **Diretrizes:**
   - Conter classes de schema (`*Schema`), validações de campos (`@validates_schema`, `@pre_load`, `@post_load`), formatos e tipos.
   - **Zero Persistência:** Não deve conter comandos SQL, DDLs, instâncias diretas de conexão ou manipulação de banco de dados.
-  - Para compatibilidade retroativa, os arquivos de modelo podem reexportar os DAOs correspondentes da camada `repository/`.
+  - **Zero Re-exports:** Schemas e DTOs devem ser definidos diretamente sem arquivos de re-exportação para outras camadas.
 
 ### 2.3. `repository/` (Camada de Persistência)
 - **Responsabilidade:** Acesso exclusivo ao banco de dados (DuckDB), execução de queries SQL, paginação, filtros e DDLs.
@@ -50,7 +50,7 @@ api/
 ### 2.4. `services/` (Camada de Negócio e Integrações)
 - **Responsabilidade:** Orquestração de regras de negócio, transformações complexas e integrações com serviços externos.
 - **Diretrizes:**
-  - Integrar com serviços externos (ex.: OpenSearch, ElasticSearch, APIs remotas, DNS, IPXA).
+  - Integrar com serviços externos (ex.: elasticsearch, ElasticSearch, APIs remotas, DNS, IPXA).
   - Coordenar operações envolvendo múltiplos repositórios ou transações cruzadas.
   - Isolar regras de negócio e algoritmos que não pertencem ao ciclo de vida HTTP nem à persistência pura.
 
@@ -93,3 +93,4 @@ api/
 - **Lógica de Negócio no Model:** Não coloque regras de negócio, chamadas de rede ou I/O dentro dos schemas em `model/`.
 - **Tratamento HTTP no Repository:** Nunca acesse `flask.request`, `flask.g` ou lance respostas HTTP a partir de `repository/` ou `services/`.
 - **Hardcode de Configuração:** Use sempre `config.py` e variáveis de ambiente centralizadas para caminhos, portas e credenciais.
+- **Re-exports e Shims:** Nunca crie ou mantenha arquivos/módulos intermediários de re-exportação apenas para retrocompatibilidade ao mover componentes. Refatore todos os imports na origem e elimine o arquivo obsoleto.

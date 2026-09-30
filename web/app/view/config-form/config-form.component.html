@@ -135,37 +135,50 @@
                                             <mat-label>{{ 'CONFIG_PAGE.LOGGING_MODE' | translate }}</mat-label>
                                             <mat-select formControlName="mode" id="logging-mode-select">
                                                 <mat-option value="local">{{ 'CONFIG_PAGE.LOGGING_MODE_LOCAL' | translate }}</mat-option>
-                                                <mat-option value="opensearch">{{ 'CONFIG_PAGE.LOGGING_MODE_OPENSEARCH' | translate }}</mat-option>
+                                                <mat-option value="elasticsearch">{{ 'CONFIG_PAGE.LOGGING_MODE_ELASTICSEARCH' | translate }}</mat-option>
                                             </mat-select>
                                             <mat-icon matSuffix class="field-icon">tune</mat-icon>
                                             <mat-hint>{{ 'CONFIG_PAGE.LOGGING_MODE_HINT' | translate }}</mat-hint>
                                         </mat-form-field>
                                     </div>
 
-                                    @if (form.get('logging.mode')?.value === 'opensearch') {
+                                    @if (form.get('logging.mode')?.value === 'elasticsearch') {
                                     <div class="policy-fields">
                                         <div class="fields-grid">
                                             <mat-form-field class="full-width">
-                                                <mat-label>{{ 'CONFIG_PAGE.CLUSTER_URL' | translate }}</mat-label>
-                                                <input matInput formControlName="url" id="logging-url-input" placeholder="http://opensearch:9200">
+                                                <mat-label>{{ 'CONFIG_PAGE.INDEX_URL' | translate }}</mat-label>
+                                                <input matInput formControlName="index_url" id="logging-index-url-input" placeholder="http://elasticsearch:9200">
                                                 <mat-icon matSuffix class="field-icon">dns</mat-icon>
-                                                <mat-hint>{{ 'CONFIG_PAGE.LOGGING_URL_HINT' | translate }}</mat-hint>
+                                                <mat-hint>{{ 'CONFIG_PAGE.INDEX_URL_HINT' | translate }}</mat-hint>
                                             </mat-form-field>
 
                                             <mat-form-field class="full-width">
                                                 <mat-label>{{ 'CONFIG_PAGE.LOGGING_TYPE' | translate }}</mat-label>
                                                 <mat-select formControlName="type" id="logging-type-select">
-                                                    <mat-option value="opensearch">OpenSearch</mat-option>
                                                     <mat-option value="elasticsearch">Elasticsearch</mat-option>
                                                 </mat-select>
                                                 <mat-icon matSuffix class="field-icon">category</mat-icon>
                                             </mat-form-field>
                                         </div>
 
+                                        <div class="fields-grid">
+                                            <mat-form-field class="full-width">
+                                                <mat-label>{{ 'CONFIG_PAGE.INDEX_USERNAME' | translate }}</mat-label>
+                                                <input matInput formControlName="index_username" id="logging-index-username-input">
+                                                <mat-icon matSuffix class="field-icon">person</mat-icon>
+                                            </mat-form-field>
+
+                                            <mat-form-field class="full-width">
+                                                <mat-label>{{ 'CONFIG_PAGE.INDEX_PASSWORD' | translate }}</mat-label>
+                                                <input matInput type="password" formControlName="index_password" id="logging-index-password-input">
+                                                <mat-icon matSuffix class="field-icon">lock</mat-icon>
+                                            </mat-form-field>
+                                        </div>
+
                                         <div class="fields-grid-single">
                                             <mat-form-field class="full-width">
                                                 <mat-label>{{ 'CONFIG_PAGE.DASHBOARD_URL' | translate }}</mat-label>
-                                                <input matInput formControlName="dashboard_url" id="logging-dashboard-url-input" placeholder="http://opensearch-dashboards:5601">
+                                                <input matInput formControlName="dashboard_url" id="logging-dashboard-url-input" placeholder="http://kibana:5601">
                                                 <mat-icon matSuffix class="field-icon">dashboard</mat-icon>
                                                 <mat-hint>{{ 'CONFIG_PAGE.DASHBOARD_URL_HINT' | translate }}</mat-hint>
                                             </mat-form-field>
@@ -173,15 +186,15 @@
 
                                         <div class="fields-grid">
                                             <mat-form-field class="full-width">
-                                                <mat-label>{{ 'CONFIG_PAGE.CLUSTER_USER' | translate }}</mat-label>
-                                                <input matInput formControlName="username" id="logging-username-input">
-                                                <mat-icon matSuffix class="field-icon">person</mat-icon>
+                                                <mat-label>{{ 'CONFIG_PAGE.DASHBOARD_USERNAME' | translate }}</mat-label>
+                                                <input matInput formControlName="dashboard_username" id="logging-dashboard-username-input">
+                                                <mat-icon matSuffix class="field-icon">person_outline</mat-icon>
                                             </mat-form-field>
 
                                             <mat-form-field class="full-width">
-                                                <mat-label>{{ 'CONFIG_PAGE.CLUSTER_PASS' | translate }}</mat-label>
-                                                <input matInput type="password" formControlName="password" id="logging-password-input">
-                                                <mat-icon matSuffix class="field-icon">lock</mat-icon>
+                                                <mat-label>{{ 'CONFIG_PAGE.DASHBOARD_PASSWORD' | translate }}</mat-label>
+                                                <input matInput type="password" formControlName="dashboard_password" id="logging-dashboard-password-input">
+                                                <mat-icon matSuffix class="field-icon">lock_outline</mat-icon>
                                             </mat-form-field>
                                         </div>
                                     </div>

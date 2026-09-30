@@ -5,19 +5,21 @@ class ConfigArchiveSchema(Schema):
     enabled = fields.Boolean()
     archive_after = fields.Integer()  # minutes
     purge_after = fields.Integer()  # days
-    type = fields.String()  # elastic_search, opensearch, syslog
+    type = fields.String()  # elasticsearch, syslog
     url = fields.String()
     username = fields.String()
     password = fields.String()
 
 
 class ConfigLoggingSchema(Schema):
-    mode = fields.String()  # local, opensearch
+    mode = fields.String()  # local, elasticsearch
     type = fields.String(allow_none=True)
-    url = fields.String(allow_none=True)
+    index_url = fields.String(allow_none=True)
+    index_username = fields.String(allow_none=True)
+    index_password = fields.String(allow_none=True)
     dashboard_url = fields.String(allow_none=True)
-    username = fields.String(allow_none=True)
-    password = fields.String(allow_none=True)
+    dashboard_username = fields.String(allow_none=True)
+    dashboard_password = fields.String(allow_none=True)
 
 
 class ConfigPurgeSchema(Schema):
