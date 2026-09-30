@@ -1,3 +1,4 @@
+import ipaddress
 import json
 import os
 import threading
@@ -30,6 +31,18 @@ from config import (
     TZ,
 )
 
+
+def _is_ip(val: Any) -> bool:
+    """Checks if a string is a valid IPv4 or IPv6 address."""
+    if not val or val in ("-", "--", "None", "null", "undefined"):
+        return False
+    try:
+        ipaddress.ip_address(str(val).strip())
+        return True
+    except (ValueError, TypeError):
+        return False
+
+
 class LogParserTool:
     """High-performance log parsing, normalization, file watching, and correlation tool."""
 
@@ -57,13 +70,15 @@ class LogParserTool:
 
         try:
             remote_ip = dto.get("remote_addr", "")
+            server_addr = dto.get("server_addr", "")
             geoip_dto = dto.get("geoip") or {}
             country_code = geoip_dto.get("country_code") or "--"
             if country_code in ("None", "null", ""):
                 country_code = "--"
 
+            clean_remote_ip = remote_ip if _is_ip(remote_ip) else None
             geo_info = {
-                "ip": remote_ip,
+                "ip": clean_remote_ip,
                 "country": country_code,
             }
 
@@ -101,7 +116,14 @@ class LogParserTool:
             score = _to_int(reputation_dto.get("score", 0))
 
             host_header = dto.get("host", "")
-            host_ip = host_header.split(":")[0] if host_header else ""
+            host_name = host_header.split(":")[0] if host_header else ""
+            dest_ip = None
+            if _is_ip(server_addr):
+                dest_ip = server_addr
+            elif host_header:
+                possible_ip = host_name
+                if _is_ip(possible_ip):
+                    dest_ip = possible_ip
 
             req_method = dto.get("method") or "GET"
             req_uri = ""
@@ -138,14 +160,14 @@ class LogParserTool:
                 "score": score,
                 "user_agent": _parse_agent(dto.get("user_agent", "")),
                 "source": {
-                    "ip": remote_ip,
+                    "ip": clean_remote_ip,
                     "port": _to_int(dto.get("remote_port", 0)),
                     "geo": geo_info,
                 },
                 "destination": {
-                    "ip": host_ip,
+                    "ip": dest_ip,
                     "port": _to_int(dto.get("server_port", 443), 443),
-                    "host": host_header,
+                    "host": host_name,
                 },
                 "http": {
                     "duration": _to_float(dto.get("duration", 0.0)),
@@ -542,6 +564,9 @@ class LogParserTool:
             if not audit:
                 return {}
             remote_ip = audit.get("source", {}).get("ip", "")
+            clean_remote_ip = remote_ip if _is_ip(remote_ip) else None
+            dest_ip = audit.get("destination", {}).get("ip", "")
+            clean_dest_ip = dest_ip if _is_ip(dest_ip) else None
             status_code = _to_int(
                 audit.get("http", {}).get("response", {}).get("status_code"), 403
             )
@@ -574,12 +599,12 @@ class LogParserTool:
                 "score": _to_int(audit.get("score", 0)),
                 "user_agent": {"family": "Unknown", "major": 0, "minor": 0},
                 "source": {
-                    "ip": remote_ip,
+                    "ip": clean_remote_ip,
                     "port": _to_int(audit.get("source", {}).get("port", 0)),
-                    "geo": {"ip": remote_ip, "country": "--"},
+                    "geo": {"ip": clean_remote_ip, "country": "--"},
                 },
                 "destination": {
-                    "ip": audit.get("destination", {}).get("ip", ""),
+                    "ip": clean_dest_ip,
                     "port": _to_int(audit.get("destination", {}).get("port", 443), 443),
                     "host": "",
                 },
@@ -593,6 +618,11 @@ class LogParserTool:
 
         if not audit:
             return merged
+
+        if audit.get("destination"):
+            aud_dest = audit["destination"]
+            if not merged.get("destination", {}).get("ip") and _is_ip(aud_dest.get("ip")):
+                merged.setdefault("destination", {})["ip"] = aud_dest["ip"]
 
         if audit.get("audit"):
             merged["audit"] = audit["audit"]

@@ -18,8 +18,9 @@ local log_data = {
         name = ngx.var.upstream or "-",
         target = ngx.var.upstream_addr or "-"
     },
-    host = ngx.var.http_host or "-",
+    host = ngx.var.host or ngx.var.http_host or "-",
     remote_addr = ngx.var.remote_addr or "-",
+    server_addr = ngx.var.server_addr or "-",
     remote_port = tonumber(ngx.var.remote_port) or 0,
     server_port = tonumber(ngx.var.server_port) or 0,
     request_line = ngx.var.request or "-",

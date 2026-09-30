@@ -41,22 +41,22 @@ services:
       timeout: 10s
       retries: 30
 
-#  kibana-setup:
-#    image: docker.elastic.co/elasticsearch/elasticsearch:9.5.4
-#    command: >
-#      bash -c '
-#        echo "Waiting for Elasticsearch to become ready...";
-#        until curl -s -u "elastic:NxGuard@2026" "http://elasticsearch:9200" > /dev/null; do
-#          sleep 3;
-#        done;
-#        echo "Configuring kibana_system password...";
-#        curl -s -u "elastic:NxGuard@2026" -X POST "http://elasticsearch:9200/_security/user/kibana_system/_password" -H "Content-Type: application/json" -d "{\"password\":\"NxGuard@2026\"}";
-#        echo "kibana_system password configured successfully.";
-#      '
-#    depends_on:
-#      elasticsearch:
-#        condition: service_healthy
-#    restart: "no"
+  kibana-setup:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.5.4
+    command: >
+      bash -c '
+        echo "Waiting for Elasticsearch to become ready...";
+        until curl -s -u "elastic:NxGuard@2026" "http://elasticsearch:9200" > /dev/null; do
+          sleep 3;
+        done;
+        echo "Configuring kibana_system password...";
+        curl -s -u "elastic:NxGuard@2026" -X POST "http://elasticsearch:9200/_security/user/kibana_system/_password" -H "Content-Type: application/json" -d "{\"password\":\"NxGuard@2026\"}";
+        echo "kibana_system password configured successfully.";
+      '
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    restart: "no"
 
   kibana:
     image: docker.elastic.co/kibana/kibana:9.5.4
@@ -70,8 +70,8 @@ services:
     depends_on:
       elasticsearch:
         condition: service_healthy
-#      kibana-setup:
-#        condition: service_completed_successfully
+      kibana-setup:
+        condition: service_completed_successfully
 
   api:
     build:

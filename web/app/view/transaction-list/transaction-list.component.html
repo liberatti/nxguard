@@ -206,7 +206,7 @@
                                     <div class="detail-item">
                                         <label>Destination Host</label>
                                         <span>{{ element.destination.host || element.destination.ip }}{{
-                                            element.destination.port ? ':' + element.destination.port : '' }}</span>
+                                            element.destination.port && !(element.destination.host && element.destination.host.includes(':')) ? ':' + element.destination.port : '' }}</span>
                                     </div>
                                     }
                                     @if (element.upstream) {

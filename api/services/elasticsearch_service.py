@@ -1,3 +1,4 @@
+import ipaddress
 import json
 import requests
 import urllib3
@@ -168,6 +169,29 @@ class ElasticsearchService:
                 doc["reputation"] = {"action": "", "score": int(doc["reputation"])}
 
     @classmethod
+    def _normalize_ip_fields(cls, doc: Dict[str, Any]):
+        """Ensures IP fields are valid IP addresses or None to avoid Elasticsearch mapper_parsing_exception."""
+        for path in (("source", "ip"), ("source", "geo", "ip"), ("destination", "ip")):
+            target = doc
+            for p in path[:-1]:
+                if isinstance(target, dict):
+                    target = target.get(p)
+                else:
+                    target = None
+                    break
+            if isinstance(target, dict):
+                leaf = path[-1]
+                val = target.get(leaf)
+                if val and val not in ("-", "--", "None", "null", ""):
+                    try:
+                        ipaddress.ip_address(str(val).strip())
+                        target[leaf] = str(val).strip()
+                    except (ValueError, TypeError):
+                        target[leaf] = None
+                else:
+                    target[leaf] = None
+
+    @classmethod
     def _format_doc(cls, record: Dict[str, Any]) -> Dict[str, Any]:
         doc = dict(record)
         doc.pop("_id", None)
@@ -179,6 +203,7 @@ class ElasticsearchService:
         cls._normalize_route(doc)
         cls._normalize_geo(doc)
         cls._normalize_reputation(doc)
+        cls._normalize_ip_fields(doc)
         return doc
 
     def persist(self, record: Dict[str, Any]) -> bool:
@@ -207,8 +232,9 @@ class ElasticsearchService:
             doc = self._format_doc(record)
             target_index = self.get_target_index(record=record)
             action_meta = {"index": {"_index": target_index}}
-            if doc.get("unique_id"):
-                action_meta["index"]["_id"] = doc["unique_id"]
+            uid = doc.get("unique_id")
+            if uid and str(uid).strip() not in ("-", "null", "undefined", ""):
+                action_meta["index"]["_id"] = str(uid).strip()
             bulk_lines.append(json.dumps(action_meta))
             bulk_lines.append(json.dumps(doc, default=str))
 
@@ -224,6 +250,26 @@ class ElasticsearchService:
                 verify=False,
             )
             if res.status_code in (200, 201):
+                try:
+                    res_data = res.json()
+                except Exception:
+                    res_data = {}
+                if res_data.get("errors"):
+                    err_samples = []
+                    for item in res_data.get("items", []):
+                        for action_res in item.values():
+                            if isinstance(action_res, dict) and "error" in action_res:
+                                err_samples.append(
+                                    f"ID {action_res.get('_id')}: {action_res.get('status')} - {action_res.get('error', {}).get('reason')}"
+                                )
+                                if len(err_samples) >= 3:
+                                    break
+                        if len(err_samples) >= 3:
+                            break
+                    logger.error(
+                        f"Elasticsearch bulk flush had errors! Samples: {'; '.join(err_samples)}"
+                    )
+                    return False
                 logger.debug(f"Successfully sent {len(records)} records to Elasticsearch ({endpoint})")
                 return True
             logger.error(f"Elasticsearch bulk flush returned status {res.status_code}: {res.text}")
