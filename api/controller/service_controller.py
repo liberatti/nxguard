@@ -102,6 +102,8 @@ def search() -> Response:
     )
     with ServiceDao() as dao:
         result = dao.search(query=query, pagination=get_pagination())
+        for service in result["data"]:
+            service.pop("certificate", None)
         return (
             response_data(result, dao.pageSchema)
             if result["metadata"]["total_elements"] > 0

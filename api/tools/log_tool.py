@@ -370,7 +370,6 @@ class LogParserTool:
 
             try:
                 with open(file_path, "r", encoding="utf-8", errors="replace") as file:
-                    logger.info(f"Opened {file_path} for continuous {log_type} tailing")
                     if initial_open:
                         if initial_file_existed:
                             file.seek(0, os.SEEK_END)
