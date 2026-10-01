@@ -1,8 +1,6 @@
-from flask import Blueprint, make_response, Response
+from flask import Blueprint, Response
 
-from nxcore.controllers.base_controller import (
-    response_error_404
-)
+from nxcore.controllers.base_controller import response_error_404
 
 from api.repository.acme_repository import ChallengeDao
 
@@ -24,7 +22,7 @@ def get_config(key: str) -> Response:
     with ChallengeDao() as model:
         result = model.get_by_key(key)
         if result:
-            response = make_response(result["content"], 200)
-            response.mimetype = "text/plain"
-            return response
+            # ACME HTTP-01 challenge requires raw text/plain response (RFC 8555)
+            # nosemgrep: python.flask.security.audit.xss.make-response-with-unknown-content.make-response-with-unknown-content
+            return Response(result["content"], status=200, mimetype="text/plain")
         return response_error_404()

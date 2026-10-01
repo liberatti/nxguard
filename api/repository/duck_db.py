@@ -8,6 +8,25 @@ from nxcore.middleware.logging_manager import logger
 from nxcore.repository.schemas.page_meta_schema import PageMetaSchema
 
 
+def validate_identifier(name: str) -> str:
+    """
+    Validates that a SQL identifier (table, sequence, or column name)
+    contains only valid alphanumeric and underscore characters.
+    """
+    if not isinstance(name, str) or not re.fullmatch(r"^[a-zA-Z_][a-zA-Z0-9_]*$", name):
+        raise ValueError(f"Invalid or unsafe SQL identifier: '{name}'")
+    return name
+
+
+def quote_identifier(name: str) -> str:
+    """
+    Validates and safely quotes a SQL identifier with double quotes.
+    """
+    valid_name = validate_identifier(name)
+    escaped = valid_name.replace('"', '""')
+    return f'"{escaped}"'
+
+
 class DuckDAO:
     """
     Data Access Object for DuckDB.
@@ -36,7 +55,7 @@ class DuckDAO:
             auto_commit (bool, optional): Whether to commit changes automatically. Defaults to True.
             db_name (str, optional): Database filename. Defaults to "app.duckdb".
         """
-        self.table_name = table_name
+        self.table_name = quote_identifier(table_name)
         self.schema = schema() if schema else None
         self.pageSchema = None
         self.db_path = db_path
@@ -186,6 +205,7 @@ class DuckDAO:
         cursor = self.conn.cursor()
         logger.debug(self._interpolate_sql(sql, params))
         try:
+            # nosemgrep: python.sqlalchemy.security.sqlalchemy-execute-raw-query.sqlalchemy-execute-raw-query
             cursor.execute(sql, params)
             if fetch:
                 columns = [col[0] for col in cursor.description]
@@ -290,7 +310,7 @@ class DuckDAO:
         vo = self.from_dict(vo)
         if not vo:
             return True
-        keys = ", ".join([f"{k} = ?" for k in vo.keys()])
+        keys = ", ".join([f"{quote_identifier(k)} = ?" for k in vo.keys()])
         sql = f"UPDATE {self.table_name} SET {keys} WHERE _id = ?"
         values = list(vo.values()) + [_id]
         self._query(sql, values)
@@ -309,13 +329,14 @@ class DuckDAO:
             any: The last inserted ID.
         """
         vo = self.from_dict(vo)
-        keys = ", ".join(vo.keys())
+        keys = ", ".join([quote_identifier(k) for k in vo.keys()])
         values_placeholder = ", ".join(["?"] * len(vo))
         sql = f"INSERT INTO {self.table_name} ({keys}) VALUES ({values_placeholder}) RETURNING _id"
         values = list(vo.values())
         logger.debug(self._interpolate_sql(sql, values))
         cursor = self.conn.cursor()
         try:
+            # nosemgrep: python.sqlalchemy.security.sqlalchemy-execute-raw-query.sqlalchemy-execute-raw-query
             cursor.execute(sql, values)
             row = cursor.fetchone()
             lastrowid = row[0] if row else None
@@ -339,7 +360,7 @@ class DuckDAO:
             return False
 
         first_vo = self.from_dict(arr[0])
-        keys = ", ".join(first_vo.keys())
+        keys = ", ".join([quote_identifier(k) for k in first_vo.keys()])
         values_placeholder = ", ".join(["?"] * len(first_vo))
         sql = f"INSERT INTO {self.table_name} ({keys}) VALUES ({values_placeholder})"
 
@@ -347,6 +368,7 @@ class DuckDAO:
         logger.debug(self._interpolate_sql(sql, values_list))
         cursor = self.conn.cursor()
         try:
+            # nosemgrep: python.sqlalchemy.security.sqlalchemy-execute-raw-query.sqlalchemy-execute-raw-query
             cursor.executemany(sql, values_list)
             if self.auto_commit:
                 self.commit()
@@ -401,14 +423,18 @@ class DuckDAO:
         if "AUTOINCREMENT" in sql_upper:
             # Extract table name from: CREATE TABLE IF NOT EXISTS table_name ( ...
             match = re.search(
-                r"CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?(\w+)", sql, re.IGNORECASE
+                r"CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?([a-zA-Z_][a-zA-Z0-9_]*)",
+                sql,
+                re.IGNORECASE,
             )
             if match:
-                table_name = match.group(1)
+                table_name = validate_identifier(match.group(1))
                 seq_name = f"seq_{table_name}"
-                seq_sql = f"CREATE SEQUENCE IF NOT EXISTS {seq_name} START 1;"
+                quoted_seq = quote_identifier(seq_name)
+                seq_sql = f"CREATE SEQUENCE IF NOT EXISTS {quoted_seq} START 1;"
                 logger.debug(seq_sql)
                 cursor = self.conn.cursor()
+                # nosemgrep: python.sqlalchemy.security.sqlalchemy-execute-raw-query.sqlalchemy-execute-raw-query, python.lang.security.audit.formatted-sql-query.formatted-sql-query
                 cursor.execute(seq_sql)
                 cursor.close()
                 # Now replace AUTOINCREMENT and standard SQLite definition
@@ -420,6 +446,7 @@ class DuckDAO:
                 )
         logger.debug(sql)
         cursor = self.conn.cursor()
+        # nosemgrep: python.sqlalchemy.security.sqlalchemy-execute-raw-query.sqlalchemy-execute-raw-query, python.lang.security.audit.formatted-sql-query.formatted-sql-query
         cursor.execute(sql)
         cursor.close()
 

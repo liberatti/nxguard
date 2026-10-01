@@ -247,7 +247,7 @@ class ElasticsearchService:
                 headers=headers,
                 auth=auth,
                 timeout=5,
-                verify=False,
+                verify=config.ELASTICSEARCH_SSL_VERIFY,
             )
             if res.status_code in (200, 201):
                 try:
@@ -456,7 +456,7 @@ class ElasticsearchService:
                 headers={"Content-Type": "application/json"},
                 auth=self._get_auth(),
                 timeout=5,
-                verify=False,
+                verify=config.ELASTICSEARCH_SSL_VERIFY,
             )
             if res.status_code == 200:
                 hits = res.json().get("hits", {}).get("hits", [])
@@ -503,7 +503,7 @@ class ElasticsearchService:
                 headers={"Content-Type": "application/json"},
                 auth=self._get_auth(),
                 timeout=10,
-                verify=False,
+                verify=config.ELASTICSEARCH_SSL_VERIFY,
             )
             if res.status_code == 200:
                 data_json = res.json()
@@ -568,7 +568,7 @@ class ElasticsearchService:
                 headers={"Content-Type": "application/json"},
                 auth=self._get_auth(),
                 timeout=10,
-                verify=False,
+                verify=config.ELASTICSEARCH_SSL_VERIFY,
             )
             if res.status_code == 200:
                 buckets = res.json().get("aggregations", {}).get("by_minute", {}).get("buckets", [])

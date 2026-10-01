@@ -1,0 +1,5 @@
+# Semgrep ignore file
+# Sintaxe idêntica ao .gitignore
+
+# Ignorar relatórios estáticos e páginas geradas do GitHub Pages
+.github/pages/

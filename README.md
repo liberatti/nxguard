@@ -1,16 +1,16 @@
 # <img src="web/assets/logo.png" alt="NXGuard Logo" width="60" align="center"> NXGuard
 
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Platform](https://img.shields.io/badge/Platform-Docker-blue.svg)](https://www.docker.com/)
-[![Sponsor](https://img.shields.io/badge/Sponsor-♥-ea4aaa?style=flat&logo=github)](https://github.com/sponsors/liberatti)
-
 **NXGuard** is a high-performance, secure API Gateway and Reverse Proxy powered by **OpenResty** and **ModSecurity**. It
 provides a robust layer of protection for your API ecosystem, ensuring scalability, security, and operational
 simplicity.
 
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=flat-square)](https://opensource.org/licenses/Apache-2.0)
+![Docker Pulls](https://img.shields.io/docker/pulls/liberatti/nxguard?style=flat-square&logo=docker&logoColor=white&color=2496ED)
+[![Sponsor](https://img.shields.io/badge/Sponsor-♥-ea4aaa?style=flat-square&logo=github)](https://github.com/sponsors/liberatti)
+
 ---
 
-## 🚀 Key Features
+## 🚀 Key Features,
 
 - **🛡️ Advanced Security:** Native integration with **ModSecurity v3** for real-time threat detection (SQLi, XSS, etc.).
 - **⚡ High Performance:** Leverages the power of **OpenResty (Nginx + LuaJIT)** for sub-millisecond request processing.

@@ -24,6 +24,7 @@ DB_PATH = "/data"
 LOGS_PATH = f"{BASE_PATH}/logs"
 INDEX_TEMPLATE_NAME = "nxguard_trn_template"
 ELASTICSEARCH_SEED_DIR = f"{BASE_PATH}/admin/engine/elasticsearch"
+ELASTICSEARCH_SSL_VERIFY = bool(os.environ.get("ELASTICSEARCH_SSL_VERIFY", "false"))
 
 ENGINE_BASE = f"{BASE_PATH}/nginx"
 ENGINE_VERSION = "1.27.1"

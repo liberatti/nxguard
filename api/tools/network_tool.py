@@ -1,6 +1,6 @@
 import ipaddress
 import socket
-from typing import List, Optional
+from typing import Any, List, Optional
 
 from nxcore.middleware.logging_manager import logger
 
@@ -57,6 +57,24 @@ class NetworkTool:
             ipaddress.ip_address(ip)
             return True
         except Exception:
+            return False
+
+    @classmethod
+    def is_ip(cls, val: Any) -> bool:
+        """Checks if a value is a valid IPv4 or IPv6 address.
+
+        Args:
+            val: Value to validate as IP address
+
+        Returns:
+            True if valid IP address, False otherwise
+        """
+        if not val or val in ("-", "--", "None", "null", "undefined"):
+            return False
+        try:
+            ipaddress.ip_address(str(val).strip())
+            return True
+        except (ValueError, TypeError):
             return False
 
     @classmethod
@@ -190,3 +208,8 @@ class NetworkTool:
         else:
             raise ValueError("Unsupported IP version")
         return prefix
+
+
+# Direct aliases
+is_ip = NetworkTool.is_ip
+_is_ip = NetworkTool.is_ip

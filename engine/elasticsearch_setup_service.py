@@ -154,7 +154,7 @@ class ElasticsearchSetupService:
                 headers={"Content-Type": "application/json"},
                 auth=self._get_auth(),
                 timeout=5,
-                verify=False,
+                verify=config.ELASTICSEARCH_SSL_VERIFY,
             )
             if res.status_code == 200:
                 logger.info(
@@ -191,7 +191,7 @@ class ElasticsearchSetupService:
                 headers={"Content-Type": "application/json"},
                 auth=self._get_auth(),
                 timeout=5,
-                verify=False,
+                verify=config.ELASTICSEARCH_SSL_VERIFY,
             )
             if res.status_code in (200, 201):
                 logger.info(
@@ -217,7 +217,10 @@ class ElasticsearchSetupService:
 
         try:
             check_res = requests.get(
-                f"{url}/{idx}/_mapping", auth=auth, timeout=5, verify=False
+                f"{url}/{idx}/_mapping",
+                auth=auth,
+                timeout=5,
+                verify=config.ELASTICSEARCH_SSL_VERIFY,
             )
             if check_res.status_code == 200:
                 mapping_data = check_res.json().get(idx, {}).get("mappings", {})
@@ -236,7 +239,12 @@ class ElasticsearchSetupService:
                     logger.warning(
                         f"Elasticsearch index '{idx}' has incompatible dynamic text mappings. Recreating with seed template mappings..."
                     )
-                    requests.delete(f"{url}/{idx}", auth=auth, timeout=5, verify=False)
+                    requests.delete(
+                        f"{url}/{idx}",
+                        auth=auth,
+                        timeout=5,
+                        verify=config.ELASTICSEARCH_SSL_VERIFY,
+                    )
                 else:
                     return True
         except Exception as e:
@@ -254,7 +262,7 @@ class ElasticsearchSetupService:
                 headers={"Content-Type": "application/json"},
                 auth=auth,
                 timeout=5,
-                verify=False,
+                verify=config.ELASTICSEARCH_SSL_VERIFY,
             )
             if res.status_code in (200, 201) or (
                 res.status_code == 400
@@ -304,7 +312,7 @@ class ElasticsearchSetupService:
                 files=files,
                 auth=self._get_dashboard_auth(),
                 timeout=10,
-                verify=False,
+                verify=config.ELASTICSEARCH_SSL_VERIFY,
             )
             if res.status_code in (200, 201):
                 logger.info(
@@ -344,7 +352,7 @@ class ElasticsearchSetupService:
                 headers={"Content-Type": "application/json", "kbn-xsrf": "true"},
                 auth=self._get_dashboard_auth(),
                 timeout=5,
-                verify=False,
+                verify=config.ELASTICSEARCH_SSL_VERIFY,
             )
             if res.status_code in (200, 201, 409) or (
                 res.status_code == 400 and "conflict" in res.text.lower()

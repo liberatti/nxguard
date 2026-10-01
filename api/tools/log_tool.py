@@ -1,4 +1,3 @@
-import ipaddress
 import json
 import os
 import threading
@@ -19,6 +18,7 @@ from api.tools.http_parse_tool import (
     parse_headers as _parse_headers,
     resolve_status_code as _resolve_status_code,
 )
+from api.tools.network_tool import _is_ip
 from api.tools.type_parse_tool import (
     parse_logtime as _parse_logtime,
     to_float as _to_float,
@@ -30,17 +30,6 @@ from config import (
     SERVER_ID,
     TZ,
 )
-
-
-def _is_ip(val: Any) -> bool:
-    """Checks if a string is a valid IPv4 or IPv6 address."""
-    if not val or val in ("-", "--", "None", "null", "undefined"):
-        return False
-    try:
-        ipaddress.ip_address(str(val).strip())
-        return True
-    except (ValueError, TypeError):
-        return False
 
 
 class LogParserTool:
@@ -358,7 +347,7 @@ class LogParserTool:
                                 buffer = ""
                             if not raw_lines[-1].endswith("\n"):
                                 buffer = raw_lines.pop()
-                            batch = [l.strip() for l in raw_lines if l.strip()]
+                            batch = [line.strip() for line in raw_lines if line.strip()]
                             if batch:
                                 cls._parse_and_cache_lines(log_type, batch, cache)
                             continue
@@ -376,7 +365,7 @@ class LogParserTool:
                                     if remaining:
                                         cls._parse_and_cache_lines(
                                             log_type,
-                                            [l.strip() for l in remaining if l.strip()],
+                                            [line.strip() for line in remaining if line.strip()],
                                             cache,
                                         )
                                     break
@@ -553,6 +542,88 @@ class LogParserTool:
                     pending_dict[uid] = (rec, new_count)
 
     @classmethod
+    def _format_standalone_audit(
+        cls,
+        audit: Dict[str, Any],
+        default_service: Optional[Dict[str, str]] = None,
+    ) -> Dict[str, Any]:
+        """Formats a standalone audit record into a transaction dictionary."""
+        remote_ip = audit.get("source", {}).get("ip", "")
+        clean_remote_ip = remote_ip if _is_ip(remote_ip) else None
+        dest_ip = audit.get("destination", {}).get("ip", "")
+        clean_dest_ip = dest_ip if _is_ip(dest_ip) else None
+        status_code = _to_int(
+            audit.get("http", {}).get("response", {}).get("status_code"), 403
+        )
+        raw_action = str(audit.get("action") or "").lower()
+        if raw_action in ("deny", "block", "blocked"):
+            action = "blocked"
+        elif raw_action in ("warn", "warning"):
+            action = "warn"
+        elif raw_action in ("allow", "allowed", "pass", "passed"):
+            action = "allowed"
+        else:
+            action = _resolve_status_code(status_code)
+
+        return {
+            "logtime": audit.get("logtime") or datetime.now(),
+            "unique_id": audit.get("unique_id", ""),
+            "server_id": audit.get("server_id") or SERVER_ID,
+            "service": default_service,
+            "route_name": "-",
+            "upstream": None,
+            "sensor": None,
+            "action": action,
+            "limit_req_status": "",
+            "geoip_status": "",
+            "rbl_status": "",
+            "rate_limit": {},
+            "geoip": {},
+            "reputation": {},
+            "mtls": {},
+            "score": _to_int(audit.get("score", 0)),
+            "user_agent": {"family": "Unknown", "major": 0, "minor": 0},
+            "source": {
+                "ip": clean_remote_ip,
+                "port": _to_int(audit.get("source", {}).get("port", 0)),
+                "geo": {"ip": clean_remote_ip, "country": "--"},
+            },
+            "destination": {
+                "ip": clean_dest_ip,
+                "port": _to_int(audit.get("destination", {}).get("port", 443), 443),
+                "host": "",
+            },
+            "http": audit.get("http", {}),
+            "audit": audit.get("audit", {}),
+        }
+
+    @classmethod
+    def _merge_audit_http(
+        cls, merged: Dict[str, Any], aud_http: Optional[Dict[str, Any]]
+    ):
+        """Merges HTTP details from audit log into the accumulated transaction record."""
+        if not aud_http:
+            return
+        acc_http = merged.setdefault("http", {})
+        aud_req = aud_http.get("request") or {}
+        if aud_req:
+            acc_req = acc_http.setdefault("request", {})
+            if aud_req.get("headers"):
+                acc_req["headers"] = _parse_headers(aud_req["headers"])
+            if aud_req.get("method") and not acc_req.get("method"):
+                acc_req["method"] = aud_req["method"]
+            if aud_req.get("uri") and not acc_req.get("uri"):
+                acc_req["uri"] = aud_req["uri"]
+
+        aud_resp = aud_http.get("response") or {}
+        if aud_resp:
+            acc_resp = acc_http.setdefault("response", {})
+            if aud_resp.get("headers"):
+                acc_resp["headers"] = _parse_headers(aud_resp["headers"])
+            if aud_resp.get("status_code") and not acc_resp.get("status_code"):
+                acc_resp["status_code"] = _to_int(aud_resp["status_code"], 200)
+
+    @classmethod
     def _combine(
         cls,
         access: Optional[Dict[str, Any]],
@@ -561,56 +632,7 @@ class LogParserTool:
     ) -> Dict[str, Any]:
         """Combines correlated access and audit records, or formats standalone logs into transactions."""
         if not access:
-            if not audit:
-                return {}
-            remote_ip = audit.get("source", {}).get("ip", "")
-            clean_remote_ip = remote_ip if _is_ip(remote_ip) else None
-            dest_ip = audit.get("destination", {}).get("ip", "")
-            clean_dest_ip = dest_ip if _is_ip(dest_ip) else None
-            status_code = _to_int(
-                audit.get("http", {}).get("response", {}).get("status_code"), 403
-            )
-            raw_action = str(audit.get("action") or "").lower()
-            if raw_action in ("deny", "block", "blocked"):
-                action = "blocked"
-            elif raw_action in ("warn", "warning"):
-                action = "warn"
-            elif raw_action in ("allow", "allowed", "pass", "passed"):
-                action = "allowed"
-            else:
-                action = _resolve_status_code(status_code)
-
-            return {
-                "logtime": audit.get("logtime") or datetime.now(),
-                "unique_id": audit.get("unique_id", ""),
-                "server_id": audit.get("server_id") or SERVER_ID,
-                "service": default_service,
-                "route_name": "-",
-                "upstream": None,
-                "sensor": None,
-                "action": action,
-                "limit_req_status": "",
-                "geoip_status": "",
-                "rbl_status": "",
-                "rate_limit": {},
-                "geoip": {},
-                "reputation": {},
-                "mtls": {},
-                "score": _to_int(audit.get("score", 0)),
-                "user_agent": {"family": "Unknown", "major": 0, "minor": 0},
-                "source": {
-                    "ip": clean_remote_ip,
-                    "port": _to_int(audit.get("source", {}).get("port", 0)),
-                    "geo": {"ip": clean_remote_ip, "country": "--"},
-                },
-                "destination": {
-                    "ip": clean_dest_ip,
-                    "port": _to_int(audit.get("destination", {}).get("port", 443), 443),
-                    "host": "",
-                },
-                "http": audit.get("http", {}),
-                "audit": audit.get("audit", {}),
-            }
+            return cls._format_standalone_audit(audit, default_service) if audit else {}
 
         merged = dict(access)
         if not merged.get("service") or not merged["service"].get("name"):
@@ -648,26 +670,7 @@ class LogParserTool:
         if status_code in (403, 406):
             merged["action"] = "blocked"
 
-        if audit.get("http"):
-            aud_http = audit["http"]
-            acc_http = merged.setdefault("http", {})
-            aud_req = aud_http.get("request") or {}
-            if aud_req:
-                acc_req = acc_http.setdefault("request", {})
-                if aud_req.get("headers"):
-                    acc_req["headers"] = _parse_headers(aud_req["headers"])
-                if aud_req.get("method") and not acc_req.get("method"):
-                    acc_req["method"] = aud_req["method"]
-                if aud_req.get("uri") and not acc_req.get("uri"):
-                    acc_req["uri"] = aud_req["uri"]
-
-            aud_resp = aud_http.get("response") or {}
-            if aud_resp:
-                acc_resp = acc_http.setdefault("response", {})
-                if aud_resp.get("headers"):
-                    acc_resp["headers"] = _parse_headers(aud_resp["headers"])
-                if aud_resp.get("status_code") and not acc_resp.get("status_code"):
-                    acc_resp["status_code"] = _to_int(aud_resp["status_code"], 200)
+        cls._merge_audit_http(merged, audit.get("http"))
 
         return merged
 

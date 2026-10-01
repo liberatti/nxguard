@@ -11,7 +11,6 @@ import os
 import threading
 import time
 import traceback
-import subprocess
 import schedule
 from nxcore.middleware.logging_manager import logger, LoggingManager
 
@@ -49,11 +48,6 @@ def post_fork(server, worker):
     """Gunicorn post-fork hook initializing instance roles, tasks, and background threads."""
     is_main = os.environ.get("NXGUARD_ROLE") == "main"
     logger.info("NXGuard instance is main: %s", is_main)
-    try:
-        subprocess.run(f"sudo chmod -R 777 {_config.DB_PATH}", shell=True)
-    except Exception:
-        pass
-
     if is_main:
         if not os.path.exists(f"{_config.DB_PATH}/app.duckdb"):
             install()

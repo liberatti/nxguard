@@ -303,7 +303,6 @@ class TransactionDao(DuckDAO):
                 elif isinstance(row["service"], dict) and svc_id and "_id" not in row["service"]:
                     row["service"]["_id"] = svc_id
 
-
         return super().to_dict(row)
 
     def get_by_id(self, _id) -> Optional[Dict[str, Any]]:

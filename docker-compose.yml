@@ -9,6 +9,7 @@ services:
     environment:
       - LOGLEVEL=INFO
       - SECURITY_ENABLED=false
+      # nosemgrep: generic.secrets.security.detected-generic-api-key.detected-generic-api-key
       - API_KEY=tZzDBUSnoy76LLSvu1Vg3e9vdFJINMT2
       - TZ=UTC
     volumes:

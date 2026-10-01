@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
 import os
 import socket
-import subprocess
 import time
 import traceback
 
@@ -186,16 +185,13 @@ def update_main_config():
 def install():
     """Initializes NXGuard database schema and indexes SecLanguage rules."""
     logger.info("Installing NXGuard")
-    try:
-        subprocess.run(f"sudo chmod -R 777 {config.DB_PATH}", shell=True)
-    except Exception:
-        pass
     os.makedirs(config.DB_PATH, exist_ok=True)
-    if os.path.exists(f"{config.DB_PATH}/app.duckdb"):
+    db_file = os.path.join(config.DB_PATH, "app.duckdb")
+    if os.path.exists(db_file):
         try:
-            os.remove(f"{config.DB_PATH}/app.duckdb")
-        except Exception:
-            subprocess.run(f"sudo rm -f {config.DB_PATH}/app.duckdb", shell=True)
+            os.remove(db_file)
+        except Exception as e:
+            logger.warning(f"Failed to remove existing database file {db_file}: {e}")
     c_builder.create_db()
     seclang_indexer.index()
 
@@ -227,4 +223,3 @@ def renew_certificates():
             f"{crt_c1} SELF certificates renewed, {crt_c2} MANAGED certificates renewed"
         )
         update_main_config()
-

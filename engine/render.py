@@ -369,6 +369,8 @@ def generate(data, output_dir=config.BASE_PATH, test=False):
 
     _normalize_entities(data)
     data.update({"IS_TEST": test, "config.BASE_PATH": config.BASE_PATH})
+    # Safe: Jinja2 is used exclusively to generate Nginx/ModSecurity server configuration files, not HTML.
+    # nosemgrep: python.flask.security.xss.audit.direct-use-of-jinja2.direct-use-of-jinja2
     env = Environment(loader=FileSystemLoader("engine/templates"))
 
     conf_dir = (

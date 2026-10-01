@@ -71,4 +71,3 @@ to_int = TypeParseTool.to_int
 to_float = TypeParseTool.to_float
 parse_dt = TypeParseTool.parse_dt
 parse_logtime = TypeParseTool.parse_logtime
-

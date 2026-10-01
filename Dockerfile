@@ -118,7 +118,8 @@ COPY --from=build_admin /root/rpmbuild/RPMS/**/*.rpm /RPMS/
 
 RUN rpm -ivh /RPMS/*.rpm && rm -rf /RPMS\
  && mkdir -p /data\
- && chmod 777 /data
+ && chown -R nxguard:nxguard /data\
+ && chmod 775 /data
 
 WORKDIR /opt/nxguard/admin
 
