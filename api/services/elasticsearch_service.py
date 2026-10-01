@@ -171,7 +171,7 @@ class ElasticsearchService:
     @classmethod
     def _normalize_ip_fields(cls, doc: Dict[str, Any]):
         """Ensures IP fields are valid IP addresses or None to avoid Elasticsearch mapper_parsing_exception."""
-        for path in (("source", "ip"), ("source", "geo", "ip"), ("destination", "ip")):
+        for path in (("source", "ip"), ("destination", "ip")):
             target = doc
             for p in path[:-1]:
                 if isinstance(target, dict):
@@ -317,21 +317,25 @@ class ElasticsearchService:
         "upstream._id": "upstream._id",
         "upstream.id": "upstream._id",
         "upstream.name": "upstream.name",
-        "rbl_status": "rbl_status",
-        "geoip_status": "geoip_status",
+        "rbl_status": "reputation.action",
+        "reputation.action": "reputation.action",
+        "reputation.trusted": "reputation.trusted",
+        "reputation.score": "reputation.score",
+        "geoip_status": "geoip.action",
+        "geoip.action": "geoip.action",
         "ipxa": "ipxa",
         "route_name": "route_name",
         "route": "route_name",
         "route.name": "route_name",
         "unique_id": "unique_id",
         "score": "score",
-        "limit_req_status": "limit_req_status",
+        "limit_req_status": "rate_limit.action",
         "source_ip": "source.ip",
         "source.ip": "source.ip",
         "source_port": "source.port",
         "source.port": "source.port",
-        "country": "source.geo.country",
-        "source.geo.country": "source.geo.country",
+        "country": "geoip.country_code",
+        "source.geo.country": "geoip.country_code",
         "geoip.country_code": "geoip.country_code",
         "destination_host": "destination.host",
         "destination.host": "destination.host",

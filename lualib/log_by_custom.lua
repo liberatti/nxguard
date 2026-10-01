@@ -47,7 +47,8 @@ local log_data = {
     reputation = {
         score = tonumber(ngx.ctx.risk_score or (ngx.req.get_headers() and ngx.req.get_headers()["x-nxg-risk-score"])) or 0,
         action = ngx.ctx.reputation_action or (ngx.req.get_headers() and ngx.req.get_headers()["x-nxg-reputation-action"]),
-        trusted = (string.lower(tostring(ngx.ctx.trusted ~= nil and ngx.ctx.trusted or (ngx.req.get_headers() and ngx.req.get_headers()["x-nxg-trusted"]))) == "true")
+        trusted = (string.lower(tostring(ngx.ctx.trusted ~= nil and ngx.ctx.trusted or (ngx.req.get_headers() and ngx.req.get_headers()["x-nxg-trusted"]))) == "true"),
+        reasons = ngx.ctx.reasons or (ngx.req.get_headers() and ngx.req.get_headers()["x-nxg-reasons"])
     },
     mtls = {
         enabled = ngx.var.ssl_client_verify and true or false,

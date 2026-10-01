@@ -20,9 +20,6 @@ class TransactionDao(DuckDAO):
         "server_id",
         "service_id",
         "action",
-        "limit_req_status",
-        "geoip_status",
-        "rbl_status",
         "ipxa",
         "route_name",
         "score",
@@ -60,9 +57,6 @@ class TransactionDao(DuckDAO):
                 server_id TEXT,
                 service_id TEXT,
                 action TEXT,
-                limit_req_status TEXT,
-                geoip_status TEXT,
-                rbl_status TEXT,
                 ipxa TEXT,
                 route_name TEXT,
                 score INTEGER,
@@ -138,21 +132,27 @@ class TransactionDao(DuckDAO):
         "upstream._id": "COALESCE(json_extract_string(CAST(upstream_json AS JSON), '$._id'), json_extract_string(CAST(upstream_json AS JSON), '$.name'))",
         "upstream.id": "COALESCE(json_extract_string(CAST(upstream_json AS JSON), '$._id'), json_extract_string(CAST(upstream_json AS JSON), '$.name'))",
         "upstream.name": "COALESCE(json_extract_string(CAST(upstream_json AS JSON), '$.name'), json_extract_string(CAST(upstream_json AS JSON), '$._id'))",
-        "rbl_status": "rbl_status",
-        "geoip_status": "geoip_status",
+        "rbl_status": "json_extract_string(CAST(reputation_json AS JSON), '$.action')",
+        "reputation.action": "json_extract_string(CAST(reputation_json AS JSON), '$.action')",
+        "reputation.trusted": "TRY_CAST(json_extract_string(CAST(reputation_json AS JSON), '$.trusted') AS BOOLEAN)",
+        "reputation.score": "TRY_CAST(json_extract_string(CAST(reputation_json AS JSON), '$.score') AS INTEGER)",
+        "geoip_status": "json_extract_string(CAST(geoip_json AS JSON), '$.action')",
+        "geoip.action": "json_extract_string(CAST(geoip_json AS JSON), '$.action')",
         "ipxa": "ipxa",
         "archived": "archived",
         "route_name": "route_name",
         "unique_id": "unique_id",
         "score": "score",
-        "limit_req_status": "limit_req_status",
+        "limit_req_status": "json_extract_string(CAST(rate_limit_json AS JSON), '$.action')",
+        "rate_limit": "json_extract_string(CAST(rate_limit_json AS JSON), '$.action')",
+        "rate_limit.action": "json_extract_string(CAST(rate_limit_json AS JSON), '$.action')",
         "source_ip": "json_extract_string(CAST(source_json AS JSON), '$.ip')",
         "source.ip": "json_extract_string(CAST(source_json AS JSON), '$.ip')",
         "source_port": "TRY_CAST(json_extract_string(CAST(source_json AS JSON), '$.port') AS INTEGER)",
         "source.port": "TRY_CAST(json_extract_string(CAST(source_json AS JSON), '$.port') AS INTEGER)",
-        "country": "COALESCE(json_extract_string(CAST(source_json AS JSON), '$.geo.country'), json_extract_string(CAST(geoip_json AS JSON), '$.country_code'))",
-        "source.geo.country": "COALESCE(json_extract_string(CAST(source_json AS JSON), '$.geo.country'), json_extract_string(CAST(geoip_json AS JSON), '$.country_code'))",
-        "geoip.country_code": "COALESCE(json_extract_string(CAST(source_json AS JSON), '$.geo.country'), json_extract_string(CAST(geoip_json AS JSON), '$.country_code'))",
+        "country": "json_extract_string(CAST(geoip_json AS JSON), '$.country_code')",
+        "source.geo.country": "json_extract_string(CAST(geoip_json AS JSON), '$.country_code')",
+        "geoip.country_code": "json_extract_string(CAST(geoip_json AS JSON), '$.country_code')",
         "destination_host": "json_extract_string(CAST(destination_json AS JSON), '$.host')",
         "destination.host": "json_extract_string(CAST(destination_json AS JSON), '$.host')",
         "destination_ip": "json_extract_string(CAST(destination_json AS JSON), '$.ip')",
@@ -170,8 +170,6 @@ class TransactionDao(DuckDAO):
         "http.response.status_code": "TRY_CAST(json_extract_string(CAST(http_json AS JSON), '$.response.status_code') AS INTEGER)",
         "duration": "TRY_CAST(json_extract_string(CAST(http_json AS JSON), '$.duration') AS DOUBLE)",
         "http.duration": "TRY_CAST(json_extract_string(CAST(http_json AS JSON), '$.duration') AS DOUBLE)",
-        "rate_limit": "COALESCE(json_extract_string(CAST(rate_limit_json AS JSON), '$.action'), limit_req_status)",
-        "rate_limit.action": "COALESCE(json_extract_string(CAST(rate_limit_json AS JSON), '$.action'), limit_req_status)",
         "user_agent": "json_extract_string(CAST(user_agent_json AS JSON), '$.family')",
         "user_agent.family": "json_extract_string(CAST(user_agent_json AS JSON), '$.family')",
         "mtls_verified": "TRY_CAST(json_extract_string(CAST(mtls_json AS JSON), '$.verified') AS BOOLEAN)",
@@ -185,7 +183,9 @@ class TransactionDao(DuckDAO):
     }
 
     @classmethod
-    def _append_dict_condition(cls, expr: str, val: dict, where_clauses: List[str], params: List[Any]):
+    def _append_dict_condition(
+        cls, expr: str, val: dict, where_clauses: List[str], params: List[Any]
+    ):
         op_map = {"$ne": "!=", "$gte": ">=", "$lte": "<=", "$gt": ">", "$lt": "<"}
         for op, op_val in val.items():
             if op in op_map:
@@ -193,7 +193,9 @@ class TransactionDao(DuckDAO):
                 params.append(op_val)
             elif op in ["$like", "$contains"]:
                 where_clauses.append(f"{expr} LIKE ?")
-                params.append(f"%{op_val}%" if not str(op_val).startswith("%") else op_val)
+                params.append(
+                    f"%{op_val}%" if not str(op_val).startswith("%") else op_val
+                )
             elif op == "$in" and isinstance(op_val, list):
                 placeholders = ", ".join(["?"] * len(op_val))
                 where_clauses.append(f"{expr} IN ({placeholders})")
@@ -264,7 +266,9 @@ class TransactionDao(DuckDAO):
         ]
         for key in json_keys:
             if key in data:
-                data[f"{key}_json"] = json.dumps(data.pop(key), default=datetime_handler)
+                data[f"{key}_json"] = json.dumps(
+                    data.pop(key), default=datetime_handler
+                )
 
         cleaned = {k: v for k, v in data.items() if k in self.ALLOWED_COLUMNS}
         return super().from_dict(cleaned)
@@ -300,7 +304,11 @@ class TransactionDao(DuckDAO):
                 svc_id = row.pop("service_id", None)
                 if not row.get("service"):
                     row["service"] = {"_id": svc_id, "name": svc_id} if svc_id else None
-                elif isinstance(row["service"], dict) and svc_id and "_id" not in row["service"]:
+                elif (
+                    isinstance(row["service"], dict)
+                    and svc_id
+                    and "_id" not in row["service"]
+                ):
                     row["service"]["_id"] = svc_id
 
         return super().to_dict(row)

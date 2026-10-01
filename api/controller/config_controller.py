@@ -84,9 +84,13 @@ def apply_config() -> Response:
                 logging_conf = (
                     active_cfg.get("logging") if isinstance(active_cfg, dict) else None
                 )
-                es_service = ElasticsearchService(logging_conf=logging_conf)
-                if es_service.is_configured():
-                    es_service.ensure_structures(force=True)
+                if (
+                    isinstance(logging_conf, dict)
+                    and logging_conf.get("mode") == "elasticsearch"
+                ):
+                    es_service = ElasticsearchService(logging_conf=logging_conf)
+                    if es_service.is_configured():
+                        es_service.ensure_structures(force=True)
 
                 change_dao.delete_all()
 

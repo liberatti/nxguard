@@ -60,16 +60,27 @@ class LogParserTool:
         try:
             remote_ip = dto.get("remote_addr", "")
             server_addr = dto.get("server_addr", "")
-            geoip_dto = dto.get("geoip") or {}
-            country_code = geoip_dto.get("country_code") or "--"
+            geoip_raw = dto.get("geoip")
+            if isinstance(geoip_raw, dict):
+                geoip_dto = dict(geoip_raw)
+            elif isinstance(geoip_raw, str):
+                geoip_dto = {"country_code": geoip_raw}
+            else:
+                geoip_dto = {}
+
+            country_code = (
+                geoip_dto.get("country_code") or dto.get("country_code") or "--"
+            )
             if country_code in ("None", "null", ""):
                 country_code = "--"
 
-            clean_remote_ip = remote_ip if _is_ip(remote_ip) else None
-            geo_info = {
-                "ip": clean_remote_ip,
-                "country": country_code,
+            geoip_action = geoip_dto.get("action") or "allowed"
+            geoip_obj = {
+                "action": geoip_action,
+                "country_code": country_code,
             }
+
+            clean_remote_ip = remote_ip if _is_ip(remote_ip) else None
 
             status_code = _to_int(dto.get("status", 200), 200)
 
@@ -85,24 +96,63 @@ class LogParserTool:
             upstream_val = dto.get("upstream")
             upstream_obj = (
                 upstream_val
-                if isinstance(upstream_val, dict) and upstream_val.get("name") not in (None, "-")
+                if isinstance(upstream_val, dict)
+                and upstream_val.get("name") not in (None, "-")
                 else None
             )
 
             sensor_val = dto.get("sensor")
             sensor_obj = (
                 sensor_val
-                if isinstance(sensor_val, dict) and sensor_val.get("name") not in (None, "-")
+                if isinstance(sensor_val, dict)
+                and sensor_val.get("name") not in (None, "-")
                 else None
             )
 
-            rate_limit_dto = dto.get("rate_limit") or {}
-            limit_req_status = rate_limit_dto.get("action") or ""
-            geoip_status = geoip_dto.get("action") or ""
+            rate_limit_raw = dto.get("rate_limit")
+            if isinstance(rate_limit_raw, dict):
+                rate_limit_dto = dict(rate_limit_raw)
+            elif isinstance(rate_limit_raw, str):
+                rate_limit_dto = {"action": rate_limit_raw}
+            else:
+                rate_limit_dto = {}
 
-            reputation_dto = dto.get("reputation") or {}
-            rbl_status = reputation_dto.get("action") or ""
-            score = _to_int(reputation_dto.get("score", 0))
+            rate_limit_action = rate_limit_dto.get("action") or "allowed"
+            rate_limit_obj = {
+                "action": rate_limit_action,
+            }
+
+            reputation_raw = dto.get("reputation")
+            if isinstance(reputation_raw, dict):
+                reputation_dto = dict(reputation_raw)
+            else:
+                reputation_dto = {}
+
+            rbl_action = reputation_dto.get("action") or "allowed"
+            trusted_val = reputation_dto.get("trusted", dto.get("trusted"))
+            if isinstance(trusted_val, str):
+                trusted_bool = trusted_val.lower() == "true"
+            else:
+                trusted_bool = bool(trusted_val) if trusted_val is not None else False
+
+            reasons_val = reputation_dto.get("reasons", dto.get("reasons"))
+            if reasons_val in ("null", "None", None, ""):
+                reasons_val = []
+            elif isinstance(reasons_val, str):
+                try:
+                    reasons_val = json.loads(reasons_val)
+                except Exception:
+                    reasons_val = [reasons_val]
+
+            rep_score = _to_int(reputation_dto.get("score", dto.get("score", 0)), 0)
+
+            reputation_obj = {
+                "action": rbl_action,
+                "trusted": trusted_bool,
+                "reasons": reasons_val,
+                "score": rep_score,
+            }
+            score = rep_score
 
             host_header = dto.get("host", "")
             host_name = host_header.split(":")[0] if host_header else ""
@@ -132,16 +182,9 @@ class LogParserTool:
                 "upstream": upstream_obj,
                 "sensor": sensor_obj,
                 "action": _resolve_status_code(status_code),
-                "limit_req_status": limit_req_status,
-                "geoip_status": geoip_status,
-                "rbl_status": rbl_status,
-                "rate_limit": (
-                    rate_limit_dto if isinstance(rate_limit_dto, dict) else {}
-                ),
-                "geoip": geoip_dto if isinstance(geoip_dto, dict) else {},
-                "reputation": (
-                    reputation_dto if isinstance(reputation_dto, dict) else {}
-                ),
+                "rate_limit": rate_limit_obj,
+                "geoip": geoip_obj,
+                "reputation": reputation_obj,
                 "ipxa": dto.get("ipxa", ""),
                 "mtls": (
                     dto.get("mtls", {}) if isinstance(dto.get("mtls"), dict) else {}
@@ -151,7 +194,6 @@ class LogParserTool:
                 "source": {
                     "ip": clean_remote_ip,
                     "port": _to_int(dto.get("remote_port", 0)),
-                    "geo": geo_info,
                 },
                 "destination": {
                     "ip": dest_ip,
@@ -280,9 +322,7 @@ class LogParserTool:
                             except (ValueError, TypeError):
                                 pass
                         elif data_str.isdigit():
-                            record["score"] = max(
-                                record.get("score", 0), int(data_str)
-                            )
+                            record["score"] = max(record.get("score", 0), int(data_str))
 
                     messages.append(msg)
 
@@ -365,7 +405,11 @@ class LogParserTool:
                                     if remaining:
                                         cls._parse_and_cache_lines(
                                             log_type,
-                                            [line.strip() for line in remaining if line.strip()],
+                                            [
+                                                line.strip()
+                                                for line in remaining
+                                                if line.strip()
+                                            ],
                                             cache,
                                         )
                                     break
@@ -477,10 +521,22 @@ class LogParserTool:
         # Graceful final flush upon thread exit
         try:
             final_records = (
-                [cls._combine(acc, None, default_service) for acc in cache.drain_all("ACCESS")]
-                + [cls._combine(None, aud, default_service) for aud in cache.drain_all("AUDIT")]
-                + [cls._combine(acc, None, default_service) for acc, _ in pending_access.values()]
-                + [cls._combine(None, aud, default_service) for aud, _ in pending_audit.values()]
+                [
+                    cls._combine(acc, None, default_service)
+                    for acc in cache.drain_all("ACCESS")
+                ]
+                + [
+                    cls._combine(None, aud, default_service)
+                    for aud in cache.drain_all("AUDIT")
+                ]
+                + [
+                    cls._combine(acc, None, default_service)
+                    for acc, _ in pending_access.values()
+                ]
+                + [
+                    cls._combine(None, aud, default_service)
+                    for aud, _ in pending_audit.values()
+                ]
             )
             pending_access.clear()
             pending_audit.clear()
@@ -574,9 +630,6 @@ class LogParserTool:
             "upstream": None,
             "sensor": None,
             "action": action,
-            "limit_req_status": "",
-            "geoip_status": "",
-            "rbl_status": "",
             "rate_limit": {},
             "geoip": {},
             "reputation": {},
@@ -586,7 +639,6 @@ class LogParserTool:
             "source": {
                 "ip": clean_remote_ip,
                 "port": _to_int(audit.get("source", {}).get("port", 0)),
-                "geo": {"ip": clean_remote_ip, "country": "--"},
             },
             "destination": {
                 "ip": clean_dest_ip,
@@ -643,7 +695,9 @@ class LogParserTool:
 
         if audit.get("destination"):
             aud_dest = audit["destination"]
-            if not merged.get("destination", {}).get("ip") and _is_ip(aud_dest.get("ip")):
+            if not merged.get("destination", {}).get("ip") and _is_ip(
+                aud_dest.get("ip")
+            ):
                 merged.setdefault("destination", {})["ip"] = aud_dest["ip"]
 
         if audit.get("audit"):
@@ -664,9 +718,7 @@ class LogParserTool:
 
         status_code = _to_int(
             merged.get("http", {}).get("response", {}).get("status_code"), 0
-        ) or _to_int(
-            audit.get("http", {}).get("response", {}).get("status_code"), 0
-        )
+        ) or _to_int(audit.get("http", {}).get("response", {}).get("status_code"), 0)
         if status_code in (403, 406):
             merged["action"] = "blocked"
 

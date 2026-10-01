@@ -22,6 +22,7 @@ if cached then
     ngx.ctx.country_code = cached.country_code
     ngx.ctx.risk_score = cached.risk_score
     ngx.ctx.trusted = cached.trusted
+    ngx.ctx.reasons = cached.reasons
     ngx.ctx.ipxa = "cached"
 else
     local httpc = http.new()
@@ -45,6 +46,7 @@ else
             if body.security then
                 ngx.ctx.risk_score = tonumber(body.security.risk_score) or 0
                 ngx.ctx.trusted = (body.security.trusted == true or string.lower(tostring(body.security.trusted)) == "true")
+                ngx.ctx.reasons = body.security.reasons
             end
         end
     else
@@ -54,16 +56,16 @@ else
     cache.set(ip, {
         country_code = ngx.ctx.country_code,
         risk_score = ngx.ctx.risk_score,
-        trusted = ngx.ctx.trusted
+        trusted = ngx.ctx.trusted,
+        reasons = ngx.ctx.reasons
     })
 end
 
 ngx.req.set_header("X-NXG-Country-Code", ngx.ctx.country_code or "--")
 ngx.req.set_header("X-NXG-Risk-Score", tostring(ngx.ctx.risk_score or 0))
 ngx.req.set_header("X-NXG-Trusted", tostring(ngx.ctx.trusted or false))
-if ngx.ctx.ipxa then
-    ngx.req.set_header("X-NXG-IPXA", ngx.ctx.ipxa)
-end
+ngx.req.set_header("X-NXG-Reasons", cjson.encode(ngx.ctx.reasons))
+ngx.req.set_header("X-NXG-IPXA", ngx.ctx.ipxa)
 
 if not ngx.ctx.trusted then
     if ngx.ctx.country_code and BLOCKED_COUNTRIES[ngx.ctx.country_code] then
@@ -79,8 +81,9 @@ if not ngx.ctx.trusted then
     if tonumber(ngx.ctx.risk_score) > 0 then
         ngx.ctx.reputation_action = "blocked"
         ngx.req.set_header("X-NXG-Reputation-Action", "blocked")
+        ngx.req.set_header("X-NXG-Reasons", ngx.ctx.reasons)
         return utils.respond(ngx.HTTP_FORBIDDEN,
-            "[block/risk-score]: " .. ip .. " risk_score=" .. ngx.ctx.risk_score)
+            "[block/risk-score]: " .. ip .. " risk_score=" .. ngx.ctx.risk_score .. " reasons=" .. ngx.ctx.reasons)
     else
         ngx.ctx.reputation_action = "allowed"
         ngx.req.set_header("X-NXG-Reputation-Action", "allowed")
