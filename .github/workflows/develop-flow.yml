@@ -29,7 +29,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install flake8 pytest
+          pip install flake8 pytest semgrep
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
       - name: Lint
@@ -38,10 +38,10 @@ jobs:
           flake8 . --exclude=web --count --exit-zero --max-complexity=20 --max-line-length=256 --statistics
 
       - name: Run Semgrep
-        run: semgrep scan --config auto --output semgrep.sarif
+        run: semgrep scan --config auto --sarif --output semgrep.sarif
 
       - name: Upload Semgrep SARIF results to GitHub Security
-        uses: github/codeql-action/upload-sarif@v3  # nosemgrep: yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag
+        uses: github/codeql-action/upload-sarif@v4  # nosemgrep: yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag
         if: always()
         with:
           sarif_file: semgrep.sarif
