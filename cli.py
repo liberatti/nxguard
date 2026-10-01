@@ -5,11 +5,13 @@ import requests
 
 import engine.seclang.seclang_indexer as indexer
 from api.tasks import install, update_main_config
+import config
 
 
 def health_check():
+
     try:
-        response = requests.get("http://localhost:5000", timeout=5)
+        response = requests.get(f"http://localhost:5000{config.APP_CONTEXT}", timeout=5)
         if response.status_code == 200:
             sys.exit(0)
         else:
