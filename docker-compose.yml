@@ -79,9 +79,12 @@ services:
       context: .
     image: liberatti/nxguard:latest
     depends_on:
-      - ipxa
-      - elasticsearch
-      - kibana
+      ipxa:
+        condition: service_started
+      elasticsearch:
+        condition: service_healthy
+      kibana:
+        condition: service_started
     environment:
       - SECURITY_ENABLED=false
       - NXGUARD_ROLE=main
@@ -94,6 +97,7 @@ services:
       - "./api:/opt/nxguard/admin/api"
       - "./engine:/opt/nxguard/admin/engine"
       - "./config.py:/opt/nxguard/admin/config.py"
+      - "./cli.py:/opt/nxguard/admin/cli.py"
       - "./main.py:/opt/nxguard/admin/main.py"
       - "./lualib:/opt/nxguard/luajit/share/lua/5.1/nxguard"
       - "./data:/data"
@@ -111,4 +115,3 @@ services:
       - TZ=UTC
     volumes:
       - "./web:/app"
- 

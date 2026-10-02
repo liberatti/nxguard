@@ -57,13 +57,11 @@
     --critical-color: var(--critical);
 }
 
-/* Base Reset */
+/* Base Reset & Variables */
 html, body {
     background-color: var(--bg-main) !important;
     color: var(--text-main) !important;
     font-family: var(--font-family);
-    margin: 0; padding: 0; height: 100%;
-    -webkit-font-smoothing: antialiased;
 }
 
 /* Material Toolbar & Sidenav */
@@ -92,20 +90,25 @@ html, body {
 
 .mat-mdc-card-header {
     display: flex !important;
+    flex-direction: row !important;
     align-items: center !important;
     justify-content: space-between !important;
     width: 100% !important;
     max-width: 100% !important;
     box-sizing: border-box !important;
-    padding: 14px 20px !important;
+    padding: 16px 20px !important;
     border-bottom: 1px solid var(--border-dim);
     margin: 0 !important;
+    gap: 16px !important;
 }
 
+.mat-mdc-card-header .mat-mdc-card-header-text,
 .mat-mdc-card-header-text {
     flex: 1 1 auto !important;
-    margin: 0 !important;
+    width: auto !important;
     min-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 .mat-mdc-card-title {
@@ -130,19 +133,35 @@ html, body {
     padding: 16px 20px !important;
     width: 100% !important;
     max-width: 100% !important;
+    overflow-x: auto;
+}
+
+.mat-mdc-card-content:has(> table),
+.mat-mdc-card-content:has(> .table-responsive-container) {
+    padding: 0 !important;
 }
 
 .mat-mdc-card-header .align-right,
 .mat-mdc-card-header mat-card-actions,
 .mat-mdc-card-header .mat-mdc-card-actions {
     display: inline-flex !important;
+    flex-direction: row !important;
     align-items: center !important;
+    justify-content: flex-end !important;
     gap: 10px !important;
     margin: 0 0 0 auto !important;
     padding: 0 !important;
     min-height: unset !important;
-    flex-shrink: 0 !important;
+    flex: 0 0 auto !important;
     box-sizing: border-box !important;
+}
+
+.mat-mdc-card-header .search-filter-field,
+.mat-mdc-card-header .upstream-search-field,
+.mat-mdc-card-header .sensor-search-field {
+    width: 260px !important;
+    max-width: 280px !important;
+    margin: 0 !important;
 }
 
 /* Sub-cards / Nested Cards */
@@ -252,32 +271,38 @@ html, body {
     color: #ffffff !important;
 }
 
-.form-stepper, mat-stepper {
-    background: transparent !important;
-}
-
-.bottom-actions {
+.bottom-actions,
+mat-card-actions[align="end"] {
     display: flex !important;
     justify-content: flex-end !important;
     align-items: center !important;
-    gap: 10px !important;
-    padding: 12px 20px !important;
+    gap: 12px !important;
+    padding: 14px 20px !important;
     background: #f8fafc !important;
     border-top: 1px solid var(--border-dim) !important;
 }
 
-.align-right, mat-card-actions[align="end"] {
-    display: flex !important;
-    justify-content: flex-end !important;
-    align-items: center !important;
-    gap: 10px !important;
-    padding: 12px 20px !important;
+/* Tables */
+.table-responsive-container {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    box-sizing: border-box;
+    display: block;
 }
 
-/* Tables */
-.mat-mdc-table {
+.mat-mdc-table,
+.custom-table,
+.trn-table,
+.upstream-table,
+.sensor-table,
+.threat-table,
+.premium-table {
     background: transparent !important;
     color: var(--text-main) !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
 }
 
 th.mat-mdc-header-cell {
@@ -288,13 +313,15 @@ th.mat-mdc-header-cell {
     letter-spacing: 0.5px;
     text-transform: uppercase;
     border-bottom: 1px solid var(--border-dim) !important;
-    padding: 10px 16px !important;
+    padding: 12px 20px !important;
+    box-sizing: border-box;
 }
 
 td.mat-mdc-cell {
     color: var(--text-main) !important;
     border-bottom: 1px solid var(--border-dim) !important;
-    padding: 10px 16px !important;
+    padding: 12px 20px !important;
+    box-sizing: border-box;
 }
 
 .mat-mdc-row:hover {
@@ -306,6 +333,7 @@ td.mat-mdc-cell.text-right,
 th.text-right, 
 td.text-right {
     text-align: right !important;
+    padding-right: 20px !important;
 }
 
 td.mat-mdc-cell.text-right {
@@ -315,17 +343,26 @@ td.mat-mdc-cell.text-right {
 
 td.mat-mdc-cell.text-right .table-cell-actions, 
 td.mat-mdc-cell.text-right .toggle-container {
-    display: flex !important;
+    display: inline-flex !important;
     justify-content: flex-end !important;
     align-items: center !important;
+    gap: 8px !important;
 }
 
 /* Paginator */
-.mat-mdc-paginator,
-.mat-mdc-paginator-container {
+.mat-mdc-paginator {
     background: #ffffff !important;
     color: var(--text-dim) !important;
     border-top: 1px solid var(--border-dim) !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+}
+
+.mat-mdc-paginator-container {
+    padding: 0 20px !important;
+    justify-content: flex-end !important;
+    min-height: 52px !important;
+    box-sizing: border-box !important;
 }
 
 .mat-mdc-paginator-page-size-label,
@@ -476,25 +513,30 @@ td.mat-mdc-cell.text-right .toggle-container {
 
 /* Header Search Filter Fields */
 .search-filter-field,
-.upstream-search-field {
-    width: 320px !important;
+.upstream-search-field,
+.sensor-search-field {
+    width: 280px !important;
+    max-width: 320px !important;
 }
 
 .search-filter-field .mat-mdc-text-field-wrapper,
-.upstream-search-field .mat-mdc-text-field-wrapper {
+.upstream-search-field .mat-mdc-text-field-wrapper,
+.sensor-search-field .mat-mdc-text-field-wrapper {
     height: 38px !important;
     max-height: 38px !important;
     padding: 0 12px !important;
 }
 
 .search-filter-field .mat-mdc-form-field-flex,
-.upstream-search-field .mat-mdc-form-field-flex {
+.upstream-search-field .mat-mdc-form-field-flex,
+.sensor-search-field .mat-mdc-form-field-flex {
     height: 38px !important;
     align-items: center !important;
 }
 
 .search-filter-field .mat-mdc-form-field-infix,
-.upstream-search-field .mat-mdc-form-field-infix {
+.upstream-search-field .mat-mdc-form-field-infix,
+.sensor-search-field .mat-mdc-form-field-infix {
     padding-top: 0 !important;
     padding-bottom: 0 !important;
     min-height: unset !important;

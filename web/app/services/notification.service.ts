@@ -34,9 +34,12 @@ export class NotificationService {
                 horizontalPosition: 'center'
             });
         } else {
-            this.snackBar.open(message, '', {
+            this.snackBar.openFromComponent(MultiSnackbarComponent, {
+                data: {
+                    message: message
+                },
                 duration: 5000,
-                panelClass: 'snackbar-error',
+                panelClass: 'snackbar-info',
                 verticalPosition: 'bottom',
                 horizontalPosition: 'center'
             });

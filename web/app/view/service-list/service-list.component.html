@@ -67,7 +67,7 @@
                                                   [checked]="element.active"
                                                   (change)="toggleServiceActive(i,$event)" id="service-active-toggle-{{i}}">{{ 'attr.active'|translate }}
                                 </mat-slide-toggle>
-                                <button mat-button [matMenuTriggerFor]="menu" id="service-menu-{{i}}">
+                                <button mat-icon-button [matMenuTriggerFor]="menu" id="service-menu-{{i}}">
                                     <mat-icon>more_vert</mat-icon>
                                 </button>
                                 <mat-menu #menu="matMenu" xPosition="before">

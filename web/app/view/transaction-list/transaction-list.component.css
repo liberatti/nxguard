@@ -158,29 +158,73 @@
 
 /* Chart Container */
 .chart-container {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
     height: 200px;
     background: #ffffff;
     border-radius: 12px;
     padding: 12px 16px;
-    margin: 8px 0 20px 0;
+    margin: 8px 0 16px 0;
     border: 1px solid #e2e8f0;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    overflow: hidden;
 }
 
-/* Table Typography & Columns */
+/* Table Container & Typography */
+.table-responsive-container {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    box-sizing: border-box;
+}
+
 .trn-table {
     width: 100%;
+    min-width: 100%;
     background: #ffffff;
+    border-collapse: collapse;
 }
 
 .col-expand {
-    flex: 0 0 90px;
-    min-width: 90px;
-    max-width: 90px;
-    justify-content: flex-start;
-    gap: 2px;
-    padding-left: 8px;
-    padding-right: 0;
+    width: 80px;
+    min-width: 80px;
+    max-width: 80px;
+    padding-left: 8px !important;
+    padding-right: 0 !important;
+    white-space: nowrap;
+}
+
+.col-time {
+    width: 140px;
+    white-space: nowrap;
+}
+
+.col-score {
+    width: 70px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.col-source {
+    width: 150px;
+    white-space: nowrap;
+}
+
+.col-service {
+    width: 130px;
+    white-space: nowrap;
+}
+
+.col-request {
+    min-width: 180px;
+}
+
+.col-duration {
+    width: 90px;
+    text-align: right;
+    white-space: nowrap;
 }
 
 .raw-btn-row {

@@ -336,7 +336,9 @@
     "IPXA_URL": "IPXA Service URL",
     "IPXA_URL_HINT": "Endpoint URL of the IPXA threat intelligence service (e.g. http://ipxa:5000)",
     "IPXA_KEY": "IPXA API Key",
-    "IPXA_KEY_HINT": "Secret API key for authenticating with IPXA service"
+    "IPXA_KEY_HINT": "Secret API key for authenticating with IPXA service",
+    "SUCCESS_SAVE": "Global configuration updated successfully",
+    "ERROR_SAVE": "Failed to update configuration"
   },
   "DASHBOARD_PAGE": {
     "TITLE": "Security Overview",

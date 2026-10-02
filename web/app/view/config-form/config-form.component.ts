@@ -20,7 +20,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { Config } from 'app/models/config';
 import { MatTabsModule } from '@angular/material/tabs';
@@ -82,6 +82,7 @@ export class ConfigFormComponent implements OnInit {
         private notificationService: NotificationService,
         private router: Router,
         private configService: ConfigService,
+        private translate: TranslateService,
         protected oauth: OAuthService,
     ) {
     }
@@ -124,17 +125,30 @@ export class ConfigFormComponent implements OnInit {
     onSubmit() {
         this.submitted = true;
         if (this.form.status === "INVALID") {
+            let detailsObj: any = {};
+            Object.keys(this.form.controls).forEach(k => {
+                let control = this.form.get(k);
+                if (control && control.status !== "VALID") {
+                    detailsObj[k] = ["Invalid value on " + k];
+                }
+            });
+            this.notificationService.openErrorSnackBar({
+                code: 400,
+                message: 'Validation Error',
+                method: 'PUT',
+                url: '/api/v1/config',
+                details: detailsObj
+            });
             return;
         }
 
         const formData = this.form.value as Config;
         this.configService.update(formData._id, formData).subscribe({
-            next: (data) => {
-                this.notificationService.openSnackBar('Config updated');
-                this.router.navigate(['/config']);
+            next: () => {
+                this.notificationService.openSnackBar(this.translate.instant('CONFIG_PAGE.SUCCESS_SAVE'));
             },
             error: (err) => {
-                this.notificationService.openSnackBar("Config failed, " + err.message);
+                this.notificationService.openSnackBar(this.translate.instant('CONFIG_PAGE.ERROR_SAVE') + (err?.message ? ': ' + err.message : ''));
             }
         });
     }

@@ -20,19 +20,25 @@ export interface SnackbarData {
     template: `
         <div class="multi-snackbar">
             <div class="snackbar-content">
-                <div *ngIf="data.messages">
-                    <div *ngFor="let message of data.messages" class="snackbar-item">
-                        {{ message }}
+                @if (data.messages) {
+                    @for (message of data.messages; track $index) {
+                        <div class="snackbar-item">
+                            {{ message }}
+                        </div>
+                    }
+                }
+                @if (data.message && !data.messages) {
+                    <div class="snackbar-item">
+                        {{ data.message }}
                     </div>
-                </div>
-                <div *ngIf="data.message && !data.messages" class="snackbar-item">
-                    {{ data.message }}
-                </div>
+                }
             </div>
-            <button *ngIf="data.errorData" mat-stroked-button color="warn" class="details-btn" (click)="openDetails()">
-                <mat-icon>info</mat-icon>
-                Details
-            </button>
+            @if (data.errorData) {
+                <button mat-stroked-button color="warn" class="details-btn" (click)="openDetails()">
+                    <mat-icon>info</mat-icon>
+                    Details
+                </button>
+            }
         </div>
     `,
     styles: [`
