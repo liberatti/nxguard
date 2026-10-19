@@ -319,6 +319,8 @@ export class TransactionFilterDialogComponent implements OnInit {
             value = isNaN(num) ? value : num;
         } else if (field?.type === 'boolean') {
             value = value === 'true' || value === true;
+        } else if (typeof value === 'string') {
+            value = value.trim();
         }
 
         return JSON.stringify({ [fieldKey]: value });

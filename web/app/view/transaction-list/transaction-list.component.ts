@@ -102,7 +102,7 @@ export class TransactionListComponent implements OnInit {
         return `${startM.format('DD/MM/YY HH:mm')} - ${endM.format('DD/MM/YY HH:mm')}`;
     }
 
-    transactionDC: string[] = ['expand', 'logtime', 'score', 'source', 'service', 'request_line', 'duration'];
+    transactionDC: string[] = ['expand', 'logtime', 'score', 'source', 'service', 'node', 'request_line', 'duration'];
     transactionDS: MatTableDataSource<TransactionLog>;
     transactionPA = new DefaultPageMeta();
     transactions: Array<TransactionLog> = [];
@@ -265,6 +265,8 @@ export class TransactionListComponent implements OnInit {
             .subscribe(result => {
                 if (result.breakpoints[Breakpoints.Small]) {
                     this.transactionDC = ['expand', 'logtime', 'source', 'service', 'request_line'];
+                } else {
+                    this.transactionDC = ['expand', 'logtime', 'score', 'source', 'service', 'node', 'request_line', 'duration'];
                 }
             });
     }
@@ -502,7 +504,7 @@ export class TransactionListComponent implements OnInit {
 
     openFilterDialog(): void {
         const dialogRef = this.confirmDialog.open(TransactionFilterDialogComponent, {
-            width: '620px',
+            width: '800px',
             maxWidth: '95vw',
         });
 
