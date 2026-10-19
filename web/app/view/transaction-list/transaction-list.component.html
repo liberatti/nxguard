@@ -71,7 +71,7 @@
                         </button>
                         <button mat-icon-button (click)="onShowRAW(element); $event.stopPropagation()"
                             matTooltip="View Raw JSON">
-                            <mat-icon>code</mat-icon>
+                            <mat-icon>data_object</mat-icon>
                         </button>
                     </td>
                 </ng-container>
@@ -221,6 +221,12 @@
                                     <div class="detail-item">
                                         <label>Route</label>
                                         <span>{{ element.route_name }}</span>
+                                    </div>
+                                    }
+                                    @if (element.sensor) {
+                                    <div class="detail-item">
+                                        <label>Sensor</label>
+                                        <span>{{ element.sensor.name || element.sensor._id }}</span>
                                     </div>
                                     }
                                 </div>

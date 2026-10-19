@@ -72,19 +72,11 @@ export class TransactionFilterDialogComponent implements OnInit {
             type: 'text',
             placeholder: 'e.g. eb6d37ef0815c282769759d6331f2914',
         },
-        {
-            key: 'archived',
-            labelKey: 'TRANSACTION.FILTER.FIELDS.ARCHIVED',
-            category: 'GENERAL',
-            icon: 'archive',
-            type: 'boolean',
-            options: ['true', 'false'],
-        },
 
         // ROUTING
         {
-            key: 'service._id',
-            labelKey: 'TRANSACTION.FILTER.FIELDS.SERVICE_ID',
+            key: 'service.name',
+            labelKey: 'TRANSACTION.FILTER.FIELDS.SERVICE_NAME',
             category: 'ROUTING',
             icon: 'miscellaneous_services',
             type: 'text',
@@ -99,16 +91,16 @@ export class TransactionFilterDialogComponent implements OnInit {
             placeholder: 'e.g. front-req, api-route',
         },
         {
-            key: 'upstream._id',
-            labelKey: 'TRANSACTION.FILTER.FIELDS.UPSTREAM_ID',
+            key: 'upstream.name',
+            labelKey: 'TRANSACTION.FILTER.FIELDS.UPSTREAM_NAME',
             category: 'ROUTING',
             icon: 'dns',
             type: 'text',
             placeholder: 'e.g. NXGuard_Frontend',
         },
         {
-            key: 'sensor._id',
-            labelKey: 'TRANSACTION.FILTER.FIELDS.SENSOR_ID',
+            key: 'sensor.name',
+            labelKey: 'TRANSACTION.FILTER.FIELDS.SENSOR_NAME',
             category: 'ROUTING',
             icon: 'sensors',
             type: 'text',
@@ -204,24 +196,16 @@ export class TransactionFilterDialogComponent implements OnInit {
             options: ['allowed', 'delayed', 'rejected'],
         },
         {
-            key: 'limit_req_status',
-            labelKey: 'TRANSACTION.FILTER.FIELDS.LIMIT_REQ_STATUS',
-            category: 'SECURITY',
-            icon: 'hourglass_empty',
-            type: 'enum',
-            options: ['PASSED', 'DELAYED', 'REJECTED'],
-        },
-        {
-            key: 'geoip_status',
-            labelKey: 'TRANSACTION.FILTER.FIELDS.GEOIP_STATUS',
+            key: 'geoip.action',
+            labelKey: 'TRANSACTION.FILTER.FIELDS.GEOIP_ACTION',
             category: 'SECURITY',
             icon: 'public',
             type: 'enum',
             options: ['allowed', 'blocked'],
         },
         {
-            key: 'rbl_status',
-            labelKey: 'TRANSACTION.FILTER.FIELDS.RBL_STATUS',
+            key: 'reputation.action',
+            labelKey: 'TRANSACTION.FILTER.FIELDS.REPUTATION_ACTION',
             category: 'SECURITY',
             icon: 'gavel',
             type: 'enum',
@@ -270,7 +254,7 @@ export class TransactionFilterDialogComponent implements OnInit {
         private fb: FormBuilder,
         public dialogRef: MatDialogRef<TransactionFilterDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any
-    ) {}
+    ) { }
 
     ngOnInit(): void {
         const initialField = this.fields[0];
@@ -299,6 +283,15 @@ export class TransactionFilterDialogComponent implements OnInit {
 
     getField(key: string): FilterFieldOption | undefined {
         return this.fields.find((f) => f.key === key);
+    }
+
+    onCategoryChange(cat: string): void {
+        this.selectedCategory = cat || 'ALL';
+        const available = this.filteredFields;
+        const currentKey = this.filterForm.get('field')?.value;
+        if (!available.some((f) => f.key === currentKey) && available.length > 0) {
+            this.filterForm.get('field')?.setValue(available[0].key);
+        }
     }
 
     get filteredFields(): FilterFieldOption[] {

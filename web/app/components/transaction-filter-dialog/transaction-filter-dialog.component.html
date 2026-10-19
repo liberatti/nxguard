@@ -14,9 +14,9 @@
 
     <mat-dialog-content class="dialog-content">
         <form [formGroup]="filterForm" class="filter-form">
-            <!-- Category Chips Selector (Left aligned) -->
+            <!-- Category Chips Selector -->
             <div class="category-selector">
-                <mat-chip-listbox [(ngModel)]="selectedCategory" [ngModelOptions]="{standalone: true}">
+                <mat-chip-listbox [ngModel]="selectedCategory" (ngModelChange)="onCategoryChange($event)" [ngModelOptions]="{standalone: true}">
                     <mat-chip-option value="ALL" color="primary" [selected]="selectedCategory === 'ALL'">
                         {{ 'TRANSACTION.FILTER.CATEGORY_LABEL' | translate }}: All
                     </mat-chip-option>

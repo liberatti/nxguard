@@ -27,12 +27,25 @@
     --shadow-premium: 0 4px 20px rgba(0, 0, 0, 0.05);
     
     /* -------------------------------------------------------------------------- */
-    /* 3. Typography                                                              */
+    /* 3. Typography & Font Size Tokens                                           */
     /* -------------------------------------------------------------------------- */
+    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    
     --text-main: #0f172a;       /* Slate 900 */
     --text-dim: #475569;        /* Slate 600 */
     --text-muted: #94a3b8;      /* Slate 400 */
-    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+    /* Standardized UX Font Size Scale */
+    --font-size-2xs: 0.6875rem; /* 11px - micro labels, badges */
+    --font-size-xs: 0.75rem;    /* 12px - table headers, captions, stat labels */
+    --font-size-sm: 0.8125rem;  /* 13px - chips, badges, descriptions, hints */
+    --font-size-base: 0.875rem; /* 14px - body text, table cells, inputs, buttons */
+    --font-size-md: 0.9375rem;  /* 15px - section subheads, list titles */
+    --font-size-lg: 1.125rem;   /* 18px - modal dialog titles, section titles */
+    --font-size-xl: 1.25rem;    /* 20px - page card titles */
+    --font-size-2xl: 1.5rem;    /* 24px - main page titles */
+    --font-size-3xl: 2.25rem;   /* 36px - stat counters */
 
     /* -------------------------------------------------------------------------- */
     /* 4. Component Tokens                                                        */
@@ -62,6 +75,8 @@ html, body {
     background-color: var(--bg-main) !important;
     color: var(--text-main) !important;
     font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    line-height: 1.5;
 }
 
 /* Material Toolbar & Sidenav */
@@ -70,6 +85,7 @@ html, body {
     background: #ffffff !important;
     border-bottom: 1px solid var(--border-dim) !important;
     color: var(--text-main) !important;
+    font-size: var(--font-size-lg) !important;
 }
 
 .mat-sidenav,
@@ -112,7 +128,7 @@ html, body {
 }
 
 .mat-mdc-card-title {
-    font-size: 1.25rem !important;
+    font-size: var(--font-size-xl) !important;
     font-weight: 700 !important;
     color: var(--text-main) !important;
     letter-spacing: -0.2px !important;
@@ -121,7 +137,7 @@ html, body {
 }
 
 .mat-mdc-card-subtitle {
-    font-size: 0.8125rem !important;
+    font-size: var(--font-size-sm) !important;
     font-weight: 400 !important;
     color: var(--text-dim) !important;
     line-height: 1.4 !important;
@@ -134,6 +150,7 @@ html, body {
     width: 100% !important;
     max-width: 100% !important;
     overflow-x: auto;
+    font-size: var(--font-size-base);
 }
 
 .mat-mdc-card-content:has(> table),
@@ -175,7 +192,7 @@ html, body {
 }
 
 .mat-mdc-card .mat-mdc-card .mat-mdc-card-title {
-    font-size: 0.95rem !important;
+    font-size: var(--font-size-md) !important;
     font-weight: 600 !important;
 }
 
@@ -194,7 +211,7 @@ html, body {
     font-weight: 600 !important;
     text-transform: none !important;
     letter-spacing: 0.2px !important;
-    font-size: 0.875rem !important;
+    font-size: var(--font-size-base) !important;
     transition: all var(--transition) !important;
 }
 
@@ -282,7 +299,7 @@ mat-card-actions[align="end"] {
     border-top: 1px solid var(--border-dim) !important;
 }
 
-/* Tables */
+/* Tables (Compact & High-Density) */
 .table-responsive-container {
     width: 100%;
     max-width: 100%;
@@ -297,7 +314,8 @@ mat-card-actions[align="end"] {
 .upstream-table,
 .sensor-table,
 .threat-table,
-.premium-table {
+.premium-table,
+.audit-table {
     background: transparent !important;
     color: var(--text-main) !important;
     width: 100% !important;
@@ -305,27 +323,47 @@ mat-card-actions[align="end"] {
     box-sizing: border-box !important;
 }
 
+/* Compact Table Rows */
+.mat-mdc-table .mat-mdc-header-row,
+.mat-mdc-header-row {
+    min-height: 38px !important;
+    height: 38px !important;
+}
+
+.mat-mdc-table .mat-mdc-row,
+.mat-mdc-row {
+    min-height: 40px !important;
+    height: auto !important;
+}
+
+.mat-mdc-table .mat-mdc-footer-row,
+.mat-mdc-footer-row {
+    min-height: 38px !important;
+    height: 38px !important;
+}
+
 th.mat-mdc-header-cell {
     background: #f8fafc !important;
     color: var(--text-dim) !important;
-    font-size: 0.75rem !important;
+    font-size: var(--font-size-xs) !important;
     font-weight: 700 !important;
     letter-spacing: 0.5px;
     text-transform: uppercase;
     border-bottom: 1px solid var(--border-dim) !important;
-    padding: 12px 20px !important;
+    padding: 8px 12px !important;
     box-sizing: border-box;
 }
 
 td.mat-mdc-cell {
     color: var(--text-main) !important;
     border-bottom: 1px solid var(--border-dim) !important;
-    padding: 12px 20px !important;
+    padding: 6px 12px !important;
+    font-size: var(--font-size-base) !important;
     box-sizing: border-box;
 }
 
 .mat-mdc-row:hover {
-    background-color: rgba(37, 99, 235, 0.02) !important;
+    background-color: rgba(37, 99, 235, 0.03) !important;
 }
 
 th.mat-mdc-header-cell.text-right, 
@@ -333,7 +371,7 @@ td.mat-mdc-cell.text-right,
 th.text-right, 
 td.text-right {
     text-align: right !important;
-    padding-right: 20px !important;
+    padding-right: 12px !important;
 }
 
 td.mat-mdc-cell.text-right {
@@ -346,7 +384,7 @@ td.mat-mdc-cell.text-right .toggle-container {
     display: inline-flex !important;
     justify-content: flex-end !important;
     align-items: center !important;
-    gap: 8px !important;
+    gap: 6px !important;
 }
 
 /* Paginator */
@@ -361,19 +399,19 @@ td.mat-mdc-cell.text-right .toggle-container {
 .mat-mdc-paginator-container {
     padding: 0 20px !important;
     justify-content: flex-end !important;
-    min-height: 52px !important;
+    min-height: 48px !important;
     box-sizing: border-box !important;
 }
 
 .mat-mdc-paginator-page-size-label,
 .mat-mdc-paginator-range-label {
     color: var(--text-dim) !important;
-    font-size: 0.8125rem !important;
+    font-size: var(--font-size-sm) !important;
 }
 
 .mat-mdc-paginator .mat-mdc-select-value {
     color: var(--text-main) !important;
-    font-size: 0.8125rem !important;
+    font-size: var(--font-size-sm) !important;
 }
 
 .mat-mdc-paginator .mat-mdc-select-arrow {
@@ -402,8 +440,9 @@ td.mat-mdc-cell.text-right .toggle-container {
     overflow: hidden !important;
 }
 
-.mat-mdc-dialog-title {
-    font-size: 1.25rem !important;
+.mat-mdc-dialog-title,
+.dialog-title {
+    font-size: var(--font-size-lg) !important;
     font-weight: 700 !important;
     color: var(--text-main) !important;
     padding: 16px 20px !important;
@@ -415,6 +454,7 @@ td.mat-mdc-cell.text-right .toggle-container {
     padding: 16px 20px !important;
     margin: 0 !important;
     max-height: 75vh !important;
+    font-size: var(--font-size-base) !important;
 }
 
 .mat-mdc-dialog-actions {
@@ -435,7 +475,7 @@ td.mat-mdc-cell.text-right .toggle-container {
 
 .mat-mdc-menu-item {
     color: var(--text-main) !important;
-    font-size: 0.875rem !important;
+    font-size: var(--font-size-base) !important;
 
     mat-icon {
         color: var(--text-dim) !important;
@@ -453,16 +493,17 @@ td.mat-mdc-cell.text-right .toggle-container {
     gap: 6px !important;
 }
 
-.mat-mdc-chip-row, .mat-mdc-chip {
+.mat-mdc-chip-row, .mat-mdc-chip, .mat-chip-option {
     --mdc-chip-container-shape: 6px !important;
     border-radius: 6px !important;
-    font-size: 0.8125rem !important;
+    font-size: var(--font-size-sm) !important;
     font-weight: 500 !important;
 }
 
 /* Form Fields */
 .mat-mdc-form-field {
     font-family: var(--font-family) !important;
+    font-size: var(--font-size-base) !important;
     --mdc-outlined-text-field-container-shape: 6px;
     --mdc-outlined-text-field-outline-color: var(--border-dim);
     --mdc-outlined-text-field-hover-outline-color: var(--border-bright);
@@ -479,70 +520,44 @@ td.mat-mdc-cell.text-right .toggle-container {
 .mat-mdc-input-element,
 .mat-mdc-select-value {
     color: var(--text-main) !important;
+    font-size: var(--font-size-base) !important;
 }
 
 .mat-mdc-input-element::placeholder {
     color: var(--text-muted) !important;
+    font-size: var(--font-size-base) !important;
 }
 
 .mat-mdc-form-field.mat-focused .mdc-floating-label {
     color: var(--primary) !important;
 }
 
-/* Prefix / Suffix Icons */
-.mat-mdc-form-field .mat-mdc-form-field-icon-prefix,
-.mat-mdc-form-field .mat-mdc-form-field-icon-suffix {
-    display: flex !important;
-    align-items: center !important;
+.mat-mdc-form-field-subscript-wrapper {
+    font-size: var(--font-size-xs) !important;
+}
+
+/* Tabs */
+.mat-mdc-tab .mdc-tab__text-label {
+    font-size: var(--font-size-base) !important;
+    font-weight: 600 !important;
+}
+
+/* Expansion Panels */
+.mat-expansion-panel-header-title {
+    font-size: var(--font-size-base) !important;
+    font-weight: 600 !important;
+    color: var(--text-main) !important;
+}
+
+.mat-expansion-panel-header-description {
+    font-size: var(--font-size-sm) !important;
     color: var(--text-dim) !important;
-    padding: 0 4px !important;
 }
 
-.mat-mdc-form-field .mat-mdc-icon-button.mat-mdc-button-base {
-    width: 24px !important;
-    height: 24px !important;
-    padding: 0 !important;
-}
-
-.mat-mdc-form-field .mat-icon {
-    font-size: 18px !important;
-    width: 18px !important;
-    height: 18px !important;
-    line-height: 18px !important;
-}
-
-/* Header Search Filter Fields */
-.search-filter-field,
-.upstream-search-field,
-.sensor-search-field {
-    width: 280px !important;
-    max-width: 320px !important;
-}
-
-.search-filter-field .mat-mdc-text-field-wrapper,
-.upstream-search-field .mat-mdc-text-field-wrapper,
-.sensor-search-field .mat-mdc-text-field-wrapper {
-    height: 38px !important;
-    max-height: 38px !important;
-    padding: 0 12px !important;
-}
-
-.search-filter-field .mat-mdc-form-field-flex,
-.upstream-search-field .mat-mdc-form-field-flex,
-.sensor-search-field .mat-mdc-form-field-flex {
-    height: 38px !important;
-    align-items: center !important;
-}
-
-.search-filter-field .mat-mdc-form-field-infix,
-.upstream-search-field .mat-mdc-form-field-infix,
-.sensor-search-field .mat-mdc-form-field-infix {
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    min-height: unset !important;
-    display: flex !important;
-    align-items: center !important;
-    width: 100% !important;
+/* Tooltips */
+.mat-mdc-tooltip .mdc-tooltip__surface {
+    font-size: var(--font-size-xs) !important;
+    border-radius: 6px !important;
 }
 
 /* Custom Scrollbar */
@@ -559,7 +574,7 @@ td.mat-mdc-cell.text-right .toggle-container {
 }
 
 .mat-mdc-slide-toggle .mdc-label {
-    font-size: 0.875rem !important;
+    font-size: var(--font-size-base) !important;
     font-weight: 500 !important;
     color: var(--text-dim) !important;
     cursor: pointer !important;

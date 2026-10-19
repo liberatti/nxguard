@@ -408,10 +408,10 @@
       },
       "FIELDS": {
         "ACTION": "Security Action (action)",
-        "SERVICE_ID": "Service (service._id)",
+        "SERVICE_NAME": "Service (service.name)",
         "ROUTE_NAME": "Route Name (route_name)",
-        "UPSTREAM_ID": "Upstream (upstream._id)",
-        "SENSOR_ID": "Sensor (sensor._id)",
+        "UPSTREAM_NAME": "Upstream (upstream.name)",
+        "SENSOR_NAME": "Sensor (sensor.name)",
         "SOURCE_IP": "Source IP (source.ip)",
         "SOURCE_PORT": "Source Port (source.port)",
         "GEOIP_COUNTRY": "Source Country (geoip.country_code)",
@@ -424,17 +424,15 @@
         "DURATION": "Duration seconds (http.duration)",
         "SCORE": "Anomaly Score (score)",
         "RATE_LIMIT_ACTION": "Rate Limit Action (rate_limit.action)",
-        "LIMIT_REQ_STATUS": "Limit Req Status (limit_req_status)",
-        "GEOIP_STATUS": "GeoIP Status (geoip_status)",
-        "RBL_STATUS": "RBL Status (rbl_status)",
+        "GEOIP_ACTION": "GeoIP Action (geoip.action)",
+        "REPUTATION_ACTION": "Reputation Action (reputation.action)",
         "IPXA": "IPXA Status (ipxa)",
         "MTLS_ENABLED": "mTLS Enabled (mtls.enabled)",
         "MTLS_VERIFIED": "mTLS Verified (mtls.verified)",
         "AUDIT_RULE_CODE": "WAF Rule ID / Code (rule_code)",
         "USER_AGENT": "User Agent Family (user_agent.family)",
         "SERVER_ID": "Node / Server ID (server_id)",
-        "UNIQUE_ID": "Unique Transaction ID (unique_id)",
-        "ARCHIVED": "Archived Status (archived)"
+        "UNIQUE_ID": "Unique Transaction ID (unique_id)"
       }
     },
     "DATE_RANGE": {
