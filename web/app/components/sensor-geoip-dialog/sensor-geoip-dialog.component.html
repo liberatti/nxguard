@@ -1,123 +1,243 @@
 <div class="sensor-geoip-dialog-container">
+    <!-- Dialog Header -->
     <div class="dialog-header">
-        <div class="header-main">
-            <div class="header-icon-box">
-                <mat-icon class="globe-icon">public</mat-icon>
-            </div>
-            <div class="header-text-group">
-                <h2 mat-dialog-title class="dialog-title">
-                    {{ data?.sensorName ? data.sensorName : ('SENSOR.GEO_BLOCKED' | translate) }}
-                </h2>
-                <div class="header-badge-row">
-                    <span class="geoip-counter-badge prominent">
-                        <mat-icon class="badge-icon">flag</mat-icon>
-                        <span class="badge-text">{{ (totalCount === 1 ? 'SENSOR.GEO_COUNT_BADGE_ONE' : 'SENSOR.GEO_COUNT_BADGE') | translate:{ count: totalCount } }}</span>
-                    </span>
-                    @if (searchQuery && filteredCount !== totalCount) {
-                        <span class="filter-count-badge">
-                            {{ filteredCount }} {{ 'SENSOR.MATCHES' | translate }}
-                        </span>
-                    }
-                    @if (isEditable && totalCount > 0) {
-                        <button mat-button color="warn" type="button" class="btn-clear-dialog" (click)="clearAll()">
-                            <mat-icon>clear_all</mat-icon>
-                            {{ 'SENSOR.CLEAR_ALL' | translate }}
-                        </button>
-                    }
-                </div>
-            </div>
+        <div class="header-left">
+            <h2 class="dialog-title" id="geoip-dialog-title">
+                {{ 'SENSOR.GEO_BLOCK_TITLE' | translate }}
+                @if (data?.sensorName) {
+                    <span class="sensor-name-badge">{{ data.sensorName }}</span>
+                }
+            </h2>
+            <p class="dialog-subtitle">{{ 'SENSOR.GEO_BLOCK_SUBTITLE' | translate }}</p>
         </div>
-        <button mat-icon-button type="button" class="close-btn" (click)="onClose()" [matTooltip]="'ACTIONS.CANCEL' | translate">
-            <mat-icon>close</mat-icon>
-        </button>
+
+        <div class="header-right">
+            <div class="toggle-wrapper" id="geoip-block-toggle-wrapper">
+                <span class="toggle-label">{{ 'SENSOR.ENABLE_BLOCK' | translate }}</span>
+                <mat-slide-toggle
+                    color="primary"
+                    [(ngModel)]="isBlockingActive"
+                    id="geoip-block-active-toggle"
+                    [attr.aria-label]="'SENSOR.ENABLE_BLOCK' | translate">
+                </mat-slide-toggle>
+            </div>
+            <button mat-icon-button type="button" class="btn-header-close" (click)="onClose()" [matTooltip]="'ACTIONS.CLOSE' | translate">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
     </div>
 
-    <mat-dialog-content class="dialog-content">
-        <!-- Add Country Dropdown in edit mode -->
-        @if (isEditable) {
-        <div class="add-country-row">
-            <mat-form-field appearance="outline" class="full-width add-country-field" subscriptSizing="dynamic">
-                <mat-label>{{ 'SENSOR.ADD_COUNTRY' | translate }}</mat-label>
-                <mat-icon matPrefix class="add-prefix-icon">add_circle_outline</mat-icon>
-                <mat-select [(ngModel)]="selectedCountryToAdd" (selectionChange)="addCountry($event.value)" id="add-country-select" [placeholder]="'SENSOR.SELECT_COUNTRY_PLACEHOLDER' | translate">
-                    @for (c of availableCountries; track c.code) {
-                    <mat-option [value]="c.code" id="country-option-{{c.code}}">
-                        <span class="fi fi-{{c.code | lowercase}} mini-flag"></span>
-                        <span class="country-option-name">{{ c.name }}</span>
-                        <span class="country-option-code">({{ c.code }})</span>
-                    </mat-option>
-                    }
-                </mat-select>
-            </mat-form-field>
-        </div>
-        }
-
-        <!-- Quick Search -->
-        <div class="search-bar-row">
-            <mat-form-field appearance="outline" class="full-width search-field" subscriptSizing="dynamic">
-                <mat-icon matPrefix class="search-prefix-icon">search</mat-icon>
-                <input matInput [(ngModel)]="searchQuery" [placeholder]="'SENSOR.FILTER_GEO_PLACEHOLDER' | translate" id="geoip-dialog-search-input">
+    <!-- Search / Filter Bar -->
+    <div class="search-section">
+        <div class="search-input-wrapper">
+            <div class="filter-icon-btn">
+                <mat-icon>filter_list</mat-icon>
+            </div>
+            <div class="search-field-box">
+                <mat-icon class="search-lens-icon">search</mat-icon>
+                <input
+                    type="text"
+                    [(ngModel)]="searchQuery"
+                    class="custom-search-input"
+                    [placeholder]="'SENSOR.SEARCH_GEO_PLACEHOLDER' | translate"
+                    id="geoip-search-input"
+                    autocomplete="off" />
                 @if (searchQuery) {
-                    <button matSuffix mat-icon-button type="button" (click)="clearSearch()" id="geoip-dialog-search-clear">
+                    <button mat-icon-button type="button" class="btn-search-clear" (click)="clearSearch()" id="geoip-search-clear">
                         <mat-icon>close</mat-icon>
                     </button>
                 }
-            </mat-form-field>
+            </div>
         </div>
+    </div>
 
-        @if (regionGroups.length > 0) {
-            <div class="regions-container">
-                @for (group of regionGroups; track group.name) {
-                    <div class="region-section">
-                        <div class="region-header">
-                            <span class="region-name">{{ group.name }}</span>
-                            <span class="region-count-pill">{{ group.countries.length }}</span>
-                        </div>
-                        <div class="tag-cloud">
-                            @for (country of group.countries; track country.code) {
-                                <div class="country-tag" [class.editable-tag]="isEditable" [matTooltip]="country.name + ' (' + country.code + ')'">
-                                    @if (country.code !== 'None' && country.code !== 'Unknown') {
-                                        <span class="fi fi-{{country.code | lowercase}} country-flag"></span>
-                                    } @else {
-                                        <mat-icon class="country-fallback-icon">public_off</mat-icon>
+    <!-- Continents & Countries Content -->
+    <div class="dialog-body-scroll" [class.blocking-disabled]="!isBlockingActive">
+        <div class="continents-list">
+            @for (continent of continents; track continent.id) {
+                <div class="continent-card" [class.is-expanded]="isContinentExpanded(continent.id)">
+                    <!-- Continent Summary Row -->
+                    <div class="continent-summary-row" (click)="toggleContinent(continent.id)">
+                        <div class="summary-left">
+                            <button
+                                type="button"
+                                class="btn-chevron"
+                                (click)="toggleContinent(continent.id, $event)"
+                                [attr.aria-label]="'Expand ' + continent.defaultName">
+                                <mat-icon class="chevron-icon">
+                                    {{ isContinentExpanded(continent.id) ? 'keyboard_arrow_down' : 'keyboard_arrow_right' }}
+                                </mat-icon>
+                            </button>
+
+                            <mat-checkbox
+                                class="continent-checkbox"
+                                [checked]="isContinentAllSelected(continent)"
+                                [indeterminate]="isContinentPartiallySelected(continent)"
+                                (change)="onContinentCheckboxChange(continent, $event.checked)"
+                                (click)="$event.stopPropagation()"
+                                id="continent-checkbox-{{ continent.id }}"
+                                [attr.aria-label]="continent.defaultName">
+                            </mat-checkbox>
+
+                            <div class="continent-icon-wrapper">
+                                @switch (continent.id) {
+                                    @case ('africa') {
+                                        <!-- Africa Silhouette / Icon -->
+                                        <svg viewBox="0 0 24 24" class="continent-svg" fill="currentColor">
+                                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                                        </svg>
                                     }
-                                    <span class="country-code">{{ country.code }}</span>
-                                    <span class="country-name">{{ country.name }}</span>
-                                    @if (isEditable) {
-                                        <button type="button" class="tag-remove-btn" (click)="removeCountry(country.code, $event)" [matTooltip]="'ACTIONS.REMOVE' | translate" id="remove-country-{{country.code}}">
-                                            <mat-icon>close</mat-icon>
-                                        </button>
+                                    @case ('north_america') {
+                                        <!-- North America Icon -->
+                                        <svg viewBox="0 0 24 24" class="continent-svg" fill="currentColor">
+                                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                                        </svg>
                                     }
-                                </div>
+                                    @case ('south_america') {
+                                        <!-- South America Icon -->
+                                        <svg viewBox="0 0 24 24" class="continent-svg" fill="currentColor">
+                                            <path d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2zm1 17.93V18c0-1.1-.9-2-2-2v-1l-4.79-4.79A7.95 7.95 0 0 1 4 12c0-4.08 3.05-7.44 7-7.93v2a2 2 0 0 0 2 2h-2v1a1 1 0 0 0 1 1h2v3h1a1.9 1.9 0 0 1 1.9 1.39A8.04 8.04 0 0 1 13 19.93z"/>
+                                        </svg>
+                                    }
+                                    @case ('asia') {
+                                        <!-- Asia Icon -->
+                                        <svg viewBox="0 0 24 24" class="continent-svg" fill="currentColor">
+                                            <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                                        </svg>
+                                    }
+                                    @case ('europe') {
+                                        <!-- Europe Icon -->
+                                        <svg viewBox="0 0 24 24" class="continent-svg" fill="currentColor">
+                                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                                        </svg>
+                                    }
+                                    @default {
+                                        <!-- Oceania / Globe Icon -->
+                                        <svg viewBox="0 0 24 24" class="continent-svg" fill="currentColor">
+                                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                                        </svg>
+                                    }
+                                }
+                            </div>
+
+                            <span class="continent-name">
+                                {{ continent.nameKey | translate }}
+                            </span>
+                            <span class="continent-selection-meta">
+                                ({{ getContinentSelectedCount(continent) }} / {{ continent.countries.length }} {{ 'SENSOR.GEO_SELECTED_COUNT' | translate }})
+                            </span>
+
+                            <!-- Status Badge -->
+                            @if (getContinentSelectedCount(continent) === 0) {
+                                <span class="continent-count-badge zero">
+                                    0/{{ continent.countries.length }}
+                                </span>
+                            } @else if (getContinentSelectedCount(continent) === continent.countries.length) {
+                                <span class="continent-count-badge all">
+                                    {{ continent.countries.length }}/{{ continent.countries.length }}
+                                </span>
+                            } @else {
+                                <span class="continent-count-badge partial">
+                                    {{ getContinentSelectedCount(continent) }} {{ 'SENSOR.GEO_SELECTED_OF' | translate }} {{ continent.countries.length }} {{ 'SENSOR.GEO_SELECTED_COUNT' | translate }}
+                                </span>
                             }
                         </div>
-                    </div>
-                }
-            </div>
-        } @else {
-            <div class="empty-state">
-                <mat-icon class="empty-icon">search_off</mat-icon>
-                <p class="empty-title">{{ 'SENSOR.NO_MATCHING_COUNTRIES' | translate }}</p>
-                @if (totalCount === 0) {
-                    <p class="empty-desc">{{ 'SENSOR.NO_GEO_SELECTED' | translate }}</p>
-                }
-            </div>
-        }
-    </mat-dialog-content>
 
-    <mat-dialog-actions align="end" class="dialog-actions">
-        <button mat-stroked-button type="button" (click)="onClose()" id="geoip-dialog-close-btn" [disabled]="isSaving">
-            {{ (isEditable ? 'ACTIONS.CANCEL' : 'ACTIONS.CLOSE') | translate }}
-        </button>
-        @if (isEditable) {
-            <button mat-flat-button color="primary" type="button" (click)="onSave()" id="geoip-dialog-save-btn" [disabled]="isSaving">
+                        <div class="summary-right">
+                            <button
+                                type="button"
+                                class="btn-view-edit"
+                                (click)="toggleContinent(continent.id, $event)"
+                                id="btn-edit-continent-{{ continent.id }}">
+                                <span class="btn-text">{{ 'SENSOR.VIEW_EDIT' | translate }}</span>
+                                <mat-icon class="btn-icon">edit</mat-icon>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Expanded Country Selection Drawer -->
+                    @if (isContinentExpanded(continent.id)) {
+                        <div class="continent-expanded-drawer">
+                            <div class="drawer-header-actions">
+                                <span class="drawer-hint-text">
+                                    {{ getContinentSelectedCount(continent) }} / {{ continent.countries.length }} {{ 'SENSOR.GEO_SELECTED_COUNT' | translate }}
+                                </span>
+                                <div class="drawer-action-links">
+                                    <button type="button" class="link-action" (click)="selectAllInContinent(continent, $event)">
+                                        <mat-icon class="link-icon">select_all</mat-icon>
+                                        {{ 'SENSOR.SELECT_ALL' | translate }}
+                                    </button>
+                                    <span class="link-divider">|</span>
+                                    <button type="button" class="link-action warn" (click)="deselectAllInContinent(continent, $event)">
+                                        <mat-icon class="link-icon">deselect</mat-icon>
+                                        {{ 'SENSOR.DESELECT_ALL' | translate }}
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="country-grid">
+                                @for (country of continent.countries; track country.code) {
+                                    <div
+                                        class="country-item-card"
+                                        [class.is-selected]="isCountrySelected(country.code)"
+                                        (click)="toggleCountry(country.code, undefined, $event)"
+                                        id="country-card-{{ country.code }}">
+                                        <mat-checkbox
+                                            class="country-checkbox"
+                                            [checked]="isCountrySelected(country.code)"
+                                            (change)="toggleCountry(country.code, $event.checked)"
+                                            (click)="$event.stopPropagation()"
+                                            id="country-chk-{{ country.code }}"
+                                            [attr.aria-label]="country.name">
+                                        </mat-checkbox>
+                                        <span class="fi fi-{{ country.code | lowercase }} country-flag"></span>
+                                        <div class="country-label-group">
+                                            <span class="country-name">{{ country.name }}</span>
+                                            <span class="country-code">({{ country.code }})</span>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Dialog Actions Footer -->
+    <div class="dialog-footer">
+        <div class="footer-left">
+            <button
+                mat-flat-button
+                color="primary"
+                type="button"
+                class="btn-save"
+                (click)="onSave()"
+                id="geoip-dialog-save-btn"
+                [disabled]="isSaving">
                 @if (isSaving) {
                     <mat-spinner diameter="18" class="btn-spinner"></mat-spinner>
                 } @else {
-                    <mat-icon>save</mat-icon>
+                    <mat-icon class="save-icon">save</mat-icon>
                 }
                 {{ 'ACTIONS.SAVE' | translate }}
             </button>
-        }
-    </mat-dialog-actions>
+            <button
+                mat-button
+                type="button"
+                class="btn-cancel"
+                (click)="onClose()"
+                id="geoip-dialog-cancel-btn"
+                [disabled]="isSaving">
+                {{ 'ACTIONS.CANCEL' | translate }}
+            </button>
+        </div>
+
+        <div class="footer-right">
+            <span class="summary-total-pill">
+                {{ totalSelectedCount }} {{ (totalSelectedCount === 1 ? 'SENSOR.GEO_COUNTRY_SINGULAR' : 'SENSOR.GEO_COUNTRIES_PLURAL') | translate }} {{ 'SENSOR.GEO_SELECTED_COUNT' | translate }}
+            </span>
+        </div>
+    </div>
 </div>

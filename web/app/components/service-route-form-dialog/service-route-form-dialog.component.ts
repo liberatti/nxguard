@@ -168,8 +168,9 @@ export class ServiceRouteFormDialogComponent implements OnInit {
 
         const openWithSensor = (sensor: Sensor) => {
             const dialogRef = this.dialog.open(SensorGeoipDialogComponent, {
-                width: '680px',
-                maxWidth: '92vw',
+                width: '800px',
+                maxWidth: '95vw',
+                maxHeight: '90vh',
                 data: {
                     sensorId: sensor._id,
                     sensor: sensor,

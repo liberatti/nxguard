@@ -226,13 +226,23 @@ export class SensorFormComponent implements OnInit, AfterViewInit {
     }
 
     openGeoipDialog(): void {
-        this.dialog.open(SensorGeoipDialogComponent, {
+        const dialogRef = this.dialog.open(SensorGeoipDialogComponent, {
             data: {
+                sensorId: this.form.value._id || this.route.snapshot.params['id'],
                 sensorName: this.form.value.name || 'Sensor GeoIP',
-                geo_codes: this.getGeoCodes()
+                geo_codes: this.getGeoCodes(),
+                editable: true
             },
-            width: '620px',
-            maxWidth: '92vw'
+            width: '800px',
+            maxWidth: '95vw',
+            maxHeight: '90vh'
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result && result.updated && result.geo_codes) {
+                this.form.get('security.geo_codes')?.setValue(result.geo_codes);
+                this.form.markAsTouched();
+            }
         });
     }
 

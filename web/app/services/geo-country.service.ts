@@ -11,140 +11,282 @@ export interface RegionGroup {
     countries: CountryInfo[];
 }
 
-const COUNTRY_DATABASE: Record<string, { name: string; region: string }> = {
-    // Americas
-    US: { name: 'United States', region: 'Americas' },
-    CA: { name: 'Canada', region: 'Americas' },
-    MX: { name: 'Mexico', region: 'Americas' },
-    BR: { name: 'Brazil', region: 'Americas' },
-    AR: { name: 'Argentina', region: 'Americas' },
-    CL: { name: 'Chile', region: 'Americas' },
-    CO: { name: 'Colombia', region: 'Americas' },
-    PE: { name: 'Peru', region: 'Americas' },
-    UY: { name: 'Uruguay', region: 'Americas' },
-    VE: { name: 'Venezuela', region: 'Americas' },
-    PA: { name: 'Panama', region: 'Americas' },
-    CR: { name: 'Costa Rica', region: 'Americas' },
-    CU: { name: 'Cuba', region: 'Americas' },
-    DO: { name: 'Dominican Republic', region: 'Americas' },
-    EC: { name: 'Ecuador', region: 'Americas' },
-    GT: { name: 'Guatemala', region: 'Americas' },
-    JM: { name: 'Jamaica', region: 'Americas' },
-    PR: { name: 'Puerto Rico', region: 'Americas' },
-    TT: { name: 'Trinidad & Tobago', region: 'Americas' },
-    BO: { name: 'Bolivia', region: 'Americas' },
-    PY: { name: 'Paraguay', region: 'Americas' },
+export interface ContinentRegion {
+    id: string;
+    nameKey: string;
+    defaultName: string;
+    countries: CountryInfo[];
+}
 
-    // Europe
-    GB: { name: 'United Kingdom', region: 'Europe' },
-    DE: { name: 'Germany', region: 'Europe' },
-    FR: { name: 'France', region: 'Europe' },
-    IT: { name: 'Italy', region: 'Europe' },
-    ES: { name: 'Spain', region: 'Europe' },
-    PT: { name: 'Portugal', region: 'Europe' },
-    NL: { name: 'Netherlands', region: 'Europe' },
-    BE: { name: 'Belgium', region: 'Europe' },
-    CH: { name: 'Switzerland', region: 'Europe' },
-    AT: { name: 'Austria', region: 'Europe' },
-    SE: { name: 'Sweden', region: 'Europe' },
-    NO: { name: 'Norway', region: 'Europe' },
-    DK: { name: 'Denmark', region: 'Europe' },
-    FI: { name: 'Finland', region: 'Europe' },
-    PL: { name: 'Poland', region: 'Europe' },
-    CZ: { name: 'Czech Republic', region: 'Europe' },
-    IE: { name: 'Ireland', region: 'Europe' },
-    GR: { name: 'Greece', region: 'Europe' },
-    RO: { name: 'Romania', region: 'Europe' },
-    HU: { name: 'Hungary', region: 'Europe' },
-    UA: { name: 'Ukraine', region: 'Europe' },
-    RU: { name: 'Russia', region: 'Europe' },
-    BY: { name: 'Belarus', region: 'Europe' },
-    BG: { name: 'Bulgaria', region: 'Europe' },
-    HR: { name: 'Croatia', region: 'Europe' },
-    SK: { name: 'Slovakia', region: 'Europe' },
-    EE: { name: 'Estonia', region: 'Europe' },
-    LV: { name: 'Latvia', region: 'Europe' },
-    LT: { name: 'Lithuania', region: 'Europe' },
-    IS: { name: 'Iceland', region: 'Europe' },
-    RS: { name: 'Serbia', region: 'Europe' },
-    SI: { name: 'Slovenia', region: 'Europe' },
-    LU: { name: 'Luxembourg', region: 'Europe' },
-    CY: { name: 'Cyprus', region: 'Europe' },
-    MT: { name: 'Malta', region: 'Europe' },
-
-    // Asia-Pacific
-    CN: { name: 'China', region: 'Asia-Pacific' },
-    JP: { name: 'Japan', region: 'Asia-Pacific' },
-    KR: { name: 'South Korea', region: 'Asia-Pacific' },
-    IN: { name: 'India', region: 'Asia-Pacific' },
-    AU: { name: 'Australia', region: 'Asia-Pacific' },
-    NZ: { name: 'New Zealand', region: 'Asia-Pacific' },
-    SG: { name: 'Singapore', region: 'Asia-Pacific' },
-    MY: { name: 'Malaysia', region: 'Asia-Pacific' },
-    TH: { name: 'Thailand', region: 'Asia-Pacific' },
-    PH: { name: 'Philippines', region: 'Asia-Pacific' },
-    VN: { name: 'Vietnam', region: 'Asia-Pacific' },
-    ID: { name: 'Indonesia', region: 'Asia-Pacific' },
-    TW: { name: 'Taiwan', region: 'Asia-Pacific' },
-    HK: { name: 'Hong Kong', region: 'Asia-Pacific' },
-    PK: { name: 'Pakistan', region: 'Asia-Pacific' },
-    BD: { name: 'Bangladesh', region: 'Asia-Pacific' },
-    LK: { name: 'Sri Lanka', region: 'Asia-Pacific' },
-    KH: { name: 'Cambodia', region: 'Asia-Pacific' },
-    MM: { name: 'Myanmar', region: 'Asia-Pacific' },
-    NP: { name: 'Nepal', region: 'Asia-Pacific' },
-    MN: { name: 'Mongolia', region: 'Asia-Pacific' },
-    KZ: { name: 'Kazakhstan', region: 'Asia-Pacific' },
-    UZ: { name: 'Uzbekistan', region: 'Asia-Pacific' },
-
-    // Middle East & Africa
-    AE: { name: 'United Arab Emirates', region: 'Middle East & Africa' },
-    SA: { name: 'Saudi Arabia', region: 'Middle East & Africa' },
-    IL: { name: 'Israel', region: 'Middle East & Africa' },
-    TR: { name: 'Turkey', region: 'Middle East & Africa' },
-    ZA: { name: 'South Africa', region: 'Middle East & Africa' },
-    NG: { name: 'Nigeria', region: 'Middle East & Africa' },
-    EG: { name: 'Egypt', region: 'Middle East & Africa' },
-    KE: { name: 'Kenya', region: 'Middle East & Africa' },
-    MA: { name: 'Morocco', region: 'Middle East & Africa' },
-    GH: { name: 'Ghana', region: 'Middle East & Africa' },
-    QA: { name: 'Qatar', region: 'Middle East & Africa' },
-    KW: { name: 'Kuwait', region: 'Middle East & Africa' },
-    OM: { name: 'Oman', region: 'Middle East & Africa' },
-    BH: { name: 'Bahrain', region: 'Middle East & Africa' },
-    JO: { name: 'Jordan', region: 'Middle East & Africa' },
-    LB: { name: 'Lebanon', region: 'Middle East & Africa' },
-    IQ: { name: 'Iraq', region: 'Middle East & Africa' },
-    IR: { name: 'Iran', region: 'Middle East & Africa' },
-    DZ: { name: 'Algeria', region: 'Middle East & Africa' },
-    TN: { name: 'Tunisia', region: 'Middle East & Africa' },
-    ET: { name: 'Ethiopia', region: 'Middle East & Africa' },
-    TZ: { name: 'Tanzania', region: 'Middle East & Africa' },
-    UG: { name: 'Uganda', region: 'Middle East & Africa' },
-    AO: { name: 'Angola', region: 'Middle East & Africa' },
-
-    // Fallbacks
-    None: { name: 'None', region: 'Other / Global' },
-    Unknown: { name: 'Unknown', region: 'Other / Global' }
-};
-
-const REGION_ORDER = [
-    'Americas',
-    'Europe',
-    'Asia-Pacific',
-    'Middle East & Africa',
-    'Other / Global'
+// 6 standard continents with exact country counts matching ISO / UN M49
+const CONTINENT_COUNTRIES: { id: string; nameKey: string; defaultName: string; countries: { code: string; name: string }[] }[] = [
+    {
+        id: 'africa',
+        nameKey: 'GEOIP_DIALOG.CONTINENTS.AFRICA',
+        defaultName: 'África',
+        countries: [
+            { code: 'DZ', name: 'Algeria' },
+            { code: 'AO', name: 'Angola' },
+            { code: 'BJ', name: 'Benin' },
+            { code: 'BW', name: 'Botswana' },
+            { code: 'BF', name: 'Burkina Faso' },
+            { code: 'BI', name: 'Burundi' },
+            { code: 'CV', name: 'Cabo Verde' },
+            { code: 'CM', name: 'Cameroon' },
+            { code: 'CF', name: 'Central African Republic' },
+            { code: 'TD', name: 'Chad' },
+            { code: 'KM', name: 'Comoros' },
+            { code: 'CG', name: 'Congo' },
+            { code: 'CD', name: 'DR Congo' },
+            { code: 'CI', name: 'Ivory Coast' },
+            { code: 'DJ', name: 'Djibouti' },
+            { code: 'EG', name: 'Egypt' },
+            { code: 'GQ', name: 'Equatorial Guinea' },
+            { code: 'ER', name: 'Eritrea' },
+            { code: 'SZ', name: 'Eswatini' },
+            { code: 'ET', name: 'Ethiopia' },
+            { code: 'GA', name: 'Gabon' },
+            { code: 'GM', name: 'Gambia' },
+            { code: 'GH', name: 'Ghana' },
+            { code: 'GN', name: 'Guinea' },
+            { code: 'GW', name: 'Guinea-Bissau' },
+            { code: 'KE', name: 'Kenya' },
+            { code: 'LS', name: 'Lesotho' },
+            { code: 'LR', name: 'Liberia' },
+            { code: 'LY', name: 'Libya' },
+            { code: 'MG', name: 'Madagascar' },
+            { code: 'MW', name: 'Malawi' },
+            { code: 'ML', name: 'Mali' },
+            { code: 'MR', name: 'Mauritania' },
+            { code: 'MU', name: 'Mauritius' },
+            { code: 'MA', name: 'Morocco' },
+            { code: 'MZ', name: 'Mozambique' },
+            { code: 'NA', name: 'Namibia' },
+            { code: 'NE', name: 'Niger' },
+            { code: 'NG', name: 'Nigeria' },
+            { code: 'RW', name: 'Rwanda' },
+            { code: 'ST', name: 'Sao Tome and Principe' },
+            { code: 'SN', name: 'Senegal' },
+            { code: 'SC', name: 'Seychelles' },
+            { code: 'SL', name: 'Sierra Leone' },
+            { code: 'SO', name: 'Somalia' },
+            { code: 'ZA', name: 'South Africa' },
+            { code: 'SS', name: 'South Sudan' },
+            { code: 'SD', name: 'Sudan' },
+            { code: 'TZ', name: 'Tanzania' },
+            { code: 'TG', name: 'Togo' },
+            { code: 'TN', name: 'Tunisia' },
+            { code: 'UG', name: 'Uganda' },
+            { code: 'ZM', name: 'Zambia' },
+            { code: 'ZW', name: 'Zimbabwe' }
+        ]
+    },
+    {
+        id: 'north_america',
+        nameKey: 'GEOIP_DIALOG.CONTINENTS.NORTH_AMERICA',
+        defaultName: 'América do Norte',
+        countries: [
+            { code: 'CA', name: 'Canada' },
+            { code: 'MX', name: 'Mexico' },
+            { code: 'US', name: 'United States' }
+        ]
+    },
+    {
+        id: 'south_america',
+        nameKey: 'GEOIP_DIALOG.CONTINENTS.SOUTH_AMERICA',
+        defaultName: 'América do Sul',
+        countries: [
+            { code: 'AR', name: 'Argentina' },
+            { code: 'BO', name: 'Bolivia' },
+            { code: 'BR', name: 'Brazil' },
+            { code: 'CL', name: 'Chile' },
+            { code: 'CO', name: 'Colombia' },
+            { code: 'EC', name: 'Ecuador' },
+            { code: 'GY', name: 'Guyana' },
+            { code: 'PY', name: 'Paraguay' },
+            { code: 'PE', name: 'Peru' },
+            { code: 'SR', name: 'Suriname' },
+            { code: 'UY', name: 'Uruguay' },
+            { code: 'VE', name: 'Venezuela' }
+        ]
+    },
+    {
+        id: 'asia',
+        nameKey: 'GEOIP_DIALOG.CONTINENTS.ASIA',
+        defaultName: 'Ásia',
+        countries: [
+            { code: 'AF', name: 'Afghanistan' },
+            { code: 'AM', name: 'Armenia' },
+            { code: 'AZ', name: 'Azerbaijan' },
+            { code: 'BH', name: 'Bahrain' },
+            { code: 'BD', name: 'Bangladesh' },
+            { code: 'BT', name: 'Bhutan' },
+            { code: 'BN', name: 'Brunei' },
+            { code: 'KH', name: 'Cambodia' },
+            { code: 'CN', name: 'China' },
+            { code: 'CY', name: 'Cyprus' },
+            { code: 'GE', name: 'Georgia' },
+            { code: 'HK', name: 'Hong Kong' },
+            { code: 'IN', name: 'India' },
+            { code: 'ID', name: 'Indonesia' },
+            { code: 'IR', name: 'Iran' },
+            { code: 'IQ', name: 'Iraq' },
+            { code: 'IL', name: 'Israel' },
+            { code: 'JP', name: 'Japan' },
+            { code: 'JO', name: 'Jordan' },
+            { code: 'KZ', name: 'Kazakhstan' },
+            { code: 'KW', name: 'Kuwait' },
+            { code: 'KG', name: 'Kyrgyzstan' },
+            { code: 'LA', name: 'Laos' },
+            { code: 'LB', name: 'Lebanon' },
+            { code: 'MY', name: 'Malaysia' },
+            { code: 'MV', name: 'Maldives' },
+            { code: 'MN', name: 'Mongolia' },
+            { code: 'MM', name: 'Myanmar' },
+            { code: 'NP', name: 'Nepal' },
+            { code: 'KP', name: 'North Korea' },
+            { code: 'OM', name: 'Oman' },
+            { code: 'PK', name: 'Pakistan' },
+            { code: 'PH', name: 'Philippines' },
+            { code: 'QA', name: 'Qatar' },
+            { code: 'SA', name: 'Saudi Arabia' },
+            { code: 'SG', name: 'Singapore' },
+            { code: 'KR', name: 'South Korea' },
+            { code: 'LK', name: 'Sri Lanka' },
+            { code: 'SY', name: 'Syria' },
+            { code: 'TW', name: 'Taiwan' },
+            { code: 'TJ', name: 'Tajikistan' },
+            { code: 'TH', name: 'Thailand' },
+            { code: 'TL', name: 'Timor-Leste' },
+            { code: 'TR', name: 'Turkey' },
+            { code: 'TM', name: 'Turkmenistan' },
+            { code: 'AE', name: 'United Arab Emirates' },
+            { code: 'UZ', name: 'Uzbekistan' },
+            { code: 'VN', name: 'Vietnam' },
+            { code: 'YE', name: 'Yemen' }
+        ]
+    },
+    {
+        id: 'europe',
+        nameKey: 'GEOIP_DIALOG.CONTINENTS.EUROPE',
+        defaultName: 'Europa',
+        countries: [
+            { code: 'AL', name: 'Albania' },
+            { code: 'AD', name: 'Andorra' },
+            { code: 'AT', name: 'Austria' },
+            { code: 'BY', name: 'Belarus' },
+            { code: 'BE', name: 'Belgium' },
+            { code: 'BA', name: 'Bosnia and Herzegovina' },
+            { code: 'BG', name: 'Bulgaria' },
+            { code: 'HR', name: 'Croatia' },
+            { code: 'CZ', name: 'Czech Republic' },
+            { code: 'DK', name: 'Denmark' },
+            { code: 'EE', name: 'Estonia' },
+            { code: 'FI', name: 'Finland' },
+            { code: 'FR', name: 'France' },
+            { code: 'DE', name: 'Germany' },
+            { code: 'GR', name: 'Greece' },
+            { code: 'HU', name: 'Hungary' },
+            { code: 'IS', name: 'Iceland' },
+            { code: 'IE', name: 'Ireland' },
+            { code: 'IT', name: 'Italy' },
+            { code: 'LV', name: 'Latvia' },
+            { code: 'LI', name: 'Liechtenstein' },
+            { code: 'LT', name: 'Lithuania' },
+            { code: 'LU', name: 'Luxembourg' },
+            { code: 'MT', name: 'Malta' },
+            { code: 'MD', name: 'Moldova' },
+            { code: 'MC', name: 'Monaco' },
+            { code: 'ME', name: 'Montenegro' },
+            { code: 'NL', name: 'Netherlands' },
+            { code: 'MK', name: 'North Macedonia' },
+            { code: 'NO', name: 'Norway' },
+            { code: 'PL', name: 'Poland' },
+            { code: 'PT', name: 'Portugal' },
+            { code: 'RO', name: 'Romania' },
+            { code: 'RU', name: 'Russia' },
+            { code: 'SM', name: 'San Marino' },
+            { code: 'RS', name: 'Serbia' },
+            { code: 'SK', name: 'Slovakia' },
+            { code: 'SI', name: 'Slovenia' },
+            { code: 'ES', name: 'Spain' },
+            { code: 'SE', name: 'Sweden' },
+            { code: 'CH', name: 'Switzerland' },
+            { code: 'UA', name: 'Ukraine' },
+            { code: 'GB', name: 'United Kingdom' },
+            { code: 'VA', name: 'Vatican City' }
+        ]
+    },
+    {
+        id: 'oceania',
+        nameKey: 'GEOIP_DIALOG.CONTINENTS.OCEANIA',
+        defaultName: 'Oceania',
+        countries: [
+            { code: 'AU', name: 'Australia' },
+            { code: 'FJ', name: 'Fiji' },
+            { code: 'KI', name: 'Kiribati' },
+            { code: 'MH', name: 'Marshall Islands' },
+            { code: 'FM', name: 'Micronesia' },
+            { code: 'NR', name: 'Nauru' },
+            { code: 'NZ', name: 'New Zealand' },
+            { code: 'PW', name: 'Palau' },
+            { code: 'PG', name: 'Papua New Guinea' },
+            { code: 'WS', name: 'Samoa' },
+            { code: 'SB', name: 'Solomon Islands' },
+            { code: 'TO', name: 'Tonga' },
+            { code: 'TV', name: 'Tuvalu' },
+            { code: 'VU', name: 'Vanuatu' }
+        ]
+    }
 ];
+
+const CODE_TO_COUNTRY: Record<string, { name: string; region: string }> = {};
+for (const continent of CONTINENT_COUNTRIES) {
+    for (const c of continent.countries) {
+        CODE_TO_COUNTRY[c.code] = { name: c.name, region: continent.defaultName };
+    }
+}
+
+// Global fallbacks
+CODE_TO_COUNTRY['None'] = { name: 'None', region: 'Other / Global' };
+CODE_TO_COUNTRY['Unknown'] = { name: 'Unknown', region: 'Other / Global' };
 
 @Injectable({
     providedIn: 'root'
 })
 export class GeoCountryService {
 
+    getContinentRegions(searchQuery: string = ''): ContinentRegion[] {
+        const query = (searchQuery || '').trim().toLowerCase();
+
+        return CONTINENT_COUNTRIES.map(continent => {
+            const countries: CountryInfo[] = continent.countries
+                .filter(c => {
+                    if (!query) return true;
+                    const matchCode = c.code.toLowerCase().includes(query);
+                    const matchName = c.name.toLowerCase().includes(query);
+                    const matchRegion = continent.defaultName.toLowerCase().includes(query);
+                    return matchCode || matchName || matchRegion;
+                })
+                .map(c => ({
+                    code: c.code,
+                    name: c.name,
+                    region: continent.defaultName
+                }));
+
+            return {
+                id: continent.id,
+                nameKey: continent.nameKey,
+                defaultName: continent.defaultName,
+                countries: countries.sort((a, b) => a.name.localeCompare(b.name))
+            };
+        });
+    }
+
     getCountryInfo(code: string): CountryInfo {
         const cleanCode = (code || '').trim();
         const upper = cleanCode.toUpperCase();
-        const entry = COUNTRY_DATABASE[upper] || COUNTRY_DATABASE[cleanCode];
+        const entry = CODE_TO_COUNTRY[upper] || CODE_TO_COUNTRY[cleanCode];
 
         if (entry) {
             return {
@@ -187,8 +329,9 @@ export class GeoCountryService {
             filtered.push(info);
         }
 
+        const regionNames = ['África', 'América do Norte', 'América do Sul', 'Ásia', 'Europa', 'Oceania', 'Other / Global'];
         const groupsMap = new Map<string, CountryInfo[]>();
-        for (const r of REGION_ORDER) {
+        for (const r of regionNames) {
             groupsMap.set(r, []);
         }
 
@@ -199,10 +342,9 @@ export class GeoCountryService {
         }
 
         const result: RegionGroup[] = [];
-        for (const r of REGION_ORDER) {
+        for (const r of regionNames) {
             const items = groupsMap.get(r) || [];
             if (items.length > 0) {
-                // sort alphabetically by name
                 items.sort((a, b) => a.name.localeCompare(b.name));
                 result.push({
                     name: r,
@@ -216,7 +358,7 @@ export class GeoCountryService {
 
     getAllCountries(): CountryInfo[] {
         const list: CountryInfo[] = [];
-        for (const [code, info] of Object.entries(COUNTRY_DATABASE)) {
+        for (const [code, info] of Object.entries(CODE_TO_COUNTRY)) {
             if (code === 'None' || code === 'Unknown') continue;
             list.push({
                 code,

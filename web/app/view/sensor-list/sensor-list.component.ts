@@ -72,13 +72,28 @@ export class SensorListComponent implements OnInit {
         if (event) {
             event.stopPropagation();
         }
-        this.confirmDialog.open(SensorGeoipDialogComponent, {
+        const dialogRef = this.confirmDialog.open(SensorGeoipDialogComponent, {
             data: {
+                sensor: element,
+                sensorId: element._id,
                 sensorName: element.name,
-                geo_codes: this.getGeoCodes(element)
+                geo_codes: this.getGeoCodes(element),
+                editable: true
             },
-            width: '620px',
-            maxWidth: '92vw'
+            width: '800px',
+            maxWidth: '95vw'
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result && result.updated) {
+                const newCodes = result.geo_codes || [];
+                if (!element.security) {
+                    element.security = { reputation: [], trusted: [], geo_codes: newCodes, geo_codes_count: newCodes.length };
+                } else {
+                    element.security.geo_codes = newCodes;
+                    element.security.geo_codes_count = newCodes.length;
+                }
+            }
         });
     }
 

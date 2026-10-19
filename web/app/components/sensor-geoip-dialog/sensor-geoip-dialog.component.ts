@@ -12,11 +12,12 @@ import {
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { GeoCountryService, RegionGroup, CountryInfo } from '../../services/geo-country.service';
+import { GeoCountryService, ContinentRegion, CountryInfo } from '../../services/geo-country.service';
 import { SensorService } from '../../services/sensor.service';
 import { NotificationService } from '../../services/notification.service';
 import { Sensor } from '../../models/sensor';
@@ -50,7 +51,8 @@ export interface SensorGeoipDialogResult {
         MatIconModule,
         MatFormFieldModule,
         MatInputModule,
-        MatSelectModule,
+        MatCheckboxModule,
+        MatSlideToggleModule,
         MatTooltipModule,
         MatProgressSpinnerModule,
         TranslatePipe
@@ -58,9 +60,11 @@ export interface SensorGeoipDialogResult {
 })
 export class SensorGeoipDialogComponent implements OnInit {
     searchQuery: string = '';
-    editableGeoCodes: string[] = [];
-    allCountries: CountryInfo[] = [];
-    selectedCountryToAdd: string = '';
+    isBlockingActive: boolean = true;
+    selectedCountryCodes: Set<string> = new Set<string>();
+    expandedContinents: Record<string, boolean> = {
+        asia: true // Default open or active as in the screenshot
+    };
     isSaving: boolean = false;
 
     constructor(
@@ -73,51 +77,98 @@ export class SensorGeoipDialogComponent implements OnInit {
     ) {}
 
     ngOnInit(): void {
-        this.editableGeoCodes = (this.data?.geo_codes || this.data?.sensor?.security?.geo_codes || []).slice();
-        this.allCountries = this.geoCountryService.getAllCountries();
+        const rawCodes = this.data?.geo_codes || this.data?.sensor?.security?.geo_codes || [];
+        this.selectedCountryCodes = new Set<string>(rawCodes.map(c => (c || '').trim().toUpperCase()));
+        this.isBlockingActive = this.selectedCountryCodes.size > 0 || this.data?.editable !== false;
     }
 
     get isEditable(): boolean {
-        return !!this.data?.editable;
+        return this.data?.editable !== false;
     }
 
-    get totalCount(): number {
-        return this.editableGeoCodes.length;
+    get continents(): ContinentRegion[] {
+        return this.geoCountryService.getContinentRegions(this.searchQuery);
     }
 
-    get regionGroups(): RegionGroup[] {
-        return this.geoCountryService.groupCountriesByRegion(
-            this.editableGeoCodes,
-            this.searchQuery
-        );
+    get totalSelectedCount(): number {
+        return this.selectedCountryCodes.size;
     }
 
-    get filteredCount(): number {
-        return this.regionGroups.reduce((acc, g) => acc + g.countries.length, 0);
-    }
-
-    get availableCountries(): CountryInfo[] {
-        const active = new Set(this.editableGeoCodes);
-        return this.allCountries.filter(c => !active.has(c.code));
-    }
-
-    addCountry(code: string): void {
-        if (!code) return;
-        if (!this.editableGeoCodes.includes(code)) {
-            this.editableGeoCodes.push(code);
+    isContinentExpanded(id: string): boolean {
+        if (this.searchQuery && this.searchQuery.trim().length > 0) {
+            return true;
         }
-        this.selectedCountryToAdd = '';
+        return !!this.expandedContinents[id];
     }
 
-    removeCountry(code: string, event?: Event): void {
+    toggleContinent(id: string, event?: Event): void {
         if (event) {
             event.stopPropagation();
         }
-        this.editableGeoCodes = this.editableGeoCodes.filter(c => c !== code);
+        this.expandedContinents[id] = !this.expandedContinents[id];
     }
 
-    clearAll(): void {
-        this.editableGeoCodes = [];
+    isContinentAllSelected(continent: ContinentRegion): boolean {
+        if (!continent.countries.length) return false;
+        return continent.countries.every(c => this.selectedCountryCodes.has(c.code.toUpperCase()));
+    }
+
+    isContinentPartiallySelected(continent: ContinentRegion): boolean {
+        const selected = this.getContinentSelectedCount(continent);
+        return selected > 0 && selected < continent.countries.length;
+    }
+
+    getContinentSelectedCount(continent: ContinentRegion): number {
+        return continent.countries.filter(c => this.selectedCountryCodes.has(c.code.toUpperCase())).length;
+    }
+
+    onContinentCheckboxChange(continent: ContinentRegion, checked: boolean, event?: unknown): void {
+        if (event && typeof event === 'object' && 'stopPropagation' in event) {
+            (event as Event).stopPropagation();
+        }
+        if (checked) {
+            continent.countries.forEach(c => this.selectedCountryCodes.add(c.code.toUpperCase()));
+        } else {
+            continent.countries.forEach(c => this.selectedCountryCodes.delete(c.code.toUpperCase()));
+        }
+    }
+
+    selectAllInContinent(continent: ContinentRegion, event?: Event): void {
+        if (event) {
+            event.stopPropagation();
+        }
+        continent.countries.forEach(c => this.selectedCountryCodes.add(c.code.toUpperCase()));
+    }
+
+    deselectAllInContinent(continent: ContinentRegion, event?: Event): void {
+        if (event) {
+            event.stopPropagation();
+        }
+        continent.countries.forEach(c => this.selectedCountryCodes.delete(c.code.toUpperCase()));
+    }
+
+    isCountrySelected(code: string): boolean {
+        return this.selectedCountryCodes.has((code || '').toUpperCase());
+    }
+
+    toggleCountry(code: string, checked?: boolean, event?: unknown): void {
+        if (event && typeof event === 'object' && 'stopPropagation' in event) {
+            (event as Event).stopPropagation();
+        }
+        const upper = (code || '').toUpperCase();
+        if (checked !== undefined) {
+            if (checked) {
+                this.selectedCountryCodes.add(upper);
+            } else {
+                this.selectedCountryCodes.delete(upper);
+            }
+        } else {
+            if (this.selectedCountryCodes.has(upper)) {
+                this.selectedCountryCodes.delete(upper);
+            } else {
+                this.selectedCountryCodes.add(upper);
+            }
+        }
     }
 
     clearSearch(): void {
@@ -129,7 +180,7 @@ export class SensorGeoipDialogComponent implements OnInit {
     }
 
     onSave(): void {
-        const updatedCodes = [...this.editableGeoCodes];
+        const updatedCodes = this.isBlockingActive ? Array.from(this.selectedCountryCodes) : [];
         const sensorId = this.data?.sensorId || this.data?.sensor?._id;
 
         if (sensorId) {

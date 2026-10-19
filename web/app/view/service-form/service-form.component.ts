@@ -503,9 +503,9 @@ export class ServiceFormComponent implements OnInit {
                     geo_codes: fullSensor.security?.geo_codes || [],
                     editable: true
                 },
-                width: '680px',
-                maxWidth: '92vw',
-                maxHeight: '85vh'
+                width: '800px',
+                maxWidth: '95vw',
+                maxHeight: '90vh'
             });
 
             dialogRef.afterClosed().subscribe(result => {

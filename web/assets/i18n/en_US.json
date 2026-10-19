@@ -223,6 +223,23 @@
     "ADD_COUNTRY": "Add Blocked Country",
     "SELECT_COUNTRY_PLACEHOLDER": "Select country to block...",
     "EDIT_GEOIP": "Edit GeoIP",
+    "GEO_BLOCK_TITLE": "GeoIP Block",
+    "GEO_BLOCK_SUBTITLE": "Select regions and countries to block traffic.",
+    "ENABLE_BLOCK": "Enable Blocking",
+    "SEARCH_GEO_PLACEHOLDER": "Search country or region...",
+    "GEO_SELECTED_COUNT": "selected",
+    "GEO_SELECTED_OF": "of",
+    "VIEW_EDIT": "View/Edit",
+    "SELECT_ALL": "Select All",
+    "DESELECT_ALL": "Deselect All",
+    "CONTINENTS": {
+      "AFRICA": "Africa",
+      "NORTH_AMERICA": "North America",
+      "SOUTH_AMERICA": "South America",
+      "ASIA": "Asia",
+      "EUROPE": "Europe",
+      "OCEANIA": "Oceania"
+    },
     "SAVED_SUCCESS": "Sensor saved successfully",
     "UPDATED_SUCCESS": "Sensor updated successfully"
   },
