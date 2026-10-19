@@ -28,3 +28,23 @@
 .ml-2 {
     margin-left: 8px;
 }
+
+.sensor-selection-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.sensor-select-field {
+    flex: 1;
+}
+
+.sensor-geoip-btn {
+    height: 48px;
+    margin-bottom: 22px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+

@@ -202,8 +202,38 @@
     "FILTER_GEO_PLACEHOLDER": "Filtrar países selecionados...",
     "NO_GEO_SELECTED": "Nenhum país bloqueado selecionado.",
     "CLEAR_ALL": "Limpar todos",
+    "GEO_COUNTRY_SINGULAR": "País",
+    "GEO_COUNTRIES_PLURAL": "Países",
+    "RBL_PROVIDER_SINGULAR": "Provedor RBL",
+    "RBL_PROVIDERS_PLURAL": "Provedores RBL",
+    "MATCHES": "correspondências",
+    "VIEW_GEO_PROFILE": "Clique para visualizar o perfil completo de países GeoIP",
+    "VIEW_RBL_PROFILE": "Clique para visualizar o perfil completo de inteligência de ameaças RBL",
+    "ADD_TITLE": "Adicionar Sensor",
+    "EDIT_TITLE": "Editar Sensor",
+    "GENERAL": "Geral",
+    "GEO_COUNT_BADGE": "GeoIP: {{ count }} Países",
+    "GEO_COUNT_BADGE_ONE": "GeoIP: 1 País",
+    "RBL_COUNT_BADGE": "{{ count }} Provedores RBL",
+    "RBL_COUNT_BADGE_ONE": "1 Provedor RBL",
+    "RULES_COUNT_SUMMARY": "{{ filtered }} / {{ total }} Regras",
+    "NO_MATCHING_COUNTRIES": "Nenhum país encontrado correspondente ao filtro",
+    "NO_MATCHING_FEEDS": "Nenhum feed encontrado correspondente ao filtro",
+    "SELECT_RULE": "Selecionar regra {{ code }}",
+    "ADD_COUNTRY": "Adicionar País Bloqueado",
+    "SELECT_COUNTRY_PLACEHOLDER": "Selecione o país para bloquear...",
+    "EDIT_GEOIP": "Editar GeoIP",
     "SAVED_SUCCESS": "Sensor salvo com sucesso",
     "UPDATED_SUCCESS": "Sensor atualizado com sucesso"
+  },
+  "THREAT_CATEGORY": {
+    "TOR_EXIT_NODES": "Nós de Saída Tor",
+    "MALWARE_C2": "C2 & Malware",
+    "BRUTE_FORCE": "Força Bruta",
+    "WEB_ATTACKS": "Ataques Web",
+    "COMPROMISED_HOSTS": "Hosts Comprometidos",
+    "SPAM_BOGONS": "Spam & Bogons",
+    "THREAT_INTEL": "Inteligência de Ameaças"
   },
   "SERVICE": {
     "DETAILS": "Detalhes",
@@ -383,6 +413,7 @@
     "SERVICE": "Serviço"
   },
   "TRANSACTION": {
+    "VIEW_RAW_JSON": "Ver JSON Bruto",
     "FILTER": {
       "ADD_FILTER": "Adicionar Filtro",
       "CLEAR_ALL": "Limpar Tudo",
@@ -484,6 +515,13 @@
   },
   "UPSTREAM": {
     "ERR_TARGET_REQUIRED": "Upstream do tipo backend requer pelo menos um destino.",
+    "PERSISTENCE": {
+      "TITLE": "Persistência de Sessão",
+      "STICKY": "Fixa",
+      "TYPE": "Tipo",
+      "COOKIE_NAME": "Nome do Cookie",
+      "PATH": "Caminho"
+    },
     "TARGETS": {
       "TITLE": "Destinos",
       "ADD_BTN": "Adicionar Destino",
@@ -495,7 +533,12 @@
       "REMOVE_TOOLTIP": "Remover destino",
       "MODAL_TITLE_ADD": "Adicionar Destino de Upstream",
       "MODAL_TITLE_EDIT": "Editar Destino de Upstream",
-      "EMPTY_MESSAGE": "Nenhum destino configurado. Adicione pelo menos um destino para este backend."
+      "EMPTY_MESSAGE": "Nenhum destino configurado. Adicione pelo menos um destino para este backend.",
+      "HOST_PORT": "Host e Porta",
+      "WEIGHT": "Peso",
+      "HEALTH_STATUS": "Status de Saúde",
+      "HEALTHY": "healthy: true",
+      "UNHEALTHY": "healthy: false"
     },
     "STATES": {
       "TITLE": "Status de Saúde do Upstream",

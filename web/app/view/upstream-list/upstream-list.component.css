@@ -75,7 +75,104 @@
     border-color: rgba(148, 163, 184, 0.3);
 }
 
-.target-badge {
-    font-size: 0.85rem;
+.upstream-name-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    max-width: 100%;
+}
+
+.upstream-name-text {
     font-weight: 500;
+    color: var(--text-main);
+}
+
+.persistence-indicator-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    line-height: 1.2;
+    background: rgba(245, 158, 11, 0.12);
+    color: #d97706;
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    cursor: help;
+    transition: var(--transition);
+    user-select: none;
+}
+
+:host-context(.dark-theme) .persistence-indicator-badge,
+:host-context([data-theme="dark"]) .persistence-indicator-badge {
+    background: rgba(245, 158, 11, 0.18);
+    color: #fbbf24;
+    border-color: rgba(251, 191, 36, 0.35);
+}
+
+.persistence-indicator-badge:hover {
+    background: rgba(245, 158, 11, 0.22);
+}
+
+.persistence-indicator-badge .persist-icon {
+    font-size: 13px;
+    width: 13px;
+    height: 13px;
+    line-height: 13px;
+    vertical-align: middle;
+}
+
+.persistence-indicator-badge .persist-text {
+    font-size: 0.6875rem;
+    letter-spacing: 0.2px;
+}
+
+/* Targets Column & Popover */
+.targets-column-cell {
+    white-space: nowrap;
+}
+
+.target-none {
+    color: var(--text-muted);
+    font-size: 0.8125rem;
+}
+
+.targets-summary-box {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: rgba(37, 99, 235, 0.08);
+    border: 1px solid rgba(37, 99, 235, 0.2);
+    transition: var(--transition);
+}
+
+:host-context(.dark-theme) .targets-summary-box,
+:host-context([data-theme="dark"]) .targets-summary-box {
+    background: rgba(37, 99, 235, 0.15);
+    border-color: rgba(37, 99, 235, 0.35);
+}
+
+.targets-summary-box:hover {
+    background: rgba(37, 99, 235, 0.16);
+    border-color: rgba(37, 99, 235, 0.45);
+}
+
+.primary-target-text {
+    font-family: var(--font-mono, monospace);
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text-main);
+}
+
+.target-count-pill {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    background: var(--primary);
+    color: #ffffff;
+    padding: 1px 5px;
+    border-radius: 8px;
+    line-height: normal;
 }

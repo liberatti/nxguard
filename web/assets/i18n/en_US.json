@@ -202,8 +202,38 @@
     "FILTER_GEO_PLACEHOLDER": "Filter selected countries...",
     "NO_GEO_SELECTED": "No geo-blocked countries selected.",
     "CLEAR_ALL": "Clear all",
+    "GEO_COUNTRY_SINGULAR": "Country",
+    "GEO_COUNTRIES_PLURAL": "Countries",
+    "RBL_PROVIDER_SINGULAR": "RBL Provider",
+    "RBL_PROVIDERS_PLURAL": "RBL Providers",
+    "MATCHES": "matches",
+    "VIEW_GEO_PROFILE": "Click to view full GeoIP country profile",
+    "VIEW_RBL_PROFILE": "Click to view full RBL threat intelligence profile",
+    "ADD_TITLE": "Add Sensor",
+    "EDIT_TITLE": "Edit Sensor",
+    "GENERAL": "General",
+    "GEO_COUNT_BADGE": "GeoIP: {{ count }} Countries",
+    "GEO_COUNT_BADGE_ONE": "GeoIP: 1 Country",
+    "RBL_COUNT_BADGE": "{{ count }} RBL Providers",
+    "RBL_COUNT_BADGE_ONE": "1 RBL Provider",
+    "RULES_COUNT_SUMMARY": "{{ filtered }} / {{ total }} Rules",
+    "NO_MATCHING_COUNTRIES": "No countries found matching your filter",
+    "NO_MATCHING_FEEDS": "No feeds found matching your filter",
+    "SELECT_RULE": "Select rule {{ code }}",
+    "ADD_COUNTRY": "Add Blocked Country",
+    "SELECT_COUNTRY_PLACEHOLDER": "Select country to block...",
+    "EDIT_GEOIP": "Edit GeoIP",
     "SAVED_SUCCESS": "Sensor saved successfully",
     "UPDATED_SUCCESS": "Sensor updated successfully"
+  },
+  "THREAT_CATEGORY": {
+    "TOR_EXIT_NODES": "Tor Exit Nodes",
+    "MALWARE_C2": "Malware C2",
+    "BRUTE_FORCE": "Brute Force",
+    "WEB_ATTACKS": "Web Attacks",
+    "COMPROMISED_HOSTS": "Compromised Hosts",
+    "SPAM_BOGONS": "Spam & Bogons",
+    "THREAT_INTEL": "Threat Intel"
   },
   "SERVICE": {
     "DETAILS": "Details",
@@ -383,6 +413,7 @@
     "SERVICE": "Service"
   },
   "TRANSACTION": {
+    "VIEW_RAW_JSON": "View Raw JSON",
     "FILTER": {
       "ADD_FILTER": "Add Filter",
       "CLEAR_ALL": "Clear All",
@@ -484,6 +515,13 @@
   },
   "UPSTREAM": {
     "ERR_TARGET_REQUIRED": "Backend upstream requires at least one target.",
+    "PERSISTENCE": {
+      "TITLE": "Session Persistence",
+      "STICKY": "Sticky",
+      "TYPE": "Type",
+      "COOKIE_NAME": "Cookie Name",
+      "PATH": "Path"
+    },
     "TARGETS": {
       "TITLE": "Targets",
       "ADD_BTN": "Add Target",
@@ -495,7 +533,12 @@
       "REMOVE_TOOLTIP": "Remove target",
       "MODAL_TITLE_ADD": "Add Upstream Target",
       "MODAL_TITLE_EDIT": "Edit Upstream Target",
-      "EMPTY_MESSAGE": "No targets configured. Add at least one target for this backend."
+      "EMPTY_MESSAGE": "No targets configured. Add at least one target for this backend.",
+      "HOST_PORT": "Host & Port",
+      "WEIGHT": "Weight",
+      "HEALTH_STATUS": "Health Status",
+      "HEALTHY": "healthy: true",
+      "UNHEALTHY": "healthy: false"
     },
     "STATES": {
       "TITLE": "Upstream Health Status",

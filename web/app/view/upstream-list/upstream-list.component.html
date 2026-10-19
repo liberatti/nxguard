@@ -30,7 +30,19 @@
                 <ng-container matColumnDef="name">
                     <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'attr.name'|translate }}</th>
                     <td mat-cell *matCellDef="let element" id="upstream-name-{{element._id}}">
-                        {{ element.name }}
+                        <div class="upstream-name-cell">
+                            <span class="upstream-name-text">{{ element.name }}</span>
+                            @if (hasPersistence(element)) {
+                            <span class="persistence-indicator-badge"
+                                  [matTooltip]="getPersistenceTooltip(element)"
+                                  matTooltipPosition="above"
+                                  matTooltipClass="pre-line-tooltip"
+                                  id="upstream-persist-badge-{{element._id}}">
+                                <mat-icon class="persist-icon">cookie</mat-icon>
+                                <span class="persist-text">{{ 'UPSTREAM.PERSISTENCE.STICKY' | translate }}</span>
+                            </span>
+                            }
+                        </div>
                     </td>
                 </ng-container>
 
@@ -59,8 +71,17 @@
 
                 <ng-container matColumnDef="targetCount">
                     <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'attr.targets'|translate }}</th>
-                    <td mat-cell *matCellDef="let element" id="upstream-target-count-{{element._id}}">
-                        <span class="target-badge">{{ element.targets?.length || 0 }}</span>
+                    <td mat-cell *matCellDef="let element" id="upstream-target-count-{{element._id}}" class="targets-column-cell">
+                        @if (!element.targets || element.targets.length === 0) {
+                            <span class="target-none">-</span>
+                        } @else {
+                            <div class="targets-summary-box">
+                                <span class="primary-target-text">{{ getPrimaryTarget(element) }}</span>
+                                @if (element.targets.length > 1) {
+                                    <span class="target-count-pill">+{{ element.targets.length - 1 }}</span>
+                                }
+                            </div>
+                        }
                     </td>
                 </ng-container>
 

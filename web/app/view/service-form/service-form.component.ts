@@ -38,7 +38,9 @@ import { Upstream } from 'app/models/upstream';
 import { Sensor } from 'app/models/sensor';
 import { Bind, Header, ProtocolType, Route, RouteType, Service } from 'app/models/service';
 import { ServiceService } from 'app/services/service.service';
+import { SensorService } from 'app/services/sensor.service';
 import { NotificationService } from 'app/services/notification.service';
+import { SensorGeoipDialogComponent } from 'app/components/sensor-geoip-dialog/sensor-geoip-dialog.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { Certificate } from "../../models/certificate";
@@ -139,6 +141,7 @@ export class ServiceFormComponent implements OnInit {
         private confirmDialog: MatDialog,
         private notificationService: NotificationService,
         private serviceService: ServiceService,
+        private sensorService: SensorService,
         private certificateService: CertificateService,
         protected oauth: OAuthService,
         private cdr: ChangeDetectorRef,
@@ -469,5 +472,68 @@ export class ServiceFormComponent implements OnInit {
 
     get f(): { [key: string]: AbstractControl } {
         return this.form.controls;
+    }
+
+    getRouteGeoCodesCount(route: Route): number {
+        if (!route || !route.sensor) return 0;
+        if (route.sensor.security?.geo_codes_count !== undefined) {
+            return route.sensor.security.geo_codes_count;
+        }
+        if (route.sensor.security?.geo_codes) {
+            return route.sensor.security.geo_codes.length;
+        }
+        return 0;
+    }
+
+    openSensorGeoipDialog(route: Route, event?: Event): void {
+        if (event) {
+            event.stopPropagation();
+        }
+        if (!route || !route.sensor) {
+            return;
+        }
+
+        const sensorId = route.sensor._id;
+        const openDialog = (fullSensor: Sensor) => {
+            const dialogRef = this.confirmDialog.open(SensorGeoipDialogComponent, {
+                data: {
+                    sensor: fullSensor,
+                    sensorId: fullSensor._id,
+                    sensorName: fullSensor.name || route.sensor.name,
+                    geo_codes: fullSensor.security?.geo_codes || [],
+                    editable: true
+                },
+                width: '680px',
+                maxWidth: '92vw',
+                maxHeight: '85vh'
+            });
+
+            dialogRef.afterClosed().subscribe(result => {
+                if (result && result.updated) {
+                    const updatedCodes = result.geo_codes || [];
+                    const updatedSensor: Sensor = result.sensor || {
+                        ...fullSensor,
+                        security: {
+                            ...(fullSensor.security || { reputation: [], trusted: [] }),
+                            geo_codes: updatedCodes,
+                            geo_codes_count: updatedCodes.length
+                        }
+                    };
+                    route.sensor = updatedSensor;
+                    const currentRoutes = (this.routeDS.data || []).slice();
+                    this.routeDS.data = currentRoutes;
+                    this.cdr.markForCheck();
+                }
+            });
+        };
+
+        if (sensorId) {
+            this.sensorService.getById(String(sensorId)).subscribe({
+                next: (sensor) => openDialog(sensor),
+                error: () => openDialog(route.sensor)
+            });
+        } else {
+            openDialog(route.sensor);
+        }
     }
 }

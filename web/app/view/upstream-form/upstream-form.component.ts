@@ -103,6 +103,27 @@ export class UpstreamFormComponent implements OnInit {
             this.form.disable();
         }
 
+        // Subscribe to persistence switch to immediately hydrate persist state synchronously
+        this.persistEnabledControl.valueChanges.subscribe(enabled => {
+            const persistGroup = this.form.get('persist') as FormGroup;
+            if (enabled) {
+                const currentName = persistGroup.get('cookie_name')?.value;
+                const currentPath = persistGroup.get('cookie_path')?.value;
+                persistGroup.patchValue({
+                    type: SessionPersistenceType.COOKIE,
+                    cookie_name: currentName && currentName.trim() !== '' ? currentName : 'SRV_ID',
+                    cookie_path: currentPath && currentPath.trim() !== '' ? currentPath : '/'
+                });
+            } else {
+                persistGroup.patchValue({
+                    type: SessionPersistenceType.NONE,
+                    cookie_name: '',
+                    cookie_path: ''
+                });
+            }
+            this.cdr.detectChanges();
+        });
+
         // If editing, fetch upstream and patch form values
         if (!this.isAddMode) {
             this.upstreamService.getById(id).subscribe(data => {
@@ -132,7 +153,8 @@ export class UpstreamFormComponent implements OnInit {
 
                     // Handle persistence
                     if (typeof data.persist !== 'undefined' && data.persist) {
-                        this.persistEnabledControl.setValue(data.persist.type !== SessionPersistenceType.NONE);
+                        const hasCookie = data.persist.type && data.persist.type !== SessionPersistenceType.NONE;
+                        this.persistEnabledControl.setValue(hasCookie, { emitEvent: false });
                     }
                 }
 
@@ -228,19 +250,23 @@ export class UpstreamFormComponent implements OnInit {
     }
 
     persistChange() {
+        const persistGroup = this.form.get('persist') as FormGroup;
         if (this.persistEnabledControl.value) {
-            this.form.get('persist')?.setValue({
-                'type': SessionPersistenceType.COOKIE,
-                'cookie_name': 'lb-route',
-                'cookie_path': '/'
-            } as SessionPersistenceEntity);
+            const currentName = persistGroup.get('cookie_name')?.value;
+            const currentPath = persistGroup.get('cookie_path')?.value;
+            persistGroup.patchValue({
+                type: SessionPersistenceType.COOKIE,
+                cookie_name: currentName && currentName.trim() !== '' ? currentName : 'SRV_ID',
+                cookie_path: currentPath && currentPath.trim() !== '' ? currentPath : '/'
+            });
         } else {
-            this.form.get('persist')?.setValue({
-                'type': SessionPersistenceType.NONE,
-                'cookie_name': '',
-                'cookie_path': ''
-            } as SessionPersistenceEntity);
+            persistGroup.patchValue({
+                type: SessionPersistenceType.NONE,
+                cookie_name: '',
+                cookie_path: ''
+            });
         }
+        this.cdr.detectChanges();
     }
 
     isPersistEnabled() {

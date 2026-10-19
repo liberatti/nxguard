@@ -1,0 +1,80 @@
+<div class="sensor-rbl-dialog-container">
+    <div class="dialog-header">
+        <div class="header-main">
+            <div class="header-icon-box">
+                <mat-icon class="shield-icon">security</mat-icon>
+            </div>
+            <div class="header-text-group">
+                <h2 mat-dialog-title class="dialog-title">
+                    {{ data?.sensorName ? data.sensorName : ('SENSOR.RBL_BLOCK' | translate) }}
+                </h2>
+                <div class="header-badge-row">
+                    <span class="rbl-counter-badge prominent">
+                        <mat-icon class="badge-icon">shield</mat-icon>
+                        <span class="badge-text">{{ (totalCount === 1 ? 'SENSOR.RBL_COUNT_BADGE_ONE' : 'SENSOR.RBL_COUNT_BADGE') | translate:{ count: totalCount } }}</span>
+                    </span>
+                    @if (searchQuery && filteredCount !== totalCount) {
+                        <span class="filter-count-badge">
+                            {{ filteredCount }} {{ 'SENSOR.MATCHES' | translate }}
+                        </span>
+                    }
+                </div>
+            </div>
+        </div>
+        <button mat-icon-button type="button" class="close-btn" (click)="onClose()" [matTooltip]="'ACTIONS.CANCEL' | translate">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+
+    <mat-dialog-content class="dialog-content">
+        <!-- Quick Search -->
+        <div class="search-bar-row">
+            <mat-form-field appearance="outline" class="full-width search-field" subscriptSizing="dynamic">
+                <mat-icon matPrefix class="search-prefix-icon">search</mat-icon>
+                <input matInput [(ngModel)]="searchQuery" [placeholder]="'SENSOR.FILTER_FEEDS_PLACEHOLDER' | translate" id="rbl-dialog-search-input">
+                @if (searchQuery) {
+                    <button matSuffix mat-icon-button type="button" (click)="clearSearch()" id="rbl-dialog-search-clear">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                }
+            </mat-form-field>
+        </div>
+
+        @if (categoryGroups.length > 0) {
+            <div class="categories-container">
+                @for (group of categoryGroups; track group.name) {
+                    <div class="category-section" [ngClass]="group.colorClass">
+                        <div class="category-header">
+                            <mat-icon class="category-icon">{{ group.icon }}</mat-icon>
+                            <span class="category-name">{{ group.key ? (group.key | translate) : group.name }}</span>
+                            <span class="category-count-pill">{{ group.providers.length }}</span>
+                        </div>
+                        <div class="providers-tag-cloud">
+                            @for (provider of group.providers; track provider.name) {
+                                <div class="provider-chip" [matTooltip]="provider.description || provider.name">
+                                    <mat-icon class="chip-icon">{{ provider.icon }}</mat-icon>
+                                    <span class="provider-name">{{ provider.name }}</span>
+                                    <span class="provider-category-badge">{{ provider.categoryKey ? (provider.categoryKey | translate) : provider.category }}</span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        } @else {
+            <div class="empty-state">
+                <mat-icon class="empty-icon">search_off</mat-icon>
+                <p class="empty-title">{{ 'SENSOR.NO_RULES_FOUND' | translate }}</p>
+                @if (totalCount === 0) {
+                    <p class="empty-desc">{{ 'SENSOR.NO_FEEDS_SELECTED' | translate }}</p>
+                }
+            </div>
+        }
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end" class="dialog-actions">
+        <button mat-stroked-button type="button" (click)="onClose()" id="rbl-dialog-close-btn">
+            {{ 'ACTIONS.CANCEL' | translate }}
+        </button>
+    </mat-dialog-actions>
+</div>

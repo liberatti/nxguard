@@ -58,6 +58,31 @@ export class UpstreamListComponent implements OnInit {
         this.upstreamDS = new MatTableDataSource<Upstream>;
     }
 
+    hasPersistence(element: Upstream): boolean {
+        return !!element.persist &&
+               !!element.persist.type &&
+               String(element.persist.type).toUpperCase() !== 'NONE';
+    }
+
+    getPersistenceTooltip(element: Upstream): string {
+        if (!this.hasPersistence(element)) return '';
+        const p = element.persist;
+        const type = p.type || 'COOKIE';
+        const name = p.cookie_name || '-';
+        const path = p.cookie_path || '/';
+        return `Type: ${type}\nCookie Name: ${name}\nPath: ${path}`;
+    }
+
+    getPrimaryTarget(element: Upstream): string {
+        if (!element.targets || element.targets.length === 0) {
+            return '-';
+        }
+        const first = element.targets[0] as any;
+        return `${first.host}:${first.port}`;
+    }
+
+
+
     ngOnInit(): void {
         this.updateGridTable();
     }

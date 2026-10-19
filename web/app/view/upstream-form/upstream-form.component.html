@@ -71,7 +71,7 @@
                             </div>
                             }
 
-                            <mat-card class="full-width persist-card">
+                            <mat-card class="full-width persist-card" [class.has-content]="persistEnabledControl.value">
                                 <mat-card-header>
                                     <mat-card-title>
                                         <mat-slide-toggle id="upstream-persist-toggle" color="primary"
@@ -81,15 +81,17 @@
                                     </mat-card-title>
                                 </mat-card-header>
                                 @if (persistEnabledControl.value) {
-                                <mat-card-content>
-                                    <div class="form-grid-2">
-                                        <mat-form-field class="full-width">
+                                <mat-card-content class="persist-card-content">
+                                    <div class="form-grid-2" formGroupName="persist">
+                                        <mat-form-field class="full-width" appearance="outline">
                                             <mat-label>Cookie Name (Optional)</mat-label>
-                                            <input id="upstream-cookie-name" matInput formControlName="cookie_name">
+                                            <input id="upstream-cookie-name" matInput formControlName="cookie_name"
+                                                placeholder="SRV_ID">
                                         </mat-form-field>
-                                        <mat-form-field class="full-width">
+                                        <mat-form-field class="full-width" appearance="outline">
                                             <mat-label>Cookie Path (Optional)</mat-label>
-                                            <input id="upstream-cookie-path" matInput formControlName="cookie_path">
+                                            <input id="upstream-cookie-path" matInput formControlName="cookie_path"
+                                                placeholder="/">
                                         </mat-form-field>
                                     </div>
                                 </mat-card-content>
@@ -204,7 +206,7 @@
             </form>
         </mat-card-content>
         <mat-card-actions align="end" class="mat-mdc-card-actions bottom-actions">
-            <button type="button" mat-stroked-button [routerLink]="['/upstream']" id="upstream-form-back-btn">
+            <button type="button" mat-stroked-button [routerLink]="['/ups']" id="upstream-form-back-btn">
                 <mat-icon>arrow_back</mat-icon>
                 {{ 'ACTIONS.CANCEL' | translate }}
             </button>

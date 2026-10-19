@@ -449,6 +449,7 @@
                                                 <th class="col-name">{{ 'ROUTE.NAME' | translate }}</th>
                                                 <th class="col-upstream">{{ 'ROUTE.UPSTREAM' | translate }}</th>
                                                 <th class="col-path">{{ 'ROUTE.REQUEST_PATH' | translate }}</th>
+                                                <th class="col-sensor">{{ 'ROUTE.SECURITY_SENSOR' | translate }}</th>
                                                 <th class="col-actions text-right"></th>
                                             </tr>
                                         </thead>
@@ -491,6 +492,23 @@
                                                         }
                                                     </div>
                                                 </td>
+                                                <td class="col-sensor">
+                                                    @if (r.sensor && (r.sensor.name || r.sensor._id)) {
+                                                    <button type="button" class="route-sensor-btn"
+                                                        (click)="openSensorGeoipDialog(r, $event)"
+                                                        [matTooltip]="'SENSOR.EDIT_GEOIP' | translate"
+                                                        id="route-sensor-btn-{{i}}">
+                                                        <mat-icon class="sensor-shield-icon">security</mat-icon>
+                                                        <span class="sensor-title">{{ r.sensor.name || ('SENSOR.TITLE' | translate) }}</span>
+                                                        <span class="sensor-geo-badge">
+                                                            <mat-icon class="globe-mini-icon">public</mat-icon>
+                                                            {{ getRouteGeoCodesCount(r) }}
+                                                        </span>
+                                                    </button>
+                                                    } @else {
+                                                    <span class="no-sensor-text">-</span>
+                                                    }
+                                                </td>
                                                 <td class="col-actions text-right">
                                                     @if (form.enabled) {
                                                     <div class="table-cell-actions">
@@ -504,6 +522,13 @@
                                                                 <mat-icon>edit</mat-icon>
                                                                 {{ 'actions.edit' | translate }}
                                                             </button>
+                                                            @if (r.sensor && (r.sensor.name || r.sensor._id)) {
+                                                            <button mat-menu-item type="button" (click)="openSensorGeoipDialog(r, $event)"
+                                                                id="edit-route-sensor-{{i}}">
+                                                                <mat-icon>public</mat-icon>
+                                                                {{ 'SENSOR.EDIT_GEOIP' | translate }}
+                                                            </button>
+                                                            }
                                                             <button mat-menu-item type="button"
                                                                 (click)="onRemoveRoute(i)" id="remove-route-{{i}}">
                                                                 <mat-icon>delete</mat-icon>

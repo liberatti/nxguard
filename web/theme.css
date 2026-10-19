@@ -207,12 +207,27 @@ html, body {
 .mat-mdc-raised-button, 
 .mat-mdc-flat-button, 
 .mat-mdc-stroked-button {
-    border-radius: var(--btn-radius) !important;
+    border-radius: var(--btn-radius, 6px) !important;
     font-weight: 600 !important;
     text-transform: none !important;
     letter-spacing: 0.2px !important;
-    font-size: var(--font-size-base) !important;
+    font-size: var(--font-size-sm, 0.8125rem) !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    padding: 0 12px !important;
+    line-height: 30px !important;
     transition: all var(--transition) !important;
+}
+
+.mat-mdc-button mat-icon, 
+.mat-mdc-raised-button mat-icon, 
+.mat-mdc-flat-button mat-icon, 
+.mat-mdc-stroked-button mat-icon {
+    font-size: 16px !important;
+    width: 16px !important;
+    height: 16px !important;
+    line-height: 16px !important;
+    margin-right: 4px !important;
 }
 
 /* Primary Solid Button */
@@ -323,43 +338,45 @@ mat-card-actions[align="end"] {
     box-sizing: border-box !important;
 }
 
-/* Compact Table Rows */
+/* Compact Table Rows (High-Density 32px–34px) */
 .mat-mdc-table .mat-mdc-header-row,
 .mat-mdc-header-row {
-    min-height: 38px !important;
-    height: 38px !important;
+    min-height: 32px !important;
+    height: 32px !important;
 }
 
 .mat-mdc-table .mat-mdc-row,
 .mat-mdc-row {
-    min-height: 40px !important;
-    height: auto !important;
+    min-height: 34px !important;
+    height: 34px !important;
 }
 
 .mat-mdc-table .mat-mdc-footer-row,
 .mat-mdc-footer-row {
-    min-height: 38px !important;
-    height: 38px !important;
+    min-height: 32px !important;
+    height: 32px !important;
 }
 
 th.mat-mdc-header-cell {
     background: #f8fafc !important;
     color: var(--text-dim) !important;
-    font-size: var(--font-size-xs) !important;
+    font-size: var(--font-size-2xs, 0.6875rem) !important;
     font-weight: 700 !important;
     letter-spacing: 0.5px;
     text-transform: uppercase;
     border-bottom: 1px solid var(--border-dim) !important;
-    padding: 8px 12px !important;
+    padding: 4px 8px !important;
     box-sizing: border-box;
+    height: 32px !important;
 }
 
 td.mat-mdc-cell {
     color: var(--text-main) !important;
     border-bottom: 1px solid var(--border-dim) !important;
-    padding: 6px 12px !important;
-    font-size: var(--font-size-base) !important;
+    padding: 4px 8px !important;
+    font-size: var(--font-size-sm, 0.8125rem) !important;
     box-sizing: border-box;
+    vertical-align: middle !important;
 }
 
 .mat-mdc-row:hover {
@@ -371,7 +388,7 @@ td.mat-mdc-cell.text-right,
 th.text-right, 
 td.text-right {
     text-align: right !important;
-    padding-right: 12px !important;
+    padding-right: 8px !important;
 }
 
 td.mat-mdc-cell.text-right {
@@ -384,10 +401,25 @@ td.mat-mdc-cell.text-right .toggle-container {
     display: inline-flex !important;
     justify-content: flex-end !important;
     align-items: center !important;
-    gap: 6px !important;
+    gap: 4px !important;
 }
 
-/* Paginator */
+td.mat-mdc-cell .mat-mdc-icon-button {
+    width: 24px !important;
+    height: 24px !important;
+    padding: 0 !important;
+    line-height: 24px !important;
+}
+
+td.mat-mdc-cell .mat-mdc-icon-button mat-icon,
+td.mat-mdc-cell .mat-mdc-icon-button .mat-icon {
+    font-size: 16px !important;
+    width: 16px !important;
+    height: 16px !important;
+    line-height: 16px !important;
+}
+
+/* Paginator (Compact 36px) */
 .mat-mdc-paginator {
     background: #ffffff !important;
     color: var(--text-dim) !important;
@@ -397,29 +429,42 @@ td.mat-mdc-cell.text-right .toggle-container {
 }
 
 .mat-mdc-paginator-container {
-    padding: 0 20px !important;
+    padding: 0 14px !important;
     justify-content: flex-end !important;
-    min-height: 48px !important;
+    min-height: 36px !important;
+    height: 36px !important;
     box-sizing: border-box !important;
 }
 
 .mat-mdc-paginator-page-size-label,
 .mat-mdc-paginator-range-label {
     color: var(--text-dim) !important;
-    font-size: var(--font-size-sm) !important;
+    font-size: var(--font-size-xs, 0.75rem) !important;
 }
 
 .mat-mdc-paginator .mat-mdc-select-value {
     color: var(--text-main) !important;
-    font-size: var(--font-size-sm) !important;
+    font-size: var(--font-size-xs, 0.75rem) !important;
 }
 
 .mat-mdc-paginator .mat-mdc-select-arrow {
     color: var(--text-dim) !important;
+    width: 14px !important;
+    height: 14px !important;
 }
 
 .mat-mdc-paginator .mat-mdc-icon-button {
     color: var(--text-dim) !important;
+    width: 26px !important;
+    height: 26px !important;
+    padding: 0 !important;
+    line-height: 26px !important;
+}
+
+.mat-mdc-paginator .mat-mdc-icon-button mat-icon {
+    font-size: 18px !important;
+    width: 18px !important;
+    height: 18px !important;
 }
 
 .mat-mdc-paginator .mat-mdc-icon-button[disabled] {
@@ -429,7 +474,9 @@ td.mat-mdc-cell.text-right .toggle-container {
 
 .mat-mdc-paginator .mat-mdc-text-field-wrapper {
     background-color: #f8fafc !important;
-    border-radius: 6px !important;
+    border-radius: 4px !important;
+    height: 26px !important;
+    min-height: 26px !important;
 }
 
 /* Dialogs */
@@ -445,24 +492,24 @@ td.mat-mdc-cell.text-right .toggle-container {
     font-size: var(--font-size-lg) !important;
     font-weight: 700 !important;
     color: var(--text-main) !important;
-    padding: 16px 20px !important;
+    padding: 12px 18px !important;
     margin: 0 !important;
     border-bottom: 1px solid var(--border-dim);
 }
 
 .mat-mdc-dialog-content {
-    padding: 16px 20px !important;
+    padding: 12px 18px !important;
     margin: 0 !important;
     max-height: 75vh !important;
-    font-size: var(--font-size-base) !important;
+    font-size: var(--font-size-sm) !important;
 }
 
 .mat-mdc-dialog-actions {
-    padding: 12px 20px !important;
+    padding: 8px 18px !important;
     margin: 0 !important;
     border-top: 1px solid var(--border-dim);
     background: #f8fafc;
-    gap: 10px !important;
+    gap: 8px !important;
 }
 
 /* Menus */
@@ -486,24 +533,51 @@ td.mat-mdc-cell.text-right .toggle-container {
     }
 }
 
-/* Chips */
-.mat-mdc-chip-listbox {
+/* Chips (Compact 24px–26px) */
+.mat-mdc-chip-listbox,
+.mat-mdc-chip-set {
     display: flex !important;
     flex-wrap: wrap !important;
-    gap: 6px !important;
+    gap: 4px !important;
 }
 
 .mat-mdc-chip-row, .mat-mdc-chip, .mat-chip-option {
-    --mdc-chip-container-shape: 6px !important;
-    border-radius: 6px !important;
-    font-size: var(--font-size-sm) !important;
+    --mdc-chip-container-height: 24px !important;
+    height: 24px !important;
+    font-size: var(--font-size-xs, 0.75rem) !important;
     font-weight: 500 !important;
+    border-radius: 4px !important;
+    padding: 0 8px !important;
+    line-height: 22px !important;
 }
 
-/* Form Fields */
+.mat-mdc-chip-row .mat-mdc-chip-remove,
+.mat-mdc-chip .mat-mdc-chip-remove {
+    width: 16px !important;
+    height: 16px !important;
+    padding: 0 !important;
+    margin-left: 2px !important;
+}
+
+.mat-mdc-chip-row .mat-mdc-chip-remove mat-icon,
+.mat-mdc-chip .mat-mdc-chip-remove mat-icon {
+    font-size: 13px !important;
+    width: 13px !important;
+    height: 13px !important;
+}
+
+.mat-mdc-chip mat-icon,
+.mat-chip-option mat-icon,
+.mat-mdc-chip-row mat-icon {
+    font-size: 13px !important;
+    width: 13px !important;
+    height: 13px !important;
+}
+
+/* Form Fields (Compact High-Density 32px) */
 .mat-mdc-form-field {
     font-family: var(--font-family) !important;
-    font-size: var(--font-size-base) !important;
+    font-size: var(--font-size-sm, 0.8125rem) !important;
     --mdc-outlined-text-field-container-shape: 6px;
     --mdc-outlined-text-field-outline-color: var(--border-dim);
     --mdc-outlined-text-field-hover-outline-color: var(--border-bright);
@@ -515,17 +589,78 @@ td.mat-mdc-cell.text-right .toggle-container {
 
 .mat-mdc-text-field-wrapper.mdc-text-field--outlined {
     background-color: #f8fafc !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    padding: 0 8px !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+.mat-mdc-text-field-wrapper.mdc-text-field--outlined .mat-mdc-form-field-infix {
+    min-height: 32px !important;
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
+    font-size: var(--font-size-sm, 0.8125rem) !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+.mat-mdc-text-field-wrapper.mdc-text-field--outlined .mat-mdc-floating-label {
+    top: 16px !important;
+    font-size: var(--font-size-sm, 0.8125rem) !important;
+    line-height: 1 !important;
+}
+
+.mat-mdc-text-field-wrapper.mdc-text-field--outlined .mdc-floating-label--float-above {
+    top: 22px !important;
+    transform: translateY(-100%) scale(0.75) !important;
+}
+
+.mat-mdc-form-field-icon-prefix,
+.mat-mdc-form-field-icon-suffix {
+    padding: 0 2px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.mat-mdc-form-field-icon-prefix .mat-icon,
+.mat-mdc-form-field-icon-suffix .mat-icon,
+.mat-mdc-form-field-icon-prefix mat-icon,
+.mat-mdc-form-field-icon-suffix mat-icon {
+    font-size: 16px !important;
+    width: 16px !important;
+    height: 16px !important;
+    line-height: 16px !important;
+}
+
+.mat-mdc-form-field-icon-suffix .mat-mdc-icon-button {
+    width: 22px !important;
+    height: 22px !important;
+    padding: 0 !important;
+    line-height: 22px !important;
+}
+
+.mat-mdc-select-arrow {
+    width: 16px !important;
+    height: 16px !important;
+}
+
+.mat-mdc-select-arrow svg {
+    width: 16px !important;
+    height: 16px !important;
 }
 
 .mat-mdc-input-element,
 .mat-mdc-select-value {
     color: var(--text-main) !important;
-    font-size: var(--font-size-base) !important;
+    font-size: var(--font-size-sm, 0.8125rem) !important;
+    line-height: 1.3 !important;
 }
 
 .mat-mdc-input-element::placeholder {
     color: var(--text-muted) !important;
-    font-size: var(--font-size-base) !important;
+    font-size: var(--font-size-sm, 0.8125rem) !important;
 }
 
 .mat-mdc-form-field.mat-focused .mdc-floating-label {
@@ -558,6 +693,16 @@ td.mat-mdc-cell.text-right .toggle-container {
 .mat-mdc-tooltip .mdc-tooltip__surface {
     font-size: var(--font-size-xs) !important;
     border-radius: 6px !important;
+}
+
+.pre-line-tooltip.mat-mdc-tooltip .mdc-tooltip__surface,
+.pre-line-tooltip .mdc-tooltip__surface {
+    white-space: pre-line !important;
+    font-family: var(--font-mono, monospace) !important;
+    font-size: var(--font-size-xs) !important;
+    line-height: 1.45 !important;
+    padding: 6px 10px !important;
+    letter-spacing: 0.2px !important;
 }
 
 /* Custom Scrollbar */

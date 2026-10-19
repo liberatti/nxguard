@@ -25,7 +25,9 @@ export interface SecRule {
 
 export interface SensorSecurity {
     geo_codes?: string[];
+    geo_codes_count?: number;
     reputation?: string[];
+    reputation_count?: number;
     trusted?: string[];
 }
 
@@ -54,6 +56,7 @@ export interface Sensor {
     name: string;
     description?: string;
     categories?: string[];
+    categories_count?: number;
     exclusions?: number[];
     security?: SensorSecurity;
     inspection?: SensorInspection;

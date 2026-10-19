@@ -21,6 +21,8 @@ import {MatTooltipModule} from '@angular/material/tooltip';
 import {RouterModule} from '@angular/router';
 import {TranslatePipe} from '@ngx-translate/core';
 import {ConfirmDialogComponent} from 'app/components/confirm-dialog/confirm-dialog.component';
+import {SensorGeoipDialogComponent} from 'app/components/sensor-geoip-dialog/sensor-geoip-dialog.component';
+import {SensorRblDialogComponent} from 'app/components/sensor-rbl-dialog/sensor-rbl-dialog.component';
 import {Sensor} from 'app/models/sensor';
 import {SensorService} from 'app/services/sensor.service';
 import {NotificationService} from 'app/services/notification.service';
@@ -44,7 +46,7 @@ import {OAuthService} from "../../services/oauth.service";
 })
 
 export class SensorListComponent implements OnInit {
-    sensorDC: string[] = ['name', 'description', 'action'];
+    sensorDC: string[] = ['name', 'description', 'geoip', 'reputation', 'action'];
     sensorDS: MatTableDataSource<Sensor>;
     sensorPA = new DefaultPageMeta();
     searchQuery: string = '';
@@ -56,6 +58,50 @@ export class SensorListComponent implements OnInit {
         protected oauth: OAuthService,
     ) {
         this.sensorDS = new MatTableDataSource<Sensor>;
+    }
+
+    getGeoCodes(element: Sensor): string[] {
+        return element?.security?.geo_codes || [];
+    }
+
+    getGeoCodesCount(element: Sensor): number {
+        return this.getGeoCodes(element).length;
+    }
+
+    openGeoipDialog(element: Sensor, event?: MouseEvent): void {
+        if (event) {
+            event.stopPropagation();
+        }
+        this.confirmDialog.open(SensorGeoipDialogComponent, {
+            data: {
+                sensorName: element.name,
+                geo_codes: this.getGeoCodes(element)
+            },
+            width: '620px',
+            maxWidth: '92vw'
+        });
+    }
+
+    getReputation(element: Sensor): string[] {
+        return element?.security?.reputation || [];
+    }
+
+    getReputationCount(element: Sensor): number {
+        return this.getReputation(element).length;
+    }
+
+    openRblDialog(element: Sensor, event?: MouseEvent): void {
+        if (event) {
+            event.stopPropagation();
+        }
+        this.confirmDialog.open(SensorRblDialogComponent, {
+            data: {
+                sensorName: element.name,
+                reputation: this.getReputation(element)
+            },
+            width: '640px',
+            maxWidth: '92vw'
+        });
     }
 
     ngOnInit(): void {

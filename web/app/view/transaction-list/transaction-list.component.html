@@ -70,8 +70,9 @@
                             }
                         </button>
                         <button mat-icon-button (click)="onShowRAW(element); $event.stopPropagation()"
-                            matTooltip="View Raw JSON">
-                            <mat-icon>data_object</mat-icon>
+                            [matTooltip]="'TRANSACTION.VIEW_RAW_JSON' | translate"
+                            id="view-raw-json-btn">
+                            <mat-icon>code</mat-icon>
                         </button>
                     </td>
                 </ng-container>
@@ -101,7 +102,7 @@
                     <th mat-header-cell *matHeaderCellDef class="col-source"> Source </th>
                     <td mat-cell *matCellDef="let element" class="col-source">
                         @if (element.source) {
-                        <span class="source-ip">{{ element.source.ip }}</span>
+                        <span class="source-ip" [matTooltip]="element.source.ip">{{ element.source.ip }}</span>
                         @if (element.source.geo?.country && element.source.geo.country !== '--') {
                         <span class="fi fi-{{ element.source.geo.country | lowercase }} flag-clickable"
                             (click)="onShowGeoIP(element); $event.stopPropagation()"
@@ -118,7 +119,7 @@
                     <th mat-header-cell *matHeaderCellDef class="col-service"> Service </th>
                     <td mat-cell *matCellDef="let element" class="col-service">
                         @if (element.service) {
-                        <span class="service-badge">
+                        <span class="service-badge" [matTooltip]="element.service.name || element.service._id">
                             {{ element.service.name || element.service._id }}
                         </span>
                         }
@@ -144,7 +145,8 @@
                     <th mat-header-cell *matHeaderCellDef class="col-request"> Request </th>
                     <td mat-cell *matCellDef="let element" class="col-request">
                         @if (element.http) {
-                        <span class="request-text">{{ element.http.request_line || (element.http.request?.method + ' ' +
+                        <span class="request-text" [matTooltip]="element.http.request_line || (element.http.request?.method + ' ' +
+                            (element.http.request?.uri || '/'))">{{ element.http.request_line || (element.http.request?.method + ' ' +
                             (element.http.request?.uri || '/')) }}</span>
                         }
                     </td>

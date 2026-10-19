@@ -1,0 +1,123 @@
+<div class="sensor-geoip-dialog-container">
+    <div class="dialog-header">
+        <div class="header-main">
+            <div class="header-icon-box">
+                <mat-icon class="globe-icon">public</mat-icon>
+            </div>
+            <div class="header-text-group">
+                <h2 mat-dialog-title class="dialog-title">
+                    {{ data?.sensorName ? data.sensorName : ('SENSOR.GEO_BLOCKED' | translate) }}
+                </h2>
+                <div class="header-badge-row">
+                    <span class="geoip-counter-badge prominent">
+                        <mat-icon class="badge-icon">flag</mat-icon>
+                        <span class="badge-text">{{ (totalCount === 1 ? 'SENSOR.GEO_COUNT_BADGE_ONE' : 'SENSOR.GEO_COUNT_BADGE') | translate:{ count: totalCount } }}</span>
+                    </span>
+                    @if (searchQuery && filteredCount !== totalCount) {
+                        <span class="filter-count-badge">
+                            {{ filteredCount }} {{ 'SENSOR.MATCHES' | translate }}
+                        </span>
+                    }
+                    @if (isEditable && totalCount > 0) {
+                        <button mat-button color="warn" type="button" class="btn-clear-dialog" (click)="clearAll()">
+                            <mat-icon>clear_all</mat-icon>
+                            {{ 'SENSOR.CLEAR_ALL' | translate }}
+                        </button>
+                    }
+                </div>
+            </div>
+        </div>
+        <button mat-icon-button type="button" class="close-btn" (click)="onClose()" [matTooltip]="'ACTIONS.CANCEL' | translate">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+
+    <mat-dialog-content class="dialog-content">
+        <!-- Add Country Dropdown in edit mode -->
+        @if (isEditable) {
+        <div class="add-country-row">
+            <mat-form-field appearance="outline" class="full-width add-country-field" subscriptSizing="dynamic">
+                <mat-label>{{ 'SENSOR.ADD_COUNTRY' | translate }}</mat-label>
+                <mat-icon matPrefix class="add-prefix-icon">add_circle_outline</mat-icon>
+                <mat-select [(ngModel)]="selectedCountryToAdd" (selectionChange)="addCountry($event.value)" id="add-country-select" [placeholder]="'SENSOR.SELECT_COUNTRY_PLACEHOLDER' | translate">
+                    @for (c of availableCountries; track c.code) {
+                    <mat-option [value]="c.code" id="country-option-{{c.code}}">
+                        <span class="fi fi-{{c.code | lowercase}} mini-flag"></span>
+                        <span class="country-option-name">{{ c.name }}</span>
+                        <span class="country-option-code">({{ c.code }})</span>
+                    </mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+        </div>
+        }
+
+        <!-- Quick Search -->
+        <div class="search-bar-row">
+            <mat-form-field appearance="outline" class="full-width search-field" subscriptSizing="dynamic">
+                <mat-icon matPrefix class="search-prefix-icon">search</mat-icon>
+                <input matInput [(ngModel)]="searchQuery" [placeholder]="'SENSOR.FILTER_GEO_PLACEHOLDER' | translate" id="geoip-dialog-search-input">
+                @if (searchQuery) {
+                    <button matSuffix mat-icon-button type="button" (click)="clearSearch()" id="geoip-dialog-search-clear">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                }
+            </mat-form-field>
+        </div>
+
+        @if (regionGroups.length > 0) {
+            <div class="regions-container">
+                @for (group of regionGroups; track group.name) {
+                    <div class="region-section">
+                        <div class="region-header">
+                            <span class="region-name">{{ group.name }}</span>
+                            <span class="region-count-pill">{{ group.countries.length }}</span>
+                        </div>
+                        <div class="tag-cloud">
+                            @for (country of group.countries; track country.code) {
+                                <div class="country-tag" [class.editable-tag]="isEditable" [matTooltip]="country.name + ' (' + country.code + ')'">
+                                    @if (country.code !== 'None' && country.code !== 'Unknown') {
+                                        <span class="fi fi-{{country.code | lowercase}} country-flag"></span>
+                                    } @else {
+                                        <mat-icon class="country-fallback-icon">public_off</mat-icon>
+                                    }
+                                    <span class="country-code">{{ country.code }}</span>
+                                    <span class="country-name">{{ country.name }}</span>
+                                    @if (isEditable) {
+                                        <button type="button" class="tag-remove-btn" (click)="removeCountry(country.code, $event)" [matTooltip]="'ACTIONS.REMOVE' | translate" id="remove-country-{{country.code}}">
+                                            <mat-icon>close</mat-icon>
+                                        </button>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        } @else {
+            <div class="empty-state">
+                <mat-icon class="empty-icon">search_off</mat-icon>
+                <p class="empty-title">{{ 'SENSOR.NO_MATCHING_COUNTRIES' | translate }}</p>
+                @if (totalCount === 0) {
+                    <p class="empty-desc">{{ 'SENSOR.NO_GEO_SELECTED' | translate }}</p>
+                }
+            </div>
+        }
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end" class="dialog-actions">
+        <button mat-stroked-button type="button" (click)="onClose()" id="geoip-dialog-close-btn" [disabled]="isSaving">
+            {{ (isEditable ? 'ACTIONS.CANCEL' : 'ACTIONS.CLOSE') | translate }}
+        </button>
+        @if (isEditable) {
+            <button mat-flat-button color="primary" type="button" (click)="onSave()" id="geoip-dialog-save-btn" [disabled]="isSaving">
+                @if (isSaving) {
+                    <mat-spinner diameter="18" class="btn-spinner"></mat-spinner>
+                } @else {
+                    <mat-icon>save</mat-icon>
+                }
+                {{ 'ACTIONS.SAVE' | translate }}
+            </button>
+        }
+    </mat-dialog-actions>
+</div>

@@ -189,16 +189,25 @@
 
         <!-- Security Sensor and Monitor Only -->
         <div class="form-section-card mt-1">
-            <mat-form-field class="full-width">
-                <mat-label>{{ 'ROUTE.SECURITY_SENSOR' | translate }}</mat-label>
-                <mat-select formControlName="sensor" [compareWith]="compareFn" id="service-route-sensor-select">
-                    @for (c of _sensors; track c._id || c.name) {
-                    <mat-option [value]="c" id="service-route-sensor-option-{{c._id}}">
-                        {{ c.name }}
-                    </mat-option>
-                    }
-                </mat-select>
-            </mat-form-field>
+            <div class="sensor-selection-row">
+                <mat-form-field class="full-width sensor-select-field">
+                    <mat-label>{{ 'ROUTE.SECURITY_SENSOR' | translate }}</mat-label>
+                    <mat-select formControlName="sensor" [compareWith]="compareFn" id="service-route-sensor-select">
+                        @for (c of _sensors; track c._id || c.name) {
+                        <mat-option [value]="c" id="service-route-sensor-option-{{c._id}}">
+                            {{ c.name }}
+                        </mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+                @if (form.get('sensor')?.value?._id) {
+                    <button type="button" mat-stroked-button color="accent" class="sensor-geoip-btn"
+                        (click)="openSensorGeoipDialog()" [matTooltip]="'SENSOR.EDIT_GEOIP' | translate" id="service-route-edit-geoip-btn">
+                        <mat-icon>public</mat-icon>
+                        {{ 'SENSOR.EDIT_GEOIP' | translate }}
+                    </button>
+                }
+            </div>
             <div class="toggle-row">
                 <span class="spacer"></span>
                 <mat-slide-toggle color="primary" formControlName="monitor_only" id="service-route-monitor-toggle">{{ 'ROUTE.MONITOR_ONLY' | translate }}</mat-slide-toggle>

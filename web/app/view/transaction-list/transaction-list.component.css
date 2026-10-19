@@ -1,13 +1,13 @@
 /* Flag Icon */
 .fi {
     display: inline-block;
-    width: 20px;
-    height: 15px;
-    min-width: 20px;
-    min-height: 15px;
+    width: 16px;
+    height: 12px;
+    min-width: 16px;
+    min-height: 12px;
     flex-shrink: 0;
-    line-height: 15px;
-    margin-left: 8px;
+    line-height: 12px;
+    margin-left: 5px;
     vertical-align: middle;
     border-radius: 2px;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
@@ -28,22 +28,24 @@
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
-    margin-top: 4px;
-    margin-bottom: 12px;
+    gap: 8px;
+    margin-top: 2px;
+    margin-bottom: 8px;
 }
 
 .filter-left-group {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
 }
 
 .filter-dialog-btn {
-    height: 42px;
-    border-radius: 8px;
+    height: 32px;
+    border-radius: 6px;
     font-weight: 600;
+    font-size: 0.8125rem;
+    padding: 0 12px;
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -51,14 +53,14 @@
 }
 
 .date-range-btn {
-    height: 42px !important;
-    border-radius: 8px !important;
+    height: 32px !important;
+    border-radius: 6px !important;
     font-weight: 600 !important;
-    font-size: 0.85rem !important;
+    font-size: 0.8125rem !important;
     display: inline-flex !important;
     align-items: center !important;
-    gap: 8px !important;
-    padding: 0 14px !important;
+    gap: 6px !important;
+    padding: 0 10px !important;
     border: 1px solid rgba(0, 0, 0, 0.15) !important;
     background: #ffffff !important;
     color: #1e293b !important;
@@ -71,31 +73,33 @@
 }
 
 .date-range-icon {
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
     color: #0284c7;
 }
 
 .date-range-label {
     font-family: 'JetBrains Mono', Consolas, monospace;
-    font-size: 0.82rem;
+    font-size: 0.78rem;
     font-weight: 600;
     color: #0f172a;
 }
 
 .date-range-arrow {
-    font-size: 20px;
-    width: 20px;
-    height: 20px;
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
     color: #64748b;
     margin-left: -2px;
 }
 
 .search-btn {
-    height: 42px;
-    border-radius: 8px;
+    height: 32px;
+    border-radius: 6px;
     font-weight: 600;
+    font-size: 0.8125rem;
+    padding: 0 12px;
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -106,17 +110,18 @@
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 12px;
-    padding: 8px 14px;
+    gap: 8px;
+    margin-bottom: 8px;
+    padding: 4px 10px;
     background: rgba(2, 132, 199, 0.05);
     border: 1px solid rgba(2, 132, 199, 0.18);
-    border-radius: 8px;
+    border-radius: 6px;
+    min-height: 32px;
 }
 
 .active-filters-title {
-    font-size: 0.8rem;
-    font-weight: 600;
+    font-size: 0.72rem;
+    font-weight: 700;
     color: #94a3b8;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -125,34 +130,38 @@
 .active-chips-box {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
+    gap: 4px;
     flex: 1;
 }
 
 .filter-chip-item {
-    font-size: 0.82rem !important;
+    font-size: 0.75rem !important;
     font-weight: 500;
+    height: 24px !important;
+    line-height: 22px !important;
+    padding: 0 6px !important;
     border-color: rgba(56, 189, 248, 0.3) !important;
     background: rgba(15, 23, 42, 0.7) !important;
 }
 
 .chip-avatar-icon {
-    font-size: 14px;
-    width: 14px;
-    height: 14px;
+    font-size: 13px;
+    width: 13px;
+    height: 13px;
     color: #38bdf8;
 }
 
 .chip-filter-label {
     font-family: 'JetBrains Mono', Consolas, monospace;
+    font-size: 0.75rem;
     color: #f1f5f9;
 }
 
 .btn-clear-all {
-    font-size: 0.76rem !important;
+    font-size: 0.72rem !important;
     font-weight: 600 !important;
-    height: 32px !important;
-    line-height: 32px !important;
+    height: 26px !important;
+    line-height: 26px !important;
     margin-left: auto;
 }
 
@@ -188,46 +197,60 @@
 }
 
 .col-expand {
-    width: 80px;
-    min-width: 80px;
-    max-width: 80px;
-    padding-left: 8px !important;
+    width: 60px;
+    min-width: 60px;
+    max-width: 60px;
+    padding-left: 6px !important;
     padding-right: 0 !important;
     white-space: nowrap;
 }
 
+.col-expand button {
+    width: 22px !important;
+    height: 22px !important;
+    line-height: 22px !important;
+    padding: 0 !important;
+}
+
+.col-expand mat-icon {
+    font-size: 15px !important;
+    width: 15px !important;
+    height: 15px !important;
+    line-height: 15px !important;
+}
+
 .col-time {
-    width: 140px;
+    width: 125px;
     white-space: nowrap;
 }
 
 .col-score {
-    width: 70px;
+    width: 60px;
     text-align: center;
     white-space: nowrap;
 }
 
 .col-source {
-    width: 150px;
+    width: 140px;
     white-space: nowrap;
 }
 
 .col-service {
-    width: 130px;
+    width: 120px;
     white-space: nowrap;
 }
 
 .col-node {
-    width: 110px;
+    width: 100px;
     white-space: nowrap;
 }
 
 .col-request {
-    min-width: 180px;
+    min-width: 160px;
 }
 
 .col-duration {
-    width: 90px;
+    width: 75px;
     text-align: right;
     white-space: nowrap;
 }
@@ -237,7 +260,7 @@
 }
 
 .time-text {
-    font-size: 0.85rem;
+    font-size: 0.78rem;
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
     color: #334155;
@@ -245,34 +268,41 @@
 }
 
 .source-ip {
-    font-family: monospace;
-    font-size: 0.88rem;
-    font-weight: 600;
+    font-family: var(--font-mono, monospace);
+    font-size: 0.8rem;
+    font-weight: 500;
     color: #0f172a;
+    display: inline-block;
+    vertical-align: middle;
 }
 
 .service-badge {
     display: inline-block;
-    padding: 3px 8px;
-    border-radius: 6px;
+    padding: 1px 6px;
+    border-radius: 4px;
     background: #f1f5f9;
     border: 1px solid #cbd5e1;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     font-weight: 600;
     color: #0f172a;
+    max-width: 110px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
 }
 
 .node-badge {
     display: inline-block;
-    padding: 2px 7px;
-    border-radius: 6px;
+    padding: 1px 6px;
+    border-radius: 4px;
     background: #f8fafc;
     border: 1px solid #cbd5e1;
     font-family: var(--font-mono, monospace);
     font-size: 0.75rem;
     font-weight: 500;
     color: #475569;
-    max-width: 100px;
+    max-width: 90px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -280,18 +310,18 @@
 }
 
 .request-text {
-    font-family: monospace;
-    font-size: 0.84rem;
+    font-family: var(--font-mono, monospace);
+    font-size: 0.78rem;
     color: #0f172a;
-    word-break: break-all;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
+    white-space: nowrap;
     overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    max-width: 100%;
 }
 
 .duration-text {
-    font-size: 0.85rem;
+    font-size: 0.78rem;
     font-variant-numeric: tabular-nums;
     color: #64748b;
     font-weight: 500;
@@ -302,12 +332,12 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 32px;
-    height: 24px;
-    border-radius: 12px;
+    min-width: 24px;
+    height: 20px;
+    border-radius: 10px;
     font-weight: 700;
-    font-size: 0.82rem;
-    padding: 0 8px;
+    font-size: 0.72rem;
+    padding: 0 6px;
     line-height: 1;
 }
 
@@ -349,6 +379,8 @@
     cursor: pointer;
     transition: background 0.15s ease;
     border-bottom: 1px solid #f1f5f9;
+    height: 34px !important;
+    min-height: 34px !important;
 }
 
 .element-row:hover {

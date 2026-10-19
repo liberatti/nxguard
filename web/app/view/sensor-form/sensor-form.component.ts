@@ -21,8 +21,7 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { RuleCategory, SecRule, Sensor } from 'app/models/sensor';
 import { Feed } from 'app/models/feed';
 import { NotificationService } from 'app/services/notification.service';
@@ -37,6 +36,10 @@ import { MatMomentDateModule } from "@angular/material-moment-adapter";
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { RuleDetailsDialogComponent } from 'app/components/rule-details-dialog/rule-details-dialog.component';
+import { SensorGeoipDialogComponent } from 'app/components/sensor-geoip-dialog/sensor-geoip-dialog.component';
+import { SensorRblDialogComponent } from 'app/components/sensor-rbl-dialog/sensor-rbl-dialog.component';
+import { RblThreatService, RblProviderInfo } from 'app/services/rbl-threat.service';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 
 @Component({
     selector: 'app-sensor-form',
@@ -138,6 +141,8 @@ export class SensorFormComponent implements OnInit, AfterViewInit {
         private ruleCatService: RuleCategoryService,
         private feedService: FeedService,
         private dialog: MatDialog,
+        private rblThreatService: RblThreatService,
+        private translate: TranslateService,
         protected oauth: OAuthService,
         protected formater: FormaterService
     ) {
@@ -220,6 +225,32 @@ export class SensorFormComponent implements OnInit, AfterViewInit {
         this.form.markAsTouched();
     }
 
+    openGeoipDialog(): void {
+        this.dialog.open(SensorGeoipDialogComponent, {
+            data: {
+                sensorName: this.form.value.name || 'Sensor GeoIP',
+                geo_codes: this.getGeoCodes()
+            },
+            width: '620px',
+            maxWidth: '92vw'
+        });
+    }
+
+    openRblDialog(): void {
+        this.dialog.open(SensorRblDialogComponent, {
+            data: {
+                sensorName: this.form.value.name || 'Sensor RBL',
+                reputation: this.getReputation()
+            },
+            width: '640px',
+            maxWidth: '92vw'
+        });
+    }
+
+    getProviderInfo(providerName: string): RblProviderInfo {
+        return this.rblThreatService.getProviderInfo(providerName);
+    }
+
     onSave() {
         this.submitted = true;
         if (this.form.status === "INVALID") {
@@ -231,12 +262,12 @@ export class SensorFormComponent implements OnInit, AfterViewInit {
         if (this.isAddMode) {
             delete payload._id;
             this.sensorService.save(payload).subscribe(() => {
-                this.notificationService.openSnackBar('Sensor saved');
+                this.translate.stream('SENSOR.SAVED_SUCCESS').subscribe(msg => this.notificationService.openSnackBar(msg));
                 this.router.navigate(['/sensor']);
             });
         } else {
             this.sensorService.update(String(payload._id), payload).subscribe(() => {
-                this.notificationService.openSnackBar('Sensor updated');
+                this.translate.stream('SENSOR.UPDATED_SUCCESS').subscribe(msg => this.notificationService.openSnackBar(msg));
                 this.router.navigate(['/sensor']);
             });
         }
