@@ -234,9 +234,14 @@
     "GEO_BLOCK_SUBTITLE": "Selecione as regiões e países para bloquear o tráfego.",
     "RBL_BLOCK_TITLE": "Bloqueio por Feeds RBL",
     "RBL_BLOCK_SUBTITLE": "Selecione listas de inteligência de ameaças e reputação para bloqueio.",
+    "BYPASS_BLOCK_TITLE": "Liberação por RBL (ByPass & Feeds Confiáveis)",
+    "BYPASS_BLOCK_SUBTITLE": "Selecione feeds e redes confiáveis para liberar e ignorar filtros de segurança.",
     "ENABLE_BLOCK": "Ativar Bloqueio",
+    "ENABLE_BYPASS": "Ativar Liberação (ByPass)",
     "SEARCH_GEO_PLACEHOLDER": "Buscar país ou região...",
     "SEARCH_RBL_PLACEHOLDER": "Buscar feed ou categoria de ameaça...",
+    "SEARCH_BYPASS_PLACEHOLDER": "Buscar feed de liberação ou categoria...",
+    "VIEW_BYPASS_PROFILE": "Clique para visualizar o perfil completo de feeds ByPass",
     "RBL_FEED_SINGULAR": "feed",
     "RBL_FEEDS_PLURAL": "feeds",
     "GEO_SELECTED_COUNT": "selecionados",
@@ -253,6 +258,8 @@
     "GEO_TOTAL_SUMMARY_ONE": "1 país selecionado",
     "RBL_TOTAL_SUMMARY": "{{ count }} feeds selecionados",
     "RBL_TOTAL_SUMMARY_ONE": "1 feed selecionado",
+    "BYPASS_TOTAL_SUMMARY": "{{ count }} feeds de liberação selecionados",
+    "BYPASS_TOTAL_SUMMARY_ONE": "1 feed de liberação selecionado",
     "CONTINENTS": {
       "AFRICA": "África",
       "NORTH_AMERICA": "América do Norte",
@@ -272,6 +279,13 @@
     "COMPROMISED_HOSTS": "Hosts Comprometidos",
     "SPAM_BOGONS": "Spam & Bogons",
     "THREAT_INTEL": "Inteligência de Ameaças"
+  },
+  "BYPASS_CATEGORY": {
+    "LOCAL_NETWORKS": "Redes Locais & Privadas",
+    "SEARCH_CRAWLERS": "Robôs de Busca Confiáveis",
+    "CDN_CLOUD": "CDNs & Proxies em Nuvem",
+    "MONITORING": "Monitoramento & Healthcheck",
+    "TRUSTED_LISTS": "Listas Confiáveis & Personalizadas"
   },
   "SERVICE": {
     "DETAILS": "Detalhes",

@@ -1,0 +1,209 @@
+<div class="sensor-bypass-dialog-container">
+    <!-- Dialog Header -->
+    <div class="dialog-header">
+        <div class="header-left">
+            <h2 class="dialog-title" id="bypass-dialog-title">
+                <mat-icon class="title-verified-icon">verified_user</mat-icon>
+                {{ 'SENSOR.BYPASS_BLOCK_TITLE' | translate }}
+                @if (data.sensorName) {
+                    <span class="sensor-name-badge">{{ data.sensorName }}</span>
+                }
+            </h2>
+            <p class="dialog-subtitle">{{ 'SENSOR.BYPASS_BLOCK_SUBTITLE' | translate }}</p>
+        </div>
+
+        <div class="header-right">
+            <div class="toggle-wrapper" id="bypass-toggle-wrapper">
+                <span class="toggle-label">{{ 'SENSOR.ENABLE_BYPASS' | translate }}</span>
+                <mat-slide-toggle
+                    color="primary"
+                    [(ngModel)]="isBypassActive"
+                    id="bypass-active-toggle"
+                    [attr.aria-label]="'SENSOR.ENABLE_BYPASS' | translate">
+                </mat-slide-toggle>
+            </div>
+            <button mat-icon-button type="button" class="btn-header-close" (click)="onClose()" [matTooltip]="'ACTIONS.CLOSE' | translate" [attr.aria-label]="'ACTIONS.CLOSE' | translate">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+    </div>
+
+    <!-- Search / Filter Bar -->
+    <div class="search-section">
+        <div class="search-input-wrapper">
+            <div class="filter-icon-btn">
+                <mat-icon>filter_list</mat-icon>
+            </div>
+            <div class="search-field-box">
+                <mat-icon class="search-lens-icon">search</mat-icon>
+                <input
+                    type="text"
+                    [(ngModel)]="searchQuery"
+                    class="custom-search-input"
+                    [placeholder]="'SENSOR.SEARCH_BYPASS_PLACEHOLDER' | translate"
+                    id="bypass-search-input"
+                    autocomplete="off" />
+                @if (searchQuery) {
+                    <button mat-icon-button type="button" class="btn-search-clear" (click)="clearSearch()" id="bypass-search-clear" [attr.aria-label]="'ACTIONS.CLOSE' | translate">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Categories & Feeds Content -->
+    <div class="dialog-body-scroll" [class.blocking-disabled]="!isBypassActive">
+        <div class="categories-list">
+            @for (category of categories; track category.name) {
+                <div class="category-card" [class.is-expanded]="isCategoryExpanded(category.id)" [ngClass]="category.colorClass">
+                    <!-- Category Summary Row -->
+                    <div class="category-summary-row" (click)="toggleCategory(category.id)">
+                        <div class="summary-left">
+                            <button
+                                type="button"
+                                class="btn-chevron"
+                                (click)="toggleCategory(category.id, $event)"
+                                [attr.aria-label]="'SENSOR.EXPAND_CATEGORY' | translate:{ name: (category.key ? (category.key | translate) : category.name) }">
+                                <mat-icon class="chevron-icon">
+                                    {{ isCategoryExpanded(category.id) ? 'keyboard_arrow_down' : 'keyboard_arrow_right' }}
+                                </mat-icon>
+                            </button>
+
+                            <mat-checkbox
+                                class="category-checkbox"
+                                [checked]="isCategoryAllSelected(category)"
+                                [indeterminate]="isCategoryPartiallySelected(category)"
+                                (change)="onCategoryCheckboxChange(category, $event.checked)"
+                                (click)="$event.stopPropagation()"
+                                id="bypass-category-checkbox-{{ category.id }}"
+                                [attr.aria-label]="category.key ? (category.key | translate) : category.name">
+                            </mat-checkbox>
+
+                            <div class="category-icon-wrapper">
+                                <mat-icon class="category-main-icon">{{ category.icon }}</mat-icon>
+                            </div>
+
+                            <span class="category-name">
+                                {{ category.key ? (category.key | translate) : category.name }}
+                            </span>
+                            <span class="category-selection-meta">
+                                {{ 'SENSOR.GEO_SELECTION_RATIO' | translate:{ selected: getCategorySelectedCount(category), total: category.providers.length } }}
+                            </span>
+
+                            <!-- Status Badge -->
+                            @if (getCategorySelectedCount(category) === 0) {
+                                <span class="category-count-badge zero">
+                                    0/{{ category.providers.length }}
+                                </span>
+                            } @else if (getCategorySelectedCount(category) === category.providers.length) {
+                                <span class="category-count-badge all">
+                                    {{ category.providers.length }}/{{ category.providers.length }}
+                                </span>
+                            } @else {
+                                <span class="category-count-badge partial">
+                                    {{ 'SENSOR.GEO_SELECTED_RATIO_BADGE' | translate:{ selected: getCategorySelectedCount(category), total: category.providers.length } }}
+                                </span>
+                            }
+                        </div>
+
+                        <div class="summary-right">
+                            <button
+                                type="button"
+                                class="btn-view-edit"
+                                (click)="toggleCategory(category.id, $event)"
+                                id="btn-edit-bypass-category-{{ category.id }}">
+                                <span class="btn-text">{{ 'SENSOR.VIEW_EDIT' | translate }}</span>
+                                <mat-icon class="btn-icon">edit</mat-icon>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Expanded Provider Feeds Selection Drawer -->
+                    @if (isCategoryExpanded(category.id)) {
+                        <div class="category-expanded-drawer">
+                            <div class="drawer-header-actions">
+                                <span class="drawer-hint-text">
+                                    {{ 'SENSOR.GEO_DRAWER_COUNT' | translate:{ selected: getCategorySelectedCount(category), total: category.providers.length } }}
+                                </span>
+                                <div class="drawer-action-links">
+                                    <button type="button" class="link-action" (click)="selectAllInCategory(category, $event)">
+                                        <mat-icon class="link-icon">select_all</mat-icon>
+                                        {{ 'SENSOR.SELECT_ALL' | translate }}
+                                    </button>
+                                    <span class="link-divider">|</span>
+                                    <button type="button" class="link-action warn" (click)="deselectAllInCategory(category, $event)">
+                                        <mat-icon class="link-icon">deselect</mat-icon>
+                                        {{ 'SENSOR.DESELECT_ALL' | translate }}
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="provider-grid">
+                                @for (provider of category.providers; track provider.name) {
+                                    <div
+                                        class="provider-item-card"
+                                        [class.is-selected]="isFeedSelected(provider.name)"
+                                        (click)="toggleFeed(provider.name, undefined, $event)"
+                                        id="bypass-provider-card-{{ provider.name }}">
+                                        <mat-checkbox
+                                            class="provider-checkbox"
+                                            [checked]="isFeedSelected(provider.name)"
+                                            (change)="toggleFeed(provider.name, $event.checked)"
+                                            (click)="$event.stopPropagation()"
+                                            id="bypass-provider-chk-{{ provider.name }}"
+                                            [attr.aria-label]="provider.name">
+                                        </mat-checkbox>
+                                        <mat-icon class="provider-feed-icon">{{ provider.icon }}</mat-icon>
+                                        <div class="provider-label-group">
+                                            <span class="provider-name">{{ provider.name }}</span>
+                                            @if (provider.description) {
+                                                <span class="provider-desc" [matTooltip]="provider.description">{{ provider.description }}</span>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Dialog Actions Footer -->
+    <div class="dialog-footer">
+        <div class="footer-left">
+            <button
+                mat-flat-button
+                color="primary"
+                type="button"
+                class="btn-save"
+                (click)="onSave()"
+                id="bypass-dialog-save-btn"
+                [disabled]="isSaving">
+                @if (isSaving) {
+                    <mat-spinner diameter="18" class="btn-spinner"></mat-spinner>
+                } @else {
+                    <mat-icon class="save-icon">save</mat-icon>
+                }
+                {{ 'ACTIONS.SAVE' | translate }}
+            </button>
+            <button
+                mat-button
+                type="button"
+                class="btn-cancel"
+                (click)="onClose()"
+                id="bypass-dialog-cancel-btn"
+                [disabled]="isSaving">
+                {{ 'ACTIONS.CANCEL' | translate }}
+            </button>
+        </div>
+
+        <div class="footer-right">
+            <span class="summary-total-pill">
+                {{ (totalSelectedCount === 1 ? 'SENSOR.BYPASS_TOTAL_SUMMARY_ONE' : 'SENSOR.BYPASS_TOTAL_SUMMARY') | translate:{ count: totalSelectedCount } }}
+            </span>
+        </div>
+    </div>
+</div>

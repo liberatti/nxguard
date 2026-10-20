@@ -29,6 +29,7 @@ export interface SensorSecurity {
     reputation?: string[];
     reputation_count?: number;
     trusted?: string[];
+    trusted_count?: number;
 }
 
 export interface SensorScore {

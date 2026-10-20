@@ -27,7 +27,9 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { RuleDetailsDialogComponent } from 'app/components/rule-details-dialog/rule-details-dialog.component';
 import { SensorGeoipDialogComponent } from 'app/components/sensor-geoip-dialog/sensor-geoip-dialog.component';
 import { SensorRblDialogComponent } from 'app/components/sensor-rbl-dialog/sensor-rbl-dialog.component';
+import { SensorBypassDialogComponent } from 'app/components/sensor-bypass-dialog/sensor-bypass-dialog.component';
 import { RblThreatService, RblProviderInfo } from 'app/services/rbl-threat.service';
+import { BypassFeedService, BypassFeedInfo } from 'app/services/bypass-feed.service';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 
 @Component({
@@ -138,6 +140,7 @@ export class SensorFormComponent implements OnInit, AfterViewInit {
         private feedService: FeedService,
         private dialog: MatDialog,
         private rblThreatService: RblThreatService,
+        private bypassFeedService: BypassFeedService,
         private translate: TranslateService,
         protected oauth: OAuthService
     ) {
@@ -253,8 +256,34 @@ export class SensorFormComponent implements OnInit, AfterViewInit {
         });
     }
 
+    openBypassDialog(): void {
+        const dialogRef = this.dialog.open(SensorBypassDialogComponent, {
+            data: {
+                sensorId: this.form.value._id || this.route.snapshot.params['id'],
+                sensorName: this.form.value.name || 'Sensor ByPass',
+                trusted: this.getTrusted(),
+                availableFeeds: this._bypass_feeds.map(f => f.name || f._id || ''),
+                editable: true
+            },
+            width: '800px',
+            maxWidth: '95vw',
+            maxHeight: '90vh'
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result && result.updated && result.trusted) {
+                this.form.get('security.trusted')?.setValue(result.trusted);
+                this.form.markAsTouched();
+            }
+        });
+    }
+
     getProviderInfo(providerName: string): RblProviderInfo {
         return this.rblThreatService.getProviderInfo(providerName);
+    }
+
+    getBypassInfo(feedName: string): BypassFeedInfo {
+        return this.bypassFeedService.getFeedInfo(feedName);
     }
 
     onSave() {

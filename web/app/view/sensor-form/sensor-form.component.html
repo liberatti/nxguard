@@ -186,13 +186,15 @@
                                             {{ 'SENSOR.RBL_BYPASS' | translate }}
                                         </mat-card-title>
                                         <div class="feed-panel-header-actions">
-                                            <span class="bypass-counter-badge prominent"
+                                            <button type="button" class="bypass-counter-badge prominent clickable-badge"
+                                                (click)="openBypassDialog()"
+                                                [matTooltip]="'SENSOR.VIEW_BYPASS_PROFILE' | translate"
                                                 id="sensor-form-bypass-summary-badge">
                                                 <mat-icon class="badge-icon">verified_user</mat-icon>
                                                 <span class="badge-text">{{ (getTrusted().length === 1 ?
                                                     'SENSOR.BYPASS_COUNT_BADGE_ONE' : 'SENSOR.BYPASS_COUNT_BADGE') |
                                                     translate:{ count: getTrusted().length } }}</span>
-                                            </span>
+                                            </button>
                                             @if (getTrusted().length) {
                                             <button mat-button color="warn" type="button" class="btn-clear-feed"
                                                 (click)="onClearAllPermit()">
@@ -203,43 +205,23 @@
                                         </div>
                                     </mat-card-header>
                                     <mat-card-content class="feed-panel-content">
-                                        <mat-form-field class="full-width feed-add-field" appearance="outline"
-                                            subscriptSizing="dynamic">
-                                            <mat-label>{{ 'SENSOR.ADD_BYPASS_FEED' | translate }}</mat-label>
-                                            <mat-select #bypassSelect
-                                                (selectionChange)="onAddPermit($event, bypassSelect)"
-                                                [placeholder]="'SENSOR.SELECT_FEED_PLACEHOLDER' | translate"
-                                                id="rbl-permit-select">
-                                                @for (c of filterActiveFeed(_bypass_feeds, getTrusted()); track c._id ||
-                                                c.name; let i =
-                                                $index) {
-                                                <mat-option [value]="c.name || c._id" id="permit-option-{{i}}">
-                                                    <div class="feed-option-row">
-                                                        <mat-icon
-                                                            class="feed-option-icon permit-icon">check_circle</mat-icon>
-                                                        <span>{{ c.name || c._id }}</span>
-                                                    </div>
-                                                </mat-option>
-                                                }
-                                                @if (filterActiveFeed(_bypass_feeds, getTrusted()).length === 0) {
-                                                <mat-option disabled class="feed-option-empty">
-                                                    {{ 'SENSOR.NO_AVAILABLE_FEEDS' | translate }}
-                                                </mat-option>
-                                                }
-                                            </mat-select>
-                                        </mat-form-field>
-
                                         <!-- Active Selected Feeds -->
                                         @if (getTrusted().length > 0) {
                                         <div class="rbl-chips-wrap">
                                             <mat-chip-listbox class="chips-container" [multiple]="false">
                                                 @for (p of getTrusted(); track p; let i = $index) {
                                                 <mat-chip-option class="feed-chip permit-chip chip-mono"
-                                                    [selectable]="false" (removed)="onRemovePermit(p)"
+                                                    [selectable]="false" [ngClass]="getBypassInfo(p).colorClass"
+                                                    [matTooltip]="(getBypassInfo(p).categoryKey ? (getBypassInfo(p).categoryKey | translate) : getBypassInfo(p).category) + (getBypassInfo(p).description ? ' • ' + getBypassInfo(p).description : '')"
+                                                    (removed)="onRemovePermit(p)"
                                                     id="permit-chip-{{p}}">
                                                     <mat-icon matChipAvatar
-                                                        class="chip-avatar-icon">check_circle</mat-icon>
+                                                        class="chip-avatar-icon">{{ getBypassInfo(p).icon }}</mat-icon>
                                                     <span class="chip-text">{{ p }}</span>
+                                                    <span class="provider-category-tag">{{
+                                                        (getBypassInfo(p).categoryKey ?
+                                                        (getBypassInfo(p).categoryKey | translate) :
+                                                        getBypassInfo(p).category) }}</span>
                                                     <button matChipRemove id="remove-permit-{{p}}"
                                                         [matTooltip]="'ACTIONS.REMOVE' | translate">
                                                         <mat-icon>cancel</mat-icon>

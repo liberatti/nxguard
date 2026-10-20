@@ -234,9 +234,14 @@
     "GEO_BLOCK_SUBTITLE": "Select regions and countries to block traffic.",
     "RBL_BLOCK_TITLE": "RBL Threat Feeds Block",
     "RBL_BLOCK_SUBTITLE": "Select threat intelligence feeds and reputation lists to block.",
+    "BYPASS_BLOCK_TITLE": "RBL ByPass & Trusted Feeds",
+    "BYPASS_BLOCK_SUBTITLE": "Select trusted intelligence and network feeds to bypass security filters.",
     "ENABLE_BLOCK": "Enable Blocking",
+    "ENABLE_BYPASS": "Enable ByPass",
     "SEARCH_GEO_PLACEHOLDER": "Search country or region...",
     "SEARCH_RBL_PLACEHOLDER": "Search threat feed or category...",
+    "SEARCH_BYPASS_PLACEHOLDER": "Search bypass feed or category...",
+    "VIEW_BYPASS_PROFILE": "Click to view full ByPass feed profile",
     "RBL_FEED_SINGULAR": "feed",
     "RBL_FEEDS_PLURAL": "feeds",
     "GEO_SELECTED_COUNT": "selected",
@@ -253,6 +258,8 @@
     "GEO_TOTAL_SUMMARY_ONE": "1 country selected",
     "RBL_TOTAL_SUMMARY": "{{ count }} feeds selected",
     "RBL_TOTAL_SUMMARY_ONE": "1 feed selected",
+    "BYPASS_TOTAL_SUMMARY": "{{ count }} bypass feeds selected",
+    "BYPASS_TOTAL_SUMMARY_ONE": "1 bypass feed selected",
     "CONTINENTS": {
       "AFRICA": "Africa",
       "NORTH_AMERICA": "North America",
@@ -272,6 +279,13 @@
     "COMPROMISED_HOSTS": "Compromised Hosts",
     "SPAM_BOGONS": "Spam & Bogons",
     "THREAT_INTEL": "Threat Intel"
+  },
+  "BYPASS_CATEGORY": {
+    "LOCAL_NETWORKS": "Private & Local Networks",
+    "SEARCH_CRAWLERS": "Search Engine Crawlers",
+    "CDN_CLOUD": "CDNs & Cloud Proxies",
+    "MONITORING": "Monitoring & Healthchecks",
+    "TRUSTED_LISTS": "Trusted & Custom Whitelists"
   },
   "SERVICE": {
     "DETAILS": "Details",
