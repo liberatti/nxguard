@@ -232,13 +232,24 @@ export class SensorFormComponent implements OnInit, AfterViewInit {
     }
 
     openRblDialog(): void {
-        this.dialog.open(SensorRblDialogComponent, {
+        const dialogRef = this.dialog.open(SensorRblDialogComponent, {
             data: {
+                sensorId: this.form.value._id || this.route.snapshot.params['id'],
                 sensorName: this.form.value.name || 'Sensor RBL',
-                reputation: this.getReputation()
+                reputation: this.getReputation(),
+                availableFeeds: this._rbl_feeds.map(f => f.name || f._id || ''),
+                editable: true
             },
-            width: '640px',
-            maxWidth: '92vw'
+            width: '800px',
+            maxWidth: '95vw',
+            maxHeight: '90vh'
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result && result.updated && result.reputation) {
+                this.form.get('security.reputation')?.setValue(result.reputation);
+                this.form.markAsTouched();
+            }
         });
     }
 

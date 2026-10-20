@@ -22,7 +22,7 @@ export interface ContinentRegion {
 const CONTINENT_COUNTRIES: { id: string; nameKey: string; defaultName: string; countries: { code: string; name: string }[] }[] = [
     {
         id: 'africa',
-        nameKey: 'GEOIP_DIALOG.CONTINENTS.AFRICA',
+        nameKey: 'SENSOR.CONTINENTS.AFRICA',
         defaultName: 'África',
         countries: [
             { code: 'DZ', name: 'Algeria' },
@@ -83,7 +83,7 @@ const CONTINENT_COUNTRIES: { id: string; nameKey: string; defaultName: string; c
     },
     {
         id: 'north_america',
-        nameKey: 'GEOIP_DIALOG.CONTINENTS.NORTH_AMERICA',
+        nameKey: 'SENSOR.CONTINENTS.NORTH_AMERICA',
         defaultName: 'América do Norte',
         countries: [
             { code: 'CA', name: 'Canada' },
@@ -93,7 +93,7 @@ const CONTINENT_COUNTRIES: { id: string; nameKey: string; defaultName: string; c
     },
     {
         id: 'south_america',
-        nameKey: 'GEOIP_DIALOG.CONTINENTS.SOUTH_AMERICA',
+        nameKey: 'SENSOR.CONTINENTS.SOUTH_AMERICA',
         defaultName: 'América do Sul',
         countries: [
             { code: 'AR', name: 'Argentina' },
@@ -112,7 +112,7 @@ const CONTINENT_COUNTRIES: { id: string; nameKey: string; defaultName: string; c
     },
     {
         id: 'asia',
-        nameKey: 'GEOIP_DIALOG.CONTINENTS.ASIA',
+        nameKey: 'SENSOR.CONTINENTS.ASIA',
         defaultName: 'Ásia',
         countries: [
             { code: 'AF', name: 'Afghanistan' },
@@ -168,7 +168,7 @@ const CONTINENT_COUNTRIES: { id: string; nameKey: string; defaultName: string; c
     },
     {
         id: 'europe',
-        nameKey: 'GEOIP_DIALOG.CONTINENTS.EUROPE',
+        nameKey: 'SENSOR.CONTINENTS.EUROPE',
         defaultName: 'Europa',
         countries: [
             { code: 'AL', name: 'Albania' },
@@ -219,7 +219,7 @@ const CONTINENT_COUNTRIES: { id: string; nameKey: string; defaultName: string; c
     },
     {
         id: 'oceania',
-        nameKey: 'GEOIP_DIALOG.CONTINENTS.OCEANIA',
+        nameKey: 'SENSOR.CONTINENTS.OCEANIA',
         defaultName: 'Oceania',
         countries: [
             { code: 'AU', name: 'Australia' },

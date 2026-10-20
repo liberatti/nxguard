@@ -43,7 +43,7 @@
                     id="geoip-search-input"
                     autocomplete="off" />
                 @if (searchQuery) {
-                    <button mat-icon-button type="button" class="btn-search-clear" (click)="clearSearch()" id="geoip-search-clear">
+                    <button mat-icon-button type="button" class="btn-search-clear" (click)="clearSearch()" id="geoip-search-clear" [attr.aria-label]="'ACTIONS.CLOSE' | translate">
                         <mat-icon>close</mat-icon>
                     </button>
                 }
@@ -63,7 +63,7 @@
                                 type="button"
                                 class="btn-chevron"
                                 (click)="toggleContinent(continent.id, $event)"
-                                [attr.aria-label]="'Expand ' + continent.defaultName">
+                                [attr.aria-label]="'SENSOR.EXPAND_REGION' | translate:{ name: (continent.nameKey | translate) }">
                                 <mat-icon class="chevron-icon">
                                     {{ isContinentExpanded(continent.id) ? 'keyboard_arrow_down' : 'keyboard_arrow_right' }}
                                 </mat-icon>
@@ -76,7 +76,7 @@
                                 (change)="onContinentCheckboxChange(continent, $event.checked)"
                                 (click)="$event.stopPropagation()"
                                 id="continent-checkbox-{{ continent.id }}"
-                                [attr.aria-label]="continent.defaultName">
+                                [attr.aria-label]="continent.nameKey | translate">
                             </mat-checkbox>
 
                             <div class="continent-icon-wrapper">
@@ -124,7 +124,7 @@
                                 {{ continent.nameKey | translate }}
                             </span>
                             <span class="continent-selection-meta">
-                                ({{ getContinentSelectedCount(continent) }} / {{ continent.countries.length }} {{ 'SENSOR.GEO_SELECTED_COUNT' | translate }})
+                                {{ 'SENSOR.GEO_SELECTION_RATIO' | translate:{ selected: getContinentSelectedCount(continent), total: continent.countries.length } }}
                             </span>
 
                             <!-- Status Badge -->
@@ -138,7 +138,7 @@
                                 </span>
                             } @else {
                                 <span class="continent-count-badge partial">
-                                    {{ getContinentSelectedCount(continent) }} {{ 'SENSOR.GEO_SELECTED_OF' | translate }} {{ continent.countries.length }} {{ 'SENSOR.GEO_SELECTED_COUNT' | translate }}
+                                    {{ 'SENSOR.GEO_SELECTED_RATIO_BADGE' | translate:{ selected: getContinentSelectedCount(continent), total: continent.countries.length } }}
                                 </span>
                             }
                         </div>
@@ -160,7 +160,7 @@
                         <div class="continent-expanded-drawer">
                             <div class="drawer-header-actions">
                                 <span class="drawer-hint-text">
-                                    {{ getContinentSelectedCount(continent) }} / {{ continent.countries.length }} {{ 'SENSOR.GEO_SELECTED_COUNT' | translate }}
+                                    {{ 'SENSOR.GEO_DRAWER_COUNT' | translate:{ selected: getContinentSelectedCount(continent), total: continent.countries.length } }}
                                 </span>
                                 <div class="drawer-action-links">
                                     <button type="button" class="link-action" (click)="selectAllInContinent(continent, $event)">
@@ -236,7 +236,7 @@
 
         <div class="footer-right">
             <span class="summary-total-pill">
-                {{ totalSelectedCount }} {{ (totalSelectedCount === 1 ? 'SENSOR.GEO_COUNTRY_SINGULAR' : 'SENSOR.GEO_COUNTRIES_PLURAL') | translate }} {{ 'SENSOR.GEO_SELECTED_COUNT' | translate }}
+                {{ (totalSelectedCount === 1 ? 'SENSOR.GEO_TOTAL_SUMMARY_ONE' : 'SENSOR.GEO_TOTAL_SUMMARY') | translate:{ count: totalSelectedCount } }}
             </span>
         </div>
     </div>

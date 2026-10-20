@@ -109,13 +109,29 @@ export class SensorListComponent implements OnInit {
         if (event) {
             event.stopPropagation();
         }
-        this.confirmDialog.open(SensorRblDialogComponent, {
+        const dialogRef = this.confirmDialog.open(SensorRblDialogComponent, {
             data: {
+                sensor: element,
+                sensorId: element._id,
                 sensorName: element.name,
-                reputation: this.getReputation(element)
+                reputation: this.getReputation(element),
+                editable: true
             },
-            width: '640px',
-            maxWidth: '92vw'
+            width: '800px',
+            maxWidth: '95vw',
+            maxHeight: '90vh'
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result && result.updated) {
+                const newFeeds = result.reputation || [];
+                if (!element.security) {
+                    element.security = { reputation: newFeeds, trusted: [], geo_codes: [], reputation_count: newFeeds.length };
+                } else {
+                    element.security.reputation = newFeeds;
+                    element.security.reputation_count = newFeeds.length;
+                }
+            }
         });
     }
 

@@ -139,28 +139,6 @@
                                         </div>
                                     </mat-card-header>
                                     <mat-card-content class="feed-panel-content">
-                                        <mat-form-field class="full-width feed-add-field" appearance="outline"
-                                            subscriptSizing="dynamic">
-                                            <mat-label>{{ 'SENSOR.ADD_BLOCK_FEED' | translate }}</mat-label>
-                                            <mat-select #blockSelect (selectionChange)="onAddBlock($event, blockSelect)"
-                                                [placeholder]="'SENSOR.SELECT_FEED_PLACEHOLDER' | translate"
-                                                id="rbl-block-select">
-                                                @for (c of filterActiveFeed(_rbl_feeds, getReputation()); track c._id || c.name; let i =
-                                                $index) {
-                                                <mat-option [value]="c.name || c._id" id="block-option-{{i}}">
-                                                    <div class="feed-option-row">
-                                                        <mat-icon class="feed-option-icon block-icon">block</mat-icon>
-                                                        <span>{{ c.name || c._id }}</span>
-                                                    </div>
-                                                </mat-option>
-                                                }
-                                                @if (filterActiveFeed(_rbl_feeds, getReputation()).length === 0) {
-                                                <mat-option disabled class="feed-option-empty">
-                                                    {{ 'SENSOR.NO_AVAILABLE_FEEDS' | translate }}
-                                                </mat-option>
-                                                }
-                                            </mat-select>
-                                        </mat-form-field>
 
                                         <!-- Active Selected Feeds -->
                                         @if (getReputation().length > 0) {
@@ -168,8 +146,7 @@
                                             <mat-chip-listbox class="chips-container" [multiple]="false">
                                                 @for (p of getReputation(); track p; let i = $index) {
                                                 <mat-chip-option class="feed-chip block-chip chip-mono"
-                                                    [selectable]="false"
-                                                    [ngClass]="getProviderInfo(p).colorClass"
+                                                    [selectable]="false" [ngClass]="getProviderInfo(p).colorClass"
                                                     [matTooltip]="(getProviderInfo(p).categoryKey ? (getProviderInfo(p).categoryKey | translate) : getProviderInfo(p).category) + (getProviderInfo(p).description ? ' • ' + getProviderInfo(p).description : '')"
                                                     (removed)="onRemoveBlock(p)" id="block-chip-{{p}}">
                                                     <mat-icon matChipAvatar class="chip-avatar-icon">{{
@@ -233,7 +210,8 @@
                                                 (selectionChange)="onAddPermit($event, bypassSelect)"
                                                 [placeholder]="'SENSOR.SELECT_FEED_PLACEHOLDER' | translate"
                                                 id="rbl-permit-select">
-                                                @for (c of filterActiveFeed(_bypass_feeds, getTrusted()); track c._id || c.name; let i =
+                                                @for (c of filterActiveFeed(_bypass_feeds, getTrusted()); track c._id ||
+                                                c.name; let i =
                                                 $index) {
                                                 <mat-option [value]="c.name || c._id" id="permit-option-{{i}}">
                                                     <div class="feed-option-row">
@@ -257,8 +235,8 @@
                                             <mat-chip-listbox class="chips-container" [multiple]="false">
                                                 @for (p of getTrusted(); track p; let i = $index) {
                                                 <mat-chip-option class="feed-chip permit-chip chip-mono"
-                                                    [selectable]="false"
-                                                    (removed)="onRemovePermit(p)" id="permit-chip-{{p}}">
+                                                    [selectable]="false" (removed)="onRemovePermit(p)"
+                                                    id="permit-chip-{{p}}">
                                                     <mat-icon matChipAvatar
                                                         class="chip-avatar-icon">check_circle</mat-icon>
                                                     <span class="chip-text">{{ p }}</span>

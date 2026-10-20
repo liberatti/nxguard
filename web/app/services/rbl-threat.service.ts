@@ -10,6 +10,7 @@ export interface RblProviderInfo {
 }
 
 export interface ThreatCategoryGroup {
+    id: string;
     name: string;
     key: string;
     icon: string;
@@ -65,13 +66,13 @@ const CATEGORY_KEYS: Record<string, string> = {
 };
 
 const CATEGORY_ORDER = [
-    { name: 'Tor Exit Nodes', key: 'THREAT_CATEGORY.TOR_EXIT_NODES', icon: 'vpn_lock', colorClass: 'cat-tor' },
-    { name: 'Malware C2', key: 'THREAT_CATEGORY.MALWARE_C2', icon: 'bug_report', colorClass: 'cat-malware' },
-    { name: 'Brute Force', key: 'THREAT_CATEGORY.BRUTE_FORCE', icon: 'lock_open', colorClass: 'cat-bruteforce' },
-    { name: 'Web Attacks', key: 'THREAT_CATEGORY.WEB_ATTACKS', icon: 'web', colorClass: 'cat-web' },
-    { name: 'Compromised Hosts', key: 'THREAT_CATEGORY.COMPROMISED_HOSTS', icon: 'gpp_bad', colorClass: 'cat-compromised' },
-    { name: 'Spam & Bogons', key: 'THREAT_CATEGORY.SPAM_BOGONS', icon: 'mark_email_unread', colorClass: 'cat-spam' },
-    { name: 'Threat Intel', key: 'THREAT_CATEGORY.THREAT_INTEL', icon: 'shield', colorClass: 'cat-intel' }
+    { id: 'tor', name: 'Tor Exit Nodes', key: 'THREAT_CATEGORY.TOR_EXIT_NODES', icon: 'vpn_lock', colorClass: 'cat-tor' },
+    { id: 'malware', name: 'Malware C2', key: 'THREAT_CATEGORY.MALWARE_C2', icon: 'bug_report', colorClass: 'cat-malware' },
+    { id: 'bruteforce', name: 'Brute Force', key: 'THREAT_CATEGORY.BRUTE_FORCE', icon: 'lock_open', colorClass: 'cat-bruteforce' },
+    { id: 'web', name: 'Web Attacks', key: 'THREAT_CATEGORY.WEB_ATTACKS', icon: 'web', colorClass: 'cat-web' },
+    { id: 'compromised', name: 'Compromised Hosts', key: 'THREAT_CATEGORY.COMPROMISED_HOSTS', icon: 'gpp_bad', colorClass: 'cat-compromised' },
+    { id: 'spam', name: 'Spam & Bogons', key: 'THREAT_CATEGORY.SPAM_BOGONS', icon: 'mark_email_unread', colorClass: 'cat-spam' },
+    { id: 'intel', name: 'Threat Intel', key: 'THREAT_CATEGORY.THREAT_INTEL', icon: 'shield', colorClass: 'cat-intel' }
 ];
 
 @Injectable({
@@ -178,6 +179,7 @@ export class RblThreatService {
             if (items.length > 0) {
                 items.sort((a, b) => a.name.localeCompare(b.name));
                 result.push({
+                    id: cat.id,
                     name: cat.name,
                     key: cat.key,
                     icon: cat.icon,
@@ -188,5 +190,15 @@ export class RblThreatService {
         }
 
         return result;
+    }
+
+    getAllThreatCategories(allProviders: string[] = [], searchQuery: string = ''): ThreatCategoryGroup[] {
+        const allNames = new Set<string>(Object.keys(KNOWN_PROVIDERS));
+        for (const p of allProviders) {
+            if (p && p.trim()) {
+                allNames.add(p.trim());
+            }
+        }
+        return this.groupProvidersByCategory(Array.from(allNames), searchQuery);
     }
 }
