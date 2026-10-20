@@ -60,7 +60,7 @@
                 <div class="form-col field-col">
                     <mat-form-field appearance="outline" class="full-width-field" subscriptSizing="dynamic">
                         <mat-label>{{ 'TRANSACTION.FILTER.FIELD_LABEL' | translate }}</mat-label>
-                        <mat-select formControlName="field">
+                        <mat-select formControlName="field" panelClass="filter-select-panel">
                             <mat-select-trigger>
                                 <div class="select-trigger-content">
                                     <mat-icon class="field-select-icon">{{ currentField.icon }}</mat-icon>
@@ -69,10 +69,12 @@
                                 </div>
                             </mat-select-trigger>
                             @for (f of filteredFields; track f.key) {
-                            <mat-option [value]="f.key">
+                            <mat-option [value]="f.key" class="field-select-option">
                                 <div class="option-content">
-                                    <mat-icon class="option-icon">{{ f.icon }}</mat-icon>
-                                    <span class="option-label">{{ f.labelKey | translate }}</span>
+                                    <div class="option-left">
+                                        <mat-icon class="option-icon">{{ f.icon }}</mat-icon>
+                                        <span class="option-label">{{ f.labelKey | translate }}</span>
+                                    </div>
                                     <span class="option-key">{{ f.key }}</span>
                                 </div>
                             </mat-option>
@@ -87,9 +89,16 @@
                     @if (currentField.type === 'enum' || currentField.type === 'boolean') {
                     <mat-form-field appearance="outline" class="full-width-field" subscriptSizing="dynamic">
                         <mat-label>{{ 'TRANSACTION.FILTER.VALUE_LABEL' | translate }}</mat-label>
-                        <mat-select formControlName="value">
+                        <mat-select formControlName="value" panelClass="filter-select-panel">
+                            <mat-select-trigger>
+                                @if (filterForm.get('value')?.value) {
+                                <span class="enum-badge enum-{{ filterForm.get('value')?.value | lowercase }}">
+                                    {{ filterForm.get('value')?.value }}
+                                </span>
+                                }
+                            </mat-select-trigger>
                             @for (opt of currentField.options; track opt) {
-                            <mat-option [value]="opt">
+                            <mat-option [value]="opt" class="enum-select-option">
                                 <span class="enum-badge enum-{{ opt | lowercase }}">{{ opt }}</span>
                             </mat-option>
                             }

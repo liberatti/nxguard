@@ -189,22 +189,49 @@
 }
 
 .field-key-badge {
+    display: inline-flex;
+    align-items: center;
+    height: 20px;
+    line-height: 20px;
     margin-left: auto;
+    margin-right: 4px;
     font-family: var(--font-mono, monospace);
-    font-size: var(--font-size-2xs, 0.6875rem);
-    color: var(--text-dim, #475569);
-    background: var(--bg-darker, #f1f5f9);
-    border: 1px solid var(--border-dim, #cbd5e1);
-    padding: 1px 6px;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    color: var(--text-dim, #64748b);
+    background: rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    padding: 0 6px;
     border-radius: 4px;
     flex-shrink: 0;
+}
+
+:host-context(.dark-theme) .field-key-badge,
+:host-context([data-theme="dark"]) .field-key-badge {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.12);
+    color: #94a3b8;
+}
+
+mat-option .mdc-list-item__primary-text {
+    display: flex !important;
+    align-items: center !important;
+    width: 100% !important;
 }
 
 .option-content {
     display: flex;
     align-items: center;
-    gap: 10px;
+    justify-content: space-between;
     width: 100%;
+    gap: 12px;
+}
+
+.option-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
 }
 
 .option-icon {
@@ -219,18 +246,33 @@
     font-weight: 500;
     font-size: var(--font-size-base, 0.875rem);
     color: var(--text-main, #0f172a);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .option-key {
+    display: inline-flex;
+    align-items: center;
+    height: 20px;
+    line-height: 20px;
     margin-left: auto;
     font-family: var(--font-mono, monospace);
-    font-size: var(--font-size-2xs, 0.6875rem);
-    color: var(--text-muted, #94a3b8);
-    background: var(--bg-darker, #f1f5f9);
-    border: 1px solid var(--border-dim, #e2e8f0);
-    padding: 1px 6px;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    color: var(--text-dim, #64748b);
+    background: rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    padding: 0 6px;
     border-radius: 4px;
     flex-shrink: 0;
+}
+
+:host-context(.dark-theme) .option-key,
+:host-context([data-theme="dark"]) .option-key {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.12);
+    color: #94a3b8;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -254,12 +296,17 @@
 }
 
 .enum-badge {
-    font-size: var(--font-size-sm, 0.8125rem);
+    display: inline-flex;
+    align-items: center;
+    height: 22px;
+    line-height: 22px;
+    font-size: 0.75rem;
     font-weight: 600;
-    padding: 2px 8px;
+    padding: 0 8px;
     border-radius: 4px;
     letter-spacing: 0.3px;
     text-transform: uppercase;
+    font-family: var(--font-mono, monospace);
 }
 
 .enum-deny,

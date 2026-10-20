@@ -162,33 +162,15 @@
                                             </mat-select>
                                         </mat-form-field>
 
-                                        <!-- Quick Search Filter for large lists -->
-                                        @if (getReputation().length > 6) {
-                                        <div class="feed-search-row">
-                                            <mat-form-field appearance="outline" class="full-width search-mini"
-                                                subscriptSizing="dynamic">
-                                                <mat-icon matPrefix>search</mat-icon>
-                                                <input matInput [(ngModel)]="blockSearchQuery"
-                                                    [ngModelOptions]="{standalone: true}"
-                                                    [placeholder]="'SENSOR.FILTER_FEEDS_PLACEHOLDER' | translate">
-                                                @if (blockSearchQuery) {
-                                                <button matSuffix mat-icon-button type="button"
-                                                    (click)="blockSearchQuery = ''">
-                                                    <mat-icon>close</mat-icon>
-                                                </button>
-                                                }
-                                            </mat-form-field>
-                                        </div>
-                                        }
-
-                                        <!-- Scrollable chips container -->
+                                        <!-- Active Selected Feeds -->
                                         @if (getReputation().length > 0) {
-                                        <div class="feed-chips-scroll">
-                                            <mat-chip-listbox class="chips-container" [multiple]="false"
-                                                [selectable]="true">
-                                                @for (p of getFilteredReputation(); track p; let i = $index) {
+                                        <div class="rbl-chips-wrap">
+                                            <mat-chip-listbox class="chips-container" [multiple]="false">
+                                                @for (p of getReputation(); track p; let i = $index) {
                                                 <mat-chip-option class="feed-chip block-chip chip-mono"
+                                                    [selectable]="false"
                                                     [ngClass]="getProviderInfo(p).colorClass"
+                                                    [matTooltip]="(getProviderInfo(p).categoryKey ? (getProviderInfo(p).categoryKey | translate) : getProviderInfo(p).category) + (getProviderInfo(p).description ? ' • ' + getProviderInfo(p).description : '')"
                                                     (removed)="onRemoveBlock(p)" id="block-chip-{{p}}">
                                                     <mat-icon matChipAvatar class="chip-avatar-icon">{{
                                                         getProviderInfo(p).icon }}</mat-icon>
@@ -204,11 +186,6 @@
                                                 </mat-chip-option>
                                                 }
                                             </mat-chip-listbox>
-                                            @if (getFilteredReputation().length === 0) {
-                                            <p class="no-filter-match">
-                                                {{ 'SENSOR.NO_MATCHING_FEEDS' | translate }}
-                                            </p>
-                                            }
                                         </div>
                                         }
 
@@ -274,32 +251,13 @@
                                             </mat-select>
                                         </mat-form-field>
 
-                                        <!-- Quick Search Filter for large lists -->
-                                        @if (getTrusted().length > 6) {
-                                        <div class="feed-search-row">
-                                            <mat-form-field appearance="outline" class="full-width search-mini"
-                                                subscriptSizing="dynamic">
-                                                <mat-icon matPrefix>search</mat-icon>
-                                                <input matInput [(ngModel)]="bypassSearchQuery"
-                                                    [ngModelOptions]="{standalone: true}"
-                                                    [placeholder]="'SENSOR.FILTER_FEEDS_PLACEHOLDER' | translate">
-                                                @if (bypassSearchQuery) {
-                                                <button matSuffix mat-icon-button type="button"
-                                                    (click)="bypassSearchQuery = ''">
-                                                    <mat-icon>close</mat-icon>
-                                                </button>
-                                                }
-                                            </mat-form-field>
-                                        </div>
-                                        }
-
-                                        <!-- Scrollable chips container -->
+                                        <!-- Active Selected Feeds -->
                                         @if (getTrusted().length > 0) {
-                                        <div class="feed-chips-scroll">
-                                            <mat-chip-listbox class="chips-container" [multiple]="false"
-                                                [selectable]="true">
-                                                @for (p of getFilteredTrusted(); track p; let i = $index) {
+                                        <div class="rbl-chips-wrap">
+                                            <mat-chip-listbox class="chips-container" [multiple]="false">
+                                                @for (p of getTrusted(); track p; let i = $index) {
                                                 <mat-chip-option class="feed-chip permit-chip chip-mono"
+                                                    [selectable]="false"
                                                     (removed)="onRemovePermit(p)" id="permit-chip-{{p}}">
                                                     <mat-icon matChipAvatar
                                                         class="chip-avatar-icon">check_circle</mat-icon>
@@ -311,11 +269,6 @@
                                                 </mat-chip-option>
                                                 }
                                             </mat-chip-listbox>
-                                            @if (getFilteredTrusted().length === 0) {
-                                            <p class="no-filter-match">
-                                                {{ 'SENSOR.NO_MATCHING_FEEDS' | translate }}
-                                            </p>
-                                            }
                                         </div>
                                         }
 
