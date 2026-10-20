@@ -15,6 +15,42 @@ export const API_DATA_FORMAT = new InjectionToken<string>('API_DATA_FORMAT');
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 import { provideTranslateService } from "@ngx-translate/core";
 
+const getInitialLang = (): string => {
+  if (typeof window === 'undefined') {
+    return 'en_US';
+  }
+  try {
+    const rawLang = localStorage.getItem('lang');
+    if (rawLang) {
+      try {
+        const parsed = JSON.parse(rawLang);
+        if (parsed) {
+          const clean = String(parsed).replace(/['"]+/g, '').trim();
+          if (clean) return clean;
+        }
+      } catch {
+        const clean = rawLang.replace(/['"]+/g, '').trim();
+        if (clean) return clean;
+      }
+    }
+    const rawUiConfig = localStorage.getItem('ui_config');
+    if (rawUiConfig) {
+      const parsedConfig = JSON.parse(rawUiConfig);
+      const loc = parsedConfig?.locale;
+      if (loc) {
+        if (typeof loc === 'object') {
+          const key = loc.key || loc.id;
+          if (key) return String(key).replace(/['"]+/g, '').trim();
+        }
+        return String(loc).replace(/['"]+/g, '').trim();
+      }
+    }
+  } catch {
+    // fallback
+  }
+  return 'en_US';
+};
+
 export const appConfig: ApplicationConfig = {
   providers: [
     { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: { appearance: 'outline' } },
@@ -41,7 +77,7 @@ export const appConfig: ApplicationConfig = {
         suffix: '.json'
       }),
       fallbackLang: 'en_US',
-      lang: (typeof window !== 'undefined' && (localStorage.getItem('lang') || JSON.parse(localStorage.getItem('ui_config') || '{}')?.locale)) || 'en_US'
+      lang: getInitialLang()
     })
   ]
 };

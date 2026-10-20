@@ -1,80 +1,118 @@
-<div class="login-viewport">
-    <div class="login-bg-grid"></div>
+<div class="vmware-viewport">
+    <!-- Top Global Accent Line -->
+    <div class="vmware-top-stripe"></div>
 
-    <div class="login-card" id="sign-in-card">
-        <!-- Card Header -->
-        <div class="card-header">
-            <div class="brand-header-left">
-                <div class="brand-icon-box">
-                    <img class="brand-logo-img" src="assets/logo.png" alt="nxguard logo">
-                </div>
-                <span class="brand-title">{{ 'AUTH.TITLE' | translate }}</span>
-            </div>
+    <!-- Background Ambient Glow & Grid -->
+    <div class="vmware-bg-glow"></div>
+    <div class="vmware-bg-pattern"></div>
 
-            <div class="header-actions-right">
-                <!-- Language Menu Trigger -->
-                <button type="button" class="action-pill-btn" [matMenuTriggerFor]="langMenu" id="sign-in-language-btn"
-                    [attr.aria-label]="'AUTH.SELECT_LANGUAGE' | translate">
-                    <mat-icon class="lang-globe-icon">language</mat-icon>
-                    <span class="lang-text">{{ currentLangCode }}</span>
-                    <mat-icon class="dropdown-chevron-icon">arrow_drop_down</mat-icon>
-                </button>
-                <mat-menu #langMenu="matMenu" class="custom-lang-menu">
-                    @for (loc of locales; track loc.id) {
-                    <button mat-menu-item (click)="onLocaleChange(loc.id)" id="lang-option-{{loc.id}}">
-                        <span>{{ loc.name }}</span>
-                    </button>
-                    }
-                </mat-menu>
-            </div>
+    <!-- Top Navigation Bar -->
+    <header class="vmware-top-nav">
+        <div class="top-nav-brand">
+            <span class="top-brand-text">{{ 'AUTH.TITLE' | translate }}</span>
+            <span class="top-brand-separator">/</span>
+            <span class="top-brand-edition">{{ 'AUTH.HOST_CLIENT' | translate }}</span>
         </div>
-
-        <div class="header-divider"></div>
-
-        <!-- Login Form -->
-        <form [formGroup]="form" id="sign-in-form" class="login-form">
-            <!-- Email Field -->
-            <div class="form-group">
-                <label class="field-label" for="sign-in-email">{{ 'AUTH.EMAIL' | translate }}</label>
-                <mat-form-field appearance="outline" class="full-width form-field-input" subscriptSizing="dynamic">
-                    <span matPrefix class="prefix-symbol">@</span>
-                    <input id="sign-in-email" matInput formControlName="email" autocomplete="username email"
-                        type="email" [placeholder]="'AUTH.PLACEHOLDER_EMAIL' | translate">
-                </mat-form-field>
-            </div>
-
-            <!-- Password Field -->
-            <div class="form-group">
-                <label class="field-label" for="sign-in-password">{{ 'AUTH.PASSWORD' | translate }}</label>
-                <mat-form-field appearance="outline" class="full-width form-field-input" subscriptSizing="dynamic">
-                    <mat-icon matPrefix class="prefix-icon">lock_outline</mat-icon>
-                    <input id="sign-in-password" matInput formControlName="password"
-                        [type]="hidePassword ? 'password' : 'text'" autocomplete="current-password"
-                        [placeholder]="'AUTH.PLACEHOLDER_PASSWORD' | translate">
-                    <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" type="button"
-                        class="password-toggle-btn" [attr.aria-label]="'AUTH.TOGGLE_PASSWORD' | translate">
-                        <mat-icon class="suffix-toggle-icon">{{hidePassword ? 'visibility_off' :
-                            'visibility'}}</mat-icon>
-                    </button>
-                </mat-form-field>
-            </div>
-
-            <!-- Submit Button -->
-            <button mat-flat-button id="sign-in-button" class="login-submit-btn" (click)="login()"
-                [disabled]="form.invalid">
-                <mat-icon class="submit-lock-icon">lock_outline</mat-icon>
-                <span>{{ 'AUTH.SIGN_IN_BTN' | translate }}</span>
+        <div class="top-nav-actions">
+            <!-- Language Selector -->
+            <button type="button" class="vmware-lang-btn" [matMenuTriggerFor]="langMenu" id="sign-in-language-btn"
+                [attr.aria-label]="'AUTH.SELECT_LANGUAGE' | translate">
+                <mat-icon class="lang-icon">language</mat-icon>
+                <span class="lang-label">{{ currentLangCode }}</span>
+                <mat-icon class="chevron-icon">arrow_drop_down</mat-icon>
             </button>
-        </form>
-    </div>
-
-    <!-- Bottom Global Footer Outside Card -->
-    <div class="login-page-footer">
-        <div class="footer-platform-title">{{ 'AUTH.ENTERPRISE_PLATFORM' | translate }}</div>
-        <div class="footer-copyright-row">
-            <span>&copy; {{ currentYear }} {{ 'AUTH.TITLE' | translate }} - {{ 'AUTH.BRAND_DESCRIPTION' | translate
-                }}</span>
-            <span class="version-badge">{{ version }}</span>
+            <mat-menu #langMenu="matMenu" class="vmware-menu-panel">
+                @for (loc of locales; track loc.id) {
+                <button mat-menu-item (click)="onLocaleChange(loc.id)" id="lang-option-{{loc.id}}"
+                    [class.is-active]="currentLangCode === (loc.id.startsWith('pt') ? 'PT' : 'EN')">
+                    <span>{{ loc.name }}</span>
+                </button>
+                }
+            </mat-menu>
         </div>
-    </div>
+    </header>
+
+    <!-- Main Clean Centered Login Card -->
+    <main class="login-main-wrapper">
+        <div class="vmware-card" id="sign-in-card">
+            <!-- Top Gradient Accent on Card -->
+            <div class="card-accent-line"></div>
+
+            <!-- Card Header: Brand & Identity -->
+            <div class="card-header">
+                <div class="brand-logo-container">
+                    <img class="brand-logo-img" src="assets/logo.png" alt="NXGuard logo">
+                </div>
+                <div class="brand-header-info">
+                    <h1 class="brand-title">{{ 'AUTH.TITLE' | translate }}</h1>
+                    <span class="brand-subtitle">{{ 'AUTH.HOST_CLIENT' | translate }}</span>
+                </div>
+            </div>
+
+            <!-- Form Section -->
+            <div class="card-body">
+                <div class="form-title-group">
+                    <h2 class="form-heading">{{ 'AUTH.SIGN_IN' | translate }}</h2>
+                    <p class="form-subheading">{{ 'AUTH.SUBTITLE_LOGIN' | translate }}</p>
+                </div>
+
+                <form [formGroup]="form" id="sign-in-form" class="login-form" (ngSubmit)="login()">
+                    <!-- Email / Username Input -->
+                    <div class="form-group">
+                        <label class="field-label" for="sign-in-email">{{ 'AUTH.EMAIL' | translate }}</label>
+                        <mat-form-field appearance="outline" class="clean-form-field" subscriptSizing="dynamic">
+                            <mat-icon matPrefix class="field-icon">account_circle</mat-icon>
+                            <input id="sign-in-email" matInput formControlName="email" autocomplete="username email"
+                                type="email" [placeholder]="'AUTH.PLACEHOLDER_EMAIL' | translate">
+                        </mat-form-field>
+                    </div>
+
+                    <!-- Password Input -->
+                    <div class="form-group">
+                        <label class="field-label" for="sign-in-password">{{ 'AUTH.PASSWORD' | translate }}</label>
+                        <mat-form-field appearance="outline" class="clean-form-field" subscriptSizing="dynamic">
+                            <mat-icon matPrefix class="field-icon">lock</mat-icon>
+                            <input id="sign-in-password" matInput formControlName="password"
+                                [type]="hidePassword ? 'password' : 'text'" autocomplete="current-password"
+                                [placeholder]="'AUTH.PLACEHOLDER_PASSWORD' | translate">
+                            <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" type="button"
+                                class="password-toggle-btn" [attr.aria-label]="'AUTH.TOGGLE_PASSWORD' | translate">
+                                <mat-icon class="toggle-icon">{{hidePassword ? 'visibility_off' :
+                                    'visibility'}}</mat-icon>
+                            </button>
+                        </mat-form-field>
+                    </div>
+
+                    <!-- Submit CTA Button -->
+                    <button mat-flat-button id="sign-in-button" type="submit" class="submit-action-btn"
+                        [disabled]="form.invalid || isLoading">
+                        @if (isLoading) {
+                        <mat-spinner diameter="18" class="btn-spinner"></mat-spinner>
+                        } @else {
+                        <mat-icon class="btn-icon">login</mat-icon>
+                        }
+                        <span>{{ 'AUTH.SIGN_IN_BTN' | translate }}</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Card Bottom: Security Banner & Status Bar -->
+            <div class="card-footer">
+                <div class="card-meta-bar">
+                    <span class="version-tag">{{ version }}</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Global Subtle Footer -->
+    <footer class="vmware-global-footer">
+        <div class="footer-content">
+            <span>&copy; {{ currentYear }} {{ 'AUTH.TITLE' | translate }}</span>
+            <span class="footer-separator">&bull;</span>
+            <span>{{ 'AUTH.BRAND_DESCRIPTION' | translate }}</span>
+            <span class="footer-separator">&bull;</span>
+            <span class="footer-edition">{{ 'AUTH.ENTERPRISE_PLATFORM' | translate }}</span>
+        </div>
+    </footer>
 </div>

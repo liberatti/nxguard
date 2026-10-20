@@ -31,6 +31,7 @@
     "PLACEHOLDER_EMAIL": "seu@email.com",
     "PLACEHOLDER_PASSWORD": "Digite sua senha",
     "LANGUAGE": "Idioma",
+    "SELECT_LANGUAGE": "Selecionar idioma",
     "SUBTITLE_LOGIN": "Digite suas credenciais para acessar o console",
     "FOOTER_NOTICE": "Acesso autorizado apenas. Todas as atividades são monitoradas e registradas.",
     "VERSION": "Versão",
@@ -39,7 +40,8 @@
     "ENTERPRISE_PLATFORM": "PLATAFORMA DE INTELIGÊNCIA CORPORATIVA",
     "BRAND_DESCRIPTION": "Inteligência IP Avançada",
     "TOGGLE_PASSWORD": "Ocultar senha",
-    "TOGGLE_THEME": "Alternar modo escuro"
+    "TOGGLE_THEME": "Alternar modo escuro",
+    "SYSTEM_OPERATIONAL": "Sistema Operacional"
   },
   "ABOUT": {
     "TITLE": "Sobre o NXGuard",

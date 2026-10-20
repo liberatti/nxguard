@@ -184,7 +184,8 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
 
     ngOnInit(): void {
         this.translate.setFallbackLang('en_US');
-        const savedLang = this.localStorage.get('lang');
+        const rawSavedLang = this.localStorage.get('lang');
+        const savedLang = rawSavedLang ? String(rawSavedLang).replace(/['"]+/g, '').trim() : null;
         if (savedLang) {
             this.translate.use(savedLang);
             moment.locale(savedLang);
@@ -232,7 +233,8 @@ export class AdminLayoutComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     ngAfterViewInit(): void {
-        const savedLang = this.localStorage.get('lang');
+        const rawSavedLang = this.localStorage.get('lang');
+        const savedLang = rawSavedLang ? String(rawSavedLang).replace(/['"]+/g, '').trim() : null;
         if (this.localStorage.exists('ui_config')) {
             this.config = this.localStorage.get('ui_config');
             if (savedLang && this.config) {
