@@ -128,7 +128,6 @@ class FeedService:
             response = requests.get(url, headers=headers, timeout=5)
             if response.status_code == 200:
                 res_data = response.json()
-                logger.info(res_data)
                 if (
                     isinstance(res_data, dict)
                     and "data" in res_data

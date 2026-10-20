@@ -52,8 +52,8 @@ def search() -> Response:
         "data": feeds,
         "metadata": {
             "total_elements": len(feeds),
-            "current_page": 1,
-            "total_pages": 1,
+            "page": 1,
+            "per_page": len(feeds),
         },
     }
     return response_data(page, feed_service.pageSchema)

@@ -25,7 +25,7 @@
                         </div>
                         <div class="mat-row mt-2" formGroupName="security">
                             <div class="mat-col-12">
-                                <mat-card appearance="outlined" class="feed-panel-card">
+                                <mat-card appearance="outlined" class="feed-panel-card geo-panel">
                                     <mat-card-header class="feed-panel-header">
                                         <mat-card-title class="feed-panel-title">
                                             <mat-icon class="feed-panel-icon geo-icon">public</mat-icon>
@@ -112,7 +112,7 @@
                             </div>
 
                             <!-- RBL Blocking Column -->
-                            <div class="mat-col-6">
+                            <div class="mat-col-6 security-feed-col">
                                 <mat-card appearance="outlined" class="feed-panel-card block-panel">
                                     <mat-card-header class="feed-panel-header">
                                         <mat-card-title class="feed-panel-title">
@@ -139,14 +139,24 @@
                                         </div>
                                     </mat-card-header>
                                     <mat-card-content class="feed-panel-content">
-                                        <mat-form-field class="full-width" appearance="outline">
-                                            <mat-label>{{ 'SENSOR.RBL_BLOCK' | translate }}</mat-label>
-                                            <mat-icon matPrefix class="field-prefix-icon">add_circle_outline</mat-icon>
-                                            <mat-select (selectionChange)="onAddBlock($event)" id="rbl-block-select">
-                                                @for (c of _rbl_feeds; track c._id || c.name; let i =
+                                        <mat-form-field class="full-width feed-add-field" appearance="outline"
+                                            subscriptSizing="dynamic">
+                                            <mat-label>{{ 'SENSOR.ADD_BLOCK_FEED' | translate }}</mat-label>
+                                            <mat-select #blockSelect (selectionChange)="onAddBlock($event, blockSelect)"
+                                                [placeholder]="'SENSOR.SELECT_FEED_PLACEHOLDER' | translate"
+                                                id="rbl-block-select">
+                                                @for (c of filterActiveFeed(_rbl_feeds, getReputation()); track c._id || c.name; let i =
                                                 $index) {
                                                 <mat-option [value]="c.name || c._id" id="block-option-{{i}}">
-                                                    {{ c.name || c._id }}
+                                                    <div class="feed-option-row">
+                                                        <mat-icon class="feed-option-icon block-icon">block</mat-icon>
+                                                        <span>{{ c.name || c._id }}</span>
+                                                    </div>
+                                                </mat-option>
+                                                }
+                                                @if (filterActiveFeed(_rbl_feeds, getReputation()).length === 0) {
+                                                <mat-option disabled class="feed-option-empty">
+                                                    {{ 'SENSOR.NO_AVAILABLE_FEEDS' | translate }}
                                                 </mat-option>
                                                 }
                                             </mat-select>
@@ -214,7 +224,7 @@
                             </div>
 
                             <!-- RBL ByPass Column -->
-                            <div class="mat-col-6">
+                            <div class="mat-col-6 security-feed-col">
                                 <mat-card appearance="outlined" class="feed-panel-card permit-panel">
                                     <mat-card-header class="feed-panel-header">
                                         <mat-card-title class="feed-panel-title">
@@ -222,10 +232,14 @@
                                             {{ 'SENSOR.RBL_BYPASS' | translate }}
                                         </mat-card-title>
                                         <div class="feed-panel-header-actions">
-                                            @if (getTrusted().length) {
-                                            <span class="feed-badge permit-badge">
-                                                {{ getTrusted().length }}
+                                            <span class="bypass-counter-badge prominent"
+                                                id="sensor-form-bypass-summary-badge">
+                                                <mat-icon class="badge-icon">verified_user</mat-icon>
+                                                <span class="badge-text">{{ (getTrusted().length === 1 ?
+                                                    'SENSOR.BYPASS_COUNT_BADGE_ONE' : 'SENSOR.BYPASS_COUNT_BADGE') |
+                                                    translate:{ count: getTrusted().length } }}</span>
                                             </span>
+                                            @if (getTrusted().length) {
                                             <button mat-button color="warn" type="button" class="btn-clear-feed"
                                                 (click)="onClearAllPermit()">
                                                 <mat-icon>clear_all</mat-icon>
@@ -235,13 +249,26 @@
                                         </div>
                                     </mat-card-header>
                                     <mat-card-content class="feed-panel-content">
-                                        <mat-form-field class="full-width" appearance="outline">
-                                            <mat-label>{{ 'SENSOR.RBL_BYPASS' | translate }}</mat-label>
-                                            <mat-icon matPrefix class="field-prefix-icon">add_circle_outline</mat-icon>
-                                            <mat-select (selectionChange)="onAddPermit($event)" id="rbl-permit-select">
-                                                @for (c of _bypass_feeds; track c._id || c.name;let i = $index) {
+                                        <mat-form-field class="full-width feed-add-field" appearance="outline"
+                                            subscriptSizing="dynamic">
+                                            <mat-label>{{ 'SENSOR.ADD_BYPASS_FEED' | translate }}</mat-label>
+                                            <mat-select #bypassSelect
+                                                (selectionChange)="onAddPermit($event, bypassSelect)"
+                                                [placeholder]="'SENSOR.SELECT_FEED_PLACEHOLDER' | translate"
+                                                id="rbl-permit-select">
+                                                @for (c of filterActiveFeed(_bypass_feeds, getTrusted()); track c._id || c.name; let i =
+                                                $index) {
                                                 <mat-option [value]="c.name || c._id" id="permit-option-{{i}}">
-                                                    {{ c.name || c._id }}
+                                                    <div class="feed-option-row">
+                                                        <mat-icon
+                                                            class="feed-option-icon permit-icon">check_circle</mat-icon>
+                                                        <span>{{ c.name || c._id }}</span>
+                                                    </div>
+                                                </mat-option>
+                                                }
+                                                @if (filterActiveFeed(_bypass_feeds, getTrusted()).length === 0) {
+                                                <mat-option disabled class="feed-option-empty">
+                                                    {{ 'SENSOR.NO_AVAILABLE_FEEDS' | translate }}
                                                 </mat-option>
                                                 }
                                             </mat-select>
@@ -276,7 +303,7 @@
                                                     (removed)="onRemovePermit(p)" id="permit-chip-{{p}}">
                                                     <mat-icon matChipAvatar
                                                         class="chip-avatar-icon">check_circle</mat-icon>
-                                                    {{ p }}
+                                                    <span class="chip-text">{{ p }}</span>
                                                     <button matChipRemove id="remove-permit-{{p}}"
                                                         [matTooltip]="'ACTIONS.REMOVE' | translate">
                                                         <mat-icon>cancel</mat-icon>
@@ -295,7 +322,7 @@
                                         @if (getTrusted().length === 0) {
                                         <div class="empty-state-feed">
                                             <mat-icon class="empty-state-icon">verified_user</mat-icon>
-                                            <span class="empty-state-text">{{ 'SENSOR.NO_FEEDS_SELECTED' | translate
+                                            <span class="empty-state-text">{{ 'SENSOR.NO_BYPASS_SELECTED' | translate
                                                 }}</span>
                                         </div>
                                         }

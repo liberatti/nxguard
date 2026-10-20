@@ -6,20 +6,13 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatGridListModule } from '@angular/material/grid-list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatListModule } from '@angular/material/list';
-import { MatMenuModule } from '@angular/material/menu';
-
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
-import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { RuleCategory, SecRule, Sensor } from 'app/models/sensor';
@@ -28,11 +21,7 @@ import { NotificationService } from 'app/services/notification.service';
 import { OAuthService } from 'app/services/oauth.service';
 import { FeedService } from 'app/services/feed.service';
 import { RuleCategoryService, SensorService } from 'app/services/sensor.service';
-import { DefaultPageMeta } from 'app/models/shared';
 import { CommonModule } from '@angular/common';
-import { FormaterService } from "app/services/formater.service";
-import { MatMomentDateModule } from "@angular/material-moment-adapter";
-
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { RuleDetailsDialogComponent } from 'app/components/rule-details-dialog/rule-details-dialog.component';
@@ -40,35 +29,42 @@ import { SensorGeoipDialogComponent } from 'app/components/sensor-geoip-dialog/s
 import { SensorRblDialogComponent } from 'app/components/sensor-rbl-dialog/sensor-rbl-dialog.component';
 import { RblThreatService, RblProviderInfo } from 'app/services/rbl-threat.service';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { map } from 'rxjs';
 
 @Component({
     selector: 'app-sensor-form',
     standalone: true,
-    imports: [RouterModule, CommonModule, FormsModule,
-        ReactiveFormsModule, TranslatePipe,
-        MatMomentDateModule, MatSidenavModule, MatIconModule, MatButtonModule,
-        MatListModule, MatCardModule, MatProgressBarModule, MatInputModule,
-        MatTableModule, MatMenuModule, MatSortModule, MatTabsModule, MatGridListModule,
-        MatTooltipModule, MatSelectModule, MatPaginatorModule, MatSlideToggleModule, MatCheckboxModule,
-        MatFormFieldModule, MatChipsModule, MatExpansionModule, MatDialogModule, MatStepperModule],
+    imports: [
+        RouterModule,
+        CommonModule,
+        FormsModule,
+        ReactiveFormsModule,
+        TranslatePipe,
+        MatIconModule,
+        MatButtonModule,
+        MatCardModule,
+        MatInputModule,
+        MatTableModule,
+        MatSortModule,
+        MatTooltipModule,
+        MatSelectModule,
+        MatPaginatorModule,
+        MatSlideToggleModule,
+        MatCheckboxModule,
+        MatFormFieldModule,
+        MatChipsModule,
+        MatExpansionModule,
+        MatDialogModule,
+        MatStepperModule
+    ],
     templateUrl: './sensor-form.component.html',
     styleUrl: './sensor-form.component.css'
 })
 export class SensorFormComponent implements OnInit, AfterViewInit {
     isAddMode: boolean;
     submitted = false;
-    selectedTabIndex = 0;
-    breakpoint: number;
     _categories: RuleCategory[] = [];
     _rbl_feeds: Feed[] = [];
     _bypass_feeds: Feed[] = [];
-    _geo_countries: string[] = [
-        "US", "CA", "BR", "IN", "GB", "AU", "DE", "FR", "IT", "ES",
-        "JP", "CN", "MX", "RU", "ZA", "KR", "NG", "AR", "SE", "NO",
-        "DK", "FI", "PL", "CH", "NL", "BE", "SG", "AE", "MY", "TH",
-        "PH", "NG", "KR", "None", "Unknown"
-    ];
     _allowed_http_versions: string[] = [
         'HTTP/1.0', 'HTTP/1.1', 'HTTP/2', 'HTTP/2.0'
     ];
@@ -145,10 +141,8 @@ export class SensorFormComponent implements OnInit, AfterViewInit {
         private dialog: MatDialog,
         private rblThreatService: RblThreatService,
         private translate: TranslateService,
-        protected oauth: OAuthService,
-        protected formater: FormaterService
+        protected oauth: OAuthService
     ) {
-        this.breakpoint = (window.innerWidth <= 600) ? 2 : 8;
         this.isAddMode = false;
         this.ruleDS = new MatTableDataSource<SecRule>;
     }
@@ -172,10 +166,10 @@ export class SensorFormComponent implements OnInit, AfterViewInit {
 
         this.getCategories(null);
         this.feedService.get_by_type('reputation').subscribe((data: any) => {
-            this._rbl_feeds = this.filterActiveFeed(Array.isArray(data) ? data : (data?.data || []));
+            this._rbl_feeds = Array.isArray(data) ? data : (data?.data || []);
         });
         this.feedService.get_by_type('bypass').subscribe((data: any) => {
-            this._bypass_feeds = this.filterActiveFeed(Array.isArray(data) ? data : (data?.data || []));
+            this._bypass_feeds = Array.isArray(data) ? data : (data?.data || []);
         });
     }
 
@@ -315,29 +309,31 @@ export class SensorFormComponent implements OnInit, AfterViewInit {
         }
     }
 
-    getFeeds(type: string) {
-        return this.feedService.get_by_type(type).subscribe((data: any) => {
-            return Array.isArray(data) ? data : (data?.data || []);
-        });
-    }
-
-    onAddBlock(event: any): void {
+    onAddBlock(event: any, selectRef?: any): void {
         let val = event.value;
         if (typeof val === 'object' && val) val = val.name || val._id;
         let list = [...this.getReputation()];
         if (val && !list.includes(val)) {
             list.push(val);
             this.form.get('security.reputation')?.setValue(list);
+            this.form.markAsTouched();
+        }
+        if (selectRef) {
+            selectRef.value = null;
         }
     }
 
-    onAddPermit(event: any): void {
+    onAddPermit(event: any, selectRef?: any): void {
         let val = event.value;
         if (typeof val === 'object' && val) val = val.name || val._id;
         let list = [...this.getTrusted()];
         if (val && !list.includes(val)) {
             list.push(val);
             this.form.get('security.trusted')?.setValue(list);
+            this.form.markAsTouched();
+        }
+        if (selectRef) {
+            selectRef.value = null;
         }
     }
 
@@ -357,15 +353,7 @@ export class SensorFormComponent implements OnInit, AfterViewInit {
         if (index >= 0) {
             list.splice(index, 1);
             this.form.get('security.reputation')?.setValue(list);
-        }
-    }
-
-    onAddGeo(event: any): void {
-        let data = event.value as string;
-        let list = [...this.getGeoCodes()];
-        if (data && !list.includes(data)) {
-            list.push(data);
-            this.form.get('security.geo_codes')?.setValue(list);
+            this.form.markAsTouched();
         }
     }
 
@@ -619,17 +607,11 @@ export class SensorFormComponent implements OnInit, AfterViewInit {
         return arr1;
     }
 
-    filterActiveGeo(geo: string[]): string[] {
-        if (!geo) return [];
-        const geoCodes = this.getGeoCodes();
-        return geo.filter(code => !geoCodes.includes(code));
-    }
-
-    filterActiveFeed(feeds: Array<Feed>): Array<Feed> {
-        if (!feeds) return [];
-        const used = [...this.getReputation(), ...this.getTrusted()];
-        return feeds.filter(a =>
-            a && !used.includes(a.name) && !used.includes(a._id)
+    filterActiveFeed(feeds: Array<Feed>, used: Array<string> | null | undefined): Array<Feed> {
+        if (!feeds || !Array.isArray(feeds)) return [];
+        const usedList = used && Array.isArray(used) ? used : [];
+        return feeds.filter((a: Feed) =>
+            a && !usedList.includes(a.name) && !usedList.includes(a._id)
         );
     }
 
