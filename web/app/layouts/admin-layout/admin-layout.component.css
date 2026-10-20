@@ -200,7 +200,7 @@
 }
 
 .sidenav {
-    width: 220px;
+    width: 236px;
     background-color: #ffffff !important;
     border-right: 1px solid var(--border-dim) !important;
     box-shadow: 1px 0 4px rgba(0, 0, 0, 0.02);
@@ -216,13 +216,13 @@
 .sidenav-menu-list {
     flex: 1;
     overflow-y: auto;
-    padding-top: 8px;
+    padding: 10px 0;
 }
 
 .sidenav-footer {
     margin-top: auto;
-    padding: 8px 10px;
-    border-top: 1px solid var(--bg-darker);
+    padding: 10px 12px;
+    border-top: 1px solid var(--border-dim, #e2e8f0);
 }
 
 .about-discreet-btn {
@@ -230,12 +230,12 @@
     display: inline-flex;
     align-items: center;
     justify-content: flex-start;
-    gap: 6px;
-    height: 34px;
-    padding: 0 8px !important;
-    border-radius: 6px;
+    gap: 8px;
+    height: 36px;
+    padding: 0 10px !important;
+    border-radius: 8px;
     color: var(--text-dim) !important;
-    font-size: 0.78rem;
+    font-size: 0.8125rem;
     font-weight: 500;
     transition: all 0.15s ease;
 
@@ -249,11 +249,11 @@
     }
 
     .about-icon {
-        font-size: 16px;
-        width: 16px;
-        height: 16px;
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
         color: var(--text-muted);
-        margin-right: 4px;
+        margin-right: 2px;
     }
 }
 
@@ -270,7 +270,7 @@
 
 .content-wrapper {
     flex: 1 0 auto;
-    padding: 20px 24px;
+    padding: 24px 28px;
     min-width: 0;
     box-sizing: border-box;
 }
@@ -291,13 +291,20 @@
 
 .menu-item-group {
     margin-bottom: 2px;
-    padding: 0 8px;
+    padding: 0 10px;
 }
 
 .nav-link-item {
-    border-radius: 6px !important;
+    border-radius: 8px !important;
     margin-bottom: 2px !important;
-    min-height: 38px !important;
+    min-height: 40px !important;
+    height: 40px !important;
+    padding: 0 12px !important;
+    transition: background 0.12s ease !important;
+
+    &:hover {
+        background: #f1f5f9 !important;
+    }
 }
 
 .nav-link-icon {
@@ -305,21 +312,29 @@
     font-size: 20px !important;
     width: 20px !important;
     height: 20px !important;
+    margin-right: 12px !important;
 }
 
 .nav-link-title {
     font-weight: 500;
-    font-size: 0.85rem;
+    font-size: 0.875rem;
+    color: var(--text-main);
 }
 
 .submenu-toggle-item {
     cursor: pointer;
     display: flex;
     align-items: center;
-    padding: 8px 10px;
-    border-radius: 6px;
+    padding: 0 12px;
+    height: 40px;
+    min-height: 40px;
+    border-radius: 8px;
     margin-bottom: 2px;
-    transition: background 0.15s ease;
+    transition: background 0.12s ease;
+
+    &:hover {
+        background: #f1f5f9;
+    }
 
     &.expanded {
         background: rgba(37, 99, 235, 0.05);
@@ -337,25 +352,32 @@
 .submenu-toggle-title {
     flex: 1;
     font-weight: 500;
-    font-size: 0.85rem;
+    font-size: 0.875rem;
     color: var(--text-main);
 }
 
 .submenu-arrow-icon {
-    font-size: 16px;
-    width: 16px;
-    height: 16px;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
     color: var(--text-dim);
 }
 
 .submenu-container {
-    padding-left: 12px;
+    padding-left: 14px;
 }
 
 .subnav-link-item {
     border-radius: 6px !important;
     margin-bottom: 2px !important;
-    min-height: 34px !important;
+    min-height: 36px !important;
+    height: 36px !important;
+    padding: 0 10px !important;
+    transition: background 0.12s ease !important;
+
+    &:hover {
+        background: #f1f5f9 !important;
+    }
 }
 
 .subnav-link-icon {
@@ -363,10 +385,12 @@
     width: 18px !important;
     height: 18px !important;
     color: var(--text-muted);
+    margin-right: 8px !important;
 }
 
 .subnav-link-title {
     font-size: 0.8125rem;
+    font-weight: 500;
 }
 
 .admin-footer {

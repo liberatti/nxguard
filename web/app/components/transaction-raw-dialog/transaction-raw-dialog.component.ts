@@ -18,6 +18,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Clipboard, ClipboardModule } from '@angular/cdk/clipboard';
 import { HighlightModule } from 'ngx-highlightjs';
+import { TranslatePipe } from '@ngx-translate/core';
 
 import { TransactionLog } from 'app/models/transaction';
 
@@ -42,6 +43,7 @@ import { TransactionLog } from 'app/models/transaction';
         MatSnackBarModule,
         ClipboardModule,
         HighlightModule,
+        TranslatePipe,
     ],
 })
 export class TransactionRAWDialogComponent {

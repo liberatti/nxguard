@@ -431,6 +431,10 @@
   },
   "TRANSACTION": {
     "VIEW_RAW_JSON": "View Raw JSON",
+    "RAW_TITLE": "Transaction Raw JSON",
+    "COPY_JSON": "Copy JSON",
+    "COPY_CLIPBOARD": "Copy JSON to clipboard",
+    "COPIED": "Copied",
     "FILTER": {
       "ADD_FILTER": "Add Filter",
       "CLEAR_ALL": "Clear All",

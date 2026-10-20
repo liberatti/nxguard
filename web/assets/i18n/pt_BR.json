@@ -431,6 +431,10 @@
   },
   "TRANSACTION": {
     "VIEW_RAW_JSON": "Ver JSON Bruto",
+    "RAW_TITLE": "JSON Bruto da Transação",
+    "COPY_JSON": "Copiar JSON",
+    "COPY_CLIPBOARD": "Copiar JSON para área de transferência",
+    "COPIED": "Copiado",
     "FILTER": {
       "ADD_FILTER": "Adicionar Filtro",
       "CLEAR_ALL": "Limpar Tudo",
