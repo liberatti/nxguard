@@ -40,6 +40,7 @@ import { SensorGeoipDialogComponent } from 'app/components/sensor-geoip-dialog/s
 import { SensorRblDialogComponent } from 'app/components/sensor-rbl-dialog/sensor-rbl-dialog.component';
 import { RblThreatService, RblProviderInfo } from 'app/services/rbl-threat.service';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { map } from 'rxjs';
 
 @Component({
     selector: 'app-sensor-form',
@@ -61,6 +62,7 @@ export class SensorFormComponent implements OnInit, AfterViewInit {
     breakpoint: number;
     _categories: RuleCategory[] = [];
     _rbl_feeds: Feed[] = [];
+    _bypass_feeds: Feed[] = [];
     _geo_countries: string[] = [
         "US", "CA", "BR", "IN", "GB", "AU", "DE", "FR", "IT", "ES",
         "JP", "CN", "MX", "RU", "ZA", "KR", "NG", "AR", "SE", "NO",
@@ -169,7 +171,12 @@ export class SensorFormComponent implements OnInit, AfterViewInit {
         }
 
         this.getCategories(null);
-        this.getFeeds(null);
+        this.feedService.get_by_type('reputation').subscribe((data: any) => {
+            this._rbl_feeds = this.filterActiveFeed(Array.isArray(data) ? data : (data?.data || []));
+        });
+        this.feedService.get_by_type('bypass').subscribe((data: any) => {
+            this._bypass_feeds = this.filterActiveFeed(Array.isArray(data) ? data : (data?.data || []));
+        });
     }
 
     ngAfterViewInit(): void {
@@ -308,16 +315,10 @@ export class SensorFormComponent implements OnInit, AfterViewInit {
         }
     }
 
-    getFeeds(event: any) {
-        if (event === null) {
-            this.feedService.get(new DefaultPageMeta()).subscribe((data: any) => {
-                const list = Array.isArray(data) ? data : (data?.data || []);
-                const allowedTypes = ['reputation', 'bypass', 'by_pass', 'network', 'network_static', 'ip', 'rbl', 'cidr'];
-                this._rbl_feeds = list.filter((item: any) =>
-                    !item['type'] || allowedTypes.includes(item['type'])
-                );
-            });
-        }
+    getFeeds(type: string) {
+        return this.feedService.get_by_type(type).subscribe((data: any) => {
+            return Array.isArray(data) ? data : (data?.data || []);
+        });
     }
 
     onAddBlock(event: any): void {

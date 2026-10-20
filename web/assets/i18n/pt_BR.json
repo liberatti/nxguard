@@ -435,6 +435,16 @@
     "COPY_JSON": "Copiar JSON",
     "COPY_CLIPBOARD": "Copiar JSON para área de transferência",
     "COPIED": "Copiado",
+    "CHART": {
+      "TITLE": "Tráfego de Transações por Ação",
+      "SUBTITLE": "Volume temporal e taxa de requisições por ação de segurança",
+      "TOTAL": "Total",
+      "TOTAL_TRANSACTIONS": "Total de transações no intervalo selecionado",
+      "RESET_ZOOM": "Redefinir Zoom",
+      "TOGGLE_SERIES": "Clique para alternar a exibição desta ação no gráfico",
+      "NO_DATA": "Nenhuma transação registrada no período selecionado",
+      "NO_DATA_HINT": "Ajuste o intervalo de tempo ou filtros de busca para visualizar os dados"
+    },
     "FILTER": {
       "ADD_FILTER": "Adicionar Filtro",
       "CLEAR_ALL": "Limpar Tudo",

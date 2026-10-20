@@ -34,7 +34,6 @@ import { TransactionLog } from 'app/models/transaction';
         MatInputModule,
         MatCardModule,
         MatButtonModule,
-        MatDialogTitle,
         MatDialogContent,
         MatDialogActions,
         MatTabsModule,

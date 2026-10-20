@@ -128,6 +128,7 @@ class FeedService:
             response = requests.get(url, headers=headers, timeout=5)
             if response.status_code == 200:
                 res_data = response.json()
+                logger.info(res_data)
                 if (
                     isinstance(res_data, dict)
                     and "data" in res_data
@@ -169,7 +170,11 @@ class FeedService:
                     )
 
                 return mapped_feeds
-            return []
+            else:
+                logger.error(
+                    f"Error fetching feeds by type from IPXA: {response.status_code}"
+                )
+                return []
         except Exception as e:
             logger.error(f"Error fetching feeds by type from IPXA: {e}")
             return []

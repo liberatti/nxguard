@@ -143,7 +143,7 @@
                                             <mat-label>{{ 'SENSOR.RBL_BLOCK' | translate }}</mat-label>
                                             <mat-icon matPrefix class="field-prefix-icon">add_circle_outline</mat-icon>
                                             <mat-select (selectionChange)="onAddBlock($event)" id="rbl-block-select">
-                                                @for (c of filterActiveFeed(_rbl_feeds); track c._id || c.name; let i =
+                                                @for (c of _rbl_feeds; track c._id || c.name; let i =
                                                 $index) {
                                                 <mat-option [value]="c.name || c._id" id="block-option-{{i}}">
                                                     {{ c.name || c._id }}
@@ -239,8 +239,7 @@
                                             <mat-label>{{ 'SENSOR.RBL_BYPASS' | translate }}</mat-label>
                                             <mat-icon matPrefix class="field-prefix-icon">add_circle_outline</mat-icon>
                                             <mat-select (selectionChange)="onAddPermit($event)" id="rbl-permit-select">
-                                                @for (c of filterActiveFeed(_rbl_feeds); track c._id || c.name; let i =
-                                                $index) {
+                                                @for (c of _bypass_feeds; track c._id || c.name;let i = $index) {
                                                 <mat-option [value]="c.name || c._id" id="permit-option-{{i}}">
                                                     {{ c.name || c._id }}
                                                 </mat-option>

@@ -435,6 +435,16 @@
     "COPY_JSON": "Copy JSON",
     "COPY_CLIPBOARD": "Copy JSON to clipboard",
     "COPIED": "Copied",
+    "CHART": {
+      "TITLE": "Transaction Traffic by Action",
+      "SUBTITLE": "Time-series volume and request rate broken down by security action",
+      "TOTAL": "Total",
+      "TOTAL_TRANSACTIONS": "Total transactions in selected window",
+      "RESET_ZOOM": "Reset Zoom",
+      "TOGGLE_SERIES": "Click to toggle this action in the chart",
+      "NO_DATA": "No transactions recorded for the selected period",
+      "NO_DATA_HINT": "Adjust your time window or search filters to display telemetry"
+    },
     "FILTER": {
       "ADD_FILTER": "Add Filter",
       "CLEAR_ALL": "Clear All",
