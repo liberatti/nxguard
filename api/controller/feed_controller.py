@@ -12,6 +12,14 @@ from api.services.feed_service import FeedService
 routes = Blueprint("feed", __name__)
 
 
+@routes.route("/config/geo", methods=["GET"])
+@has_any_authority(authorities=["viewer", "superuser"])
+def get_geo_countries() -> Response:
+    with FeedService() as feed_service:
+        feed = feed_service.get_geo_countries()
+        return response_data(feed) if feed else response_error_404()
+
+
 @routes.route("/<feed_id>", methods=["GET"])
 @has_any_authority(authorities=["viewer", "superuser"])
 def get(feed_id: str) -> Response:

@@ -77,6 +77,7 @@ export class SensorGeoipDialogComponent implements OnInit {
         const rawCodes = this.data?.geo_codes || this.data?.sensor?.security?.geo_codes || [];
         this.selectedCountryCodes = new Set<string>(rawCodes.map(c => (c || '').trim().toUpperCase()));
         this.isBlockingActive = this.selectedCountryCodes.size > 0 || this.data?.editable !== false;
+        this.geoCountryService.loadContinentRegions().subscribe();
     }
 
     get isEditable(): boolean {

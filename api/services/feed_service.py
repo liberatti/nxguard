@@ -56,6 +56,20 @@ class FeedService:
     def json_load(self, json_data):
         return self.schema.load(json_data)
 
+    def get_geo_countries(self):
+        try:
+            url, headers = self.get_api_config("/api/config/geo")
+            response = requests.get(url, headers=headers, timeout=5)
+            if response.status_code == 200:
+                return response.json()
+            url, headers = self.get_api_config("/api/feed/config/geo")
+            response = requests.get(url, headers=headers, timeout=5)
+            if response.status_code == 200:
+                return response.json()
+        except Exception as e:
+            logger.error(f"Error fetching geo countries from IPXA: {e}")
+            return {}
+
     def get_all(self, pagination=None):
         try:
             url, headers = self.get_api_config("/api/feed")

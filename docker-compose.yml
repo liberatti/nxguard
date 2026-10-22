@@ -104,14 +104,3 @@ services:
       - "./logs:/opt/nxguard/logs"
     extra_hosts:
       - "host.docker.internal:host-gateway"
-
-  web:
-    image: node:lts
-    working_dir: /app
-    command: sh -c "npm install --legacy-peer-deps && npm run container"
-    ports:
-      - "4200:4200"
-    environment:
-      - TZ=UTC
-    volumes:
-      - "./web:/app"
