@@ -126,7 +126,9 @@ class SecRule(SecBaseSchema):
     scope = fields.List(fields.String(), allow_none=True)
     tags = fields.List(fields.String(), allow_none=True)
     attachment = fields.String(allow_none=True)
-    chain_starter = fields.Boolean(allow_none=False, load_default=False, dump_default=False)
+    chain_starter = fields.Boolean(
+        allow_none=False, load_default=False, dump_default=False
+    )
 
 
 class RuleCategorySchema(Schema):
@@ -141,9 +143,12 @@ class RuleCategorySchema(Schema):
 
     _id = fields.String()
     name = fields.String(required=True)
-    phase = fields.Integer(required=True)  # 1-config, 2-request, 3-request-block, 4-response, 5-response-block, 6-correlation
+    phase = fields.Integer(
+        required=True
+    )  # 1-config, 2-request, 3-request-block, 4-response, 5-response-block, 6-correlation
     file = fields.String(required=False)
     scope = fields.String(required=False)
     rules = fields.Nested(SecRule, many=True)
     exclusions = fields.List(fields.Integer(), allow_none=True)
     system = fields.Boolean(required=False)
+    runtime = fields.String(required=False)
