@@ -737,6 +737,12 @@
       "title": "Usuários",
       "subtitle": "Lista de todos os usuários"
     },
+    "rulecat": {
+      "link": "Categorias",
+      "title": "Categorias de Regras",
+      "subtitle": "Gerencie as categorias de regras do ModSecurity e WAF",
+      "filter_placeholder": "Buscar categorias por nome, ID ou fase..."
+    },
     "config": {
       "link": "Configurações",
       "title": "Configurações",
@@ -744,6 +750,56 @@
     },
     "system": {
       "link": "Sistema"
+    }
+  },
+  "RULECAT": {
+    "TITLE": "Categorias de Regras",
+    "SUBTITLE": "Gerencie as categorias de regras do ModSecurity e WAF",
+    "CREATE": "Criar Categoria",
+    "EDIT": "Editar Categoria",
+    "SEARCH_PLACEHOLDER": "Buscar categorias por nome ou ID...",
+    "EMPTY": "Nenhuma categoria de regra encontrada",
+    "LIVE_PREVIEW": "Pré-visualização da Categoria",
+    "FIELDS": {
+      "ID": "ID da Categoria",
+      "ID_HINT": "Identificador numérico ou prefixo (ex: 945)",
+      "NAME": "Nome da Categoria",
+      "NAME_HINT": "Nome descritivo da categoria (ex: 945-NGGUARD-CUSTOM-RULES)",
+      "PHASE": "Fase",
+      "SCOPE": "Escopo",
+      "SEQ": "Sequência",
+      "SEQ_HINT": "Ordem sequencial de execução",
+      "FILE": "Arquivo de Regra",
+      "FILE_HINT": "Arquivo de configuração da regra (ex: REQUEST-945-NGGUARD-CUSTOM-RULES.conf)",
+      "RUNTIME": "Runtime",
+      "RUNTIME_HINT": "Modo de execução (ex: custom, standard)",
+      "SYSTEM": "Protegido pelo Sistema",
+      "SYSTEM_DESC": "Categorias protegidas pelo sistema não podem ser modificadas sem permissão de superusuário",
+      "TYPE": "Tipo",
+      "ACTIONS": "Ações"
+    },
+    "PHASES": {
+      "1": "Fase 1 - Cabeçalhos da Requisição (Config e Exceções)",
+      "2": "Fase 2 - Corpo da Requisição (Regras e Ataques)",
+      "3": "Fase 3 - Avaliação de Bloqueio da Requisição",
+      "4": "Fase 4 - Cabeçalhos da Resposta (Vazamento de Dados)",
+      "5": "Fase 5 - Corpo da Resposta (Avaliação de Bloqueio)",
+      "6": "Fase 6 - Correlação e Logs"
+    },
+    "SCOPES": {
+      "REQUEST": "Requisição",
+      "RESPONSE": "Resposta"
+    },
+    "TYPES": {
+      "SYSTEM": "Sistema",
+      "CUSTOM": "Personalizado"
+    },
+    "CONFIRM_DELETE_TITLE": "Confirmar Remoção da Categoria",
+    "CONFIRM_DELETE_MSG": "Tem certeza de que deseja remover a categoria de regra",
+    "NOTIFICATIONS": {
+      "SAVED": "Categoria de regra salva com sucesso",
+      "UPDATED": "Categoria de regra atualizada com sucesso",
+      "REMOVED": "Categoria de regra removida com sucesso"
     }
   },
   "aboutMessage": "Obrigado",

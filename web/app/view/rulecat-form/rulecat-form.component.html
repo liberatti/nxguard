@@ -1,0 +1,177 @@
+<div class="rulecat-form-container">
+    <mat-card class="rulecat-form-card" id="rulecat-form-card">
+        <!-- Header -->
+        <mat-card-header class="rulecat-form-header">
+            <div class="header-titles">
+                <mat-card-title class="card-title">
+                    <mat-icon class="title-icon">category</mat-icon>
+                    <span>{{ 'RULECAT.TITLE' | translate }}</span>
+                </mat-card-title>
+                <mat-card-subtitle class="card-subtitle">
+                    {{ (isAddMode ? 'RULECAT.CREATE' : 'RULECAT.EDIT') | translate }}
+                </mat-card-subtitle>
+            </div>
+        </mat-card-header>
+
+        @if (isLoading) {
+        <mat-progress-bar mode="indeterminate" class="loading-bar"></mat-progress-bar>
+        }
+
+        <mat-card-content class="rulecat-form-content">
+            <!-- Category Live Preview Card -->
+            <div class="category-preview-card" id="rulecat-live-preview">
+                <div class="preview-icon-wrapper">
+                    <mat-icon class="preview-avatar-icon">shield</mat-icon>
+                </div>
+                <div class="preview-info">
+                    <div class="preview-top-row">
+                        <span class="preview-id-badge">{{ form.get('_id')?.value || 'NEW' }}</span>
+                        <h3 class="preview-name">{{ form.get('name')?.value || ('RULECAT.FIELDS.NAME' | translate) }}</h3>
+                    </div>
+                    @if (form.get('file')?.value) {
+                    <p class="preview-file-text">
+                        <mat-icon class="file-icon">description</mat-icon>
+                        <span>{{ form.get('file')?.value }}</span>
+                    </p>
+                    }
+                    <div class="preview-tags">
+                        <span class="preview-chip phase-chip" [ngClass]="'phase-' + form.get('phase')?.value">
+                            {{ 'RULECAT.FIELDS.PHASE' | translate }} {{ form.get('phase')?.value }}
+                        </span>
+                        <span class="preview-chip scope-chip" [ngClass]="'scope-' + form.get('scope')?.value">
+                            <mat-icon class="chip-mini-icon">{{ form.get('scope')?.value === 'request' ? 'arrow_downward' : 'arrow_upward' }}</mat-icon>
+                            {{ form.get('scope')?.value | uppercase }}
+                        </span>
+                        @if (form.get('seq')?.value !== null && form.get('seq')?.value !== undefined) {
+                        <span class="preview-chip seq-chip">
+                            SEQ #{{ form.get('seq')?.value }}
+                        </span>
+                        }
+                        @if (form.get('system')?.value) {
+                        <span class="preview-chip system-chip">
+                            <mat-icon class="chip-mini-icon">verified_user</mat-icon>
+                            {{ 'RULECAT.TYPES.SYSTEM' | translate }}
+                        </span>
+                        } @else {
+                        <span class="preview-chip custom-chip">
+                            <mat-icon class="chip-mini-icon">extension</mat-icon>
+                            {{ 'RULECAT.TYPES.CUSTOM' | translate }}
+                        </span>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Fields -->
+            <form [formGroup]="form" class="rulecat-form" id="rulecat-form-element">
+                <div class="mat-row">
+                    <!-- ID Field -->
+                    <div class="mat-col-4">
+                        <mat-form-field appearance="outline" class="full-width">
+                            <mat-label>{{ 'RULECAT.FIELDS.ID' | translate }}</mat-label>
+                            <input matInput formControlName="_id" id="rulecat-id-input" [placeholder]="'RULECAT.FIELDS.ID_HINT' | translate" [readonly]="!isAddMode">
+                            <mat-icon matSuffix class="field-icon">tag</mat-icon>
+                            <mat-hint>{{ 'RULECAT.FIELDS.ID_HINT' | translate }}</mat-hint>
+                        </mat-form-field>
+                    </div>
+
+                    <!-- Name Field -->
+                    <div class="mat-col-8">
+                        <mat-form-field appearance="outline" class="full-width">
+                            <mat-label>{{ 'RULECAT.FIELDS.NAME' | translate }} *</mat-label>
+                            <input matInput formControlName="name" id="rulecat-name-input" [placeholder]="'RULECAT.FIELDS.NAME_HINT' | translate">
+                            <mat-icon matSuffix class="field-icon">badge</mat-icon>
+                            <mat-hint>{{ 'RULECAT.FIELDS.NAME_HINT' | translate }}</mat-hint>
+                        </mat-form-field>
+                    </div>
+
+                    <!-- Phase Field -->
+                    <div class="mat-col-6">
+                        <mat-form-field appearance="outline" class="full-width">
+                            <mat-label>{{ 'RULECAT.FIELDS.PHASE' | translate }} *</mat-label>
+                            <mat-select formControlName="phase" id="rulecat-phase-select">
+                                @for (p of phases; track p.value) {
+                                <mat-option [value]="p.value" id="rulecat-phase-option-{{p.value}}">
+                                    <div class="phase-option-item">
+                                        <span class="phase-chip" [ngClass]="'phase-' + p.value">P{{ p.value }}</span>
+                                        <span>{{ p.labelKey | translate }}</span>
+                                    </div>
+                                </mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+
+                    <!-- Scope Field -->
+                    <div class="mat-col-6">
+                        <mat-form-field appearance="outline" class="full-width">
+                            <mat-label>{{ 'RULECAT.FIELDS.SCOPE' | translate }}</mat-label>
+                            <mat-select formControlName="scope" id="rulecat-scope-select">
+                                @for (s of scopes; track s) {
+                                <mat-option [value]="s" id="rulecat-scope-option-{{s}}">
+                                    <div class="scope-option-item">
+                                        <mat-icon class="scope-opt-icon">{{ s === 'request' ? 'arrow_downward' : 'arrow_upward' }}</mat-icon>
+                                        <span>{{ ('RULECAT.SCOPES.' + (s | uppercase)) | translate }} ({{ s }})</span>
+                                    </div>
+                                </mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+
+                    <!-- Sequence Field -->
+                    <div class="mat-col-4">
+                        <mat-form-field appearance="outline" class="full-width">
+                            <mat-label>{{ 'RULECAT.FIELDS.SEQ' | translate }}</mat-label>
+                            <input matInput type="number" formControlName="seq" id="rulecat-seq-input" [placeholder]="'RULECAT.FIELDS.SEQ_HINT' | translate">
+                            <mat-icon matSuffix class="field-icon">format_list_numbered</mat-icon>
+                            <mat-hint>{{ 'RULECAT.FIELDS.SEQ_HINT' | translate }}</mat-hint>
+                        </mat-form-field>
+                    </div>
+
+                    <!-- File Field -->
+                    <div class="mat-col-8">
+                        <mat-form-field appearance="outline" class="full-width">
+                            <mat-label>{{ 'RULECAT.FIELDS.FILE' | translate }}</mat-label>
+                            <input matInput formControlName="file" id="rulecat-file-input" [placeholder]="'RULECAT.FIELDS.FILE_HINT' | translate">
+                            <mat-icon matSuffix class="field-icon">description</mat-icon>
+                            <mat-hint>{{ 'RULECAT.FIELDS.FILE_HINT' | translate }}</mat-hint>
+                        </mat-form-field>
+                    </div>
+
+                    <!-- Runtime Field -->
+                    <div class="mat-col-6">
+                        <mat-form-field appearance="outline" class="full-width">
+                            <mat-label>{{ 'RULECAT.FIELDS.RUNTIME' | translate }}</mat-label>
+                            <input matInput formControlName="runtime" id="rulecat-runtime-input" [placeholder]="'RULECAT.FIELDS.RUNTIME_HINT' | translate">
+                            <mat-icon matSuffix class="field-icon">memory</mat-icon>
+                            <mat-hint>{{ 'RULECAT.FIELDS.RUNTIME_HINT' | translate }}</mat-hint>
+                        </mat-form-field>
+                    </div>
+
+                    <!-- System Toggle -->
+                    <div class="mat-col-6 toggle-wrapper">
+                        <mat-slide-toggle formControlName="system" id="rulecat-system-toggle" color="primary">
+                            <span class="toggle-label">{{ 'RULECAT.FIELDS.SYSTEM' | translate }}</span>
+                        </mat-slide-toggle>
+                        <span class="toggle-hint">{{ 'RULECAT.FIELDS.SYSTEM_DESC' | translate }}</span>
+                    </div>
+                </div>
+            </form>
+        </mat-card-content>
+
+        <!-- Actions -->
+        <mat-card-actions align="end" class="bottom-actions">
+            <button type="button" mat-stroked-button [routerLink]="['/rulecat']" id="rulecat-cancel-btn">
+                <mat-icon>arrow_back</mat-icon>
+                {{ 'ACTIONS.CANCEL' | translate }}
+            </button>
+            @if (form.enabled) {
+            <button type="button" mat-flat-button color="primary" (click)="onSubmit()" [disabled]="form.invalid || isLoading" id="rulecat-save-btn">
+                <mat-icon>save</mat-icon>
+                {{ 'ACTIONS.SAVE' | translate }}
+            </button>
+            }
+        </mat-card-actions>
+    </mat-card>
+</div>

@@ -16,6 +16,8 @@ import {ConfigFormComponent} from './view/config-form/config-form.component';
 import {DashboardHomeComponent} from "./view/dashboard-home/dashboard-home.component";
 import {UserListComponent} from "./view/user-list/user-list.component";
 import {UserFormComponent} from "./view/user-form/user-form.component";
+import {RuleCategoryListComponent} from "./view/rulecat-list/rulecat-list.component";
+import {RuleCategoryFormComponent} from "./view/rulecat-form/rulecat-form.component";
 
 export const routes: Routes = [
     {
@@ -70,6 +72,14 @@ export const routes: Routes = [
                     {path: '', component: CertificateListComponent},
                     {path: 'add', component: CertificateFormComponent},
                     {path: 'edit/:id', component: CertificateFormComponent},
+                ]
+            },
+            {
+                path: 'rulecat',
+                children: [
+                    {path: '', component: RuleCategoryListComponent},
+                    {path: 'add', component: RuleCategoryFormComponent},
+                    {path: 'edit/:id', component: RuleCategoryFormComponent},
                 ]
             },
             {path: 'account', component: AccountComponent},

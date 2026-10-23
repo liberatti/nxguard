@@ -2,7 +2,7 @@
   "config": {
     "dns_resolver": "127.0.0.11 8.8.8.8 1.1.1.1",
     "ipxa": {
-      "url": "http://ipxa:5000",
+      "url": "http://ipxa:5000/ipxa",
       "key": "tZzDBUSnoy76LLSvu1Vg3e9vdFJINMT2"
     },
     "logging": {

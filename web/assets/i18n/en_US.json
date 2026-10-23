@@ -737,6 +737,12 @@
       "title": "Users",
       "subtitle": "List of all users"
     },
+    "rulecat": {
+      "link": "Categories",
+      "title": "Rule Categories",
+      "subtitle": "Manage ModSecurity and WAF rule categories",
+      "filter_placeholder": "Search categories by name, ID or phase..."
+    },
     "config": {
       "link": "Configuration",
       "title": "Configuration",
@@ -744,6 +750,56 @@
     },
     "system": {
       "link": "System"
+    }
+  },
+  "RULECAT": {
+    "TITLE": "Rule Categories",
+    "SUBTITLE": "Manage ModSecurity and WAF rule categories",
+    "CREATE": "Create Category",
+    "EDIT": "Edit Category",
+    "SEARCH_PLACEHOLDER": "Search categories by name or ID...",
+    "EMPTY": "No rule categories found",
+    "LIVE_PREVIEW": "Rule Category Live Preview",
+    "FIELDS": {
+      "ID": "Category ID",
+      "ID_HINT": "Numeric identifier or prefix (e.g. 945)",
+      "NAME": "Category Name",
+      "NAME_HINT": "Descriptive category name (e.g. 945-NGGUARD-CUSTOM-RULES)",
+      "PHASE": "Phase",
+      "SCOPE": "Scope",
+      "SEQ": "Sequence",
+      "SEQ_HINT": "Execution sequence order",
+      "FILE": "Rule File",
+      "FILE_HINT": "Rule configuration file (e.g. REQUEST-945-NGGUARD-CUSTOM-RULES.conf)",
+      "RUNTIME": "Runtime",
+      "RUNTIME_HINT": "Runtime mode (e.g. custom, standard)",
+      "SYSTEM": "System Protected",
+      "SYSTEM_DESC": "System protected rule category cannot be modified without superuser access",
+      "TYPE": "Type",
+      "ACTIONS": "Actions"
+    },
+    "PHASES": {
+      "1": "Phase 1 - Request Headers (Config & Exceptions)",
+      "2": "Phase 2 - Request Body (Rules & Attacks)",
+      "3": "Phase 3 - Request Blocking Evaluation",
+      "4": "Phase 4 - Response Headers (Data Leakages)",
+      "5": "Phase 5 - Response Body (Blocking Evaluation)",
+      "6": "Phase 6 - Correlation & Logging"
+    },
+    "SCOPES": {
+      "REQUEST": "Request",
+      "RESPONSE": "Response"
+    },
+    "TYPES": {
+      "SYSTEM": "System",
+      "CUSTOM": "Custom"
+    },
+    "CONFIRM_DELETE_TITLE": "Confirm Category Removal",
+    "CONFIRM_DELETE_MSG": "Are you sure you want to remove rule category",
+    "NOTIFICATIONS": {
+      "SAVED": "Rule category saved successfully",
+      "UPDATED": "Rule category updated successfully",
+      "REMOVED": "Rule category removed successfully"
     }
   },
   "aboutMessage": "Thanks",

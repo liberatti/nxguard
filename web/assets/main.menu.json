@@ -39,6 +39,11 @@
         "icon": "group"
       },
       {
+        "label": "view.rulecat.link",
+        "route": "/rulecat",
+        "icon": "category"
+      },
+      {
         "label": "view.config.link",
         "route": "/config",
         "icon": "settings"

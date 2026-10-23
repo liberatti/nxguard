@@ -1,10 +1,17 @@
 import { Feed } from "./feed";
 
 export interface RuleCategory {
-    _id: string;
+    _id?: string;
     name: string;
-    rules: Array<SecRule>;
-    mandatory: boolean;
+    phase?: number;
+    file?: string;
+    scope?: string;
+    seq?: number;
+    system?: boolean;
+    runtime?: string;
+    rules?: Array<SecRule>;
+    exclusions?: number[];
+    mandatory?: boolean;
 }
 
 export interface SecRule {

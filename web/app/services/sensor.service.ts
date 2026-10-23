@@ -1,7 +1,7 @@
 import {Injectable, Injector} from "@angular/core";
 import {APIService} from "./api.service";
 import {RuleCategory, SecRule, Sensor} from "../models/sensor";
-import {Observable} from "rxjs";
+import {Observable, map} from "rxjs";
 import {HttpParams} from "@angular/common/http";
 import {Page} from "../models/shared";
 
@@ -20,12 +20,18 @@ export class SensorService extends APIService<Sensor, string> {
 @Injectable({
     providedIn: 'root'
 })
-export class RuleCategoryService extends APIService<RuleCategory, number> {
+export class RuleCategoryService extends APIService<RuleCategory, string> {
 
     constructor(
         protected override injector: Injector
     ) {
         super(injector, 'rulecat')
+    }
+
+    getAll(): Observable<Array<RuleCategory>> {
+        return this.httpClient.get<any>(this.END_POINT).pipe(
+            map(res => Array.isArray(res) ? res : (res?.data || []))
+        );
     }
 
     getByPhases(phases?: Array<number>): Observable<Array<RuleCategory>> {
