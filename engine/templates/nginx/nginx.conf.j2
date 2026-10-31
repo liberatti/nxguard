@@ -15,7 +15,9 @@ http {
   proxy_hide_header Server;
 
   merge_slashes on;
-  resolver {{config.dns_resolver}} valid=30s;
+  {%- if config.dns_resolver %}
+  resolver {{ config.dns_resolver }} valid=30s;
+  {%- endif %}
   uninitialized_variable_warn off;
   lua_shared_dict log_buffer 2m;
   lua_shared_dict ipxa_cache 1m;
@@ -65,6 +67,13 @@ http {
 
   proxy_next_upstream error timeout invalid_header http_500 http_502 http_503 http_504;
   include upstreams.conf;
+
+  server {
+    listen 80 default_server;
+    server_name _;
+    return 503;
+  }
+
   {%- for u in services %}
   {%- if u.active %}
   include service-{{ u.render_name if u.render_name else u.name }}.conf;
