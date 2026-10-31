@@ -580,19 +580,7 @@
                 <mat-icon>arrow_back</mat-icon>
                 {{ 'ACTIONS.CANCEL' | translate }}
             </button>
-             <button mat-stroked-button matStepperPrevious type="button" id="back-routes-button">
-                                    <mat-icon>navigate_before</mat-icon>
-                                    {{ 'ACTIONS.BACK' | translate }}
-                                </button>
-                                
-
             @if (form.enabled) {
-                <button mat-flat-button color="primary" type="button"
-                                    (click)="onSubmit()" id="save-routes-step-button">
-                                    <mat-icon>save</mat-icon>
-                                    {{ 'ACTIONS.SAVE' | translate }}
-                                </button>
-                                
             <button type="button" mat-flat-button color="primary" (click)="onSubmit()"
                 id="save-service-button">
                 <mat-icon>save</mat-icon>
