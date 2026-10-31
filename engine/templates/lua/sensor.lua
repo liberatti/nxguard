@@ -61,10 +61,17 @@ else
     })
 end
 
+local reasons_str = ""
+if type(ngx.ctx.reasons) == "table" then
+    reasons_str = table.concat(ngx.ctx.reasons, ",")
+elseif ngx.ctx.reasons ~= nil then
+    reasons_str = tostring(ngx.ctx.reasons)
+end
+
 ngx.req.set_header("X-NXG-Country-Code", ngx.ctx.country_code or "--")
 ngx.req.set_header("X-NXG-Risk-Score", tostring(ngx.ctx.risk_score or 0))
 ngx.req.set_header("X-NXG-Trusted", tostring(ngx.ctx.trusted or false))
-ngx.req.set_header("X-NXG-Reasons", cjson.encode(ngx.ctx.reasons))
+ngx.req.set_header("X-NXG-Reasons", cjson.encode(ngx.ctx.reasons or {}))
 ngx.req.set_header("X-NXG-IPXA", ngx.ctx.ipxa)
 
 if not ngx.ctx.trusted then
@@ -81,9 +88,9 @@ if not ngx.ctx.trusted then
     if tonumber(ngx.ctx.risk_score) > 0 then
         ngx.ctx.reputation_action = "blocked"
         ngx.req.set_header("X-NXG-Reputation-Action", "blocked")
-        ngx.req.set_header("X-NXG-Reasons", ngx.ctx.reasons)
+        ngx.req.set_header("X-NXG-Reasons", reasons_str)
         return utils.respond(ngx.HTTP_FORBIDDEN,
-            "[block/risk-score]: " .. ip .. " risk_score=" .. ngx.ctx.risk_score .. " reasons=" .. ngx.ctx.reasons)
+            "[block/risk-score]: " .. ip .. " risk_score=" .. ngx.ctx.risk_score .. " reasons=" .. reasons_str)
     else
         ngx.ctx.reputation_action = "allowed"
         ngx.req.set_header("X-NXG-Reputation-Action", "allowed")

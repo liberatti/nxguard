@@ -18,9 +18,9 @@
 
 /* Card & Toolbar */
 .trn-card {
-    border-radius: 14px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
-    background: #ffffff;
+    border-radius: var(--card-radius);
+    box-shadow: var(--shadow-premium);
+    background: var(--surface);
 }
 
 .filter-toolbar {
@@ -56,41 +56,41 @@
     height: 32px !important;
     border-radius: 6px !important;
     font-weight: 600 !important;
-    font-size: 0.8125rem !important;
+    font-size: var(--font-size-sm) !important;
     display: inline-flex !important;
     align-items: center !important;
     gap: 6px !important;
     padding: 0 10px !important;
-    border: 1px solid rgba(0, 0, 0, 0.15) !important;
-    background: #ffffff !important;
-    color: #1e293b !important;
-    transition: all 0.2s ease;
+    border: 1px solid var(--border-dim) !important;
+    background: var(--surface) !important;
+    color: var(--text-main) !important;
+    transition: all var(--transition);
 }
 
 .date-range-btn:hover {
-    border-color: #0284c7 !important;
-    background: rgba(2, 132, 199, 0.05) !important;
+    border-color: var(--primary) !important;
+    background: rgba(37, 99, 235, 0.05) !important;
 }
 
 .date-range-icon {
     font-size: 16px;
     width: 16px;
     height: 16px;
-    color: #0284c7;
+    color: var(--primary);
 }
 
 .date-range-label {
-    font-family: 'JetBrains Mono', Consolas, monospace;
-    font-size: 0.78rem;
+    font-family: var(--font-mono);
+    font-size: var(--font-size-xs);
     font-weight: 600;
-    color: #0f172a;
+    color: var(--text-main);
 }
 
 .date-range-arrow {
     font-size: 16px;
     width: 16px;
     height: 16px;
-    color: #64748b;
+    color: var(--text-dim);
     margin-left: -2px;
 }
 

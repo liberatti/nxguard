@@ -63,7 +63,7 @@
     border: 1px solid var(--border-dim);
     border-radius: var(--card-radius);
     overflow: hidden;
-    background: #ffffff;
+    background: var(--surface);
     box-shadow: var(--shadow-premium);
 }
 
@@ -71,7 +71,7 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    font-size: 1.1rem;
+    font-size: var(--font-size-lg);
     font-weight: 600;
     color: var(--text-main);
 }
@@ -85,11 +85,12 @@
 }
 
 .targets-count-badge {
-    font-size: 0.75rem;
+    font-size: var(--font-size-xs);
     font-weight: 600;
     padding: 2px 8px;
     border-radius: 12px;
-    background: #e2e8f0;
+    background: var(--bg-darker);
+    border: 1px solid var(--border-dim);
     color: var(--text-dim);
     line-height: normal;
     display: inline-flex;

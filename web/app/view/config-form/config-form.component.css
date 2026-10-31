@@ -28,7 +28,7 @@
     align-items: center;
     gap: 10px;
     font-weight: 600;
-    font-size: 0.95rem;
+    font-size: var(--font-size-md);
     color: var(--text-main);
 }
 
@@ -41,7 +41,7 @@
 
 .panel-desc {
     color: var(--text-muted);
-    font-size: 0.8rem;
+    font-size: var(--font-size-xs);
 }
 
 .panel-content-body {

@@ -11,14 +11,15 @@
 }
 
 .dashboard-title {
-    font-size: 1.5rem;
+    font-size: var(--font-size-2xl);
     margin: 0;
     letter-spacing: -0.5px;
 }
 
 .dashboard-subtitle {
-    margin: 1px 0 0;
-    font-size: 0.78rem;
+    margin: 2px 0 0;
+    font-size: var(--font-size-sm);
+    color: var(--text-dim);
 }
 
 .dashboard-header-actions {
@@ -359,25 +360,25 @@
 
 .status-chip.passed,
 .status-chip.allowed {
-    background: #ecfdf5;
-    color: #059669;
-    border: 1px solid #a7f3d0;
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+    border: 1px solid rgba(16, 185, 129, 0.25);
 }
 
 .status-chip.deny,
 .status-chip.block,
 .status-chip.blocked {
-    background: #fef2f2;
-    color: #dc2626;
-    border: 1px solid #fecaca;
+    background: rgba(225, 29, 72, 0.1);
+    color: var(--error);
+    border: 1px solid rgba(225, 29, 72, 0.25);
 }
 
 .status-chip.warn,
 .status-chip.warning,
 .status-chip.rejected {
-    background: #fffbeb;
-    color: #d97706;
-    border: 1px solid #fde68a;
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--warning);
+    border: 1px solid rgba(245, 158, 11, 0.25);
 }
 
 .fi {

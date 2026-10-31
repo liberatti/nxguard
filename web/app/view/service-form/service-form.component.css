@@ -4,15 +4,15 @@
 
 .service-form-card {
     border-radius: var(--card-radius, 12px);
-    background: #ffffff;
-    border: 1px solid var(--border-dim, #e2e8f0);
-    box-shadow: var(--shadow-premium, 0 4px 20px -2px rgba(0, 0, 0, 0.05));
+    background: var(--surface);
+    border: 1px solid var(--border-dim);
+    box-shadow: var(--shadow-premium);
     overflow: hidden;
 }
 
 .service-form-card mat-card-header {
     padding: 20px 24px 12px 24px;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid var(--border-dim);
 }
 
 .service-form-card mat-card-content {
@@ -71,7 +71,7 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    font-size: 1rem;
+    font-size: var(--font-size-md);
     font-weight: 600;
     color: var(--text-main);
     margin: 0;
@@ -85,7 +85,7 @@
 }
 
 .section-subtitle {
-    font-size: 0.8125rem;
+    font-size: var(--font-size-sm);
     color: var(--text-dim);
     margin-top: 4px;
 }

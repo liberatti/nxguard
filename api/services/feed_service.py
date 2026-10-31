@@ -61,7 +61,6 @@ class FeedService:
             url, headers = self.get_api_config("/api/config/geo")
             response = requests.get(url, headers=headers, timeout=5)
             if response.status_code == 200:
-                logger.info(f"Fetched geo countries from IPXA: {response.json()}")
                 return response.json()
             else:
                 logger.error(
