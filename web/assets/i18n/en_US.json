@@ -761,7 +761,7 @@
     "EMPTY": "No rule categories found",
     "LIVE_PREVIEW": "Rule Category Live Preview",
     "FIELDS": {
-      "ID": "Category ID",
+      "ID": "ID",
       "ID_HINT": "Numeric identifier or prefix (e.g. 945)",
       "NAME": "Category Name",
       "NAME_HINT": "Descriptive category name (e.g. 945-NGGUARD-CUSTOM-RULES)",
@@ -772,10 +772,11 @@
       "FILE": "Rule File",
       "FILE_HINT": "Rule configuration file (e.g. REQUEST-945-NGGUARD-CUSTOM-RULES.conf)",
       "RUNTIME": "Runtime",
-      "RUNTIME_HINT": "Runtime mode (e.g. custom, standard)",
+      "RUNTIME_HINT": "Enable runtime execution",
+      "RUNTIME_DESC": "Enable runtime execution for this rule category",
       "SYSTEM": "System Protected",
       "SYSTEM_DESC": "System protected rule category cannot be modified without superuser access",
-      "TYPE": "Type",
+      "PROVIDER": "Provider",
       "ACTIONS": "Actions"
     },
     "PHASES": {

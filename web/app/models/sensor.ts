@@ -1,5 +1,3 @@
-import { Feed } from "./feed";
-
 export interface RuleCategory {
     _id?: string;
     name: string;
@@ -8,7 +6,7 @@ export interface RuleCategory {
     scope?: string;
     seq?: number;
     system?: boolean;
-    runtime?: string;
+    provider: string;
     rules?: Array<SecRule>;
     exclusions?: number[];
     mandatory?: boolean;

@@ -3,7 +3,7 @@ from flask import Blueprint, request
 from marshmallow import ValidationError
 
 from api.repository.oauth_repository import UserDao
-from nxcore.controllers.base_controller import (
+from api.middleware.controllers.base_controller import (
     response_data,
     response_error_404,
     response_error_parse,
@@ -12,7 +12,7 @@ from nxcore.controllers.base_controller import (
     response_error_403,
     response_data_removed,
 )
-from nxcore.middleware.jwt_manager import JWTManager
+from api.middleware.jwt_manager import JWTManager
 
 routes = Blueprint("user", __name__)
 

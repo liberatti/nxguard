@@ -2,7 +2,7 @@ from datetime import datetime
 from flask import Blueprint, request, Response
 from marshmallow import ValidationError
 
-from nxcore.controllers.base_controller import (
+from api.middleware.controllers.base_controller import (
     response_data,
     response_error_404,
     response_error_parse,
@@ -12,9 +12,9 @@ from nxcore.controllers.base_controller import (
     has_any_authority,
     response_data_removed,
 )
-from nxcore.middleware.socket_manager import emit_event
+from api.middleware.socket_manager import emit_event
 
-from nxcore.common_utils import deep_merge, replace_tz
+from api.middleware.common_utils import deep_merge, replace_tz
 from api.repository.certificate_repository import CertificateDao
 from api.repository.config_repository import ChangeDao
 from api.repository.service_repository import ServiceDao

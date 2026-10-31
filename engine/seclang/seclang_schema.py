@@ -143,6 +143,9 @@ class RuleCategorySchema(Schema):
 
     _id = fields.String()
     name = fields.String(required=True)
+    seq = fields.Integer(
+            required=True
+        ) 
     phase = fields.Integer(
         required=True
     )  # 1-config, 2-request, 3-request-block, 4-response, 5-response-block, 6-correlation
@@ -151,4 +154,4 @@ class RuleCategorySchema(Schema):
     rules = fields.Nested(SecRule, many=True)
     exclusions = fields.List(fields.Integer(), allow_none=True)
     system = fields.Boolean(required=False)
-    runtime = fields.String(required=False)
+    provider = fields.String(required=False)

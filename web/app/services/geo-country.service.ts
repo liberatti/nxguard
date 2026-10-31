@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { catchError, map, shareReplay, tap } from 'rxjs/operators';
 import { FeedService } from './feed.service';
+import { ConfigService } from './config.service';
 
 export interface CountryInfo {
     code: string;
@@ -32,13 +33,13 @@ export class GeoCountryService {
     };
     private loadCache$: Observable<ContinentRegion[]> | null = null;
 
-    constructor(private feedService: FeedService) {
+    constructor(private configService: ConfigService) {
         this.loadGeoCountries().subscribe();
     }
 
     loadGeoCountries(forceRefresh: boolean = false): Observable<ContinentRegion[]> {
         if (!this.loadCache$ || forceRefresh) {
-            this.loadCache$ = this.feedService.get_geo_countries().pipe(
+            this.loadCache$ = this.configService.get_geo_countries().pipe(
                 map((data: any) => {
                     const list = Array.isArray(data) ? data : (data?.data || []);
                     return this.normalizeContinents(list);

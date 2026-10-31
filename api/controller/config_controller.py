@@ -1,14 +1,16 @@
 import json
+from api.services.feed_service import FeedService
 from flask import Blueprint, Response, request
 from marshmallow import ValidationError
-from nxcore.controllers.base_controller import (
+from api.middleware.controllers.base_controller import (
     response_data,
     response_error,
+    response_error_404,
     response_error_parse,
     has_any_authority,
 )
-from nxcore.middleware.socket_manager import emit_event
-from nxcore.middleware.logging_manager import logger
+from api.middleware.socket_manager import emit_event
+from api.middleware.logging_manager import logger
 
 import engine.admin as c_admin
 import engine.build as c_builder
@@ -198,3 +200,10 @@ def backup_import() -> Response:
     except Exception as e:
         logger.error(f"Error importing configuration: {e}")
         return response_error(f"Failed to import configuration: {str(e)}")
+
+@routes.route("/geo", methods=["GET"])
+@has_any_authority(authorities=["viewer", "superuser"])
+def get_geo_countries() -> Response:
+    with FeedService() as feed_service:
+        feed = feed_service.get_geo_countries()
+        return response_data(feed) if feed else response_error_404()

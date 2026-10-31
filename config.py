@@ -39,7 +39,6 @@ CERTIFICATE_RENEW = int(os.environ.get("CERTIFICATE_RENEW", "7"))
 LOGLEVEL = os.environ.get("LOGLEVEL", "INFO").upper()
 
 # Security config
-SECURITY_ENABLED = bool(os.environ.get("SECURITY_ENABLED", "true"))
 KEY_SIZE = 2048
 JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", secrets.token_urlsafe(32))
 JWT_EXPIRE = 3600
@@ -107,3 +106,9 @@ SCORE_REGEX = re.compile(
     r"(?:Total\s*(?:Anomaly\s*)?Score|Score|Matched Data):\s*(\d+)",
     re.IGNORECASE,
 )
+
+
+def get(key: str, default=None):
+    """Retrieve configuration variable by name, falling back to default."""
+    return globals().get(key, default)
+

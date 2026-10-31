@@ -211,7 +211,6 @@ export class AppComponent {
       - API_KEY=xxxxxxxx
       - IPINFO_TOKEN=xxxxxxxx
       - LOGLEVEL=INFO
-      - SECURITY_ENABLED=true
       - IBLOCKLIST_USERNAME=xxxxxxxx
       - IBLOCKLIST_PASSWORD=xxxxxxxx
       - MAXMIND_ACCOUNT_ID=xxxxxxxx

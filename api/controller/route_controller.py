@@ -1,7 +1,7 @@
 from flask import Blueprint, request, Response
 from marshmallow import ValidationError
 
-from nxcore.controllers.base_controller import (
+from api.middleware.controllers.base_controller import (
     response_data,
     response_error_404,
     response_error_parse,

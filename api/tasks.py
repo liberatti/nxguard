@@ -5,8 +5,8 @@ import time
 import traceback
 
 import requests
-from nxcore.common_utils import get_server_id, replace_tz
-from nxcore.middleware.logging_manager import logger
+from api.middleware.common_utils import get_server_id, replace_tz
+from api.middleware.logging_manager import logger
 
 import config
 import engine.admin as c_admin

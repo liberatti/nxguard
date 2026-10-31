@@ -6,9 +6,9 @@ from datetime import datetime
 from typing import Dict, Any, List, Optional
 from marshmallow import Schema, fields
 
-from nxcore.middleware.logging_manager import logger
-from nxcore.repository.schemas.page_meta_schema import PageMetaSchema
-from nxcore.common_utils import replace_tz
+from api.middleware.logging_manager import logger
+from api.middleware.repository.schemas.page_meta_schema import PageMetaSchema
+from api.middleware.common_utils import replace_tz
 from api.repository.config_repository import ConfigDao
 from api.model.transaction_model import TransactionSchema
 from engine.elasticsearch_setup_service import ElasticsearchSetupService

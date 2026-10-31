@@ -64,6 +64,11 @@ export class RuleCategoryFormComponent implements OnInit {
 
     scopes: string[] = ['request', 'response'];
 
+    get selectedPhase(): PhaseOption | undefined {
+        const val = this.form.get('phase')?.value;
+        return this.phases.find(p => p.value === Number(val));
+    }
+
     form = new FormGroup({
         _id: new FormControl<string>(''),
         name: new FormControl<string>('', {
@@ -77,7 +82,7 @@ export class RuleCategoryFormComponent implements OnInit {
         scope: new FormControl<string>('request', { nonNullable: true }),
         seq: new FormControl<number | null>(null),
         file: new FormControl<string>(''),
-        runtime: new FormControl<string>('custom'),
+        provider: new FormControl<string>(''),
         system: new FormControl<boolean>(false)
     });
 
@@ -110,8 +115,8 @@ export class RuleCategoryFormComponent implements OnInit {
                             scope: data.scope || (data.phase && data.phase >= 4 ? 'response' : 'request'),
                             seq: data.seq !== undefined ? data.seq : null,
                             file: data.file || '',
-                            runtime: data.runtime || '',
-                            system: !!data.system
+                            system: !!data.system,
+                            provider: data.provider || ''
                         });
                     }
                     this.isLoading = false;
@@ -159,7 +164,7 @@ export class RuleCategoryFormComponent implements OnInit {
             name: raw.name.trim(),
             phase: Number(raw.phase),
             scope: raw.scope,
-            system: !!raw.system
+            system: !!raw.system,
         };
 
         if (raw._id && raw._id.trim()) {
@@ -170,9 +175,6 @@ export class RuleCategoryFormComponent implements OnInit {
         }
         if (raw.file && raw.file.trim()) {
             payload.file = raw.file.trim();
-        }
-        if (raw.runtime && raw.runtime.trim()) {
-            payload.runtime = raw.runtime.trim();
         }
 
         this.isLoading = true;

@@ -6,7 +6,7 @@ from marshmallow import ValidationError
 from api.repository.config_repository import ChangeDao
 from api.repository.upstream_repository import UpstreamDao, UpstreamStatesDao
 from api.repository.service_repository import ServiceDao
-from nxcore.controllers.base_controller import (
+from api.middleware.controllers.base_controller import (
     response_data,
     response_error,
     response_error_404,
@@ -15,7 +15,7 @@ from nxcore.controllers.base_controller import (
     get_pagination,
     has_any_authority,
 )
-from nxcore.middleware.socket_manager import emit_event
+from api.middleware.socket_manager import emit_event
 
 routes = Blueprint("upstream", __name__)
 

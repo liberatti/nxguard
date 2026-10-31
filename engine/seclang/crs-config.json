@@ -20,7 +20,8 @@
       "name": "900-EXCLUSION-RULES-BEFORE-CRS",
       "file": "REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf.example",
       "seq": 1,
-      "system": true
+      "system": true,
+      "provider": "core-rule-set"
     },
     {
       "_id": "905",
@@ -28,7 +29,8 @@
       "scope": "request",
       "name": "905-COMMON-EXCEPTIONS",
       "file": "REQUEST-905-COMMON-EXCEPTIONS.conf",
-      "seq": 3
+      "seq": 3,
+      "provider": "core-rule-set"
     },
     {
       "_id": "911",
@@ -36,7 +38,8 @@
       "scope": "request",
       "name": "911-METHOD-ENFORCEMENT",
       "file": "REQUEST-911-METHOD-ENFORCEMENT.conf",
-      "seq": 4
+      "seq": 4,
+      "provider": "core-rule-set"
     },
     {
       "_id": "913",
@@ -44,7 +47,8 @@
       "scope": "request",
       "name": "913-SCANNER-DETECTION",
       "file": "REQUEST-913-SCANNER-DETECTION.conf",
-      "seq": 5
+      "seq": 5,
+      "provider": "core-rule-set"
     },
     {
       "_id": "920",
@@ -52,7 +56,8 @@
       "scope": "request",
       "name": "920-PROTOCOL-ENFORCEMENT",
       "file": "REQUEST-920-PROTOCOL-ENFORCEMENT.conf",
-      "seq": 6
+      "seq": 6,
+      "provider": "core-rule-set"
     },
     {
       "_id": "921",
@@ -60,7 +65,8 @@
       "scope": "request",
       "name": "921-PROTOCOL-ATTACK",
       "file": "REQUEST-921-PROTOCOL-ATTACK.conf",
-      "seq": 7
+      "seq": 7,
+      "provider": "core-rule-set"
     },
     {
       "_id": "922",
@@ -68,7 +74,8 @@
       "scope": "request",
       "name": "922-MULTIPART-ATTACK",
       "file": "REQUEST-922-MULTIPART-ATTACK.conf",
-      "seq": 8
+      "seq": 8,
+      "provider": "core-rule-set"
     },
     {
       "_id": "930",
@@ -76,7 +83,8 @@
       "scope": "request",
       "name": "930-APPLICATION-ATTACK-LFI",
       "file": "REQUEST-930-APPLICATION-ATTACK-LFI.conf",
-      "seq": 9
+      "seq": 9,
+      "provider": "core-rule-set"
     },
     {
       "_id": "931",
@@ -84,7 +92,8 @@
       "scope": "request",
       "name": "931-APPLICATION-ATTACK-RFI",
       "file": "REQUEST-931-APPLICATION-ATTACK-RFI.conf",
-      "seq": 10
+      "seq": 10,
+      "provider": "core-rule-set"
     },
     {
       "_id": "932",
@@ -92,7 +101,8 @@
       "scope": "request",
       "name": "932-APPLICATION-ATTACK-RCE",
       "file": "REQUEST-932-APPLICATION-ATTACK-RCE.conf",
-      "seq": 11
+      "seq": 11,
+      "provider": "core-rule-set"
     },
     {
       "_id": "933",
@@ -100,7 +110,8 @@
       "scope": "request",
       "name": "933-APPLICATION-ATTACK-PHP",
       "file": "REQUEST-933-APPLICATION-ATTACK-PHP.conf",
-      "seq": 12
+      "seq": 12,
+      "provider": "core-rule-set"
     },
     {
       "_id": "934",
@@ -108,7 +119,8 @@
       "scope": "request",
       "name": "934-APPLICATION-ATTACK-GENERIC",
       "file": "REQUEST-934-APPLICATION-ATTACK-GENERIC.conf",
-      "seq": 13
+      "seq": 13,
+      "provider": "core-rule-set"
     },
     {
       "_id": "941",
@@ -116,7 +128,8 @@
       "scope": "request",
       "name": "941-APPLICATION-ATTACK-XSS",
       "file": "REQUEST-941-APPLICATION-ATTACK-XSS.conf",
-      "seq": 14
+      "seq": 14,  
+      "provider": "core-rule-set"
     },
     {
       "_id": "942",
@@ -124,7 +137,8 @@
       "scope": "request",
       "name": "942-APPLICATION-ATTACK-SQLI",
       "file": "REQUEST-942-APPLICATION-ATTACK-SQLI.conf",
-      "seq": 15
+      "seq": 15,
+      "provider": "core-rule-set"
     },
     {
       "_id": "943",
@@ -132,7 +146,8 @@
       "scope": "request",
       "name": "943-APPLICATION-ATTACK-SESSION-FIXATION",
       "file": "REQUEST-943-APPLICATION-ATTACK-SESSION-FIXATION.conf",
-      "seq": 16
+      "seq": 16,
+      "provider": "core-rule-set"
     },
     {
       "_id": "944",
@@ -140,7 +155,8 @@
       "scope": "request",
       "name": "944-APPLICATION-ATTACK-JAVA",
       "file": "REQUEST-944-APPLICATION-ATTACK-JAVA.conf",
-      "seq": 17
+      "seq": 17,
+      "provider": "core-rule-set"
     },
     {
       "_id": "949",
@@ -149,7 +165,8 @@
       "name": "949-BLOCKING-EVALUATION",
       "file": "REQUEST-949-BLOCKING-EVALUATION.conf",
       "seq": 18,
-      "system": true
+      "system": true,
+      "provider": "core-rule-set"
     },
     {
       "_id": "999",
@@ -157,7 +174,8 @@
       "scope": "request",
       "name": "999-COMMON-EXCEPTIONS-AFTER",
       "file": "REQUEST-999-COMMON-EXCEPTIONS-AFTER.conf",
-      "seq": 19
+      "seq": 19,
+      "provider": "core-rule-set"
     },
     {
       "_id": "950",
@@ -165,7 +183,8 @@
       "scope": "response",
       "name": "950-DATA-LEAKAGES",
       "file": "RESPONSE-950-DATA-LEAKAGES.conf",
-      "seq": 20
+      "seq": 20,
+      "provider": "core-rule-set"
     },
     {
       "_id": "951",
@@ -173,7 +192,8 @@
       "scope": "response",
       "name": "951-DATA-LEAKAGES-SQL",
       "file": "RESPONSE-951-DATA-LEAKAGES-SQL.conf",
-      "seq": 21
+      "seq": 21,
+      "provider": "core-rule-set"
     },
     {
       "_id": "952",
@@ -181,7 +201,8 @@
       "scope": "response",
       "name": "952-DATA-LEAKAGES-JAVA",
       "file": "RESPONSE-952-DATA-LEAKAGES-JAVA.conf",
-      "seq": 22
+      "seq": 22,
+      "provider": "core-rule-set"
     },
     {
       "_id": "953",
@@ -189,7 +210,8 @@
       "scope": "response",
       "name": "953-DATA-LEAKAGES-PHP",
       "file": "RESPONSE-953-DATA-LEAKAGES-PHP.conf",
-      "seq": 23
+      "seq": 23,
+      "provider": "core-rule-set"
     },
     {
       "_id": "954",
@@ -197,7 +219,8 @@
       "scope": "response",
       "name": "954-DATA-LEAKAGES-IIS",
       "file": "RESPONSE-954-DATA-LEAKAGES-IIS.conf",
-      "seq": 24
+      "seq": 24,
+      "provider": "core-rule-set"
     },
     {
       "_id": "955",
@@ -205,7 +228,8 @@
       "scope": "response",
       "name": "955-WEB-SHELLS",
       "file": "RESPONSE-955-WEB-SHELLS.conf",
-      "seq": 25
+      "seq": 25,
+      "provider": "core-rule-set"
     },
     {
       "_id": "956",
@@ -213,7 +237,8 @@
       "scope": "response",
       "name": "956-DATA-LEAKAGES-RUBY",
       "file": "RESPONSE-956-DATA-LEAKAGES-RUBY.conf",
-      "seq": 26
+      "seq": 26,
+      "provider": "core-rule-set"
     },
     {
       "_id": "959",
@@ -222,7 +247,8 @@
       "name": "959-BLOCKING-EVALUATION",
       "file": "RESPONSE-959-BLOCKING-EVALUATION.conf",
       "seq": 27,
-      "system": true
+      "system": true,
+      "provider": "core-rule-set"
     },
     {
       "_id": "980",
@@ -231,7 +257,8 @@
       "name": "980-CORRELATION",
       "file": "RESPONSE-980-CORRELATION.conf",
       "seq": 28,
-      "system": true
+      "system": true,
+      "provider": "core-rule-set"
     }
   ]
 }

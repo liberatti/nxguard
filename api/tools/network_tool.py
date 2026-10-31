@@ -2,7 +2,7 @@ import ipaddress
 import socket
 from typing import Any, List, Optional
 
-from nxcore.middleware.logging_manager import logger
+from api.middleware.logging_manager import logger
 
 
 class NetworkTool:

@@ -193,11 +193,12 @@ def _generate_sensors(
             }
             for c in ordered_cats["data"]:
                 if bool(c.get("system")) or c.get("name") in sensor_cats:
-                    if c.get("file"):
-                        file_path = f"{output_dir}/modsec/coreruleset/{c['file']}"
-                        if os.path.exists(file_path):
-                            with open(file_path, "r", encoding="utf-8") as r_data:
-                                c.update({"rules": r_data.read()})
+                    # TODO: No need to load file, categories are already loaded in the database. Remove this code and update the sensor generation logic to use the database directly.
+                    #if c.get("file"):
+                    #    file_path = f"{output_dir}/modsec/coreruleset/{c['file']}"
+                    #    if os.path.exists(file_path):
+                    #        with open(file_path, "r", encoding="utf-8") as r_data:
+                    #            c.update({"rules": r_data.read()})
                     categories.append(c)
 
             sensor.update({"categories": categories})

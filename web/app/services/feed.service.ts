@@ -24,7 +24,5 @@ export class FeedService extends APIService<Feed, string> {
         return this.httpClient.get<Feed[]>(this.END_POINT + "?type=" + type);
     }
 
-    get_geo_countries(): Observable<any[]> {
-        return this.httpClient.get<any[]>(this.END_POINT + "/config/geo");
-    }
+
 }

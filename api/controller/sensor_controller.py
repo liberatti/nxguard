@@ -1,7 +1,7 @@
 from flask import Blueprint, request, Response
 from marshmallow import ValidationError
 
-from nxcore.controllers.base_controller import (
+from api.middleware.controllers.base_controller import (
     response_data,
     response_error,
     response_error_404,
@@ -12,7 +12,7 @@ from nxcore.controllers.base_controller import (
 )
 
 
-from nxcore.middleware.socket_manager import emit_event
+from api.middleware.socket_manager import emit_event
 from api.repository.config_repository import ChangeDao
 from api.repository.sensor_repository import SensorDao
 from api.repository.service_repository import ServiceDao

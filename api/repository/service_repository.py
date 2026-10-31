@@ -2,8 +2,8 @@ import json
 from typing import Dict, Any, List, Optional
 
 import config
-from nxcore.middleware.logging_manager import logger
-from api.repository.duck_db import DuckDAO
+from api.middleware.logging_manager import logger
+from api.middleware.repository.duck_db import DuckDAO
 from api.repository.certificate_repository import CertificateDao
 from api.repository.route_repository import RouteDao
 from api.model.service_model import ServiceSchema

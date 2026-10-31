@@ -3,8 +3,8 @@ from datetime import datetime
 from typing import Dict, Any, List, Optional, Tuple
 
 import config
-from nxcore.middleware.logging_manager import logger
-from api.repository.duck_db import DuckDAO
+from api.middleware.logging_manager import logger
+from api.middleware.repository.duck_db import DuckDAO
 from api.model.transaction_model import TransactionSchema
 
 

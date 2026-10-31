@@ -3,8 +3,8 @@ import json
 from typing import Dict, Any, Optional
 
 import config
-from nxcore.middleware.logging_manager import logger
-from api.repository.duck_db import DuckDAO
+from api.middleware.logging_manager import logger
+from api.middleware.repository.duck_db import DuckDAO
 from api.model.config_model import ConfigSchema, ConfigBackupSchema, ChangeSchema
 
 

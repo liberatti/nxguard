@@ -1,38 +1,27 @@
-<div class="rulecat-container">
-    <mat-card id="rulecat-list-card" class="rulecat-card">
-        <mat-card-header class="rulecat-card-header">
-            <div class="header-titles">
-                <mat-card-title class="card-title">
-                    <mat-icon class="title-icon">category</mat-icon>
-                    <span>{{ 'RULECAT.TITLE' | translate }}</span>
-                    <span class="count-badge" id="rulecat-count-badge">{{ dataSource.filteredData.length }}</span>
-                </mat-card-title>
-                <mat-card-subtitle class="card-subtitle">{{ 'RULECAT.SUBTITLE' | translate }}</mat-card-subtitle>
-            </div>
-
-            <mat-card-actions class="header-actions">
+<ng-container>
+    <mat-card id="rulecat-list-card">
+        <mat-card-header>
+            <mat-card-title>{{ 'view.rulecat.title' | translate }}</mat-card-title>
+            <mat-card-subtitle>{{ 'view.rulecat.subtitle' | translate }}</mat-card-subtitle>
+            <mat-card-actions class="align-right">
+                <mat-form-field appearance="outline" subscriptSizing="dynamic" class="upstream-search-field">
+                    <mat-icon matPrefix>search</mat-icon>
+                    <input matInput id="rulecat-filter-input" [(ngModel)]="searchQuery" (keyup.enter)="applyFilter()"
+                        [placeholder]="'view.rulecat.filter_placeholder' | translate">
+                    @if (searchQuery) {
+                    <button matSuffix mat-icon-button id="rulecat-filter-clear-btn" (click)="clearFilter()">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                    }
+                </mat-form-field>
                 @if (oauth.isRole('superuser')) {
-                <button id="add-rulecat-btn" mat-flat-button color="primary" [routerLink]="['add']" class="create-btn">
+                <button id="add-rulecat-btn" mat-flat-button color="primary" [routerLink]="['add']">
                     <mat-icon>add</mat-icon>
-                    {{ 'ACTIONS.ADD' | translate }}
+                    {{ 'actions.create' | translate }}
                 </button>
                 }
             </mat-card-actions>
         </mat-card-header>
-
-        <!-- Filter bar -->
-        <div class="table-toolbar">
-            <mat-form-field appearance="outline" class="search-field" subscriptSizing="dynamic">
-                <mat-icon matPrefix class="search-icon">search</mat-icon>
-                <mat-label>{{ 'RULECAT.SEARCH_PLACEHOLDER' | translate }}</mat-label>
-                <input matInput id="rulecat-search-input" [value]="searchQuery" (keyup)="applyFilter($event)" [placeholder]="'RULECAT.SEARCH_PLACEHOLDER' | translate">
-                @if (searchQuery) {
-                <button mat-icon-button matSuffix (click)="clearFilter()" [attr.aria-label]="'ACTIONS.CANCEL' | translate" id="rulecat-clear-search-btn">
-                    <mat-icon>close</mat-icon>
-                </button>
-                }
-            </mat-form-field>
-        </div>
 
         @if (isLoading) {
         <mat-progress-bar mode="indeterminate" class="loading-bar"></mat-progress-bar>
@@ -97,21 +86,29 @@
                     </td>
                 </ng-container>
 
-                <!-- System / Type Column -->
-                <ng-container matColumnDef="system">
-                    <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'RULECAT.FIELDS.TYPE' | translate }}</th>
-                    <td mat-cell *matCellDef="let element" id="rulecat-system-{{element._id}}">
-                        @if (element.system) {
-                        <span class="type-chip system-type" [matTooltip]="'RULECAT.FIELDS.SYSTEM_DESC' | translate">
-                            <mat-icon class="type-chip-icon">verified_user</mat-icon>
-                            {{ 'RULECAT.TYPES.SYSTEM' | translate }}
-                        </span>
-                        } @else {
-                        <span class="type-chip custom-type">
-                            <mat-icon class="type-chip-icon">extension</mat-icon>
-                            {{ 'RULECAT.TYPES.CUSTOM' | translate }}
-                        </span>
-                        }
+                <!-- provider Column -->
+                <ng-container matColumnDef="provider">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'RULECAT.FIELDS.PROVIDER' | translate }}</th>
+                    <td mat-cell *matCellDef="let element" id="rulecat-provider-{{element._id}}">
+                        <div class="type-chips-wrapper">
+                            @if (element.provider) {
+                            <span class="type-chip provider-type" [matTooltip]="'RULECAT.FIELDS.PROVIDER_DESC' | translate">
+                                <mat-icon class="type-chip-icon">build</mat-icon>
+                                {{ element.provider }}
+                            </span>
+                            } @else {
+                            <span class="type-chip custom-type">
+                                <mat-icon class="type-chip-icon">extension</mat-icon>
+                                {{ 'RULECAT.TYPES.CUSTOM' | translate }}
+                            </span>
+                            }
+                            @if (element.runtime) {
+                            <span class="type-chip runtime-type" [matTooltip]="'RULECAT.FIELDS.RUNTIME_DESC' | translate">
+                                <mat-icon class="type-chip-icon">memory</mat-icon>
+                                {{ 'RULECAT.FIELDS.RUNTIME' | translate }}
+                            </span>
+                            }
+                        </div>
                     </td>
                 </ng-container>
 
@@ -153,4 +150,4 @@
             <mat-paginator [pageSizeOptions]="[10, 25, 50, 100]" [pageSize]="25" id="rulecat-paginator" class="rulecat-paginator"></mat-paginator>
         </mat-card-content>
     </mat-card>
-</div>
+</ng-container>

@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from functools import lru_cache
 from typing import Any, Dict, List, Optional
 
-from nxcore.middleware.logging_manager import logger
+from api.middleware.logging_manager import logger
 
 from api.repository.config_repository import ConfigDao
 from api.repository.transaction_repository import TransactionDao

@@ -46,6 +46,9 @@ export class ConfigService extends APIService<Config, string> {
     uploadConfig(data: FormData): Observable<any> {
         return this.httpClient.post<any>(this.END_POINT + "/backup", data);
     }
+    get_geo_countries(): Observable<any[]> {
+        return this.httpClient.get<any[]>(this.END_POINT + "/geo");
+    }
 }
 
 @Injectable({

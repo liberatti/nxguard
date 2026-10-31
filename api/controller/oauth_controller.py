@@ -2,13 +2,13 @@ import traceback
 from typing import Dict
 
 import bcrypt
-from nxcore.controllers.base_controller import (
+from api.middleware.controllers.base_controller import (
     response_data,
     response_error_parse,
     response_error_500,
     response_error_401,
 )
-from nxcore.middleware.jwt_manager import JWTManager
+from api.middleware.jwt_manager import JWTManager
 from flask import Blueprint, request, Response
 from marshmallow import ValidationError
 

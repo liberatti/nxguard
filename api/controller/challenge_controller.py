@@ -1,6 +1,6 @@
 from flask import Blueprint, Response
 
-from nxcore.controllers.base_controller import response_error_404
+from api.middleware.controllers.base_controller import response_error_404
 
 from api.repository.acme_repository import ChallengeDao
 

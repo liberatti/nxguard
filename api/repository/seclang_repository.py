@@ -2,7 +2,7 @@ import json
 from typing import List, Dict, Any, Optional
 
 import config
-from api.repository.duck_db import DuckDAO
+from api.middleware.repository.duck_db import DuckDAO
 from engine.seclang.seclang_schema import RuleCategorySchema, SecRule
 
 
@@ -111,10 +111,17 @@ class RuleCategoryDao(DuckDAO):
                 exclusions_json JSON DEFAULT '[]',
                 scope TEXT,
                 seq INTEGER,
-                system BOOLEAN DEFAULT FALSE
+                system BOOLEAN DEFAULT FALSE,
+                provider TEXT
             );
         """
         )
+        try:
+            self.ddl(
+                f"ALTER TABLE {self.table_name} ADD COLUMN IF NOT EXISTS provider TEXT"
+            )
+        except Exception:
+            pass
 
     def from_dict(self, vo):
         vo = vo.copy()
@@ -142,7 +149,7 @@ class RuleCategoryDao(DuckDAO):
         return self.to_dict(rs[0], dependents=dependents) if rs else None
 
     def get_by_name(self, name: str, dependents: bool = True) -> Optional[Dict[str, Any]]:
-        sql = f"SELECT * FROM {self.table_name} WHERE name = ? LIMIT 1"
+        sql = f"SELECT * FROM {self.table_name} WHERE name = ? ORDER BY seq ASC LIMIT 1"
         rs = self._query(sql, (name,), fetch=True)
         return self.to_dict(rs[0], dependents=dependents) if rs else None
 
@@ -150,21 +157,21 @@ class RuleCategoryDao(DuckDAO):
         self, name: str, phases: List[int], dependents: bool = False
     ) -> List[Dict[str, Any]]:
         if not phases:
-            sql = f"SELECT * FROM {self.table_name} WHERE (system IS NULL OR system = FALSE) AND name LIKE ?"
+            sql = f"SELECT * FROM {self.table_name} WHERE (system IS NULL OR system = FALSE) AND name LIKE ?  order by seq asc"
             params = [f"%{name}%"]
         else:
             placeholders = ", ".join(["?"] * len(phases))
-            sql = f"SELECT * FROM {self.table_name} WHERE (system IS NULL OR system = FALSE) AND name LIKE ? AND phase IN ({placeholders})"
+            sql = f"SELECT * FROM {self.table_name} WHERE (system IS NULL OR system = FALSE) AND name LIKE ? AND phase IN ({placeholders})  order by seq asc"
             params = [f"%{name}%"] + phases
         rs = self._query(sql, params, fetch=True)
         return [self.to_dict(row, dependents=dependents) for row in rs]
 
     def get_by_phases(self, phases: List[int], dependents: bool = False) -> List[Dict[str, Any]]:
         if not phases:
-            sql = f"SELECT * FROM {self.table_name} WHERE (system IS NULL OR system = FALSE)"
+            sql = f"SELECT * FROM {self.table_name} WHERE (system IS NULL OR system = FALSE) order by seq asc"
             rs = self._query(sql, fetch=True)
         else:
             placeholders = ", ".join(["?"] * len(phases))
-            sql = f"SELECT * FROM {self.table_name} WHERE (system IS NULL OR system = FALSE) AND phase IN ({placeholders})"
+            sql = f"SELECT * FROM {self.table_name} WHERE (system IS NULL OR system = FALSE) AND phase IN ({placeholders})  order by seq asc"
             rs = self._query(sql, phases, fetch=True)
         return [self.to_dict(row, dependents=dependents) for row in rs]

@@ -1,9 +1,9 @@
 import requests
 from typing import Dict, Any
-from nxcore.middleware.logging_manager import logger
+from api.middleware.logging_manager import logger
 from api.repository.config_repository import ConfigDao
 from marshmallow import Schema, fields
-from nxcore.repository.schemas.page_meta_schema import PageMetaSchema
+from api.middleware.repository.schemas.page_meta_schema import PageMetaSchema
 from api.model.ipxa_model import FeedSchema
 from api.tools.type_parse_tool import parse_dt
 
@@ -61,11 +61,13 @@ class FeedService:
             url, headers = self.get_api_config("/api/config/geo")
             response = requests.get(url, headers=headers, timeout=5)
             if response.status_code == 200:
+                logger.info(f"Fetched geo countries from IPXA: {response.json()}")
                 return response.json()
-            url, headers = self.get_api_config("/api/feed/config/geo")
-            response = requests.get(url, headers=headers, timeout=5)
-            if response.status_code == 200:
-                return response.json()
+            else:
+                logger.error(
+                    f"Error fetching geo countries from IPXA: {response.status_code}"
+                )
+                return {}
         except Exception as e:
             logger.error(f"Error fetching geo countries from IPXA: {e}")
             return {}

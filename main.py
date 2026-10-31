@@ -16,17 +16,6 @@ from flask_restful import Api
 import config
 from api.routes import register as register_api_routes
 
-nxcore_config.init(
-    {
-        "LOGLEVEL": config.LOGLEVEL,
-        "JWT_SECRET_KEY": config.JWT_SECRET_KEY,
-        "JWT_AUD": config.JWT_AUD,
-        "SECURITY_ENABLED": config.SECURITY_ENABLED,
-        "API_KEY": config.NXGUARD_API_KEY,
-    }
-)
-
-
 app = Flask(__name__)
 app.config["UPLOAD_FOLDER"] = "/tmp"
 app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024  # Limite de 16MB

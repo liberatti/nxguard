@@ -4,8 +4,8 @@ import duckdb
 
 from marshmallow import Schema, fields
 
-from nxcore.middleware.logging_manager import logger
-from nxcore.repository.schemas.page_meta_schema import PageMetaSchema
+from api.middleware.logging_manager import logger
+from api.middleware.repository.schemas.page_meta_schema import PageMetaSchema
 
 
 def validate_identifier(name: str) -> str:

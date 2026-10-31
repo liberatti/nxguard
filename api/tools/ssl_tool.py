@@ -12,9 +12,9 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives.hashes import SHA256
 from cryptography.x509.oid import NameOID
 
-from nxcore.middleware.logging_manager import logger
+from api.middleware.logging_manager import logger
 
-from nxcore.common_utils import replace_tz
+from api.middleware.common_utils import replace_tz
 from api.repository.acme_repository import ChallengeDao
 from api.repository.config_repository import ConfigDao
 from config import APP_BASE, KEY_SIZE, TZ

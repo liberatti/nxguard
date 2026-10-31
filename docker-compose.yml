@@ -8,7 +8,6 @@ services:
     restart: unless-stopped
     environment:
       - LOGLEVEL=INFO
-      - SECURITY_ENABLED=false
       # nosemgrep: generic.secrets.security.detected-generic-api-key.detected-generic-api-key
       - API_KEY=tZzDBUSnoy76LLSvu1Vg3e9vdFJINMT2
       - TZ=UTC
@@ -86,7 +85,7 @@ services:
     #     kibana:
     #       condition: service_started
     environment:
-      - SECURITY_ENABLED=false
+      - JWT_SECRET_KEY=dev
       - NXGUARD_ROLE=main
       - TZ=UTC
     ports:

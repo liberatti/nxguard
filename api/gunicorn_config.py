@@ -12,7 +12,7 @@ import threading
 import time
 import traceback
 import schedule
-from nxcore.middleware.logging_manager import logger, LoggingManager
+from api.middleware.logging_manager import logger, LoggingManager
 
 import config as _config
 

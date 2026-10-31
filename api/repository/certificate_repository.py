@@ -3,9 +3,9 @@ from datetime import datetime, timedelta
 from typing import Dict, Any
 
 import config
-from nxcore.common_utils import replace_tz
-from nxcore.middleware.logging_manager import logger
-from api.repository.duck_db import DuckDAO
+from api.middleware.common_utils import replace_tz
+from api.middleware.logging_manager import logger
+from api.middleware.repository.duck_db import DuckDAO
 from api.model.certificate_model import CertificateSchema
 
 

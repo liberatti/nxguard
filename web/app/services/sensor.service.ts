@@ -28,8 +28,11 @@ export class RuleCategoryService extends APIService<RuleCategory, string> {
         super(injector, 'rulecat')
     }
 
-    getAll(): Observable<Array<RuleCategory>> {
-        return this.httpClient.get<any>(this.END_POINT).pipe(
+    getAll(params?: {  }): Observable<Array<RuleCategory>> {
+        let options = {
+            params: new HttpParams()
+        };
+        return this.httpClient.get<any>(this.END_POINT, options).pipe(
             map(res => Array.isArray(res) ? res : (res?.data || []))
         );
     }

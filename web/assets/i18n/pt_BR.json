@@ -761,7 +761,7 @@
     "EMPTY": "Nenhuma categoria de regra encontrada",
     "LIVE_PREVIEW": "Pré-visualização da Categoria",
     "FIELDS": {
-      "ID": "ID da Categoria",
+      "ID": "ID",
       "ID_HINT": "Identificador numérico ou prefixo (ex: 945)",
       "NAME": "Nome da Categoria",
       "NAME_HINT": "Nome descritivo da categoria (ex: 945-NGGUARD-CUSTOM-RULES)",
@@ -772,10 +772,11 @@
       "FILE": "Arquivo de Regra",
       "FILE_HINT": "Arquivo de configuração da regra (ex: REQUEST-945-NGGUARD-CUSTOM-RULES.conf)",
       "RUNTIME": "Runtime",
-      "RUNTIME_HINT": "Modo de execução (ex: custom, standard)",
+      "RUNTIME_HINT": "Habilitar execução em runtime",
+      "RUNTIME_DESC": "Habilitar execução em runtime para esta categoria de regra",
       "SYSTEM": "Protegido pelo Sistema",
       "SYSTEM_DESC": "Categorias protegidas pelo sistema não podem ser modificadas sem permissão de superusuário",
-      "TYPE": "Tipo",
+      "PROVIDER": "Fornecedor",
       "ACTIONS": "Ações"
     },
     "PHASES": {

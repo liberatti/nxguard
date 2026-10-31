@@ -2,7 +2,7 @@ import json
 from typing import Dict, Any, Optional
 
 import config
-from api.repository.duck_db import DuckDAO
+from api.middleware.repository.duck_db import DuckDAO
 from api.model.sensor_model import SensorSchema
 
 

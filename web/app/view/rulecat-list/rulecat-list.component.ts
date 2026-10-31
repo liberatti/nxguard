@@ -52,7 +52,7 @@ import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-
     styleUrl: './rulecat-list.component.css'
 })
 export class RuleCategoryListComponent implements OnInit, AfterViewInit {
-    displayedColumns: string[] = ['_id', 'name', 'phase', 'scope', 'seq', 'system', 'action'];
+    displayedColumns: string[] = ['_id', 'name', 'phase', 'scope', 'seq', 'provider', 'action'];
     dataSource = new MatTableDataSource<RuleCategory>([]);
     isLoading = false;
     searchQuery = '';
@@ -88,9 +88,9 @@ export class RuleCategoryListComponent implements OnInit, AfterViewInit {
 
     loadCategories(): void {
         this.isLoading = true;
-        this.ruleCatService.getAll().subscribe({
+        this.ruleCatService.getAll({ runtime: true }).subscribe({
             next: (data: RuleCategory[]) => {
-                this.dataSource.data = data;
+                this.dataSource.data = (data || []);
                 this.isLoading = false;
             },
             error: () => {

@@ -1,7 +1,7 @@
 from flask import Blueprint, request, Response
 from marshmallow import ValidationError
 
-from nxcore.controllers.base_controller import (
+from api.middleware.controllers.base_controller import (
     response_data,
     response_error_404,
     response_error_parse,
@@ -79,7 +79,12 @@ def search() -> Response:
         elif phases:
             result = dao.get_by_phases(phases)
         else:
-            result = dao.get_by_phases([])
+            result = dao.get_by_phases(None)
+        #TODO: All categories are already loaded in the database. Remove this code and update the sensor generation logic to use the database directly.
+        #if runtime is not None:
+        #    is_runtime = runtime.lower() in ("true", "1")
+        #    result = [r for r in result if bool(r.get("runtime")) == is_runtime]
+
         return response_data(result, RuleCategorySchema(many=True))
 
 
