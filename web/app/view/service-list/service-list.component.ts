@@ -24,7 +24,7 @@ import {MatTooltipModule} from '@angular/material/tooltip';
 import {RouterModule} from '@angular/router';
 import {TranslatePipe} from '@ngx-translate/core';
 import {ConfirmDialogComponent} from 'app/components/confirm-dialog/confirm-dialog.component';
-import {Service} from 'app/models/service';
+import {Service, Route} from 'app/models/service';
 import {ServiceService} from 'app/services/service.service';
 import {NotificationService} from 'app/services/notification.service';
 import {OAuthService} from "../../services/oauth.service";
@@ -50,6 +50,7 @@ export class ServiceListComponent implements OnInit {
     serviceDS: MatTableDataSource<Service>;
     servicePA = new DefaultPageMeta();
     searchQuery: string = '';
+    isLoading: boolean = false;
 
     constructor(
         private notificationService: NotificationService,
@@ -76,8 +77,10 @@ export class ServiceListComponent implements OnInit {
     }
 
     updateGridTable() {
+        this.isLoading = true;
         this.serviceService.get(this.servicePA, this.searchQuery).subscribe({
             next: (data) => {
+                this.isLoading = false;
                 if (data && data.metadata) {
                     this.serviceDS.data = data.data || [];
                     this.servicePA.total_elements = data.metadata.total_elements;
@@ -87,15 +90,15 @@ export class ServiceListComponent implements OnInit {
                 }
             },
             error: () => {
+                this.isLoading = false;
                 this.serviceDS.data = [];
                 this.servicePA.total_elements = 0;
             }
         });
     }
 
-
     onSave() {
-        this.serviceService.get(this.servicePA).subscribe(data => {
+        this.serviceService.get(this.servicePA).subscribe(() => {
             this.updateGridTable();
         });
     }
@@ -106,9 +109,8 @@ export class ServiceListComponent implements OnInit {
         });
 
         dialogRef.afterClosed().subscribe(result => {
-            // accepted
             if (result && dto._id) {
-                this.serviceService.removeById(dto._id).subscribe(data => {
+                this.serviceService.removeById(dto._id).subscribe(() => {
                     this.updateGridTable();
                     this.notificationService.openSnackBar('Service removed');
                 });
@@ -128,8 +130,56 @@ export class ServiceListComponent implements OnInit {
             active: e.checked
         } as Partial<Service>;
 
-        this.serviceService.patch(service['_id'] as string, service).subscribe(data => {
-            this.updateGridTable();
+        this.serviceService.patch(service['_id'] as string, service).subscribe({
+            next: () => {
+                this.updateGridTable();
+            },
+            error: () => {
+                this.updateGridTable();
+            }
         });
+    }
+
+    getPrimarySans(element: Service): string[] {
+        if (!element.sans || element.sans.length === 0) return [];
+        return element.sans.slice(0, 2);
+    }
+
+    getRemainingSansCount(element: Service): number {
+        if (!element.sans || element.sans.length <= 2) return 0;
+        return element.sans.length - 2;
+    }
+
+    getAllSansTooltip(element: Service): string {
+        if (!element.sans) return '';
+        return element.sans.join('\n');
+    }
+
+    getPrimaryRoutes(element: Service): Route[] {
+        if (!element.routes || element.routes.length === 0) return [];
+        return element.routes.slice(0, 2);
+    }
+
+    getRemainingRoutesCount(element: Service): number {
+        if (!element.routes || element.routes.length <= 2) return 0;
+        return element.routes.length - 2;
+    }
+
+    getAllRoutesTooltip(element: Service): string {
+        if (!element.routes || element.routes.length === 0) return '';
+        return element.routes.map(r => {
+            const type = r.type || 'UPSTREAM';
+            const upstream = r.upstream?.name ? ` -> ${r.upstream.name}` : '';
+            return `${r.name} (${type})${upstream}`;
+        }).join('\n');
+    }
+
+    getRouteTooltip(r: Route): string {
+        const parts: string[] = [];
+        if (r.name) parts.push(`Route: ${r.name}`);
+        if (r.type) parts.push(`Type: ${r.type}`);
+        if (r.upstream?.name) parts.push(`Upstream: ${r.upstream.name}`);
+        if (r.paths && r.paths.length > 0) parts.push(`Paths: ${r.paths.join(', ')}`);
+        return parts.join('\n');
     }
 }

@@ -160,7 +160,18 @@
     "REQUEST_METHODS": "Request Methods",
     "CACHE_METHODS": "Cache Methods",
     "INVALID_REGEX": "Invalid NGINX regex pattern",
-    "PATH_HINT": "e.g. ^/api/v1/.* or /static/"
+    "PATH_HINT": "e.g. ^/api/v1/.* or /static/",
+    "PRIORITY": "Priority",
+    "TARGET": "Destination",
+    "NO_SENSOR": "No Sensor",
+    "ADD_TITLE": "Add Route",
+    "EDIT_TITLE": "Edit Route",
+    "DIALOG_SUBTITLE": "Define URL matching rules, target destination, and security sensor inspection.",
+    "SECTION_GENERAL": "Routing Target & Identity",
+    "SECTION_PATH": "URL Path Matching",
+    "SECTION_SECURITY": "Security & WAF Policy",
+    "SECTION_HTTP": "HTTP Methods & Content",
+    "MONITOR_HINT": "Inspect and log security anomalies without blocking requests"
   },
   "SENSOR": {
     "CONFIG": "Config",
@@ -708,7 +719,15 @@
       "link": "Services",
       "title": "Services",
       "subtitle": "Describe all services",
-      "filter_placeholder": "Search by name or domain..."
+      "filter_placeholder": "Search by name or domain...",
+      "no_data": "No services configured",
+      "no_data_desc": "Add a service to start proxying and protecting web traffic.",
+      "no_results": "No matching services found",
+      "no_results_hint": "Try adjusting your search criteria.",
+      "all_domains": "All domains (*)",
+      "active_status": "Active",
+      "inactive_status": "Inactive",
+      "toggle_active": "Toggle service status"
     },
     "upstream": {
       "link": "Upstreams",

@@ -320,13 +320,7 @@
                                     }
                                 </div>
                             </div>
-                            <div class="step-actions">
-                                <button mat-flat-button color="primary" matStepperNext type="button"
-                                    id="next-details-button">
-                                    {{ 'ACTIONS.NEXT' | translate }}
-                                    <mat-icon iconPositionEnd>navigate_next</mat-icon>
-                                </button>
-                            </div>
+                           
                         </div>
                     </mat-step>
 
@@ -404,17 +398,7 @@
                                     }
                                 </mat-card-content>
                             </mat-card>
-                            <div class="step-actions">
-                                <button mat-stroked-button matStepperPrevious type="button" id="back-overrides-button">
-                                    <mat-icon>navigate_before</mat-icon>
-                                    {{ 'ACTIONS.BACK' | translate }}
-                                </button>
-                                <button mat-flat-button color="primary" matStepperNext type="button"
-                                    id="next-overrides-button">
-                                    {{ 'ACTIONS.NEXT' | translate }}
-                                    <mat-icon iconPositionEnd>navigate_next</mat-icon>
-                                </button>
-                            </div>
+                            
                         </div>
                     </mat-step>
 
@@ -442,106 +426,135 @@
                                 </mat-card-header>
                                 <mat-card-content>
                                     @if (routeDS.data && routeDS.data.length) {
-                                    <table class="custom-table cdk-drop-list-table">
-                                        <thead>
-                                            <tr>
-                                                <th class="drag-handle-cell"></th>
-                                                <th class="col-name">{{ 'ROUTE.NAME' | translate }}</th>
-                                                <th class="col-upstream">{{ 'ROUTE.UPSTREAM' | translate }}</th>
-                                                <th class="col-path">{{ 'ROUTE.REQUEST_PATH' | translate }}</th>
-                                                <th class="col-sensor">{{ 'ROUTE.SECURITY_SENSOR' | translate }}</th>
-                                                <th class="col-actions text-right"></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody cdkDropList [cdkDropListData]="routeDS.data"
-                                            (cdkDropListDropped)="moveRoute($event)">
-                                            @for (r of routeDS.data; track r.name || r._id; let i = $index) {
-                                            <tr cdkDrag>
-                                                <td cdkDragHandle class="drag-handle-cell" [matTooltip]="'SERVICE.ROUTES_SUBTITLE' | translate">
-                                                    <mat-icon>drag_indicator</mat-icon>
-                                                </td>
-                                                <td class="col-name route-name-cell">
-                                                    {{ r.name }}
-                                                </td>
-                                                <td class="col-upstream">
-                                                    @if (r.type != 'REDIRECT' && r.type != 'STATIC') {
-                                                    <span class="target-badge upstream">
-                                                        <mat-icon class="badge-icon">hub</mat-icon>
-                                                        {{ r.upstream?.name || 'Upstream' }}
-                                                    </span>
-                                                    }
-                                                    @if (r.type == 'REDIRECT') {
-                                                    <span class="target-badge redirect">
-                                                        <mat-icon class="badge-icon">directions</mat-icon>
-                                                        REDIRECT
-                                                    </span>
-                                                    }
-                                                    @if (r.type == 'STATIC') {
-                                                    <span class="target-badge static">
-                                                        <mat-icon class="badge-icon">folder</mat-icon>
-                                                        STATIC
-                                                    </span>
-                                                    }
-                                                </td>
-                                                <td class="col-path">
-                                                    <div class="paths-list">
-                                                        @for (p of r.paths; track p) {
-                                                        <span class="path-chip">
-                                                            {{ p }}
+                                    <div class="table-responsive-container routes-table-container">
+                                        <table class="custom-table cdk-drop-list-table routes-table">
+                                            <thead>
+                                                <tr>
+                                                    <th class="col-priority">{{ 'ROUTE.PRIORITY' | translate }}</th>
+                                                    <th class="col-name">{{ 'ROUTE.NAME' | translate }}</th>
+                                                    <th class="col-upstream">{{ 'ROUTE.TARGET' | translate }}</th>
+                                                    <th class="col-path">{{ 'ROUTE.REQUEST_PATH' | translate }}</th>
+                                                    <th class="col-sensor">{{ 'ROUTE.SECURITY_SENSOR' | translate }}</th>
+                                                    <th class="col-actions text-right">{{ 'attr.actions' | translate }}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody cdkDropList [cdkDropListData]="routeDS.data"
+                                                (cdkDropListDropped)="moveRoute($event)">
+                                                @for (r of routeDS.data; track r.name || r._id; let i = $index) {
+                                                <tr cdkDrag class="route-table-row">
+                                                    <td class="col-priority">
+                                                        <div class="priority-handle-wrapper" cdkDragHandle [matTooltip]="'SERVICE.ROUTES_SUBTITLE' | translate">
+                                                            <mat-icon class="drag-handle-icon">drag_indicator</mat-icon>
+                                                            <span class="priority-number">#{{ i + 1 }}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td class="col-name">
+                                                        <div class="route-name-wrapper">
+                                                            <div class="route-title-box">
+                                                                <span class="route-main-name">{{ r.name }}</span>
+                                                                @if (r.monitor_only) {
+                                                                <span class="route-mode-badge monitor" [matTooltip]="'ROUTE.MONITOR_ONLY' | translate">
+                                                                    <mat-icon class="mini-icon">visibility</mat-icon>
+                                                                    {{ 'ROUTE.MONITOR_ONLY' | translate }}
+                                                                </span>
+                                                                }
+                                                            </div>
+                                                            @if (r.methods && r.methods.length > 0) {
+                                                            <div class="route-methods-list">
+                                                                @for (m of r.methods; track m) {
+                                                                <span class="method-tag" [class]="'method-' + (m | lowercase)">{{ m }}</span>
+                                                                }
+                                                            </div>
+                                                            }
+                                                        </div>
+                                                    </td>
+                                                    <td class="col-upstream">
+                                                        @if (r.type != 'REDIRECT' && r.type != 'STATIC') {
+                                                        <div class="target-card upstream">
+                                                            <mat-icon class="target-icon">hub</mat-icon>
+                                                            <span class="target-name">{{ r.upstream?.name || 'Upstream' }}</span>
+                                                        </div>
+                                                        }
+                                                        @if (r.type == 'REDIRECT') {
+                                                        <div class="target-card redirect">
+                                                            <div class="target-header">
+                                                                <mat-icon class="target-icon">directions</mat-icon>
+                                                                <span class="target-type-label">REDIRECT {{ r.redirect?.code || 301 }}</span>
+                                                            </div>
+                                                            @if (r.redirect && r.redirect.url) {
+                                                            <span class="target-subtext" [matTooltip]="r.redirect.url">{{ r.redirect.url }}</span>
+                                                            }
+                                                        </div>
+                                                        }
+                                                        @if (r.type == 'STATIC') {
+                                                        <div class="target-card static">
+                                                            <div class="target-header">
+                                                                <mat-icon class="target-icon">folder</mat-icon>
+                                                                <span class="target-type-label">STATIC</span>
+                                                            </div>
+                                                            @if (r.static && r.static.name) {
+                                                            <span class="target-subtext" [matTooltip]="r.static.name">{{ r.static.name }}</span>
+                                                            }
+                                                        </div>
+                                                        }
+                                                    </td>
+                                                    <td class="col-path">
+                                                        @if (r.paths && r.paths.length > 0) {
+                                                        <div class="paths-list">
+                                                            @for (p of r.paths; track p) {
+                                                            <span class="path-chip">
+                                                                <mat-icon class="path-prefix-icon">code</mat-icon>
+                                                                <span class="path-text">{{ p }}</span>
+                                                            </span>
+                                                            }
+                                                        </div>
+                                                        } @else {
+                                                        <span class="empty-cell-dash">-</span>
+                                                        }
+                                                    </td>
+                                                    <td class="col-sensor">
+                                                        @if (r.sensor && (r.sensor.name || r.sensor._id)) {
+                                                         <mat-icon class="sensor-shield-icon">security</mat-icon>
+                                                            <span class="sensor-title">{{ r.sensor.name || ('SENSOR.TITLE' | translate) }}</span>
+                                                        } @else {
+                                                        <span class="no-sensor-badge">
+                                                            <mat-icon class="mini-icon">shield</mat-icon>
+                                                            <span>{{ 'ROUTE.NO_SENSOR' | translate }}</span>
                                                         </span>
                                                         }
-                                                    </div>
-                                                </td>
-                                                <td class="col-sensor">
-                                                    @if (r.sensor && (r.sensor.name || r.sensor._id)) {
-                                                    <button type="button" class="route-sensor-btn"
-                                                        (click)="openSensorGeoipDialog(r, $event)"
-                                                        [matTooltip]="'SENSOR.EDIT_GEOIP' | translate"
-                                                        id="route-sensor-btn-{{i}}">
-                                                        <mat-icon class="sensor-shield-icon">security</mat-icon>
-                                                        <span class="sensor-title">{{ r.sensor.name || ('SENSOR.TITLE' | translate) }}</span>
-                                                        <span class="sensor-geo-badge">
-                                                            <mat-icon class="globe-mini-icon">public</mat-icon>
-                                                            {{ getRouteGeoCodesCount(r) }}
-                                                        </span>
-                                                    </button>
-                                                    } @else {
-                                                    <span class="no-sensor-text">-</span>
-                                                    }
-                                                </td>
-                                                <td class="col-actions text-right">
-                                                    @if (form.enabled) {
-                                                    <div class="table-cell-actions">
-                                                        <button mat-icon-button type="button"
-                                                            [matMenuTriggerFor]="menu">
-                                                            <mat-icon>more_vert</mat-icon>
-                                                        </button>
-                                                        <mat-menu #menu="matMenu" xPosition="before">
-                                                            <button mat-menu-item type="button" (click)="onEditRoute(i)"
-                                                                id="edit-route-{{i}}">
-                                                                <mat-icon>edit</mat-icon>
-                                                                {{ 'actions.edit' | translate }}
+                                                    </td>
+                                                    <td class="col-actions text-right">
+                                                        @if (form.enabled) {
+                                                        <div class="table-cell-actions">
+                 
+                                                            <button mat-icon-button type="button"
+                                                                [matMenuTriggerFor]="menu"
+                                                                [matTooltip]="'attr.actions' | translate"
+                                                                id="route-menu-btn-{{i}}"
+                                                                class="route-action-btn">
+                                                                <mat-icon>more_vert</mat-icon>
                                                             </button>
-                                                            @if (r.sensor && (r.sensor.name || r.sensor._id)) {
-                                                            <button mat-menu-item type="button" (click)="openSensorGeoipDialog(r, $event)"
-                                                                id="edit-route-sensor-{{i}}">
-                                                                <mat-icon>public</mat-icon>
-                                                                {{ 'SENSOR.EDIT_GEOIP' | translate }}
-                                                            </button>
-                                                            }
-                                                            <button mat-menu-item type="button"
-                                                                (click)="onRemoveRoute(i)" id="remove-route-{{i}}">
-                                                                <mat-icon>delete</mat-icon>
-                                                                {{ 'actions.delete' | translate }}
-                                                            </button>
-                                                        </mat-menu>
-                                                    </div>
-                                                    }
-                                                </td>
-                                            </tr>
-                                            }
-                                        </tbody>
-                                    </table>
+                                                            <mat-menu #menu="matMenu" xPosition="before">
+                                                                <button mat-menu-item type="button" (click)="onEditRoute(i)"
+                                                                    id="edit-route-{{i}}">
+                                                                    <mat-icon>edit</mat-icon>
+                                                                    <span>{{ 'actions.edit' | translate }}</span>
+                                                                </button>
+                                        
+                                                                <button mat-menu-item type="button"
+                                                                    (click)="onRemoveRoute(i)" id="remove-route-{{i}}" class="delete-menu-item">
+                                                                    <mat-icon color="warn">delete</mat-icon>
+                                                                    <span class="text-warn">{{ 'actions.delete' | translate }}</span>
+                                                                </button>
+                                                            </mat-menu>
+                                                        </div>
+                                                        }
+                                                    </td>
+                                                </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
                                     } @else {
                                     <div class="empty-state">
                                         <mat-icon class="empty-state-icon">alt_route</mat-icon>
@@ -557,19 +570,6 @@
                                     }
                                 </mat-card-content>
                             </mat-card>
-                            <div class="step-actions">
-                                <button mat-stroked-button matStepperPrevious type="button" id="back-routes-button">
-                                    <mat-icon>navigate_before</mat-icon>
-                                    {{ 'ACTIONS.BACK' | translate }}
-                                </button>
-                                @if (form.enabled) {
-                                <button mat-flat-button color="primary" type="button"
-                                    (click)="onSubmit()" id="save-routes-step-button">
-                                    <mat-icon>save</mat-icon>
-                                    {{ 'ACTIONS.SAVE' | translate }}
-                                </button>
-                                }
-                            </div>
                         </div>
                     </mat-step>
                 </mat-stepper>
@@ -580,7 +580,19 @@
                 <mat-icon>arrow_back</mat-icon>
                 {{ 'ACTIONS.CANCEL' | translate }}
             </button>
+             <button mat-stroked-button matStepperPrevious type="button" id="back-routes-button">
+                                    <mat-icon>navigate_before</mat-icon>
+                                    {{ 'ACTIONS.BACK' | translate }}
+                                </button>
+                                
+
             @if (form.enabled) {
+                <button mat-flat-button color="primary" type="button"
+                                    (click)="onSubmit()" id="save-routes-step-button">
+                                    <mat-icon>save</mat-icon>
+                                    {{ 'ACTIONS.SAVE' | translate }}
+                                </button>
+                                
             <button type="button" mat-flat-button color="primary" (click)="onSubmit()"
                 id="save-service-button">
                 <mat-icon>save</mat-icon>

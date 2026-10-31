@@ -388,8 +388,8 @@ export class ServiceFormComponent implements OnInit {
 
     onAddRoute() {
         const dialogRef = this.confirmDialog.open(ServiceRouteFormDialogComponent, {
-            width: '780px',
-            maxWidth: '95vw'
+            width: '1020px',
+            maxWidth: '96vw'
         });
 
         dialogRef.afterClosed().subscribe(result => {
@@ -406,8 +406,8 @@ export class ServiceFormComponent implements OnInit {
     onEditRoute(index: number) {
         const targetRoute = this.routeDS.data[index];
         const dialogRef = this.confirmDialog.open(ServiceRouteFormDialogComponent, {
-            width: '780px',
-            maxWidth: '95vw',
+            width: '1020px',
+            maxWidth: '96vw',
             data: targetRoute
         });
 
