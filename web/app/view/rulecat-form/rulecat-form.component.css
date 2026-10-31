@@ -1,46 +1,7 @@
-.rulecat-form-container {
-    width: 100%;
-}
-
 .rulecat-form-card {
     margin-bottom: 24px;
     border-radius: 14px;
     border: 1px solid var(--border-dim, #e2e8f0);
-}
-
-.rulecat-form-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 24px 12px 24px;
-}
-
-.header-titles {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.card-title {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 1.25rem;
-    font-weight: 700;
-    margin: 0;
-}
-
-.title-icon {
-    color: var(--primary, #2563eb);
-    font-size: 24px;
-    width: 24px;
-    height: 24px;
-}
-
-.card-subtitle {
-    font-size: 0.85rem;
-    color: var(--text-dim, #64748b);
-    margin: 0;
 }
 
 .loading-bar {

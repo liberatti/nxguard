@@ -1,16 +1,9 @@
-<div class="rulecat-form-container">
+<ng-container>
     <mat-card class="rulecat-form-card" id="rulecat-form-card">
         <!-- Header -->
-        <mat-card-header class="rulecat-form-header">
-            <div class="header-titles">
-                <mat-card-title class="card-title">
-                    <mat-icon class="title-icon">category</mat-icon>
-                    <span>{{ 'RULECAT.TITLE' | translate }}</span>
-                </mat-card-title>
-                <mat-card-subtitle class="card-subtitle">
-                    {{ (isAddMode ? 'RULECAT.CREATE' : 'RULECAT.EDIT') | translate }}
-                </mat-card-subtitle>
-            </div>
+        <mat-card-header>
+            <mat-card-title>{{ 'RULECAT.TITLE' | translate }}</mat-card-title>
+            <mat-card-subtitle>{{ (isAddMode ? 'RULECAT.CREATE' : 'RULECAT.EDIT') | translate }}</mat-card-subtitle>
         </mat-card-header>
 
         @if (isLoading) {
@@ -175,4 +168,4 @@
             }
         </mat-card-actions>
     </mat-card>
-</div>
+</ng-container>
