@@ -1,7 +1,7 @@
 import re
 from typing import List
 
-from nxcore.middleware.logging_manager import logger
+from api.middleware.logging_manager import logger
 
 from engine.seclang.seclang_schema import (
     SecComponentSignature,

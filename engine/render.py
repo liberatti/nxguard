@@ -3,7 +3,7 @@ import os
 import re
 
 from jinja2 import Environment, FileSystemLoader
-from nxcore.middleware.logging_manager import logger
+from api.middleware.logging_manager import logger
 
 import config
 from api.repository.seclang_repository import RuleCategoryDao

@@ -4,7 +4,7 @@ import json
 import os
 
 import bcrypt
-from nxcore.common_utils import gen_random_string
+from api.middleware.common_utils import gen_random_string
 
 import config
 from api.repository.certificate_repository import CertificateDao
@@ -16,7 +16,7 @@ from api.repository.route_repository import RouteDao
 from api.repository.upstream_repository import UpstreamDao, NodeStatusDao, UpstreamStatesDao
 from api.repository.transaction_repository import TransactionDao
 from api.tools.network_tool import NetworkTool
-from nxcore.middleware.logging_manager import logger
+from api.middleware.logging_manager import logger
 from api.repository.acme_repository import ChallengeDao
 
 

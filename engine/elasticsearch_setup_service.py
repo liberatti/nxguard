@@ -5,7 +5,7 @@ import urllib3
 from datetime import datetime
 from typing import Dict, Any, Optional
 
-from nxcore.middleware.logging_manager import logger
+from api.middleware.logging_manager import logger
 from api.repository.config_repository import ConfigDao
 import config
 from config import INDEX_TEMPLATE_NAME, ELASTICSEARCH_SEED_DIR

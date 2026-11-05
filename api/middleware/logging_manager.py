@@ -12,7 +12,7 @@ except Exception:
 
 
 # Base package logger with NullHandler to prevent warnings
-logger = logging.getLogger("nxcore")
+logger = logging.getLogger("nxguard")
 logger.addHandler(logging.NullHandler())
 
 
@@ -46,7 +46,7 @@ class LoggingManager:
             self.configure(loglevel)
 
     def configure(self, loglevel_name: str = "INFO") -> None:
-        """Configures logging for the nxcore library and sets the custom logger class.
+        """Configures logging and sets the custom logger class.
 
         Args:
             loglevel_name (str): Log level name (e.g. "INFO", "DEBUG").
@@ -65,7 +65,7 @@ class LoggingManager:
         console_handler.setFormatter(formatter)
         self.console_handler = console_handler
 
-        lib_logger = logging.getLogger("nxcore")
+        lib_logger = logging.getLogger("nxguard")
         lib_logger.setLevel(level)
 
         # Clear existing handlers

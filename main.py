@@ -2,11 +2,10 @@
 
 import traceback
 
-import nxcore.config as nxcore_config
-from nxcore.controllers.base_controller import response_error_404, response_error_500
-from nxcore.middleware.logging_manager import logger, LoggingManager
-from nxcore.middleware.socket_manager import init_socketio
-from nxcore.middleware.jwt_manager import JWTManager
+from api.middleware.controllers.base_controller import response_error_404, response_error_500
+from api.middleware.logging_manager import logger, LoggingManager
+from api.middleware.socket_manager import init_socketio
+from api.middleware.jwt_manager import JWTManager
 
 from flask import Flask, Blueprint
 from flask_cors import CORS

@@ -6,8 +6,8 @@ import os
 import subprocess
 import time
 import psutil
-from nxcore.common_utils import gen_random_string
-from nxcore.middleware.logging_manager import logger
+from api.middleware.common_utils import gen_random_string
+from api.middleware.logging_manager import logger
 
 import engine.render as c_render
 from api.repository.config_repository import ConfigBackupDao, ConfigDao
