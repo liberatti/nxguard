@@ -147,6 +147,18 @@
     border: 1px solid rgba(16, 185, 129, 0.2);
 }
 
+.srctype-feed-chip {
+    background: rgba(14, 165, 233, 0.08);
+    color: var(--info, #0284c7);
+    border: 1px solid rgba(14, 165, 233, 0.25);
+}
+
+.srctype-user-chip {
+    background: rgba(16, 185, 129, 0.08);
+    color: var(--success, #10b981);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
 .type-chips-wrapper {
     display: inline-flex;
     align-items: center;

@@ -1,4 +1,4 @@
-from marshmallow import EXCLUDE, Schema, fields
+from marshmallow import EXCLUDE, Schema, fields, validate
 
 
 class DataObjectSchema(Schema):
@@ -28,7 +28,9 @@ class SecBaseSchema(Schema):
         unknown = EXCLUDE
 
     _id = fields.String(allow_none=True)
-    schema_type = fields.String()
+    schema_type = fields.String(
+        load_default="SecRule", dump_default="SecRule", allow_none=True
+    )
     code = fields.Integer()
     seq = fields.Integer(allow_none=True)
     phase = fields.Integer()
@@ -155,3 +157,9 @@ class RuleCategorySchema(Schema):
     exclusions = fields.List(fields.Integer(), allow_none=True)
     system = fields.Boolean(required=False)
     provider = fields.String(required=False)
+    srctype = fields.String(
+        required=False,
+        dump_default="feed",
+        load_default="feed",
+        validate=validate.OneOf(["feed", "user"]),
+    )

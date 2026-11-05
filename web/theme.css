@@ -710,6 +710,7 @@ td.mat-mdc-cell .mat-mdc-icon-button .mat-icon,
     flex-wrap: wrap !important;
     gap: 6px !important;
     scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
 }
 
 .mat-mdc-chip-row, .mat-mdc-chip, .mat-chip-option {
@@ -719,45 +720,93 @@ td.mat-mdc-cell .mat-mdc-icon-button .mat-icon,
     font-size: var(--font-size-xs, 0.75rem) !important;
     font-weight: 500 !important;
     border-radius: 6px !important;
-    padding: 0 10px !important;
+    padding: 0 8px !important;
     line-height: normal !important;
     box-sizing: border-box !important;
     overflow: hidden !important;
     scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
 }
 
 .mat-mdc-chip-row .mdc-evolution-chip__cell,
 .mat-mdc-chip .mdc-evolution-chip__cell,
 .mat-chip-option .mdc-evolution-chip__cell,
+.mat-mdc-chip-row .mdc-evolution-chip__cell--primary,
+.mat-mdc-chip .mdc-evolution-chip__cell--primary,
+.mat-mdc-chip-row .mdc-evolution-chip__cell--trailing,
+.mat-mdc-chip .mdc-evolution-chip__cell--trailing,
 .mat-mdc-chip-row .mdc-evolution-chip__action,
 .mat-mdc-chip .mdc-evolution-chip__action,
 .mat-chip-option .mdc-evolution-chip__action,
-.mat-mdc-chip-action-label {
+.mat-mdc-chip-row .mdc-evolution-chip__action--primary,
+.mat-mdc-chip .mdc-evolution-chip__action--primary,
+.mat-mdc-chip-row .mdc-evolution-chip__action--trailing,
+.mat-mdc-chip .mdc-evolution-chip__action--trailing,
+.mat-mdc-chip-action-label,
+.mat-mdc-standard-chip,
+.mdc-evolution-chip {
     overflow: hidden !important;
     overflow-x: hidden !important;
     overflow-y: hidden !important;
     scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
 }
 
-.mat-mdc-chip-row *::-webkit-scrollbar,
-.mat-mdc-chip *::-webkit-scrollbar,
-.mat-chip-option *::-webkit-scrollbar,
-.mat-mdc-chip-set *::-webkit-scrollbar,
-.mat-mdc-chip-listbox *::-webkit-scrollbar {
+.mat-mdc-chip-action-label {
+    white-space: nowrap !important;
+    text-overflow: ellipsis !important;
+    line-height: normal !important;
+}
+
+/* Zero out any webkit scrollbar or scrollbar thumb inside chip elements */
+.mat-mdc-chip-set ::-webkit-scrollbar,
+.mat-mdc-chip-listbox ::-webkit-scrollbar,
+.mat-mdc-chip-row ::-webkit-scrollbar,
+.mat-mdc-chip ::-webkit-scrollbar,
+.mat-chip-option ::-webkit-scrollbar,
+.mdc-evolution-chip ::-webkit-scrollbar,
+.mat-mdc-chip-row::-webkit-scrollbar,
+.mat-mdc-chip::-webkit-scrollbar,
+.mat-chip-option::-webkit-scrollbar,
+.mdc-evolution-chip::-webkit-scrollbar,
+.mat-mdc-chip-set ::-webkit-scrollbar-thumb,
+.mat-mdc-chip-listbox ::-webkit-scrollbar-thumb,
+.mat-mdc-chip-row ::-webkit-scrollbar-thumb,
+.mat-mdc-chip ::-webkit-scrollbar-thumb,
+.mat-chip-option ::-webkit-scrollbar-thumb,
+.mdc-evolution-chip ::-webkit-scrollbar-thumb,
+.mat-mdc-chip-row::-webkit-scrollbar-thumb,
+.mat-mdc-chip::-webkit-scrollbar-thumb,
+.mat-chip-option::-webkit-scrollbar-thumb,
+.mdc-evolution-chip::-webkit-scrollbar-thumb,
+.mat-mdc-chip-set ::-webkit-scrollbar-track,
+.mat-mdc-chip-listbox ::-webkit-scrollbar-track,
+.mat-mdc-chip-row ::-webkit-scrollbar-track,
+.mat-mdc-chip ::-webkit-scrollbar-track,
+.mat-chip-option ::-webkit-scrollbar-track,
+.mdc-evolution-chip ::-webkit-scrollbar-track {
     display: none !important;
     width: 0 !important;
     height: 0 !important;
+    background: transparent !important;
+    opacity: 0 !important;
 }
 
 .mat-mdc-chip-row .mat-mdc-chip-remove,
 .mat-mdc-chip .mat-mdc-chip-remove {
     width: 16px !important;
     height: 16px !important;
+    min-width: 16px !important;
+    min-height: 16px !important;
     padding: 0 !important;
-    margin-left: 4px !important;
+    margin: 0 0 0 4px !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
+    border: none !important;
+    outline: none !important;
+    background: transparent !important;
+    cursor: pointer !important;
 }
 
 .mat-mdc-chip-row .mat-mdc-chip-remove mat-icon,

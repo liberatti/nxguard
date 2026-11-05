@@ -77,6 +77,10 @@ class RuleDao(DuckDAO):
         rs = self._query(sql, (category_id,), fetch=True)
         return [self.to_dict(row) for row in rs]
 
+    def delete_by_category(self, category_id: str) -> None:
+        sql = f"DELETE FROM {self.table_name} WHERE category_id = ?"
+        self._query(sql, (category_id,))
+
 
 class RuleCategoryDao(DuckDAO):
     """
@@ -112,7 +116,8 @@ class RuleCategoryDao(DuckDAO):
                 scope TEXT,
                 seq INTEGER,
                 system BOOLEAN DEFAULT FALSE,
-                provider TEXT
+                provider TEXT,
+                srctype TEXT DEFAULT 'feed'
             );
         """
         )
@@ -122,11 +127,25 @@ class RuleCategoryDao(DuckDAO):
             )
         except Exception:
             pass
+        try:
+            self.ddl(
+                f"ALTER TABLE {self.table_name} ADD COLUMN IF NOT EXISTS srctype TEXT DEFAULT 'feed'"
+            )
+        except Exception:
+            pass
+        try:
+            self.ddl(
+                f"UPDATE {self.table_name} SET srctype = 'feed' WHERE srctype IS NULL"
+            )
+        except Exception:
+            pass
 
     def from_dict(self, vo):
         vo = vo.copy()
         if "exclusions" in vo:
             vo.update({"exclusions_json": json.dumps(vo.pop("exclusions"))})
+        if "srctype" not in vo or not vo["srctype"]:
+            vo["srctype"] = "feed"
         # Exclude nested rules from direct serialization to rule_category table
         vo.pop("rules", None)
         return super().from_dict(vo)
@@ -137,11 +156,18 @@ class RuleCategoryDao(DuckDAO):
             if "exclusions_json" in row:
                 val = row.pop("exclusions_json")
                 row.update({"exclusions": json.loads(val) if val else []})
+            if "srctype" not in row or not row["srctype"]:
+                row["srctype"] = "feed"
             # Retrieve associated rules from the rule table
             if dependents:
                 with RuleDao() as rule_dao:
                     row["rules"] = rule_dao.get_by_category(row["_id"])
         return super().to_dict(row)
+
+    def delete_by_id(self, cat_id: str) -> bool:
+        with RuleDao() as rule_dao:
+            rule_dao.delete_by_category(cat_id)
+        return super().delete_by_id(cat_id)
 
     def get_by_id(self, cat_id: str, dependents: bool = True) -> Optional[Dict[str, Any]]:
         sql = f"SELECT * FROM {self.table_name} WHERE _id = ? LIMIT 1"

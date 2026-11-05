@@ -7,6 +7,7 @@ export interface RuleCategory {
     seq?: number;
     system?: boolean;
     provider: string;
+    srctype?: 'feed' | 'user' | string;
     rules?: Array<SecRule>;
     exclusions?: number[];
     mandatory?: boolean;

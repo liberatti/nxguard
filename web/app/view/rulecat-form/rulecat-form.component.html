@@ -3,7 +3,7 @@
         <!-- Header -->
         <mat-card-header>
             <mat-card-title>{{ 'RULECAT.TITLE' | translate }}</mat-card-title>
-            <mat-card-subtitle>{{ (isAddMode ? 'RULECAT.CREATE' : 'RULECAT.EDIT') | translate }}</mat-card-subtitle>
+            <mat-card-subtitle>{{ (isAddMode ? 'RULECAT.CREATE' : (isFeedCategory ? 'RULECAT.VIEW' : 'RULECAT.EDIT')) | translate }}</mat-card-subtitle>
         </mat-card-header>
 
         @if (isLoading) {
@@ -11,6 +11,13 @@
         }
 
         <mat-card-content class="rulecat-form-content">
+            @if (isFeedCategory) {
+            <div class="feed-readonly-banner" id="feed-readonly-banner">
+                <mat-icon class="banner-icon">lock</mat-icon>
+                <span>{{ 'RULECAT.READONLY_FEED_NOTICE' | translate }}</span>
+            </div>
+            }
+
             <!-- Category Live Preview Card -->
             <div class="category-preview-card" id="rulecat-live-preview">
                 <div class="preview-icon-wrapper">
@@ -35,6 +42,10 @@
                             <mat-icon class="chip-mini-icon">{{ form.get('scope')?.value === 'request' ? 'arrow_downward' : 'arrow_upward' }}</mat-icon>
                             {{ form.get('scope')?.value | uppercase }}
                         </span>
+                        <span class="preview-chip srctype-chip" [ngClass]="'srctype-' + (form.get('srctype')?.value || 'user')">
+                            <mat-icon class="chip-mini-icon">{{ form.get('srctype')?.value === 'user' ? 'person' : 'rss_feed' }}</mat-icon>
+                            {{ ('RULECAT.SRCTYPES.' + ((form.get('srctype')?.value || 'user') | uppercase)) | translate }}
+                        </span>
                         @if (form.get('seq')?.value !== null && form.get('seq')?.value !== undefined) {
                         <span class="preview-chip seq-chip">
                             SEQ #{{ form.get('seq')?.value }}
@@ -50,107 +61,279 @@
                 </div>
             </div>
 
-            <!-- Form Fields -->
+            <!-- Form with Tabs -->
             <form [formGroup]="form" class="rulecat-form" id="rulecat-form-element">
-                <div class="mat-row">
-                    <!-- ID Field -->
-                    <div class="mat-col-4">
-                        <mat-form-field appearance="outline" class="full-width">
-                            <mat-label>{{ 'RULECAT.FIELDS.ID' | translate }}</mat-label>
-                            <input matInput formControlName="_id" id="rulecat-id-input" [placeholder]="'RULECAT.FIELDS.ID_HINT' | translate" [readonly]="!isAddMode">
-                            <mat-icon matSuffix class="field-icon">tag</mat-icon>
-                            <mat-hint>{{ 'RULECAT.FIELDS.ID_HINT' | translate }}</mat-hint>
-                        </mat-form-field>
-                    </div>
+                <mat-tab-group animationDuration="150ms" id="rulecat-tabs" class="rulecat-tabs">
+                    <!-- Tab 1: Category Details -->
+                    <mat-tab>
+                        <ng-template mat-tab-label>
+                            <mat-icon class="tab-icon">tune</mat-icon>
+                            <span>{{ 'RULECAT.TAB_DETAILS' | translate }}</span>
+                        </ng-template>
 
-                    <!-- Name Field -->
-                    <div class="mat-col-8">
-                        <mat-form-field appearance="outline" class="full-width">
-                            <mat-label>{{ 'RULECAT.FIELDS.NAME' | translate }} *</mat-label>
-                            <input matInput formControlName="name" id="rulecat-name-input" [placeholder]="'RULECAT.FIELDS.NAME_HINT' | translate">
-                            <mat-icon matSuffix class="field-icon">badge</mat-icon>
-                            <mat-hint>{{ 'RULECAT.FIELDS.NAME_HINT' | translate }}</mat-hint>
-                        </mat-form-field>
-                    </div>
+                        <div class="tab-pane-content">
+                            <div class="mat-row">
+                                <!-- ID Field -->
+                                <div class="mat-col-4">
+                                    <mat-form-field appearance="outline" class="full-width">
+                                        <mat-label>{{ 'RULECAT.FIELDS.ID' | translate }}</mat-label>
+                                        <input matInput formControlName="_id" id="rulecat-id-input" [placeholder]="'RULECAT.FIELDS.ID_HINT' | translate" [readonly]="!isAddMode">
+                                        <mat-icon matSuffix class="field-icon">tag</mat-icon>
+                                        <mat-hint>{{ 'RULECAT.FIELDS.ID_HINT' | translate }}</mat-hint>
+                                    </mat-form-field>
+                                </div>
 
-                    <!-- Phase Field -->
-                    <div class="mat-col-6">
-                        <mat-form-field appearance="outline" class="full-width">
-                            <mat-label>{{ 'RULECAT.FIELDS.PHASE' | translate }} *</mat-label>
-                            <mat-select formControlName="phase" id="rulecat-phase-select">
-                                <mat-select-trigger>
-                                    @if (selectedPhase; as p) {
-                                    <div class="phase-option-item">
-                                        <span class="phase-chip" [ngClass]="'phase-' + p.value">P{{ p.value }}</span>
-                                        <span>{{ p.labelKey | translate }}</span>
-                                    </div>
+                                <!-- Name Field -->
+                                <div class="mat-col-8">
+                                    <mat-form-field appearance="outline" class="full-width">
+                                        <mat-label>{{ 'RULECAT.FIELDS.NAME' | translate }} *</mat-label>
+                                        <input matInput formControlName="name" id="rulecat-name-input" [placeholder]="'RULECAT.FIELDS.NAME_HINT' | translate">
+                                        <mat-icon matSuffix class="field-icon">badge</mat-icon>
+                                        <mat-hint>{{ 'RULECAT.FIELDS.NAME_HINT' | translate }}</mat-hint>
+                                    </mat-form-field>
+                                </div>
+
+                                <!-- Phase Field -->
+                                <div class="mat-col-6">
+                                    <mat-form-field appearance="outline" class="full-width">
+                                        <mat-label>{{ 'RULECAT.FIELDS.PHASE' | translate }} *</mat-label>
+                                        <mat-select formControlName="phase" id="rulecat-phase-select">
+                                            <mat-select-trigger>
+                                                @if (selectedPhase; as p) {
+                                                <div class="phase-option-item">
+                                                    <span class="phase-chip" [ngClass]="'phase-' + p.value">P{{ p.value }}</span>
+                                                    <span>{{ p.labelKey | translate }}</span>
+                                                </div>
+                                                }
+                                            </mat-select-trigger>
+                                            @for (p of phases; track p.value) {
+                                            <mat-option [value]="p.value" id="rulecat-phase-option-{{p.value}}">
+                                                <div class="phase-option-item">
+                                                    <span class="phase-chip" [ngClass]="'phase-' + p.value">P{{ p.value }}</span>
+                                                    <span>{{ p.labelKey | translate }}</span>
+                                                </div>
+                                            </mat-option>
+                                            }
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
+
+                                <!-- Scope Field -->
+                                <div class="mat-col-6">
+                                    <mat-form-field appearance="outline" class="full-width">
+                                        <mat-label>{{ 'RULECAT.FIELDS.SCOPE' | translate }}</mat-label>
+                                        <mat-select formControlName="scope" id="rulecat-scope-select">
+                                            <mat-select-trigger>
+                                                @if (form.get('scope')?.value; as s) {
+                                                <div class="scope-option-item">
+                                                    <mat-icon class="scope-opt-icon">{{ s === 'request' ? 'arrow_downward' : 'arrow_upward' }}</mat-icon>
+                                                    <span>{{ ('RULECAT.SCOPES.' + (s | uppercase)) | translate }} ({{ s }})</span>
+                                                </div>
+                                                }
+                                            </mat-select-trigger>
+                                            @for (s of scopes; track s) {
+                                            <mat-option [value]="s" id="rulecat-scope-option-{{s}}">
+                                                <div class="scope-option-item">
+                                                    <mat-icon class="scope-opt-icon">{{ s === 'request' ? 'arrow_downward' : 'arrow_upward' }}</mat-icon>
+                                                    <span>{{ ('RULECAT.SCOPES.' + (s | uppercase)) | translate }} ({{ s }})</span>
+                                                </div>
+                                            </mat-option>
+                                            }
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
+
+                                <!-- Sequence Field -->
+                                <div class="mat-col-4">
+                                    <mat-form-field appearance="outline" class="full-width">
+                                        <mat-label>{{ 'RULECAT.FIELDS.SEQ' | translate }}</mat-label>
+                                        <input matInput type="number" formControlName="seq" id="rulecat-seq-input" [placeholder]="'RULECAT.FIELDS.SEQ_HINT' | translate">
+                                        <mat-icon matSuffix class="field-icon">format_list_numbered</mat-icon>
+                                        <mat-hint>{{ 'RULECAT.FIELDS.SEQ_HINT' | translate }}</mat-hint>
+                                    </mat-form-field>
+                                </div>
+
+                                <!-- File Field -->
+                                <div class="mat-col-8">
+                                    <mat-form-field appearance="outline" class="full-width">
+                                        <mat-label>{{ 'RULECAT.FIELDS.FILE' | translate }}</mat-label>
+                                        <input matInput formControlName="file" id="rulecat-file-input" [placeholder]="'RULECAT.FIELDS.FILE_HINT' | translate">
+                                        <mat-icon matSuffix class="field-icon">description</mat-icon>
+                                        <mat-hint>{{ 'RULECAT.FIELDS.FILE_HINT' | translate }}</mat-hint>
+                                    </mat-form-field>
+                                </div>
+
+                                <!-- System Toggle -->
+                                <div class="mat-col-6 toggle-wrapper">
+                                    <mat-slide-toggle formControlName="system" id="rulecat-system-toggle" color="primary">
+                                        <span class="toggle-label">{{ 'RULECAT.FIELDS.SYSTEM' | translate }}</span>
+                                    </mat-slide-toggle>
+                                    <span class="toggle-hint">{{ 'RULECAT.FIELDS.SYSTEM_DESC' | translate }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </mat-tab>
+
+                    <!-- Tab 2: Category Rules -->
+                    <mat-tab>
+                        <ng-template mat-tab-label>
+                            <mat-icon class="tab-icon">gavel</mat-icon>
+                            <span>{{ 'RULECAT.TAB_RULES' | translate }}</span>
+                            @if (rules.length > 0) {
+                            <span class="rules-count-pill tab-pill">{{ rules.length }}</span>
+                            }
+                        </ng-template>
+
+                        <div class="tab-pane-content">
+                            @if (isFeedCategory && isAddMode) {
+                            <div class="rules-empty-state">
+                                <mat-icon class="rules-empty-icon">info</mat-icon>
+                                <span>{{ 'RULECAT.NO_RULES_ADD_MODE' | translate }}</span>
+                            </div>
+                            } @else if (rules.length === 0 && isUserCategory) {
+                            <div class="rules-empty-state">
+                                <mat-icon class="rules-empty-icon">gavel</mat-icon>
+                                <span class="rules-empty-text">{{ 'RULECAT.NO_RULES_USER' | translate }}</span>
+                                <button type="button" mat-flat-button color="primary" class="mt-3" (click)="openCreateRule()" id="rulecat-add-rule-empty-btn">
+                                    <mat-icon>add</mat-icon>
+                                    <span>{{ 'RULECAT.ADD_RULE' | translate }}</span>
+                                </button>
+                            </div>
+                            } @else {
+                            <div class="rules-tab-toolbar">
+                                <div class="rules-tab-info">
+                                    <h4 class="rules-tab-title">{{ 'RULECAT.RULES_SECTION_TITLE' | translate }}</h4>
+                                    <p class="rules-tab-subtitle">
+                                        {{ 'RULECAT.RULES_SECTION_SUBTITLE' | translate }} — 
+                                        <span class="rules-count-badge">{{ 'RULECAT.RULES_COUNT' | translate:{ count: rules.length } }}</span>
+                                    </p>
+                                </div>
+                                <div class="rules-toolbar-actions">
+                                    <mat-form-field appearance="outline" class="rules-search-field">
+                                        <mat-icon matPrefix class="search-prefix-icon">search</mat-icon>
+                                        <input matInput [(ngModel)]="ruleSearchQuery" [ngModelOptions]="{standalone: true}"
+                                            (ngModelChange)="applyRuleFilter()"
+                                            [placeholder]="'RULECAT.SEARCH_RULES_PLACEHOLDER' | translate"
+                                            id="rulecat-rules-search-input">
+                                        @if (ruleSearchQuery) {
+                                        <button mat-icon-button matSuffix (click)="clearRuleFilter()" [attr.aria-label]="'ACTIONS.CLEAR' | translate">
+                                            <mat-icon>clear</mat-icon>
+                                        </button>
+                                        }
+                                    </mat-form-field>
+                                    @if (isUserCategory) {
+                                    <button type="button" mat-flat-button color="primary" class="btn-add-rule" (click)="openCreateRule()" id="rulecat-add-rule-btn">
+                                        <mat-icon>add</mat-icon>
+                                        <span>{{ 'RULECAT.ADD_RULE' | translate }}</span>
+                                    </button>
                                     }
-                                </mat-select-trigger>
-                                @for (p of phases; track p.value) {
-                                <mat-option [value]="p.value" id="rulecat-phase-option-{{p.value}}">
-                                    <div class="phase-option-item">
-                                        <span class="phase-chip" [ngClass]="'phase-' + p.value">P{{ p.value }}</span>
-                                        <span>{{ p.labelKey | translate }}</span>
-                                    </div>
-                                </mat-option>
-                                }
-                            </mat-select>
-                        </mat-form-field>
-                    </div>
+                                </div>
+                            </div>
 
-                    <!-- Scope Field -->
-                    <div class="mat-col-6">
-                        <mat-form-field appearance="outline" class="full-width">
-                            <mat-label>{{ 'RULECAT.FIELDS.SCOPE' | translate }}</mat-label>
-                            <mat-select formControlName="scope" id="rulecat-scope-select">
-                                <mat-select-trigger>
-                                    @if (form.get('scope')?.value; as s) {
-                                    <div class="scope-option-item">
-                                        <mat-icon class="scope-opt-icon">{{ s === 'request' ? 'arrow_downward' : 'arrow_upward' }}</mat-icon>
-                                        <span>{{ ('RULECAT.SCOPES.' + (s | uppercase)) | translate }} ({{ s }})</span>
-                                    </div>
-                                    }
-                                </mat-select-trigger>
-                                @for (s of scopes; track s) {
-                                <mat-option [value]="s" id="rulecat-scope-option-{{s}}">
-                                    <div class="scope-option-item">
-                                        <mat-icon class="scope-opt-icon">{{ s === 'request' ? 'arrow_downward' : 'arrow_upward' }}</mat-icon>
-                                        <span>{{ ('RULECAT.SCOPES.' + (s | uppercase)) | translate }} ({{ s }})</span>
-                                    </div>
-                                </mat-option>
-                                }
-                            </mat-select>
-                        </mat-form-field>
-                    </div>
+                            <div class="rules-table-wrapper">
+                                <table mat-table [dataSource]="ruleDS" matSort class="rules-table" id="rulecat-rules-table">
+                                    <!-- Rule ID / Code Column -->
+                                    <ng-container matColumnDef="code">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'RULECAT.FIELDS.ID' | translate }}</th>
+                                        <td mat-cell *matCellDef="let element">
+                                            <span class="rule-code-badge">{{ element.code || element._id }}</span>
+                                        </td>
+                                    </ng-container>
 
-                    <!-- Sequence Field -->
-                    <div class="mat-col-4">
-                        <mat-form-field appearance="outline" class="full-width">
-                            <mat-label>{{ 'RULECAT.FIELDS.SEQ' | translate }}</mat-label>
-                            <input matInput type="number" formControlName="seq" id="rulecat-seq-input" [placeholder]="'RULECAT.FIELDS.SEQ_HINT' | translate">
-                            <mat-icon matSuffix class="field-icon">format_list_numbered</mat-icon>
-                            <mat-hint>{{ 'RULECAT.FIELDS.SEQ_HINT' | translate }}</mat-hint>
-                        </mat-form-field>
-                    </div>
+                                    <!-- Action Column -->
+                                    <ng-container matColumnDef="action">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'SENSOR.ACTION' | translate }}</th>
+                                        <td mat-cell *matCellDef="let element">
+                                            <span class="rule-action-badge" [ngClass]="getActionClass(element.action)">
+                                                {{ (element.action || 'PASS') | uppercase }}
+                                            </span>
+                                        </td>
+                                    </ng-container>
 
-                    <!-- File Field -->
-                    <div class="mat-col-8">
-                        <mat-form-field appearance="outline" class="full-width">
-                            <mat-label>{{ 'RULECAT.FIELDS.FILE' | translate }}</mat-label>
-                            <input matInput formControlName="file" id="rulecat-file-input" [placeholder]="'RULECAT.FIELDS.FILE_HINT' | translate">
-                            <mat-icon matSuffix class="field-icon">description</mat-icon>
-                            <mat-hint>{{ 'RULECAT.FIELDS.FILE_HINT' | translate }}</mat-hint>
-                        </mat-form-field>
-                    </div>
+                                    <!-- Phase Column -->
+                                    <ng-container matColumnDef="phase">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'RULECAT.FIELDS.PHASE' | translate }}</th>
+                                        <td mat-cell *matCellDef="let element">
+                                            <span class="phase-chip" [ngClass]="'phase-' + element.phase">P{{ element.phase }}</span>
+                                        </td>
+                                    </ng-container>
 
-                    <!-- System Toggle -->
-                    <div class="mat-col-6 toggle-wrapper">
-                        <mat-slide-toggle formControlName="system" id="rulecat-system-toggle" color="primary">
-                            <span class="toggle-label">{{ 'RULECAT.FIELDS.SYSTEM' | translate }}</span>
-                        </mat-slide-toggle>
-                        <span class="toggle-hint">{{ 'RULECAT.FIELDS.SYSTEM_DESC' | translate }}</span>
-                    </div>
-                </div>
+                                    <!-- Severity Column -->
+                                    <ng-container matColumnDef="severity">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'SENSOR.SEVERITY' | translate }}</th>
+                                        <td mat-cell *matCellDef="let element">
+                                            @if (element.severity) {
+                                            <span class="rule-severity-badge" [ngClass]="getSeverityClass(element.severity)">
+                                                {{ element.severity }}
+                                            </span>
+                                            } @else {
+                                            <span class="rule-severity-none">-</span>
+                                            }
+                                        </td>
+                                    </ng-container>
+
+                                    <!-- Description / Comment Column -->
+                                    <ng-container matColumnDef="description">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'SENSOR.RULE_DESCRIPTION' | translate }}</th>
+                                        <td mat-cell *matCellDef="let element">
+                                            <div class="rule-desc-cell">
+                                                <div class="rule-msg-row">
+                                                    <span class="rule-msg-text">
+                                                        {{ element.msg || element.comment || ('SENSOR.CONTROL_RULE' | translate) }}
+                                                    </span>
+                                                </div>
+                                                @if (element.tags && element.tags.length > 0) {
+                                                <div class="rule-tags-row">
+                                                    @for (tag of element.tags; track tag) {
+                                                    <span class="rule-tag-pill">{{ tag }}</span>
+                                                    }
+                                                </div>
+                                                }
+                                            </div>
+                                        </td>
+                                    </ng-container>
+
+                                    <!-- Actions Column -->
+                                    <ng-container matColumnDef="actions">
+                                        <th mat-header-cell *matHeaderCellDef class="text-right">{{ 'RULECAT.FIELDS.ACTIONS' | translate }}</th>
+                                        <td mat-cell *matCellDef="let element" class="text-right">
+                                            <div class="rule-action-buttons">
+                                                <button type="button" mat-stroked-button class="btn-raw-rule" (click)="openRawRule(element)"
+                                                    [matTooltip]="'RULECAT.VIEW_RAW' | translate" id="rulecat-view-raw-{{element.code}}">
+                                                    <mat-icon class="btn-raw-icon">terminal</mat-icon>
+                                                    <span>{{ 'RULECAT.VIEW_RAW' | translate }}</span>
+                                                </button>
+                                                @if (isUserCategory) {
+                                                <button type="button" mat-icon-button (click)="openEditRule(element)"
+                                                    [matTooltip]="'ACTIONS.EDIT' | translate" id="rulecat-edit-rule-{{element.code}}">
+                                                    <mat-icon>edit</mat-icon>
+                                                </button>
+                                                <button type="button" mat-icon-button color="warn" (click)="removeRule(element)"
+                                                    [matTooltip]="'ACTIONS.DELETE' | translate" id="rulecat-delete-rule-{{element.code}}">
+                                                    <mat-icon>delete</mat-icon>
+                                                </button>
+                                                }
+                                            </div>
+                                        </td>
+                                    </ng-container>
+
+                                    <tr mat-header-row *matHeaderRowDef="ruleDC"></tr>
+                                    <tr mat-row *matRowDef="let row; columns: ruleDC;" class="rule-table-row"></tr>
+                                    <tr class="mat-row" *matNoDataRow>
+                                        <td class="mat-cell empty-table-cell" [attr.colspan]="ruleDC.length">
+                                            {{ 'RULECAT.EMPTY' | translate }}
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <mat-paginator [pageSizeOptions]="pageSizeOptions" [pageSize]="10" showFirstLastButtons
+                                    class="rules-paginator" id="rulecat-rules-paginator">
+                                </mat-paginator>
+                            </div>
+                            }
+                        </div>
+                    </mat-tab>
+                </mat-tab-group>
             </form>
         </mat-card-content>
 
@@ -160,7 +343,7 @@
                 <mat-icon>arrow_back</mat-icon>
                 {{ 'ACTIONS.CANCEL' | translate }}
             </button>
-            @if (form.enabled) {
+            @if (form.enabled && isUserCategory) {
             <button type="button" mat-flat-button color="primary" (click)="onSubmit()" [disabled]="form.invalid || isLoading" id="rulecat-save-btn">
                 <mat-icon>save</mat-icon>
                 {{ 'ACTIONS.SAVE' | translate }}

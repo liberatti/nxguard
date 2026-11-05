@@ -36,6 +36,7 @@ def index(
         rule_dao.delete_all()
 
         for c in meta["categories"]:
+            c["srctype"] = "feed"
             cat_dao.persist(c)
             parser = RuleSetParser()
             rules = parser.load(c["file"], base_path)

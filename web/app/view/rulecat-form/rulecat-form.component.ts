@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 
@@ -14,11 +14,18 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatSort, MatSortModule } from '@angular/material/sort';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 
 import { RuleCategory } from '../../models/sensor';
 import { RuleCategoryService } from '../../services/sensor.service';
 import { NotificationService } from '../../services/notification.service';
 import { OAuthService } from '../../services/oauth.service';
+import { RuleDetailsDialogComponent } from '../../components/rule-details-dialog/rule-details-dialog.component';
+import { RuleFormDialogComponent } from '../../components/rule-form-dialog/rule-form-dialog.component';
 
 export interface PhaseOption {
     value: number;
@@ -31,6 +38,7 @@ export interface PhaseOption {
     standalone: true,
     imports: [
         CommonModule,
+        FormsModule,
         ReactiveFormsModule,
         RouterModule,
         TranslatePipe,
@@ -43,7 +51,12 @@ export interface PhaseOption {
         MatSlideToggleModule,
         MatTooltipModule,
         MatChipsModule,
-        MatProgressBarModule
+        MatProgressBarModule,
+        MatTabsModule,
+        MatTableModule,
+        MatPaginatorModule,
+        MatSortModule,
+        MatDialogModule
     ],
     templateUrl: './rulecat-form.component.html',
     styleUrl: './rulecat-form.component.css'
@@ -52,6 +65,15 @@ export class RuleCategoryFormComponent implements OnInit {
     isAddMode = true;
     isLoading = false;
     submitted = false;
+
+    rules: any[] = [];
+    ruleDS: MatTableDataSource<any> = new MatTableDataSource<any>([]);
+    ruleDC: string[] = ['code', 'action', 'phase', 'severity', 'description', 'actions'];
+    ruleSearchQuery: string = '';
+    pageSizeOptions: number[] = [10, 25, 50, 100];
+
+    @ViewChild(MatPaginator) paginator!: MatPaginator;
+    @ViewChild(MatSort) sort!: MatSort;
 
     phases: PhaseOption[] = [
         { value: 1, labelKey: 'RULECAT.PHASES.1', scope: 'request' },
@@ -69,6 +91,14 @@ export class RuleCategoryFormComponent implements OnInit {
         return this.phases.find(p => p.value === Number(val));
     }
 
+    get isUserCategory(): boolean {
+        return this.isAddMode || this.form.get('srctype')?.value === 'user';
+    }
+
+    get isFeedCategory(): boolean {
+        return !this.isAddMode && this.form.get('srctype')?.value === 'feed';
+    }
+
     form = new FormGroup({
         _id: new FormControl<string>(''),
         name: new FormControl<string>('', {
@@ -83,6 +113,7 @@ export class RuleCategoryFormComponent implements OnInit {
         seq: new FormControl<number | null>(null),
         file: new FormControl<string>(''),
         provider: new FormControl<string>(''),
+        srctype: new FormControl<string>('user'),
         system: new FormControl<boolean>(false)
     });
 
@@ -91,6 +122,7 @@ export class RuleCategoryFormComponent implements OnInit {
         private router: Router,
         private ruleCatService: RuleCategoryService,
         private notificationService: NotificationService,
+        private dialog: MatDialog,
         protected oauth: OAuthService
     ) {}
 
@@ -108,6 +140,7 @@ export class RuleCategoryFormComponent implements OnInit {
                 next: (res: any) => {
                     const data: RuleCategory = (res && res.data) ? res.data : res;
                     if (data) {
+                        const srctype = data.srctype || 'feed';
                         this.form.patchValue({
                             _id: data._id || '',
                             name: data.name || '',
@@ -116,8 +149,28 @@ export class RuleCategoryFormComponent implements OnInit {
                             seq: data.seq !== undefined ? data.seq : null,
                             file: data.file || '',
                             system: !!data.system,
-                            provider: data.provider || ''
+                            provider: data.provider || '',
+                            srctype: srctype
                         });
+
+                        // Permitir editar apenas categoria user; categoria feed deve ser apenas visualização
+                        if (srctype === 'feed') {
+                            this.form.disable();
+                        }
+
+                        if (data.rules && Array.isArray(data.rules)) {
+                            this.rules = data.rules.map(r => this.normalizeRule(r));
+                            this.ruleDS.data = this.rules;
+                            this.setupRuleFilterPredicate();
+                            setTimeout(() => {
+                                if (this.paginator) {
+                                    this.ruleDS.paginator = this.paginator;
+                                }
+                                if (this.sort) {
+                                    this.ruleDS.sort = this.sort;
+                                }
+                            });
+                        }
                     }
                     this.isLoading = false;
                 },
@@ -155,7 +208,7 @@ export class RuleCategoryFormComponent implements OnInit {
 
     onSubmit(): void {
         this.submitted = true;
-        if (this.form.invalid) {
+        if (this.form.invalid || !this.isUserCategory) {
             return;
         }
 
@@ -165,6 +218,9 @@ export class RuleCategoryFormComponent implements OnInit {
             phase: Number(raw.phase),
             scope: raw.scope,
             system: !!raw.system,
+            srctype: 'user',
+            provider: raw.provider?.trim() || 'user',
+            rules: this.rules
         };
 
         if (raw._id && raw._id.trim()) {
@@ -201,6 +257,157 @@ export class RuleCategoryFormComponent implements OnInit {
                     this.isLoading = false;
                 }
             });
+        }
+    }
+
+    normalizeRule(rule: any): any {
+        const cleanStr = (s?: string | null) => {
+            if (!s) return '';
+            return String(s).trim().replace(/^['"]|['"]$/g, '');
+        };
+        return {
+            ...rule,
+            code: rule.code || (rule._id ? Number(rule._id) : 0),
+            msg: cleanStr(rule.msg),
+            severity: cleanStr(rule.severity).toUpperCase(),
+            action: (rule.action || 'pass').toLowerCase(),
+            phase: rule.phase !== undefined ? rule.phase : 1,
+            comment: (rule.comment || '').trim(),
+            raw: rule.raw || '',
+            tags: Array.isArray(rule.tags) ? rule.tags : []
+        };
+    }
+
+    setupRuleFilterPredicate(): void {
+        this.ruleDS.filterPredicate = (data: any, filter: string) => {
+            const term = (filter || '').trim().toLowerCase();
+            if (!term) return true;
+            const codeStr = String(data.code || data._id || '');
+            const msgStr = (data.msg || '').toLowerCase();
+            const commentStr = (data.comment || '').toLowerCase();
+            const sevStr = (data.severity || '').toLowerCase();
+            const actionStr = (data.action || '').toLowerCase();
+            const tagsStr = (data.tags || []).join(' ').toLowerCase();
+            const rawStr = (data.raw || '').toLowerCase();
+            return (
+                codeStr.includes(term) ||
+                msgStr.includes(term) ||
+                commentStr.includes(term) ||
+                sevStr.includes(term) ||
+                actionStr.includes(term) ||
+                tagsStr.includes(term) ||
+                rawStr.includes(term)
+            );
+        };
+    }
+
+    applyRuleFilter(): void {
+        this.setupRuleFilterPredicate();
+        this.ruleDS.filter = (this.ruleSearchQuery || '').trim().toLowerCase();
+        if (this.ruleDS.paginator) {
+            this.ruleDS.paginator.firstPage();
+        }
+    }
+
+    clearRuleFilter(): void {
+        this.ruleSearchQuery = '';
+        this.applyRuleFilter();
+    }
+
+    openRawRule(rule: any): void {
+        this.dialog.open(RuleDetailsDialogComponent, {
+            data: {
+                ...rule,
+                initialTab: 'raw'
+            },
+            width: '860px',
+            maxWidth: '94vw'
+        });
+    }
+
+    openCreateRule(): void {
+        const dialogRef = this.dialog.open(RuleFormDialogComponent, {
+            data: {
+                categoryPhase: Number(this.form.get('phase')?.value) || 2,
+                categoryScope: this.form.get('scope')?.value || 'request',
+                existingCodes: this.rules.map(r => r.code)
+            },
+            width: '820px',
+            maxWidth: '94vw'
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result) {
+                this.rules = [this.normalizeRule(result), ...this.rules];
+                this.ruleDS.data = this.rules;
+                this.form.markAsDirty();
+            }
+        });
+    }
+
+    openEditRule(rule: any): void {
+        const dialogRef = this.dialog.open(RuleFormDialogComponent, {
+            data: {
+                rule: { ...rule },
+                categoryPhase: Number(this.form.get('phase')?.value) || 2,
+                categoryScope: this.form.get('scope')?.value || 'request',
+                existingCodes: this.rules.map(r => r.code)
+            },
+            width: '820px',
+            maxWidth: '94vw'
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result) {
+                const idx = this.rules.findIndex(r => r.code === rule.code);
+                if (idx >= 0) {
+                    this.rules[idx] = this.normalizeRule(result);
+                } else {
+                    this.rules.unshift(this.normalizeRule(result));
+                }
+                this.rules = [...this.rules];
+                this.ruleDS.data = this.rules;
+                this.form.markAsDirty();
+            }
+        });
+    }
+
+    removeRule(rule: any): void {
+        this.rules = this.rules.filter(r => r.code !== rule.code);
+        this.ruleDS.data = this.rules;
+        this.form.markAsDirty();
+    }
+
+    getSeverityClass(severity?: string): string {
+        switch ((severity || '').toUpperCase()) {
+            case 'CRITICAL':
+            case 'EMERGENCY':
+                return 'sev-critical';
+            case 'ERROR':
+            case 'ALERT':
+                return 'sev-error';
+            case 'WARNING':
+                return 'sev-warning';
+            case 'NOTICE':
+                return 'sev-notice';
+            case 'INFO':
+            case 'DEBUG':
+            default:
+                return 'sev-info';
+        }
+    }
+
+    getActionClass(action?: string): string {
+        switch ((action || '').toLowerCase()) {
+            case 'block':
+            case 'deny':
+            case 'drop':
+                return 'action-block';
+            case 'allow':
+            case 'pass':
+                return 'action-pass';
+            default:
+                return 'action-other';
         }
     }
 }

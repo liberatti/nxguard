@@ -1,18 +1,42 @@
+from api.repository.config_repository import ChangeDao
 from flask import Blueprint, request, Response
 from marshmallow import ValidationError
 
 from api.middleware.controllers.base_controller import (
     response_data,
+    response_error_403,
     response_error_404,
     response_error_parse,
     response_data_removed,
     has_any_authority,
 )
+from api.middleware.socket_manager import emit_event
 
-from api.repository.seclang_repository import RuleCategoryDao
+from api.repository.seclang_repository import RuleCategoryDao, RuleDao
 from engine.seclang.seclang_schema import RuleCategorySchema
 
 routes = Blueprint("rulecat", __name__)
+
+@routes.after_request
+def after(response: Response) -> Response:
+    """
+    Track changes after rule category modifications.
+        response: The Flask response object
+    Returns:
+        Response: The modified response object
+    """
+    if request.method in [
+        "PUT",
+        "POST",
+        "DELETE",
+        "PATCH",
+    ] and response.status_code in [200, 201]:
+        with ChangeDao() as dao:
+            if not dao.get_by_name("rulecat"):
+                dao.persist({"name": "rulecat"})
+            emit_event("tracking_evt")
+    return response
+
 
 
 @routes.route("/<cat_id>", methods=["GET"])
@@ -100,7 +124,34 @@ def save() -> Response:
     try:
         with RuleCategoryDao() as dao:
             cat_dict = dao.json_load(request.json)
+            cat_dict["srctype"] = "user"
+            if not cat_dict.get("provider"):
+                cat_dict["provider"] = "user"
+            rules = cat_dict.pop("rules", None)
             pk = dao.persist(cat_dict)
+            if rules:
+                with RuleDao() as rule_dao:
+                    for idx, r in enumerate(rules, 1):
+                        r_code = r.get("code") or r.get("_id")
+                        if r_code:
+                            r_id = str(r_code)
+                            rule_data = {
+                                "_id": r_id,
+                                "code": int(r_code),
+                                "category_id": pk,
+                                "raw": r.get("raw") or "",
+                                "attachment": r.get("attachment"),
+                                "action": r.get("action") or "pass",
+                                "scope": r.get("scope") or [],
+                                "tags": r.get("tags") or [],
+                                "msg": r.get("msg") or "",
+                                "logdata": r.get("logdata"),
+                                "severity": r.get("severity"),
+                                "phase": r.get("phase") or cat_dict.get("phase") or 1,
+                                "seq": r.get("seq") or idx,
+                                "comment": r.get("comment") or "",
+                            }
+                            rule_dao.persist(rule_data)
             saved = dao.get_by_id(pk) or cat_dict
             return response_data(saved, dao.schema)
     except ValidationError as err:
@@ -124,8 +175,40 @@ def update(cat_id: str) -> Response:
             existing = dao.get_by_id(cat_id, dependents=False)
             if not existing:
                 return response_error_404()
+            if existing.get("srctype") == "feed":
+                return response_error_403(
+                    "Categories with srctype 'feed' are read-only and cannot be modified"
+                )
             cat_dict = dao.json_load(request.json)
+            cat_dict["srctype"] = "user"
+            if not cat_dict.get("provider"):
+                cat_dict["provider"] = "user"
+            rules = cat_dict.pop("rules", None)
             dao.update_by_id(cat_id, cat_dict)
+            if rules is not None:
+                with RuleDao() as rule_dao:
+                    rule_dao.delete_by_category(cat_id)
+                    for idx, r in enumerate(rules, 1):
+                        r_code = r.get("code") or r.get("_id")
+                        if r_code:
+                            r_id = str(r_code)
+                            rule_data = {
+                                "_id": r_id,
+                                "code": int(r_code),
+                                "category_id": cat_id,
+                                "raw": r.get("raw") or "",
+                                "attachment": r.get("attachment"),
+                                "action": r.get("action") or "pass",
+                                "scope": r.get("scope") or [],
+                                "tags": r.get("tags") or [],
+                                "msg": r.get("msg") or "",
+                                "logdata": r.get("logdata"),
+                                "severity": r.get("severity"),
+                                "phase": r.get("phase") or cat_dict.get("phase") or 1,
+                                "seq": r.get("seq") or idx,
+                                "comment": r.get("comment") or "",
+                            }
+                            rule_dao.persist(rule_data)
             updated = dao.get_by_id(cat_id) or cat_dict
             return response_data(updated, dao.schema)
     except ValidationError as err:
@@ -148,5 +231,9 @@ def delete(cat_id: str) -> Response:
         cat = dao.get_by_id(cat_id, dependents=False)
         if not cat:
             return response_error_404()
+        if cat.get("srctype") == "feed":
+            return response_error_403(
+                "Categories with srctype 'feed' are read-only and cannot be deleted"
+            )
         dao.delete_by_id(cat_id)
         return response_data_removed(cat_id)
