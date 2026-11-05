@@ -165,20 +165,82 @@ html, body {
     flex-direction: row !important;
     align-items: center !important;
     justify-content: flex-end !important;
-    gap: 10px !important;
+    gap: 12px !important;
     margin: 0 0 0 auto !important;
     padding: 0 !important;
-    min-height: unset !important;
+    min-height: 38px !important;
     flex: 0 0 auto !important;
     box-sizing: border-box !important;
 }
 
+.mat-mdc-card-header mat-card-actions .mat-mdc-button-base,
+.mat-mdc-card-header .align-right .mat-mdc-button-base {
+    margin: 0 !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    vertical-align: middle !important;
+}
+
 .mat-mdc-card-header .search-filter-field,
 .mat-mdc-card-header .upstream-search-field,
-.mat-mdc-card-header .sensor-search-field {
+.mat-mdc-card-header .sensor-search-field,
+.mat-mdc-card-header mat-card-actions .mat-mdc-form-field {
     width: 280px !important;
     max-width: 320px !important;
     margin: 0 !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    max-height: 38px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    vertical-align: middle !important;
+}
+
+.mat-mdc-card-header .search-filter-field .mat-mdc-text-field-wrapper,
+.mat-mdc-card-header .upstream-search-field .mat-mdc-text-field-wrapper,
+.mat-mdc-card-header .sensor-search-field .mat-mdc-text-field-wrapper,
+.mat-mdc-card-header mat-card-actions .mat-mdc-form-field .mat-mdc-text-field-wrapper {
+    height: 38px !important;
+    min-height: 38px !important;
+    max-height: 38px !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+.mat-mdc-card-header .search-filter-field .mat-mdc-form-field-flex,
+.mat-mdc-card-header .upstream-search-field .mat-mdc-form-field-flex,
+.mat-mdc-card-header .sensor-search-field .mat-mdc-form-field-flex,
+.mat-mdc-card-header mat-card-actions .mat-mdc-form-field .mat-mdc-form-field-flex {
+    height: 38px !important;
+    align-items: center !important;
+}
+
+.mat-mdc-card-header .search-filter-field .mat-mdc-form-field-infix,
+.mat-mdc-card-header .upstream-search-field .mat-mdc-form-field-infix,
+.mat-mdc-card-header .sensor-search-field .mat-mdc-form-field-infix,
+.mat-mdc-card-header mat-card-actions .mat-mdc-form-field .mat-mdc-form-field-infix {
+    height: 38px !important;
+    min-height: 38px !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+.mat-mdc-card-header .search-filter-field .mat-mdc-form-field-subscript-wrapper,
+.mat-mdc-card-header .upstream-search-field .mat-mdc-form-field-subscript-wrapper,
+.mat-mdc-card-header .sensor-search-field .mat-mdc-form-field-subscript-wrapper,
+.mat-mdc-card-header mat-card-actions .mat-mdc-form-field .mat-mdc-form-field-subscript-wrapper {
+    display: none !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 /* Sub-cards / Nested Cards */
@@ -647,16 +709,44 @@ td.mat-mdc-cell .mat-mdc-icon-button .mat-icon,
     display: flex !important;
     flex-wrap: wrap !important;
     gap: 6px !important;
+    scrollbar-width: none !important;
 }
 
 .mat-mdc-chip-row, .mat-mdc-chip, .mat-chip-option {
     --mdc-chip-container-height: 26px !important;
     height: 26px !important;
+    min-height: 26px !important;
     font-size: var(--font-size-xs, 0.75rem) !important;
     font-weight: 500 !important;
     border-radius: 6px !important;
     padding: 0 10px !important;
-    line-height: 24px !important;
+    line-height: normal !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    scrollbar-width: none !important;
+}
+
+.mat-mdc-chip-row .mdc-evolution-chip__cell,
+.mat-mdc-chip .mdc-evolution-chip__cell,
+.mat-chip-option .mdc-evolution-chip__cell,
+.mat-mdc-chip-row .mdc-evolution-chip__action,
+.mat-mdc-chip .mdc-evolution-chip__action,
+.mat-chip-option .mdc-evolution-chip__action,
+.mat-mdc-chip-action-label {
+    overflow: hidden !important;
+    overflow-x: hidden !important;
+    overflow-y: hidden !important;
+    scrollbar-width: none !important;
+}
+
+.mat-mdc-chip-row *::-webkit-scrollbar,
+.mat-mdc-chip *::-webkit-scrollbar,
+.mat-chip-option *::-webkit-scrollbar,
+.mat-mdc-chip-set *::-webkit-scrollbar,
+.mat-mdc-chip-listbox *::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
 }
 
 .mat-mdc-chip-row .mat-mdc-chip-remove,
@@ -665,6 +755,9 @@ td.mat-mdc-cell .mat-mdc-icon-button .mat-icon,
     height: 16px !important;
     padding: 0 !important;
     margin-left: 4px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 }
 
 .mat-mdc-chip-row .mat-mdc-chip-remove mat-icon,
@@ -672,6 +765,7 @@ td.mat-mdc-cell .mat-mdc-icon-button .mat-icon,
     font-size: 14px !important;
     width: 14px !important;
     height: 14px !important;
+    line-height: 14px !important;
 }
 
 .mat-mdc-chip mat-icon,
@@ -680,6 +774,7 @@ td.mat-mdc-cell .mat-mdc-icon-button .mat-icon,
     font-size: 14px !important;
     width: 14px !important;
     height: 14px !important;
+    line-height: 14px !important;
 }
 
 /* Form Fields (Standardized 40px Height & Proper Notch Alignment) */
@@ -726,6 +821,26 @@ td.mat-mdc-cell .mat-mdc-icon-button .mat-icon,
     padding-bottom: 0 !important;
     display: flex !important;
     align-items: center !important;
+}
+
+/* Header search fields inside action bar override to 38px to match button height */
+.mat-mdc-card-header .mat-mdc-card-actions .mat-mdc-form-field:not(:has(textarea)) .mat-mdc-text-field-wrapper.mdc-text-field--outlined,
+.mat-mdc-card-header .align-right .mat-mdc-form-field:not(:has(textarea)) .mat-mdc-text-field-wrapper.mdc-text-field--outlined,
+.mat-mdc-card-header .mat-mdc-card-actions .search-filter-field .mat-mdc-text-field-wrapper,
+.mat-mdc-card-header .align-right .search-filter-field .mat-mdc-text-field-wrapper {
+    height: 38px !important;
+    min-height: 38px !important;
+    max-height: 38px !important;
+}
+
+.mat-mdc-card-header .mat-mdc-card-actions .mat-mdc-form-field:not(:has(textarea)) .mat-mdc-form-field-infix,
+.mat-mdc-card-header .align-right .mat-mdc-form-field:not(:has(textarea)) .mat-mdc-form-field-infix,
+.mat-mdc-card-header .mat-mdc-card-actions .search-filter-field .mat-mdc-form-field-infix,
+.mat-mdc-card-header .align-right .search-filter-field .mat-mdc-form-field-infix {
+    height: 38px !important;
+    min-height: 38px !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
 }
 
 /* Multi-line Textarea Form Fields */

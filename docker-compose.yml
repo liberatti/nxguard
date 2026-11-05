@@ -8,7 +8,6 @@ services:
     restart: unless-stopped
     environment:
       - LOGLEVEL=INFO
-      # nosemgrep: generic.secrets.security.detected-generic-api-key.detected-generic-api-key
       - API_KEY=tZzDBUSnoy76LLSvu1Vg3e9vdFJINMT2
       - TZ=UTC
     volumes:

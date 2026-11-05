@@ -4,7 +4,7 @@
             <mat-card-title>{{ 'view.upstream.title'|translate }}</mat-card-title>
             <mat-card-subtitle>{{ 'view.upstream.subtitle'|translate }}</mat-card-subtitle>
             <mat-card-actions class="align-right">
-                <mat-form-field appearance="outline" subscriptSizing="dynamic" class="upstream-search-field">
+                <mat-form-field appearance="outline" subscriptSizing="dynamic" class="search-filter-field upstream-search-field">
                     <mat-icon matPrefix>search</mat-icon>
                     <input matInput id="upstream-filter-input" [(ngModel)]="searchQuery" (keyup.enter)="applyFilter()"
                         [placeholder]="'view.upstream.filter_placeholder' | translate">

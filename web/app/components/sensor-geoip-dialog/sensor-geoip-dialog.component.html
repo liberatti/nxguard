@@ -12,15 +12,6 @@
         </div>
 
         <div class="header-right">
-            <div class="toggle-wrapper" id="geoip-block-toggle-wrapper">
-                <span class="toggle-label">{{ 'SENSOR.ENABLE_BLOCK' | translate }}</span>
-                <mat-slide-toggle
-                    color="primary"
-                    [(ngModel)]="isBlockingActive"
-                    id="geoip-block-active-toggle"
-                    [attr.aria-label]="'SENSOR.ENABLE_BLOCK' | translate">
-                </mat-slide-toggle>
-            </div>
             <button mat-icon-button type="button" class="btn-header-close" (click)="onClose()" [matTooltip]="'ACTIONS.CLOSE' | translate">
                 <mat-icon>close</mat-icon>
             </button>
