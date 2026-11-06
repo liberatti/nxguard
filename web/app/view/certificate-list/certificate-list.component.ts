@@ -106,7 +106,7 @@ export class CertificateListComponent implements OnInit {
     }
 
     getStatusTip(e: Certificate) {
-        let format = this.translateService.instant('format.display.datetime');
+        let format = this.translateService.instant('FORMAT.DISPLAY.DATETIME');
         return `not_after: ${moment(e.not_after).format(format)}
         not_before: ${moment(e.not_before).format(format)}`
     }

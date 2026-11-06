@@ -48,11 +48,23 @@
   "ABOUT": {
     "TITLE": "Sobre o NXGuard",
     "SUBTITLE": "API Gateway de Alta Performance & Motor de Segurança",
-    "TAB_ABOUT": "Sobre",
+    "TAB_ABOUT": "Visão Geral",
     "TAB_RESTORE": "Restaurar Config",
-    "CHOOSE_FILE": "Escolher arquivo ZIP para restauração",
+    "CHOOSE_FILE": "Escolher arquivo JSON de backup",
     "SELECTED_FILE": "Arquivo Selecionado",
-    "POWERED_BY": "Desenvolvido com OpenResty & ModSecurity"
+    "POWERED_BY": "Desenvolvido com OpenResty & ModSecurity",
+    "TAB_BACKUP_RESTORE": "Backup & Restauração",
+    "BACKUP_TITLE": "Exportar Configuração (Backup)",
+    "BACKUP_DESC": "Baixe um backup completo de todos os serviços, upstreams e regras de segurança em formato JSON.",
+    "BACKUP_BTN": "Baixar Backup",
+    "RESTORE_TITLE": "Importar Configuração (Restaurar)",
+    "RESTORE_DESC": "Envie um arquivo JSON de backup previamente exportado para restaurar a configuração do sistema.",
+    "API_DOCS": "API REST",
+    "API_DOCS_SUB": "Documentação OpenAPI / Swagger",
+    "GITHUB_TITLE": "Repositório GitHub",
+    "GITHUB_SUB": "Código fonte, versões e problemas",
+    "ARCHITECTURE_TITLE": "Arquitetura Principal",
+    "MESSAGE": "Obrigado"
   },
   "ATTR": {
     "ACTIVE": "Ativo",
@@ -62,7 +74,11 @@
     "LOGIN": {
       "USERNAME": "Informe seu usuário",
       "PASSWORD": "Sua senha aqui"
-    }
+    },
+    "ACTIONS": "Ações",
+    "DESCRIPTION": "Descrição",
+    "PROTOCOL": "Protocolo",
+    "TARGETS": "Destinos"
   },
   "CONTENT": {
     "COPY": "&copy; 2026 NXGuard. Todos os direitos reservados. Esta solução é desenvolvida sobre o OpenResty.",
@@ -86,7 +102,7 @@
   },
   "VIEW": {
     "BACKUP": {
-      "LINK": "backup",
+      "LINK": "Backup",
       "TITLE": "Backup"
     },
     "DASHBOARD": {
@@ -101,13 +117,22 @@
     "SERVICE": {
       "LINK": "Serviços",
       "TITLE": "Serviços",
-      "SUBTITLE": "Descrever todos os serviços"
+      "SUBTITLE": "Descrever todos os serviços",
+      "FILTER_PLACEHOLDER": "Buscar por nome ou domínio...",
+      "NO_DATA": "Nenhum serviço configurado",
+      "NO_DATA_DESC": "Adicione um serviço para começar a fazer proxy e proteger o tráfego web.",
+      "NO_RESULTS": "Nenhum serviço encontrado",
+      "NO_RESULTS_HINT": "Tente ajustar seus critérios de busca.",
+      "ALL_DOMAINS": "Todos os domínios (*)",
+      "ACTIVE_STATUS": "Ativo",
+      "INACTIVE_STATUS": "Inativo",
+      "TOGGLE_ACTIVE": "Alternar status do serviço"
     },
     "UPSTREAM": {
       "LINK": "Upstreams",
       "TITLE": "Upstreams",
       "SUBTITLE": "Lista de todos os upstreams",
-      "FILTER_PLACEHOLDER": "Filtrar upstreams por nome ou descrição...",
+      "FILTER_PLACEHOLDER": "Buscar por nome ou descrição...",
       "ERR_TARGET_REQUIRED": "Upstream do tipo backend requer pelo menos um destino.",
       "TARGETS": "Destinos",
       "TARGET_HOST": "Endereço de Rede",
@@ -118,7 +143,7 @@
     "HOSTNAME": {
       "LINK": "Hostnames",
       "TITLE": "Hostnames",
-      "SUBTITLE": "Lista de todos os Hostnames"
+      "SUBTITLE": "Lista de todos os hostnames"
     },
     "CERTIFICATE": {
       "LINK": "Certificados",
@@ -128,7 +153,8 @@
     "SENSOR": {
       "LINK": "Sensores",
       "TITLE": "Sensores",
-      "SUBTITLE": "Lista de todos os sensores"
+      "SUBTITLE": "Lista de todos os sensores",
+      "FILTER_PLACEHOLDER": "Buscar por nome ou descrição..."
     },
     "USER": {
       "LINK": "Usuários",
@@ -136,12 +162,18 @@
       "SUBTITLE": "Lista de todos os usuários"
     },
     "CONFIG": {
-      "LINK": "Configuração",
+      "LINK": "Configurações",
       "TITLE": "Configurações",
       "SUBTITLE": "Lista de todas as configurações"
     },
     "SYSTEM": {
       "LINK": "Sistema"
+    },
+    "RULECAT": {
+      "LINK": "Categorias",
+      "TITLE": "Categorias de Regras",
+      "SUBTITLE": "Gerencie as categorias de regras do ModSecurity e WAF",
+      "FILTER_PLACEHOLDER": "Buscar categorias por nome, ID ou fase..."
     }
   },
   "CERTIFICATE": {
@@ -291,7 +323,8 @@
       "OCEANIA": "Oceania"
     },
     "SAVED_SUCCESS": "Sensor salvo com sucesso",
-    "UPDATED_SUCCESS": "Sensor atualizado com sucesso"
+    "UPDATED_SUCCESS": "Sensor atualizado com sucesso",
+    "TITLE": "Sensor"
   },
   "THREAT_CATEGORY": {
     "TOR_EXIT_NODES": "Nós de Saída Tor",
@@ -655,131 +688,6 @@
       "MONTH_YEAR_A11Y_LABEL": "MMMM YYYY"
     }
   },
-  "actions": {
-    "edit": "Editar",
-    "remove": "Remover",
-    "create": "Criar",
-    "save": "Salvar",
-    "refresh": "Atualizar",
-    "close": "Fechar",
-    "cancel": "Cancelar",
-    "confirm": "Confirmar",
-    "next": "Próximo",
-    "back": "Voltar",
-    "add": "Adicionar",
-    "delete": "Excluir",
-    "apply": "Aplicar",
-    "backup": "Backup",
-    "restore": "Restaurar"
-  },
-  "about": {
-    "title": "Sobre o NXGuard",
-    "subtitle": "API Gateway de Alta Performance & Motor de Segurança",
-    "tab_about": "Visão Geral",
-    "tab_backup_restore": "Backup & Restauração",
-    "backup_title": "Exportar Configuração (Backup)",
-    "backup_desc": "Baixe um backup completo de todos os serviços, upstreams e regras de segurança em formato JSON.",
-    "backup_btn": "Baixar Backup",
-    "restore_title": "Importar Configuração (Restaurar)",
-    "restore_desc": "Envie um arquivo JSON de backup previamente exportado para restaurar a configuração do sistema.",
-    "choose_file": "Escolher arquivo JSON de backup",
-    "selected_file": "Arquivo Selecionado",
-    "powered_by": "Desenvolvido com OpenResty & ModSecurity",
-    "api_docs": "API REST",
-    "api_docs_sub": "Documentação OpenAPI / Swagger",
-    "github_title": "Repositório GitHub",
-    "github_sub": "Código fonte, versões e problemas",
-    "architecture_title": "Arquitetura Principal"
-  },
-  "attr": {
-    "active": "Ativo",
-    "name": "Nome",
-    "domains": "Domínios",
-    "routes": "Rotas",
-    "description": "Descrição",
-    "protocol": "Protocolo",
-    "targets": "Destinos",
-    "actions": "Ações"
-  },
-  "content": {
-    "copy": "&copy; 2026 NXGuard. Todos os direitos reservados. Esta solução é desenvolvida sobre o OpenResty.",
-    "about": "Este é um servidor proxy construído sobre o OpenResty com ModSecurity para proteção avançada.",
-    "restore_notice": "Aviso de Restauração de Configuração: Todos os dados existentes serão sobrescritos pela configuração restaurada."
-  },
-  "nav": {
-    "about": "Sobre",
-    "account": "Conta",
-    "logout": "Sair"
-  },
-  "view": {
-    "backup": {
-      "link": "backup"
-    },
-    "dashboard": {
-      "link": "Dashboard",
-      "title": "Dashboard"
-    },
-    "transaction": {
-      "link": "Atividade de Rede",
-      "title": "Transações",
-      "subtitle": "Listar todas as transações"
-    },
-    "service": {
-      "link": "Serviços",
-      "title": "Serviços",
-      "subtitle": "Descrever todos os serviços",
-      "filter_placeholder": "Buscar por nome ou domínio...",
-      "no_data": "Nenhum serviço configurado",
-      "no_data_desc": "Adicione um serviço para começar a fazer proxy e proteger o tráfego web.",
-      "no_results": "Nenhum serviço encontrado",
-      "no_results_hint": "Tente ajustar seus critérios de busca.",
-      "all_domains": "Todos os domínios (*)",
-      "active_status": "Ativo",
-      "inactive_status": "Inativo",
-      "toggle_active": "Alternar status do serviço"
-    },
-    "upstream": {
-      "link": "Upstreams",
-      "title": "Upstreams",
-      "subtitle": "Lista de todos os upstreams",
-      "filter_placeholder": "Buscar por nome ou descrição..."
-    },
-    "hostname": {
-      "link": "Hostnames",
-      "title": "Hostnames",
-      "subtitle": "Lista de todos os hostnames"
-    },
-    "certificate": {
-      "link": "Certificados",
-      "title": "Certificados",
-      "subtitle": "Lista de todos os certificados"
-    },
-    "sensor": {
-      "link": "Sensores",
-      "title": "Sensores",
-      "subtitle": "Lista de todos os sensores",
-      "filter_placeholder": "Buscar por nome ou descrição..."
-    },
-    "user": {
-      "link": "Usuários",
-      "title": "Usuários",
-      "subtitle": "Lista de todos os usuários"
-    },
-    "rulecat": {
-      "link": "Categorias",
-      "title": "Categorias de Regras",
-      "subtitle": "Gerencie as categorias de regras do ModSecurity e WAF",
-      "filter_placeholder": "Buscar categorias por nome, ID ou fase..."
-    },
-    "config": {
-      "link": "Configurações",
-      "title": "Configurações",
-      "subtitle": "Lista de todas as configurações"
-    },
-    "system": {
-      "link": "Sistema"
-    }
-  },
   "RULECAT": {
     "TITLE": "Categorias de Regras",
     "SUBTITLE": "Gerencie as categorias de regras do ModSecurity e WAF",
@@ -811,7 +719,9 @@
       "SYSTEM": "Protegido pelo Sistema",
       "SYSTEM_DESC": "Categorias protegidas pelo sistema não podem ser modificadas sem permissão de superusuário",
       "PROVIDER": "Fornecedor",
-      "ACTIONS": "Ações"
+      "ACTIONS": "Ações",
+      "PROVIDER_DESC": "Provedor da categoria de regras ou feed",
+      "REQUIRED": "Campo obrigatório"
     },
     "PHASES": {
       "1": "Fase 1 - Cabeçalhos da Requisição (Config e Exceções)",
@@ -875,15 +785,6 @@
       "SAVED": "Categoria de regra salva com sucesso",
       "UPDATED": "Categoria de regra atualizada com sucesso",
       "REMOVED": "Categoria de regra removida com sucesso"
-    }
-  },
-  "aboutMessage": "Obrigado",
-  "format": {
-    "display": {
-      "datetime": "DD/MM/YYYY HH:mm:ss",
-      "monthYearLabel": "MMM YYYY",
-      "dateA11yLabel": "LL",
-      "monthYearA11yLabel": "MMMM YYYY"
     }
   }
 }

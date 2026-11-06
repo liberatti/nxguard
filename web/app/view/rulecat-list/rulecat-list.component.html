@@ -1,13 +1,13 @@
 <ng-container>
     <mat-card id="rulecat-list-card">
         <mat-card-header>
-            <mat-card-title>{{ 'view.rulecat.title' | translate }}</mat-card-title>
-            <mat-card-subtitle>{{ 'view.rulecat.subtitle' | translate }}</mat-card-subtitle>
+            <mat-card-title>{{ 'VIEW.RULECAT.TITLE' | translate }}</mat-card-title>
+            <mat-card-subtitle>{{ 'VIEW.RULECAT.SUBTITLE' | translate }}</mat-card-subtitle>
             <mat-card-actions class="align-right">
                 <mat-form-field appearance="outline" subscriptSizing="dynamic" class="search-filter-field upstream-search-field">
                     <mat-icon matPrefix>search</mat-icon>
                     <input matInput id="rulecat-filter-input" [(ngModel)]="searchQuery" (keyup.enter)="applyFilter()"
-                        [placeholder]="'view.rulecat.filter_placeholder' | translate">
+                        [placeholder]="'VIEW.RULECAT.FILTER_PLACEHOLDER' | translate">
                     @if (searchQuery) {
                     <button matSuffix mat-icon-button id="rulecat-filter-clear-btn" (click)="clearFilter()">
                         <mat-icon>close</mat-icon>
@@ -17,7 +17,7 @@
                 @if (oauth.isRole('superuser')) {
                 <button id="add-rulecat-btn" mat-flat-button color="primary" [routerLink]="['add']">
                     <mat-icon>add</mat-icon>
-                    {{ 'actions.create' | translate }}
+                    {{ 'ACTIONS.CREATE' | translate }}
                 </button>
                 }
             </mat-card-actions>

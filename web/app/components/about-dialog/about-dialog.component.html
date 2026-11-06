@@ -5,13 +5,13 @@
             <img class="brand-logo" src="assets/logo.png" alt="NXGuard Logo" />
             <div class="brand-info">
                 <div class="title-row">
-                    <h2 class="brand-title" mat-dialog-title>{{ 'about.title' | translate }}</h2>
+                    <h2 class="brand-title" mat-dialog-title>{{ 'ABOUT.TITLE' | translate }}</h2>
                     <span class="version-badge">{{version}}</span>
                 </div>
-                <p class="brand-subtitle">{{ 'about.subtitle' | translate }}</p>
+                <p class="brand-subtitle">{{ 'ABOUT.SUBTITLE' | translate }}</p>
             </div>
         </div>
-        <button mat-icon-button (click)="onDismiss()" class="close-header-btn" id="about-dialog-header-close-btn" [matTooltip]="'actions.close' | translate">
+        <button mat-icon-button (click)="onDismiss()" class="close-header-btn" id="about-dialog-header-close-btn" [matTooltip]="'ACTIONS.CLOSE' | translate">
             <mat-icon>close</mat-icon>
         </button>
     </div>
@@ -20,16 +20,16 @@
     <mat-dialog-content class="dialog-content">
         <mat-tab-group (selectedTabChange)="onTabChanged($event)" class="custom-tab-group" id="about-dialog-tabs">
             <!-- Overview Tab -->
-            <mat-tab [label]="'about.tab_about' | translate" id="about-tab">
+            <mat-tab [label]="'ABOUT.TAB_ABOUT' | translate" id="about-tab">
                 <div class="tab-content about-content">
                     <div class="about-hero-box">
-                        <p class="about-description">{{ 'content.about' | translate }}</p>
+                        <p class="about-description">{{ 'CONTENT.ABOUT' | translate }}</p>
                     </div>
 
                     <div class="section-block">
                         <h4 class="section-title">
                             <mat-icon class="section-icon">memory</mat-icon>
-                            {{ 'about.architecture_title' | translate }}
+                            {{ 'ABOUT.ARCHITECTURE_TITLE' | translate }}
                         </h4>
                         <div class="feature-pills">
                             <div class="feature-pill">
@@ -52,8 +52,8 @@
                             <a href="https://github.com/liberatti/nxguard" target="_blank" class="link-card" id="about-github-link">
                                 <img class="link-icon github-icon" src="assets/github-mark.png" alt="GitHub" />
                                 <div class="link-info">
-                                    <span class="link-title">{{ 'about.github_title' | translate }}</span>
-                                    <span class="link-sub">{{ 'about.github_sub' | translate }}</span>
+                                    <span class="link-title">{{ 'ABOUT.GITHUB_TITLE' | translate }}</span>
+                                    <span class="link-sub">{{ 'ABOUT.GITHUB_SUB' | translate }}</span>
                                 </div>
                                 <mat-icon class="link-arrow">open_in_new</mat-icon>
                             </a>
@@ -63,21 +63,21 @@
             </mat-tab>
 
             <!-- Backup & Restore Tab -->
-            <mat-tab [label]="'about.tab_backup_restore' | translate" id="backup-restore-tab">
+            <mat-tab [label]="'ABOUT.TAB_BACKUP_RESTORE' | translate" id="backup-restore-tab">
                 <div class="tab-content backup-restore-content">
                     <!-- Backup Section Card -->
                     <mat-card appearance="outlined" class="action-card">
                         <mat-card-header class="action-card-header">
                             <mat-icon class="action-card-icon backup-icon">file_download</mat-icon>
                             <div>
-                                <mat-card-title class="action-card-title">{{ 'about.backup_title' | translate }}</mat-card-title>
-                                <mat-card-subtitle class="action-card-subtitle">{{ 'about.backup_desc' | translate }}</mat-card-subtitle>
+                                <mat-card-title class="action-card-title">{{ 'ABOUT.BACKUP_TITLE' | translate }}</mat-card-title>
+                                <mat-card-subtitle class="action-card-subtitle">{{ 'ABOUT.BACKUP_DESC' | translate }}</mat-card-subtitle>
                             </div>
                         </mat-card-header>
                         <mat-card-actions class="action-card-actions">
                             <button mat-flat-button color="primary" (click)="downloadConfig()" class="action-btn" id="download-config-btn">
                                 <mat-icon>file_download</mat-icon>
-                                <span>{{ 'about.backup_btn' | translate }}</span>
+                                <span>{{ 'ABOUT.BACKUP_BTN' | translate }}</span>
                             </button>
                         </mat-card-actions>
                     </mat-card>
@@ -87,14 +87,14 @@
                         <mat-card-header class="action-card-header">
                             <mat-icon class="action-card-icon restore-icon">restore</mat-icon>
                             <div>
-                                <mat-card-title class="action-card-title">{{ 'about.restore_title' | translate }}</mat-card-title>
-                                <mat-card-subtitle class="action-card-subtitle">{{ 'about.restore_desc' | translate }}</mat-card-subtitle>
+                                <mat-card-title class="action-card-title">{{ 'ABOUT.RESTORE_TITLE' | translate }}</mat-card-title>
+                                <mat-card-subtitle class="action-card-subtitle">{{ 'ABOUT.RESTORE_DESC' | translate }}</mat-card-subtitle>
                             </div>
                         </mat-card-header>
                         <mat-card-content class="action-card-content">
                             <div class="notice-banner">
                                 <mat-icon class="notice-icon">warning_amber</mat-icon>
-                                <p class="notice-text" [innerHTML]="'content.restore_notice' | translate"></p>
+                                <p class="notice-text" [innerHTML]="'CONTENT.RESTORE_NOTICE' | translate"></p>
                             </div>
 
                             @if (!restoreReady) {
@@ -115,7 +115,7 @@
                                         <div class="dropzone-icon-wrapper">
                                             <mat-icon class="dropzone-icon">cloud_upload</mat-icon>
                                         </div>
-                                        <span class="dropzone-title">{{ 'about.choose_file' | translate }}</span>
+                                        <span class="dropzone-title">{{ 'ABOUT.CHOOSE_FILE' | translate }}</span>
                                         <span class="dropzone-hint">.JSON format only</span>
                                     </label>
                                     }
@@ -132,7 +132,7 @@
                                             </div>
                                         </div>
                                         <button type="button" mat-icon-button (click)="clearSelectedFile($event)"
-                                            [matTooltip]="'actions.remove' | translate" id="clear-selected-file-btn">
+                                            [matTooltip]="'ACTIONS.REMOVE' | translate" id="clear-selected-file-btn">
                                             <mat-icon>close</mat-icon>
                                         </button>
                                     </div>
@@ -145,7 +145,7 @@
                             <button mat-flat-button color="warn" (click)="onSubmit()" [disabled]="!selectedFile || !restoreReady"
                                 class="action-btn" id="restore-config-btn">
                                 <mat-icon>restore</mat-icon>
-                                <span>{{ 'actions.restore' | translate }}</span>
+                                <span>{{ 'ACTIONS.RESTORE' | translate }}</span>
                             </button>
                         </mat-card-actions>
                     </mat-card>
@@ -157,7 +157,7 @@
     <!-- Footer Actions -->
     <mat-dialog-actions align="end" class="dialog-actions">
         <button mat-flat-button color="primary" (click)="onDismiss()" class="action-btn" id="about-dialog-close-btn">
-            <span>{{ 'actions.close' | translate }}</span>
+            <span>{{ 'ACTIONS.CLOSE' | translate }}</span>
         </button>
     </mat-dialog-actions>
 </div>

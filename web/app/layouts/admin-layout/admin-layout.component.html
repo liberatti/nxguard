@@ -36,11 +36,11 @@
             <mat-menu #userMenu="matMenu" class="premium-menu" xPosition="before">
                 <a mat-menu-item [routerLink]="['/account']">
                     <mat-icon>person</mat-icon>
-                    <span>{{ 'nav.account' | translate }}</span>
+                    <span>{{ 'NAV.ACCOUNT' | translate }}</span>
                 </a>
                 <a mat-menu-item (click)="signOut()">
                     <mat-icon>exit_to_app</mat-icon>
-                    <span>{{ 'nav.logout' | translate }}</span>
+                    <span>{{ 'NAV.LOGOUT' | translate }}</span>
                 </a>
             </mat-menu>
         </div>
@@ -87,7 +87,7 @@
                 <div class="sidenav-footer">
                     <button mat-button class="about-discreet-btn" (click)="showAbout()" id="sidenav-about-btn">
                         <mat-icon class="about-icon">info_outline</mat-icon>
-                        <span>{{ 'nav.about' | translate }} NXGUARD</span>
+                        <span>{{ 'NAV.ABOUT' | translate }} NXGUARD</span>
                     </button>
                 </div>
             </div>
@@ -100,7 +100,7 @@
             </div>
 
             <footer class="admin-footer">
-                <div [innerHTML]="'content.copy' | translate"></div>
+                <div [innerHTML]="'CONTENT.COPY' | translate"></div>
                 <div class="engine-version-text">NXGUARD Engine {{ version }}</div>
             </footer>
         </mat-sidenav-content>

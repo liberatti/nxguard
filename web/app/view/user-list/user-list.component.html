@@ -1,13 +1,13 @@
 <ng-container>
     <mat-card id="user-list-card" class="user-card">
         <mat-card-header>
-            <mat-card-title>{{ 'view.user.title' | translate }}</mat-card-title>
-            <mat-card-subtitle>{{ 'view.user.subtitle' | translate }}</mat-card-subtitle>
+            <mat-card-title>{{ 'VIEW.USER.TITLE' | translate }}</mat-card-title>
+            <mat-card-subtitle>{{ 'VIEW.USER.SUBTITLE' | translate }}</mat-card-subtitle>
             <mat-card-actions class="align-right">
                 @if (oauth.isRole('superuser')) {
                 <button id="add-user-btn" mat-flat-button color="primary" [routerLink]="['add']" class="create-btn">
                     <mat-icon>person_add</mat-icon>
-                    {{ 'actions.create' | translate }}
+                    {{ 'ACTIONS.CREATE' | translate }}
                 </button>
                 }
             </mat-card-actions>
@@ -65,12 +65,12 @@
                                 <mat-menu #menu="matMenu" xPosition="before" class="premium-menu">
                                     <button mat-menu-item [routerLink]="['edit', element._id]" id="edit-user-{{element._id}}">
                                         <mat-icon>edit</mat-icon>
-                                        <span>{{ 'actions.edit' | translate }}</span>
+                                        <span>{{ 'ACTIONS.EDIT' | translate }}</span>
                                     </button>
                                     @if (oauth.isRole('superuser')) {
                                     <button mat-menu-item (click)="onRemove(element)" id="delete-user-{{element._id}}" class="delete-menu-item">
                                         <mat-icon color="warn">delete</mat-icon>
-                                        <span class="text-warn">{{ 'actions.delete' | translate }}</span>
+                                        <span class="text-warn">{{ 'ACTIONS.DELETE' | translate }}</span>
                                     </button>
                                     }
                                 </mat-menu>

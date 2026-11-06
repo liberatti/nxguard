@@ -12,7 +12,7 @@
                 <p class="dialog-subtitle">{{ 'ROUTE.DIALOG_SUBTITLE' | translate }}</p>
             </div>
         </div>
-        <button mat-icon-button type="button" class="btn-header-close" (click)="onCancel()" [matTooltip]="'actions.close' | translate" id="btn-close-route-dialog">
+        <button mat-icon-button type="button" class="btn-header-close" (click)="onCancel()" [matTooltip]="'ACTIONS.CLOSE' | translate" id="btn-close-route-dialog">
             <mat-icon>close</mat-icon>
         </button>
     </div>
@@ -120,7 +120,7 @@
                                     <mat-chip-row (removed)="onRemovePath(p)" id="service-route-path-chip-{{p}}" class="chip-mono">
                                         <mat-icon class="chip-mini-icon">terminal</mat-icon>
                                         {{ p }}
-                                        <button matChipRemove id="remove-service-route-path-{{p}}" [attr.aria-label]="'actions.remove' | translate">
+                                        <button matChipRemove id="remove-service-route-path-{{p}}" [attr.aria-label]="'ACTIONS.REMOVE' | translate">
                                             <mat-icon>cancel</mat-icon>
                                         </button>
                                     </mat-chip-row>
@@ -192,7 +192,7 @@
                                             @for (p of getArrayVal(form.value.allowed_methods); track p) {
                                             <mat-chip-row (removed)="onRemoveAllowedMethod(p)" id="service-route-allowed-method-chip-{{p}}" class="method-chip">
                                                 {{ p }}
-                                                <button matChipRemove id="remove-service-route-allowed-method-{{p}}" [attr.aria-label]="'actions.remove' | translate">
+                                                <button matChipRemove id="remove-service-route-allowed-method-{{p}}" [attr.aria-label]="'ACTIONS.REMOVE' | translate">
                                                     <mat-icon>cancel</mat-icon>
                                                 </button>
                                             </mat-chip-row>
@@ -219,7 +219,7 @@
                                             @for (p of form.value.cache_methods; track p) {
                                             <mat-chip-row (removed)="onRemoveCacheMethod(p)" id="service-route-cache-method-chip-{{p}}" class="method-chip">
                                                 {{ p }}
-                                                <button matChipRemove id="remove-service-route-cache-method-{{p}}" [attr.aria-label]="'actions.remove' | translate">
+                                                <button matChipRemove id="remove-service-route-cache-method-{{p}}" [attr.aria-label]="'ACTIONS.REMOVE' | translate">
                                                     <mat-icon>cancel</mat-icon>
                                                 </button>
                                             </mat-chip-row>
@@ -250,7 +250,7 @@
                                         @for (p of getArrayVal(form.value.allowed_content_type); track p) {
                                         <mat-chip-row (removed)="onRemoveAllowedContentType(p)" id="service-route-allowed-content-type-chip-{{p}}" class="content-type-chip">
                                             {{ p }}
-                                            <button matChipRemove id="remove-service-route-allowed-content-type-{{p}}" [attr.aria-label]="'actions.remove' | translate">
+                                            <button matChipRemove id="remove-service-route-allowed-content-type-{{p}}" [attr.aria-label]="'ACTIONS.REMOVE' | translate">
                                                 <mat-icon>cancel</mat-icon>
                                             </button>
                                         </mat-chip-row>
@@ -270,11 +270,11 @@
     <div mat-dialog-actions align="end" class="dialog-actions">
         <button type="button" mat-stroked-button (click)="onCancel()" id="cancel-service-route-btn">
             <mat-icon>keyboard_return</mat-icon>
-            {{ 'actions.cancel' | translate }}
+            {{ 'ACTIONS.CANCEL' | translate }}
         </button>
         <button type="button" mat-flat-button color="primary" (click)="onSubmit()" id="save-service-route-btn">
             <mat-icon>save</mat-icon>
-            {{ 'actions.save' | translate }}
+            {{ 'ACTIONS.SAVE' | translate }}
         </button>
     </div>
 </div>

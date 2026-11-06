@@ -1,8 +1,8 @@
 <ng-container>
     <mat-card class="service-form-card">
         <mat-card-header class="mb-2">
-            <mat-card-title>{{ 'view.service.title' | translate }}</mat-card-title>
-            <mat-card-subtitle>{{ (isAddMode ? 'actions.create' : 'actions.edit') | translate }}</mat-card-subtitle>
+            <mat-card-title>{{ 'VIEW.SERVICE.TITLE' | translate }}</mat-card-title>
+            <mat-card-subtitle>{{ (isAddMode ? 'ACTIONS.CREATE' : 'ACTIONS.EDIT') | translate }}</mat-card-subtitle>
         </mat-card-header>
         <mat-card-content>
             <form [formGroup]="form">
@@ -216,13 +216,13 @@
                                                                 <button mat-menu-item type="button"
                                                                     (click)="onEditBind(i)" id="edit-bind-{{i}}">
                                                                     <mat-icon>edit</mat-icon>
-                                                                    {{ 'actions.edit' | translate }}
+                                                                    {{ 'ACTIONS.EDIT' | translate }}
                                                                 </button>
                                                                 @if (form.enabled) {
                                                                 <button mat-menu-item type="button"
                                                                     (click)="onBindRemove(i)" id="remove-bind-{{i}}">
                                                                     <mat-icon>delete</mat-icon>
-                                                                    {{ 'actions.delete' | translate }}
+                                                                    {{ 'ACTIONS.DELETE' | translate }}
                                                                 </button>
                                                                 }
                                                             </mat-menu>
@@ -242,7 +242,7 @@
                                             <button mat-flat-button color="primary" type="button"
                                                 (click)="onAddBind()" id="add-bind-button">
                                                 <mat-icon>add</mat-icon>
-                                                {{ 'actions.create' | translate }}
+                                                {{ 'ACTIONS.CREATE' | translate }}
                                             </button>
                                             }
                                         </mat-card-actions>
@@ -338,7 +338,7 @@
                                         <button mat-flat-button color="primary" type="button"
                                             (click)="onAddHeader()" id="add-header-button">
                                             <mat-icon>add</mat-icon>
-                                            {{ 'actions.create' | translate }}
+                                            {{ 'ACTIONS.CREATE' | translate }}
                                         </button>
                                         }
                                     </div>
@@ -375,7 +375,7 @@
                                                         <button mat-menu-item type="button" (click)="onRemoveHeader(i)"
                                                             id="remove-header-{{i}}">
                                                             <mat-icon>delete</mat-icon>
-                                                            {{ 'actions.delete' | translate }}
+                                                            {{ 'ACTIONS.DELETE' | translate }}
                                                         </button>
                                                     </mat-menu>
                                                 </div>
@@ -391,7 +391,7 @@
                                         <button mat-stroked-button color="primary" type="button" class="mt-2"
                                             (click)="onAddHeader()">
                                             <mat-icon>add</mat-icon>
-                                            {{ 'actions.create' | translate }}
+                                            {{ 'ACTIONS.CREATE' | translate }}
                                         </button>
                                         }
                                     </div>
@@ -419,7 +419,7 @@
                                         <button mat-flat-button color="primary" type="button"
                                             (click)="onAddRoute()" id="add-route-button">
                                             <mat-icon>add</mat-icon>
-                                            {{ 'actions.create' | translate }}
+                                            {{ 'ACTIONS.CREATE' | translate }}
                                         </button>
                                         }
                                     </div>
@@ -435,7 +435,7 @@
                                                     <th class="col-upstream">{{ 'ROUTE.TARGET' | translate }}</th>
                                                     <th class="col-path">{{ 'ROUTE.REQUEST_PATH' | translate }}</th>
                                                     <th class="col-sensor">{{ 'ROUTE.SECURITY_SENSOR' | translate }}</th>
-                                                    <th class="col-actions text-right">{{ 'attr.actions' | translate }}</th>
+                                                    <th class="col-actions text-right">{{ 'ATTR.ACTIONS' | translate }}</th>
                                                 </tr>
                                             </thead>
                                             <tbody cdkDropList [cdkDropListData]="routeDS.data"
@@ -529,7 +529,7 @@
                  
                                                             <button mat-icon-button type="button"
                                                                 [matMenuTriggerFor]="menu"
-                                                                [matTooltip]="'attr.actions' | translate"
+                                                                [matTooltip]="'ATTR.ACTIONS' | translate"
                                                                 id="route-menu-btn-{{i}}"
                                                                 class="route-action-btn">
                                                                 <mat-icon>more_vert</mat-icon>
@@ -538,13 +538,13 @@
                                                                 <button mat-menu-item type="button" (click)="onEditRoute(i)"
                                                                     id="edit-route-{{i}}">
                                                                     <mat-icon>edit</mat-icon>
-                                                                    <span>{{ 'actions.edit' | translate }}</span>
+                                                                    <span>{{ 'ACTIONS.EDIT' | translate }}</span>
                                                                 </button>
                                         
                                                                 <button mat-menu-item type="button"
                                                                     (click)="onRemoveRoute(i)" id="remove-route-{{i}}" class="delete-menu-item">
                                                                     <mat-icon color="warn">delete</mat-icon>
-                                                                    <span class="text-warn">{{ 'actions.delete' | translate }}</span>
+                                                                    <span class="text-warn">{{ 'ACTIONS.DELETE' | translate }}</span>
                                                                 </button>
                                                             </mat-menu>
                                                         </div>
@@ -563,7 +563,7 @@
                                         <button mat-stroked-button color="primary" type="button" class="mt-2"
                                             (click)="onAddRoute()">
                                             <mat-icon>add</mat-icon>
-                                            {{ 'actions.create' | translate }}
+                                            {{ 'ACTIONS.CREATE' | translate }}
                                         </button>
                                         }
                                     </div>

@@ -1,50 +1,50 @@
 [
   {
-    "label": "view.dashboard.link",
+    "label": "VIEW.DASHBOARD.LINK",
     "route": "/dashboard",
     "icon": "space_dashboard"
   },
   {
-    "label": "view.transaction.link",
+    "label": "VIEW.TRANSACTION.LINK",
     "route": "/trn",
     "icon": "timeline"
   },
   {
-    "label": "view.service.link",
+    "label": "VIEW.SERVICE.LINK",
     "route": "/service",
     "icon": "layers"
   },
   {
-    "label": "view.upstream.link",
+    "label": "VIEW.UPSTREAM.LINK",
     "route": "/ups",
     "icon": "alt_route"
   },
   {
-    "label": "view.sensor.link",
+    "label": "VIEW.SENSOR.LINK",
     "route": "/sensor",
     "icon": "security"
   },
   {
-    "label": "view.system.link",
+    "label": "VIEW.SYSTEM.LINK",
     "icon": "tune",
     "menu": [
       {
-        "label": "view.certificate.link",
+        "label": "VIEW.CERTIFICATE.LINK",
         "route": "/certificate",
         "icon": "verified_user"
       },
       {
-        "label": "view.user.link",
+        "label": "VIEW.USER.LINK",
         "route": "/users",
         "icon": "group"
       },
       {
-        "label": "view.rulecat.link",
+        "label": "VIEW.RULECAT.LINK",
         "route": "/rulecat",
         "icon": "category"
       },
       {
-        "label": "view.config.link",
+        "label": "VIEW.CONFIG.LINK",
         "route": "/config",
         "icon": "settings"
       }

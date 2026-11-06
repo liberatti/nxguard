@@ -48,11 +48,23 @@
   "ABOUT": {
     "TITLE": "About NXGuard",
     "SUBTITLE": "High-Performance API Gateway & Security Engine",
-    "TAB_ABOUT": "About",
+    "TAB_ABOUT": "Overview",
     "TAB_RESTORE": "Restore Config",
-    "CHOOSE_FILE": "Choose ZIP file to restore",
+    "CHOOSE_FILE": "Choose JSON backup file",
     "SELECTED_FILE": "Selected File",
-    "POWERED_BY": "Powered by OpenResty & ModSecurity"
+    "POWERED_BY": "Powered by OpenResty & ModSecurity",
+    "TAB_BACKUP_RESTORE": "Backup & Restore",
+    "BACKUP_TITLE": "Export Configuration (Backup)",
+    "BACKUP_DESC": "Download a complete backup of all services, upstreams, and security rules in JSON format.",
+    "BACKUP_BTN": "Download Backup",
+    "RESTORE_TITLE": "Import Configuration (Restore)",
+    "RESTORE_DESC": "Upload a previously exported JSON backup to restore system configuration.",
+    "API_DOCS": "REST API",
+    "API_DOCS_SUB": "OpenAPI / Swagger documentation",
+    "GITHUB_TITLE": "GitHub Repository",
+    "GITHUB_SUB": "Source code, releases & issue tracking",
+    "ARCHITECTURE_TITLE": "Core Architecture",
+    "MESSAGE": "Thanks"
   },
   "ATTR": {
     "ACTIVE": "Active",
@@ -62,7 +74,11 @@
     "LOGIN": {
       "USERNAME": "Enter your username",
       "PASSWORD": "Password here"
-    }
+    },
+    "ACTIONS": "Actions",
+    "DESCRIPTION": "Description",
+    "PROTOCOL": "Protocol",
+    "TARGETS": "Targets"
   },
   "CONTENT": {
     "COPY": "&copy; 2026 NXGuard. All rights reserved. This solution is built on top of OpenResty.",
@@ -86,7 +102,7 @@
   },
   "VIEW": {
     "BACKUP": {
-      "LINK": "backup",
+      "LINK": "Backup",
       "TITLE": "Backup"
     },
     "DASHBOARD": {
@@ -99,15 +115,24 @@
       "SUBTITLE": "List all transactions"
     },
     "SERVICE": {
-      "LINK": "Service",
+      "LINK": "Services",
       "TITLE": "Services",
-      "SUBTITLE": "Describe all services"
+      "SUBTITLE": "Describe all services",
+      "FILTER_PLACEHOLDER": "Search by name or domain...",
+      "NO_DATA": "No services configured",
+      "NO_DATA_DESC": "Add a service to start proxying and protecting web traffic.",
+      "NO_RESULTS": "No matching services found",
+      "NO_RESULTS_HINT": "Try adjusting your search criteria.",
+      "ALL_DOMAINS": "All domains (*)",
+      "ACTIVE_STATUS": "Active",
+      "INACTIVE_STATUS": "Inactive",
+      "TOGGLE_ACTIVE": "Toggle service status"
     },
     "UPSTREAM": {
-      "LINK": "Upstream",
-      "TITLE": "Upstream",
+      "LINK": "Upstreams",
+      "TITLE": "Upstreams",
       "SUBTITLE": "List of all upstreams",
-      "FILTER_PLACEHOLDER": "Filter upstreams by name or description...",
+      "FILTER_PLACEHOLDER": "Search by name or description...",
       "ERR_TARGET_REQUIRED": "Backend upstream requires at least one target.",
       "TARGETS": "Targets",
       "TARGET_HOST": "Network Address",
@@ -116,19 +141,20 @@
       "NO_TARGETS": "No targets configured. Add at least one target for this backend."
     },
     "HOSTNAME": {
-      "LINK": "Hostname",
-      "TITLE": "Hostname",
-      "SUBTITLE": "List of all Hostnames"
+      "LINK": "Hostnames",
+      "TITLE": "Hostnames",
+      "SUBTITLE": "List of all hostnames"
     },
     "CERTIFICATE": {
-      "LINK": "Certificate",
-      "TITLE": "Certificate",
+      "LINK": "Certificates",
+      "TITLE": "Certificates",
       "SUBTITLE": "List of all certificates"
     },
     "SENSOR": {
-      "LINK": "Sensor",
-      "TITLE": "Sensor",
-      "SUBTITLE": "List of all sensors"
+      "LINK": "Sensors",
+      "TITLE": "Sensors",
+      "SUBTITLE": "List of all sensors",
+      "FILTER_PLACEHOLDER": "Search by name or description..."
     },
     "USER": {
       "LINK": "Users",
@@ -136,12 +162,18 @@
       "SUBTITLE": "List of all users"
     },
     "CONFIG": {
-      "LINK": "Config",
-      "TITLE": "Config",
+      "LINK": "Configuration",
+      "TITLE": "Configuration",
       "SUBTITLE": "List of all configs"
     },
     "SYSTEM": {
       "LINK": "System"
+    },
+    "RULECAT": {
+      "LINK": "Categories",
+      "TITLE": "Rule Categories",
+      "SUBTITLE": "Manage ModSecurity and WAF rule categories",
+      "FILTER_PLACEHOLDER": "Search categories by name, ID or phase..."
     }
   },
   "CERTIFICATE": {
@@ -291,7 +323,8 @@
       "OCEANIA": "Oceania"
     },
     "SAVED_SUCCESS": "Sensor saved successfully",
-    "UPDATED_SUCCESS": "Sensor updated successfully"
+    "UPDATED_SUCCESS": "Sensor updated successfully",
+    "TITLE": "Sensor"
   },
   "THREAT_CATEGORY": {
     "TOR_EXIT_NODES": "Tor Exit Nodes",
@@ -655,131 +688,6 @@
       "MONTH_YEAR_A11Y_LABEL": "MMMM YYYY"
     }
   },
-  "actions": {
-    "edit": "Edit",
-    "remove": "Remove",
-    "create": "Create",
-    "save": "Save",
-    "refresh": "Refresh",
-    "close": "Close",
-    "cancel": "Cancel",
-    "confirm": "Confirm",
-    "next": "Next",
-    "back": "Back",
-    "add": "Add",
-    "delete": "Delete",
-    "apply": "Apply",
-    "backup": "Backup",
-    "restore": "Restore"
-  },
-  "about": {
-    "title": "About NXGuard",
-    "subtitle": "High-Performance API Gateway & Security Engine",
-    "tab_about": "Overview",
-    "tab_backup_restore": "Backup & Restore",
-    "backup_title": "Export Configuration (Backup)",
-    "backup_desc": "Download a complete backup of all services, upstreams, and security rules in JSON format.",
-    "backup_btn": "Download Backup",
-    "restore_title": "Import Configuration (Restore)",
-    "restore_desc": "Upload a previously exported JSON backup to restore system configuration.",
-    "choose_file": "Choose JSON backup file",
-    "selected_file": "Selected File",
-    "powered_by": "Powered by OpenResty & ModSecurity",
-    "api_docs": "REST API",
-    "api_docs_sub": "OpenAPI / Swagger documentation",
-    "github_title": "GitHub Repository",
-    "github_sub": "Source code, releases & issue tracking",
-    "architecture_title": "Core Architecture"
-  },
-  "attr": {
-    "active": "Active",
-    "name": "Name",
-    "domains": "Domains",
-    "routes": "Routes",
-    "description": "Description",
-    "protocol": "Protocol",
-    "targets": "Targets",
-    "actions": "Actions"
-  },
-  "content": {
-    "copy": "&copy; 2026 NXGuard. All rights reserved. This solution is built on top of OpenResty.",
-    "about": "This is a proxy server built on OpenResty with ModSecurity for advanced protection.",
-    "restore_notice": "Configuration Restore Notice: All existing data will be overwritten by the restored configuration."
-  },
-  "nav": {
-    "about": "About",
-    "account": "Account",
-    "logout": "Log Out"
-  },
-  "view": {
-    "backup": {
-      "link": "backup"
-    },
-    "dashboard": {
-      "link": "Dashboard",
-      "title": "Dashboard"
-    },
-    "transaction": {
-      "link": "Network Activity",
-      "title": "Transactions",
-      "subtitle": "List all transactions"
-    },
-    "service": {
-      "link": "Services",
-      "title": "Services",
-      "subtitle": "Describe all services",
-      "filter_placeholder": "Search by name or domain...",
-      "no_data": "No services configured",
-      "no_data_desc": "Add a service to start proxying and protecting web traffic.",
-      "no_results": "No matching services found",
-      "no_results_hint": "Try adjusting your search criteria.",
-      "all_domains": "All domains (*)",
-      "active_status": "Active",
-      "inactive_status": "Inactive",
-      "toggle_active": "Toggle service status"
-    },
-    "upstream": {
-      "link": "Upstreams",
-      "title": "Upstreams",
-      "subtitle": "List of all upstreams",
-      "filter_placeholder": "Search by name or description..."
-    },
-    "hostname": {
-      "link": "Hostnames",
-      "title": "Hostnames",
-      "subtitle": "List of all hostnames"
-    },
-    "certificate": {
-      "link": "Certificates",
-      "title": "Certificates",
-      "subtitle": "List of all certificates"
-    },
-    "sensor": {
-      "link": "Sensors",
-      "title": "Sensors",
-      "subtitle": "List of all sensors",
-      "filter_placeholder": "Search by name or description..."
-    },
-    "user": {
-      "link": "Users",
-      "title": "Users",
-      "subtitle": "List of all users"
-    },
-    "rulecat": {
-      "link": "Categories",
-      "title": "Rule Categories",
-      "subtitle": "Manage ModSecurity and WAF rule categories",
-      "filter_placeholder": "Search categories by name, ID or phase..."
-    },
-    "config": {
-      "link": "Configuration",
-      "title": "Configuration",
-      "subtitle": "List of all configs"
-    },
-    "system": {
-      "link": "System"
-    }
-  },
   "RULECAT": {
     "TITLE": "Rule Categories",
     "SUBTITLE": "Manage ModSecurity and WAF rule categories",
@@ -811,7 +719,9 @@
       "SYSTEM": "System Protected",
       "SYSTEM_DESC": "System protected rule category cannot be modified without superuser access",
       "PROVIDER": "Provider",
-      "ACTIONS": "Actions"
+      "ACTIONS": "Actions",
+      "PROVIDER_DESC": "Rule category provider or feed source",
+      "REQUIRED": "Field is required"
     },
     "PHASES": {
       "1": "Phase 1 - Request Headers (Config & Exceptions)",
@@ -875,15 +785,6 @@
       "SAVED": "Rule category saved successfully",
       "UPDATED": "Rule category updated successfully",
       "REMOVED": "Rule category removed successfully"
-    }
-  },
-  "aboutMessage": "Thanks",
-  "format": {
-    "display": {
-      "datetime": "DD/MM/YYYY HH:mm:ss",
-      "monthYearLabel": "MMM YYYY",
-      "dateA11yLabel": "LL",
-      "monthYearA11yLabel": "MMMM YYYY"
     }
   }
 }

@@ -1,13 +1,13 @@
 <ng-container>
     <mat-card>
         <mat-card-header>
-            <mat-card-title>{{ 'view.upstream.title'|translate }}</mat-card-title>
-            <mat-card-subtitle>{{ 'view.upstream.subtitle'|translate }}</mat-card-subtitle>
+            <mat-card-title>{{ 'VIEW.UPSTREAM.TITLE'|translate }}</mat-card-title>
+            <mat-card-subtitle>{{ 'VIEW.UPSTREAM.SUBTITLE'|translate }}</mat-card-subtitle>
             <mat-card-actions class="align-right">
                 <mat-form-field appearance="outline" subscriptSizing="dynamic" class="search-filter-field upstream-search-field">
                     <mat-icon matPrefix>search</mat-icon>
                     <input matInput id="upstream-filter-input" [(ngModel)]="searchQuery" (keyup.enter)="applyFilter()"
-                        [placeholder]="'view.upstream.filter_placeholder' | translate">
+                        [placeholder]="'VIEW.UPSTREAM.FILTER_PLACEHOLDER' | translate">
                     @if (searchQuery) {
                     <button matSuffix mat-icon-button id="upstream-filter-clear-btn" (click)="clearFilter()">
                         <mat-icon>close</mat-icon>
@@ -17,7 +17,7 @@
                 @if (oauth.isRole('superuser')) {
                 <button id="add-upstream-btn" mat-flat-button color="primary" [routerLink]="['add']">
                     <mat-icon>add</mat-icon>
-                    {{ 'actions.create'|translate }}
+                    {{ 'ACTIONS.CREATE'|translate }}
                 </button>
                 }
             </mat-card-actions>
@@ -28,7 +28,7 @@
                 <tr mat-row *matRowDef="let row; columns: upstreamDC;"></tr>
 
                 <ng-container matColumnDef="name">
-                    <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'attr.name'|translate }}</th>
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'ATTR.NAME'|translate }}</th>
                     <td mat-cell *matCellDef="let element" id="upstream-name-{{element._id}}">
                         <div class="upstream-name-cell">
                             <span class="upstream-name-text">{{ element.name }}</span>
@@ -47,7 +47,7 @@
                 </ng-container>
 
                 <ng-container matColumnDef="protocol">
-                    <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'attr.protocol'|translate }}</th>
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'ATTR.PROTOCOL'|translate }}</th>
                     <td mat-cell *matCellDef="let element" id="upstream-protocol-{{element._id}}">
                         <span class="protocol-chip clickable"
                             [class.healthy]="element.healthy === 'healthy'"
@@ -63,14 +63,14 @@
                 </ng-container>
 
                 <ng-container matColumnDef="description">
-                    <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'attr.description'|translate }}</th>
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'ATTR.DESCRIPTION'|translate }}</th>
                     <td mat-cell *matCellDef="let element" id="upstream-description-{{element._id}}">
                         {{ element.description || '-' }}
                     </td>
                 </ng-container>
 
                 <ng-container matColumnDef="targetCount">
-                    <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'attr.targets'|translate }}</th>
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'ATTR.TARGETS'|translate }}</th>
                     <td mat-cell *matCellDef="let element" id="upstream-target-count-{{element._id}}" class="targets-column-cell">
                         @if (!element.targets || element.targets.length === 0) {
                             <span class="target-none">-</span>
@@ -86,7 +86,7 @@
                 </ng-container>
 
                 <ng-container matColumnDef="action">
-                    <th mat-header-cell *matHeaderCellDef class="text-right"> {{ 'attr.actions'|translate }}</th>
+                    <th mat-header-cell *matHeaderCellDef class="text-right"> {{ 'ATTR.ACTIONS'|translate }}</th>
                     <td mat-cell *matCellDef="let element;let i = index;" class="text-right">
                         <div class="table-cell-actions">
                             <div class="toggle-container no-border">
@@ -97,13 +97,13 @@
                                     <button mat-menu-item [routerLink]="['edit',element._id]"
                                         id="edit-upstream-{{element._id}}">
                                         <mat-icon>edit</mat-icon>
-                                        {{ 'actions.edit'|translate }}
+                                        {{ 'ACTIONS.EDIT'|translate }}
                                     </button>
                                     @if (oauth.isRole('superuser')) {
                                     <button mat-menu-item (click)="onRemove(element)"
                                         id="delete-upstream-{{element._id}}">
                                         <mat-icon>delete</mat-icon>
-                                        {{ 'actions.remove'|translate }}
+                                        {{ 'ACTIONS.REMOVE'|translate }}
                                     </button>
                                     }
                                 </mat-menu>
