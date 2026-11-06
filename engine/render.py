@@ -194,19 +194,42 @@ def _generate_sensors(
             with RuleDao() as rule_dao:
                 for c in ordered_cats["data"]:
                     if bool(c.get("system")) or c.get("name") in sensor_cats:
-                        # TODO: Need to load file, categories are already loaded in the database.
-                        #  Remove this code and update the sensor generation logic to use the database directly.
-                        #if c["srctype"] == "feed" and c.get("file"):
-                        #    file_path = f"{output_dir}/modsec/coreruleset/{c['file']}"
-                        #    if os.path.exists(file_path):
-                        #        with open(file_path, "r", encoding="utf-8") as r_data:
-                        #            c.update({"rules": r_data.read()})
-                        #elif c["srctype"] == "user":
-                        #    with RuleDao() as rule_dao:
-                        #        rules = rule_dao.get_by_category_id(c["_id"])
-                        #        c.update({"rules": "\n".join(r["raw"] for r in rules)})
                         rules = rule_dao.get_by_category(c["_id"])
-                        c.update({"rules": "\n".join(r["raw"] for r in rules)})
+                        c.update(
+                            {
+                                "rules": "\n\n".join(
+                                    r["raw"].strip()
+                                    for r in rules
+                                    if r.get("raw") and r["raw"].strip()
+                                )
+                                + "\n"
+                            }
+                        )
+                        #TODO: Create attachment support on engine.index to copy attachment files to modsec/coreruleset folder
+                        """for r in rules:
+                            att = r.get("attachment")
+                            raw = r.get("raw") or ""
+                            if att:
+                                for match in re.finditer(
+                                    r"@(pmFromFile|ipMatchFromFile|pmf)\s+([^\s\"\'\)]+)",
+                                    raw,
+                                ):
+                                    data_file_name = os.path.basename(
+                                        match.group(2).strip().strip("\"'")
+                                    )
+                                    target_data_file = (
+                                        f"{output_dir}/modsec/coreruleset/{data_file_name}"
+                                    )
+                                    if not os.path.exists(target_data_file):
+                                        os.makedirs(
+                                            os.path.dirname(target_data_file),
+                                            exist_ok=True,
+                                        )
+                                        with open(
+                                            target_data_file, "w", encoding="utf-8"
+                                        ) as df:
+                                            df.write(att)
+                        """
                     categories.append(c)
 
             sensor.update({"categories": categories})
