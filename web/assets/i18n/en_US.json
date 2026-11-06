@@ -720,6 +720,7 @@
       "SYSTEM_DESC": "System protected rule category cannot be modified without superuser access",
       "PROVIDER": "Provider",
       "ACTIONS": "Actions",
+      "TYPE": "Type",
       "PROVIDER_DESC": "Rule category provider or feed source",
       "REQUIRED": "Field is required"
     },

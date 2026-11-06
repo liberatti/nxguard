@@ -31,14 +31,15 @@ class SecBaseSchema(Schema):
     schema_type = fields.String(
         load_default="SecRule", dump_default="SecRule", allow_none=True
     )
-    code = fields.Integer()
+    code = fields.Integer(allow_none=True)
     seq = fields.Integer(allow_none=True)
-    phase = fields.Integer()
-    action = fields.String()
-    logging = fields.String()
-    audit_log = fields.String()
-    version = fields.String()
-    raw = fields.String()
+    phase = fields.Integer(allow_none=True)
+    action = fields.String(allow_none=True)
+    logging = fields.String(allow_none=True)
+    audit_log = fields.String(allow_none=True)
+    version = fields.String(allow_none=True)
+    raw = fields.String(allow_none=True)
+    msg = fields.String(allow_none=True)
 
     @classmethod
     def schema_class(cls, schema_type: str) -> type:
@@ -77,6 +78,9 @@ class SecAction(SecBaseSchema):
     class Meta:
         unknown = EXCLUDE
 
+    schema_type = fields.String(
+        load_default="SecAction", dump_default="SecAction", allow_none=True
+    )
     initcol = fields.List(fields.String())
     t = fields.List(fields.String())
     setvar = fields.List(fields.String())
@@ -94,7 +98,10 @@ class SecComponentSignature(SecBaseSchema):
     class Meta:
         unknown = EXCLUDE
 
-    text = fields.String()
+    schema_type = fields.String(
+        load_default="SecComponentSignature", dump_default="SecComponentSignature", allow_none=True
+    )
+    text = fields.String(allow_none=True)
 
 
 class SecMarker(SecBaseSchema):
@@ -107,7 +114,10 @@ class SecMarker(SecBaseSchema):
     class Meta:
         unknown = EXCLUDE
 
-    text = fields.String()
+    schema_type = fields.String(
+        load_default="SecMarker", dump_default="SecMarker", allow_none=True
+    )
+    text = fields.String(allow_none=True)
 
 
 class SecRule(SecBaseSchema):

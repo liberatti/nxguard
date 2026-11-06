@@ -68,7 +68,7 @@ export class RuleCategoryFormComponent implements OnInit {
 
     rules: any[] = [];
     ruleDS: MatTableDataSource<any> = new MatTableDataSource<any>([]);
-    ruleDC: string[] = ['code', 'action', 'phase', 'severity', 'description', 'actions'];
+    ruleDC: string[] = ['code', 'schema_type', 'action', 'phase', 'severity', 'description', 'actions'];
     ruleSearchQuery: string = '';
     pageSizeOptions: number[] = [10, 25, 50, 100];
 
@@ -265,13 +265,16 @@ export class RuleCategoryFormComponent implements OnInit {
             if (!s) return '';
             return String(s).trim().replace(/^['"]|['"]$/g, '');
         };
+        const hasValidCode = rule.code !== undefined && rule.code !== null && rule.code !== '' && rule.code !== 0 && !isNaN(Number(rule.code));
+        const codeNum = hasValidCode ? Number(rule.code) : null;
         return {
             ...rule,
-            code: rule.code || (rule._id ? Number(rule._id) : 0),
+            code: codeNum,
+            schema_type: rule.schema_type || 'SecRule',
             msg: cleanStr(rule.msg),
             severity: cleanStr(rule.severity).toUpperCase(),
-            action: (rule.action || 'pass').toLowerCase(),
-            phase: rule.phase !== undefined ? rule.phase : 1,
+            action: rule.action ? cleanStr(rule.action).toLowerCase() : '',
+            phase: rule.phase !== undefined && rule.phase !== null && rule.phase !== '' ? Number(rule.phase) : null,
             comment: (rule.comment || '').trim(),
             raw: rule.raw || '',
             tags: Array.isArray(rule.tags) ? rule.tags : []
@@ -282,7 +285,8 @@ export class RuleCategoryFormComponent implements OnInit {
         this.ruleDS.filterPredicate = (data: any, filter: string) => {
             const term = (filter || '').trim().toLowerCase();
             if (!term) return true;
-            const codeStr = String(data.code || data._id || '');
+            const codeStr = String(data.code || (data._id && data._id !== 'None' ? data._id : '') || '');
+            const schemaTypeStr = String(data.schema_type || '').toLowerCase();
             const msgStr = (data.msg || '').toLowerCase();
             const commentStr = (data.comment || '').toLowerCase();
             const sevStr = (data.severity || '').toLowerCase();
@@ -291,6 +295,7 @@ export class RuleCategoryFormComponent implements OnInit {
             const rawStr = (data.raw || '').toLowerCase();
             return (
                 codeStr.includes(term) ||
+                schemaTypeStr.includes(term) ||
                 msgStr.includes(term) ||
                 commentStr.includes(term) ||
                 sevStr.includes(term) ||
@@ -359,7 +364,7 @@ export class RuleCategoryFormComponent implements OnInit {
 
         dialogRef.afterClosed().subscribe(result => {
             if (result) {
-                const idx = this.rules.findIndex(r => r.code === rule.code);
+                const idx = this.rules.findIndex(r => (rule.code ? r.code === rule.code : (rule._id ? r._id === rule._id : r === rule)));
                 if (idx >= 0) {
                     this.rules[idx] = this.normalizeRule(result);
                 } else {
@@ -373,7 +378,7 @@ export class RuleCategoryFormComponent implements OnInit {
     }
 
     removeRule(rule: any): void {
-        this.rules = this.rules.filter(r => r.code !== rule.code);
+        this.rules = this.rules.filter(r => (rule.code ? r.code !== rule.code : (rule._id ? r._id !== rule._id : r !== rule)));
         this.ruleDS.data = this.rules;
         this.form.markAsDirty();
     }

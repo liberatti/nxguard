@@ -196,17 +196,17 @@ def _generate_sensors(
                     if bool(c.get("system")) or c.get("name") in sensor_cats:
                         # TODO: Need to load file, categories are already loaded in the database.
                         #  Remove this code and update the sensor generation logic to use the database directly.
-                        if c["srctype"] == "feed" and c.get("file"):
-                            file_path = f"{output_dir}/modsec/coreruleset/{c['file']}"
-                            if os.path.exists(file_path):
-                                with open(file_path, "r", encoding="utf-8") as r_data:
-                                    c.update({"rules": r_data.read()})
-                        elif c["srctype"] == "user":
-                            with RuleDao() as rule_dao:
-                                rules = rule_dao.get_by_category_id(c["_id"])
-                                c.update({"rules": "\n".join(r["raw"] for r in rules)})
-                        #rules = rule_dao.get_by_category(c["_id"])
-                        #c.update({"rules": "\n".join(r["raw"] for r in rules)})
+                        #if c["srctype"] == "feed" and c.get("file"):
+                        #    file_path = f"{output_dir}/modsec/coreruleset/{c['file']}"
+                        #    if os.path.exists(file_path):
+                        #        with open(file_path, "r", encoding="utf-8") as r_data:
+                        #            c.update({"rules": r_data.read()})
+                        #elif c["srctype"] == "user":
+                        #    with RuleDao() as rule_dao:
+                        #        rules = rule_dao.get_by_category_id(c["_id"])
+                        #        c.update({"rules": "\n".join(r["raw"] for r in rules)})
+                        rules = rule_dao.get_by_category(c["_id"])
+                        c.update({"rules": "\n".join(r["raw"] for r in rules)})
                     categories.append(c)
 
             sensor.update({"categories": categories})

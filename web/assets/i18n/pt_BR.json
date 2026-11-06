@@ -720,6 +720,7 @@
       "SYSTEM_DESC": "Categorias protegidas pelo sistema não podem ser modificadas sem permissão de superusuário",
       "PROVIDER": "Fornecedor",
       "ACTIONS": "Ações",
+      "TYPE": "Tipo",
       "PROVIDER_DESC": "Provedor da categoria de regras ou feed",
       "REQUIRED": "Campo obrigatório"
     },

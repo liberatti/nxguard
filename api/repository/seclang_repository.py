@@ -43,10 +43,17 @@ class RuleDao(DuckDAO):
                 seq INTEGER,
                 tags_json JSON,
                 severity TEXT,
-                comment TEXT
+                comment TEXT,
+                schema_type TEXT DEFAULT 'SecRule'
             );
         """
         )
+        try:
+            self.ddl(
+                f"ALTER TABLE {self.table_name} ADD COLUMN IF NOT EXISTS schema_type TEXT DEFAULT 'SecRule'"
+            )
+        except Exception:
+            pass
 
     def from_dict(self, vo):
         vo = vo.copy()
@@ -54,6 +61,8 @@ class RuleDao(DuckDAO):
             vo.update({"scope_json": json.dumps(vo.pop("scope"))})
         if "tags" in vo:
             vo.update({"tags_json": json.dumps(vo.pop("tags"))})
+        if "schema_type" not in vo or not vo["schema_type"]:
+            vo["schema_type"] = "SecRule"
         return super().from_dict(vo)
 
     def to_dict(self, row):
@@ -65,6 +74,8 @@ class RuleDao(DuckDAO):
             if "tags_json" in row:
                 val = row.pop("tags_json")
                 row.update({"tags": json.loads(val) if val else []})
+            if not row.get("schema_type"):
+                row["schema_type"] = "SecRule"
         return super().to_dict(row)
 
     def get_by_code(self, rule_code: int) -> Optional[Dict[str, Any]]:

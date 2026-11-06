@@ -236,7 +236,23 @@
                                     <ng-container matColumnDef="code">
                                         <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'RULECAT.FIELDS.ID' | translate }}</th>
                                         <td mat-cell *matCellDef="let element">
-                                            <span class="rule-code-badge">{{ element.code || element._id }}</span>
+                                            @if (element.code) {
+                                            <span class="rule-code-badge">{{ element.code }}</span>
+                                            } @else if (element._id && element._id !== 'None' && element.schema_type !== 'SecMarker') {
+                                            <span class="rule-code-badge">{{ element._id }}</span>
+                                            } @else {
+                                            <span class="empty-cell-dash">-</span>
+                                            }
+                                        </td>
+                                    </ng-container>
+
+                                    <!-- Schema Type Column -->
+                                    <ng-container matColumnDef="schema_type">
+                                        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'RULECAT.FIELDS.TYPE' | translate }}</th>
+                                        <td mat-cell *matCellDef="let element">
+                                            <span class="schema-type-chip" [ngClass]="'schema-type-' + ((element.schema_type || 'SecRule') | lowercase)">
+                                                {{ element.schema_type || 'SecRule' }}
+                                            </span>
                                         </td>
                                     </ng-container>
 
@@ -244,9 +260,13 @@
                                     <ng-container matColumnDef="action">
                                         <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'SENSOR.ACTION' | translate }}</th>
                                         <td mat-cell *matCellDef="let element">
+                                            @if (element.action) {
                                             <span class="rule-action-badge" [ngClass]="getActionClass(element.action)">
-                                                {{ (element.action || 'PASS') | uppercase }}
+                                                {{ element.action | uppercase }}
                                             </span>
+                                            } @else {
+                                            <span class="empty-cell-dash">-</span>
+                                            }
                                         </td>
                                     </ng-container>
 
@@ -254,7 +274,11 @@
                                     <ng-container matColumnDef="phase">
                                         <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'RULECAT.FIELDS.PHASE' | translate }}</th>
                                         <td mat-cell *matCellDef="let element">
+                                            @if (element.phase !== null && element.phase !== undefined && element.phase !== '') {
                                             <span class="phase-chip" [ngClass]="'phase-' + element.phase">P{{ element.phase }}</span>
+                                            } @else {
+                                            <span class="empty-cell-dash">-</span>
+                                            }
                                         </td>
                                     </ng-container>
 
@@ -298,18 +322,17 @@
                                         <th mat-header-cell *matHeaderCellDef class="text-right">{{ 'RULECAT.FIELDS.ACTIONS' | translate }}</th>
                                         <td mat-cell *matCellDef="let element" class="text-right">
                                             <div class="rule-action-buttons">
-                                                <button type="button" mat-stroked-button class="btn-raw-rule" (click)="openRawRule(element)"
-                                                    [matTooltip]="'RULECAT.VIEW_RAW' | translate" id="rulecat-view-raw-{{element.code}}">
-                                                    <mat-icon class="btn-raw-icon">terminal</mat-icon>
-                                                    <span>{{ 'RULECAT.VIEW_RAW' | translate }}</span>
+                                                <button type="button" mat-icon-button (click)="openRawRule(element)"
+                                                    [matTooltip]="'RULECAT.VIEW_RAW' | translate" id="rulecat-view-raw-{{element.code || element._id}}">
+                                                    <mat-icon>terminal</mat-icon>
                                                 </button>
                                                 @if (isUserCategory) {
                                                 <button type="button" mat-icon-button (click)="openEditRule(element)"
-                                                    [matTooltip]="'ACTIONS.EDIT' | translate" id="rulecat-edit-rule-{{element.code}}">
+                                                    [matTooltip]="'ACTIONS.EDIT' | translate" id="rulecat-edit-rule-{{element.code || element._id}}">
                                                     <mat-icon>edit</mat-icon>
                                                 </button>
                                                 <button type="button" mat-icon-button color="warn" (click)="removeRule(element)"
-                                                    [matTooltip]="'ACTIONS.DELETE' | translate" id="rulecat-delete-rule-{{element.code}}">
+                                                    [matTooltip]="'ACTIONS.DELETE' | translate" id="rulecat-delete-rule-{{element.code || element._id}}">
                                                     <mat-icon>delete</mat-icon>
                                                 </button>
                                                 }
