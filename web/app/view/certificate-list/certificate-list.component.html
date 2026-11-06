@@ -53,6 +53,24 @@
                     </td>
                 </ng-container>
 
+                <ng-container matColumnDef="in_use">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'CERTIFICATE.IN_USE' | translate }}</th>
+                    <td mat-cell *matCellDef="let element" id="certificate-in-use-{{element._id}}">
+                        @if (element.in_use && element.in_use > 0) {
+                        <span class="in-use-badge in-use-active"
+                              [matTooltip]="(element.in_use === 1 ? 'CERTIFICATE.IN_USE_TIP_ONE' : 'CERTIFICATE.IN_USE_TIP') | translate:{ count: element.in_use }">
+                            <mat-icon class="in-use-icon">lan</mat-icon>
+                            <span>{{ (element.in_use === 1 ? 'CERTIFICATE.IN_USE_COUNT_ONE' : 'CERTIFICATE.IN_USE_COUNT') | translate:{ count: element.in_use } }}</span>
+                        </span>
+                        } @else {
+                        <span class="in-use-badge in-use-zero" [matTooltip]="'CERTIFICATE.NOT_IN_USE_TIP' | translate">
+                            <mat-icon class="in-use-icon">link_off</mat-icon>
+                            <span>{{ 'CERTIFICATE.NOT_IN_USE' | translate }}</span>
+                        </span>
+                        }
+                    </td>
+                </ng-container>
+
                 <ng-container matColumnDef="force_renew">
                     <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ 'CERTIFICATE.FORCE_RENEW' | translate }}</th>
                     <td mat-cell *matCellDef="let element">

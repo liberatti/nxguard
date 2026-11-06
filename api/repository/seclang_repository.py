@@ -30,7 +30,7 @@ class RuleDao(DuckDAO):
         self.ddl(
             f"""
             CREATE TABLE IF NOT EXISTS {self.table_name} (
-                _id TEXT PRIMARY KEY,
+                _id TEXT,
                 code INTEGER,
                 category_id TEXT,
                 action TEXT,

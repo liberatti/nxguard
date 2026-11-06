@@ -148,7 +148,14 @@
     "FORCE_RENEW": "Pendente de Renovação",
     "RENEW_PENDING": "Renovação pendente",
     "RENEW_SCHEDULED": "Renovação agendada",
-    "RENEW_NOT_SCHEDULED": "Sem renovação agendada"
+    "RENEW_NOT_SCHEDULED": "Sem renovação agendada",
+    "IN_USE": "Em Uso",
+    "IN_USE_COUNT_ONE": "{{ count }} serviço",
+    "IN_USE_COUNT": "{{ count }} serviços",
+    "NOT_IN_USE": "Não utilizado",
+    "IN_USE_TIP_ONE": "Utilizado por {{ count }} serviço",
+    "IN_USE_TIP": "Utilizado por {{ count }} serviços",
+    "NOT_IN_USE_TIP": "Nenhum serviço está utilizando este certificado"
   },
   "ROUTE": {
     "ALLOWED_METHODS": "Métodos HTTP Permitidos",

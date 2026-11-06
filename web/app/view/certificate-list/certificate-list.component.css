@@ -14,3 +14,46 @@
 .text-muted-icon {
     color: var(--text-muted);
 }
+
+.in-use-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: var(--font-size-xs, 0.75rem);
+    font-weight: 500;
+}
+
+.in-use-badge.in-use-active {
+    background: rgba(37, 99, 235, 0.08);
+    color: var(--primary, #2563eb);
+    border: 1px solid rgba(37, 99, 235, 0.25);
+}
+
+.in-use-badge.in-use-zero {
+    background: rgba(148, 163, 184, 0.08);
+    color: var(--text-muted, #94a3b8);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.in-use-icon {
+    font-size: 15px !important;
+    width: 15px !important;
+    height: 15px !important;
+    line-height: 15px !important;
+}
+
+:host-context(.dark-theme) .in-use-badge.in-use-active,
+:host-context([data-theme="dark"]) .in-use-badge.in-use-active {
+    background: rgba(59, 130, 246, 0.15);
+    color: #60a5fa;
+    border-color: rgba(59, 130, 246, 0.35);
+}
+
+:host-context(.dark-theme) .in-use-badge.in-use-zero,
+:host-context([data-theme="dark"]) .in-use-badge.in-use-zero {
+    background: rgba(148, 163, 184, 0.1);
+    color: #64748b;
+    border-color: rgba(148, 163, 184, 0.2);
+}

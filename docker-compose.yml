@@ -99,6 +99,7 @@ services:
       - "./main.py:/opt/nxguard/admin/main.py"
       - "./lualib:/opt/nxguard/luajit/share/lua/5.1/nxguard"
       - "./data:/data"
+      #- "./data/coreruleset:/opt/nxguard/modsec/coreruleset"
       - "./logs:/opt/nxguard/logs"
     extra_hosts:
       - "host.docker.internal:host-gateway"

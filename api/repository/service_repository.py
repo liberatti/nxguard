@@ -1,5 +1,5 @@
 import json
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, Union
 
 import config
 from api.middleware.logging_manager import logger
@@ -213,6 +213,50 @@ class ServiceDao(DuckDAO):
         except Exception as e:
             logger.error(f"Error retrieving services by certificate: {str(e)}")
             raise
+
+    def count_by_certificate_ids(self) -> Dict[Union[int, str], int]:
+        """
+        Count the number of services using each certificate.
+
+        Returns:
+            Dict[Union[int, str], int]: Mapping of certificate_id to count of services.
+        """
+        try:
+            query = f"SELECT certificate_id, COUNT(*) as count FROM {self.table_name} WHERE certificate_id IS NOT NULL GROUP BY certificate_id"
+            rows = self._query(query, fetch=True)
+            counts: Dict[Union[int, str], int] = {}
+            if rows:
+                for r in rows:
+                    cid = r.get("certificate_id")
+                    if cid is not None:
+                        cnt = int(r.get("count", 0))
+                        try:
+                            counts[int(cid)] = cnt
+                        except (ValueError, TypeError):
+                            pass
+                        counts[str(cid)] = cnt
+            return counts
+        except Exception as e:
+            logger.error(f"Error counting services by certificate: {str(e)}")
+            return {}
+
+    def count_by_certificate_id(self, certificate_id: Union[int, str]) -> int:
+        """
+        Count the number of services using a specific certificate.
+
+        Args:
+            certificate_id: The ID of the certificate.
+
+        Returns:
+            int: Number of services using the certificate.
+        """
+        try:
+            query = f"SELECT COUNT(*) as count FROM {self.table_name} WHERE certificate_id = ?"
+            rows = self._query(query, (certificate_id,), fetch=True)
+            return int(rows[0]["count"]) if rows else 0
+        except Exception as e:
+            logger.error(f"Error counting services for certificate {certificate_id}: {str(e)}")
+            return 0
 
     def search(
         self, query: str = None, pagination: dict = None, order_by: str = None

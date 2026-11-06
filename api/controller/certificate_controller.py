@@ -57,13 +57,12 @@ def get(certificate_id: str) -> Response:
     Returns:
         Response: JSON response containing the certificate data or 404 error
     """
-    with CertificateDao() as dao:
+    with CertificateDao() as dao, ServiceDao() as dao_service:
         certificate = dao.get_by_id(certificate_id)
-        return (
-            response_data(certificate, schema=dao.schema)
-            if certificate
-            else response_error_404()
-        )
+        if certificate:
+            certificate["in_use"] = dao_service.count_by_certificate_id(certificate_id)
+            return response_data(certificate, schema=dao.schema)
+        return response_error_404()
 
 
 @routes.route("", methods=["GET"])
@@ -75,10 +74,11 @@ def search() -> Response:
     Returns:
         Response: JSON response containing paginated certificate list or 404 error
     """
-    with CertificateDao() as dao:
+    with CertificateDao() as dao, ServiceDao() as dao_service:
         result = dao.get_all(pagination=get_pagination())
 
         if result and result["metadata"]["total_elements"] > 0:
+            counts = dao_service.count_by_certificate_ids()
             renew_date = replace_tz(datetime.now())
             for cert in result["data"]:
                 is_expired = False
@@ -88,6 +88,12 @@ def search() -> Response:
                 elif not_after and isinstance(not_after, datetime):
                     is_expired = replace_tz(not_after) < renew_date
                 cert["status"] = "EXPIRED" if is_expired else "VALID"
+                cert_id = cert.get("_id")
+                cert["in_use"] = (
+                    counts.get(cert_id, counts.get(str(cert_id), 0))
+                    if cert_id is not None
+                    else 0
+                )
             return response_data(result, schema=dao.pageSchema)
         return response_error_404()
 

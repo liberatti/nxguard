@@ -45,7 +45,7 @@ import {OAuthService} from "../../services/oauth.service";
 
 export class CertificateListComponent implements OnInit {
 
-    certificateDC: string[] = ['status', 'name', 'provider', 'subjects', 'force_renew', 'action'];
+    certificateDC: string[] = ['status', 'name', 'provider', 'subjects', 'in_use', 'force_renew', 'action'];
     certificateDS: MatTableDataSource<Certificate>;
     certificatePA: PageMeta;
 

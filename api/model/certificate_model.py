@@ -23,3 +23,4 @@ class CertificateSchema(Schema):
     status = fields.String(required=False)
     provider = fields.String(required=False)
     force_renew = fields.Boolean(required=False, load_default=False, dump_default=False)
+    in_use = fields.Integer(required=False, load_default=0, dump_default=0)

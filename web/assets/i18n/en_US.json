@@ -148,7 +148,14 @@
     "FORCE_RENEW": "Pending Renewal",
     "RENEW_PENDING": "Pending renewal",
     "RENEW_SCHEDULED": "Renewal scheduled",
-    "RENEW_NOT_SCHEDULED": "No renewal scheduled"
+    "RENEW_NOT_SCHEDULED": "No renewal scheduled",
+    "IN_USE": "In Use",
+    "IN_USE_COUNT_ONE": "{{ count }} service",
+    "IN_USE_COUNT": "{{ count }} services",
+    "NOT_IN_USE": "Not in use",
+    "IN_USE_TIP_ONE": "Used by {{ count }} service",
+    "IN_USE_TIP": "Used by {{ count }} services",
+    "NOT_IN_USE_TIP": "No service is using this certificate"
   },
   "ROUTE": {
     "ALLOWED_METHODS": "Allowed HTTP Methods",

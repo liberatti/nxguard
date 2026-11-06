@@ -42,7 +42,8 @@ def index(
             rules = parser.load(c["file"], base_path)
             s = 1
             for rule in rules:
-                if rule.get("schema_type") == "SecRule":
+                #TODO: Uncomment this line to filter only SecRule rules
+                #if rule.get("schema_type") == "SecRule":
                     rule_doc = {
                         "_id": f"{rule.get('code')}",
                         "code": rule.get("code"),
@@ -59,5 +60,6 @@ def index(
                         "severity": rule.get("severity"),
                         "comment": rule.get("comment"),
                     }
+
                     rule_dao.persist(rule_doc)
                     s += 1
