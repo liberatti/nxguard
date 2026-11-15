@@ -71,6 +71,21 @@ class FeedService:
             logger.error(f"Error fetching geo countries from IPXA: {e}")
             return {}
 
+    def get_stats(self):
+        try:
+            url, headers = self.get_api_config("/api/config/stats")
+            response = requests.get(url, headers=headers, timeout=5)
+            if response.status_code == 200:
+                return response.json()
+            else:
+                logger.error(
+                    f"Error fetching stats from IPXA: {response.status_code}"
+                )
+                return {}
+        except Exception as e:
+            logger.error(f"Error fetching stats from IPXA: {e}")
+            return {}
+
     def get_all(self, pagination=None):
         try:
             url, headers = self.get_api_config("/api/feed")

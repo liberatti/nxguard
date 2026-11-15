@@ -24,6 +24,14 @@ export interface ConfigIpxa {
     key?: string;
 }
 
+export interface IpxaStats {
+    cache_size: number;
+    feeds_bypass: number;
+    feeds_reputation: number;
+    geoip_entries: number;
+    rbl_size: number;
+}
+
 export interface Config {
     _id: string;
     ca_certificate: string;
