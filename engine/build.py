@@ -141,10 +141,13 @@ def init_from_data(data_dir=None, data_file="init-data.json", data=None):
                 conf["logging"] = {
                     "mode": "local",
                     "type": "elasticsearch",
+                    "audit_log_parts": "ABHF",
                     "url": "",
                     "username": "",
                     "password": "",
                 }
+            elif "audit_log_parts" not in conf["logging"]:
+                conf["logging"]["audit_log_parts"] = "ABHF"
             if "purge" not in conf or conf.get("purge") is None:
                 conf["purge"] = {
                     "enabled": False,

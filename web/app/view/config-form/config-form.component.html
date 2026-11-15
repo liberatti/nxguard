@@ -140,6 +140,14 @@
                                             <mat-icon matSuffix class="field-icon">tune</mat-icon>
                                             <mat-hint>{{ 'CONFIG_PAGE.LOGGING_MODE_HINT' | translate }}</mat-hint>
                                         </mat-form-field>
+
+                                        <mat-form-field class="full-width">
+                                            <mat-label>{{ 'CONFIG_PAGE.SEC_AUDIT_LOG_PARTS' | translate }}</mat-label>
+                                            <input matInput formControlName="audit_log_parts" id="sec-audit-log-parts-input" [placeholder]="'CONFIG_PAGE.SEC_AUDIT_LOG_PARTS_PLACEHOLDER' | translate"
+                                                (input)="onAuditLogPartsInput($event)">
+                                            <mat-icon matSuffix class="field-icon">rule</mat-icon>
+                                            <mat-hint>{{ 'CONFIG_PAGE.SEC_AUDIT_LOG_PARTS_HINT' | translate }}</mat-hint>
+                                        </mat-form-field>
                                     </div>
 
                                     @if (form.get('logging.mode')?.value === 'elasticsearch') {

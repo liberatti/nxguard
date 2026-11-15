@@ -2,6 +2,7 @@
 export interface ConfigLogging {
     mode: 'local' | 'elasticsearch' | string;
     type?: string;
+    audit_log_parts?: string;
     index_url?: string;
     index_username?: string;
     index_password?: string;

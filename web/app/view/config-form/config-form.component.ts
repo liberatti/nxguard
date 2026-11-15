@@ -56,6 +56,7 @@ export class ConfigFormComponent implements OnInit {
         dns_resolver: new FormControl<string>(''),
         logging: new FormGroup({
             mode: new FormControl<string>('local'),
+            audit_log_parts: new FormControl<string>('ABHF'),
             type: new FormControl<string>('elasticsearch'),
             index_url: new FormControl<string>(''),
             index_username: new FormControl<string>(''),
@@ -99,6 +100,7 @@ export class ConfigFormComponent implements OnInit {
                 dns_resolver: c.dns_resolver,
                 logging: c.logging ? {
                     mode: c.logging.mode || 'local',
+                    audit_log_parts: c.logging.audit_log_parts || 'ABHF',
                     type: c.logging.type || 'elasticsearch',
                     index_url: c.logging.index_url ?? c.logging.url ?? '',
                     index_username: c.logging.index_username ?? c.logging.username ?? '',
@@ -108,6 +110,7 @@ export class ConfigFormComponent implements OnInit {
                     dashboard_password: c.logging.dashboard_password ?? ''
                 } : {
                     mode: 'local',
+                    audit_log_parts: 'ABHF',
                     type: 'elasticsearch',
                     index_url: '',
                     index_username: '',
@@ -151,6 +154,17 @@ export class ConfigFormComponent implements OnInit {
                 this.notificationService.openSnackBar(this.translate.instant('CONFIG_PAGE.ERROR_SAVE') + (err?.message ? ': ' + err.message : ''));
             }
         });
+    }
+
+    onAuditLogPartsInput(event: Event): void {
+        const input = event.target as HTMLInputElement;
+        if (input && input.value) {
+            const upper = input.value.toUpperCase();
+            if (input.value !== upper) {
+                input.value = upper;
+                this.form.get('logging.audit_log_parts')?.setValue(upper, { emitEvent: false });
+            }
+        }
     }
 
     get f(): { [key: string]: AbstractControl } {

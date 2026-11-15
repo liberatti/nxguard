@@ -14,6 +14,7 @@ class ConfigArchiveSchema(Schema):
 class ConfigLoggingSchema(Schema):
     mode = fields.String()  # local, elasticsearch
     type = fields.String(allow_none=True)
+    audit_log_parts = fields.String(allow_none=True, load_default="ABHF")
     index_url = fields.String(allow_none=True)
     index_username = fields.String(allow_none=True)
     index_password = fields.String(allow_none=True)
