@@ -1,7 +1,10 @@
 <ng-container>
     <mat-card id="rulecat-list-card">
         <mat-card-header>
-            <mat-card-title>{{ 'VIEW.RULECAT.TITLE' | translate }}</mat-card-title>
+            <mat-card-title class="title-with-icon">
+                <mat-icon class="title-icon">category</mat-icon>
+                <span>{{ 'VIEW.RULECAT.TITLE' | translate }}</span>
+            </mat-card-title>
             <mat-card-subtitle>{{ 'VIEW.RULECAT.SUBTITLE' | translate }}</mat-card-subtitle>
             <mat-card-actions class="align-right">
                 <mat-form-field appearance="outline" subscriptSizing="dynamic" class="search-filter-field upstream-search-field">

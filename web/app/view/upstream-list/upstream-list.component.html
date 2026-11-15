@@ -1,7 +1,10 @@
 <ng-container>
     <mat-card>
         <mat-card-header>
-            <mat-card-title>{{ 'VIEW.UPSTREAM.TITLE'|translate }}</mat-card-title>
+            <mat-card-title class="title-with-icon">
+                <mat-icon class="title-icon">alt_route</mat-icon>
+                <span>{{ 'VIEW.UPSTREAM.TITLE'|translate }}</span>
+            </mat-card-title>
             <mat-card-subtitle>{{ 'VIEW.UPSTREAM.SUBTITLE'|translate }}</mat-card-subtitle>
             <mat-card-actions class="align-right">
                 <mat-form-field appearance="outline" subscriptSizing="dynamic" class="search-filter-field upstream-search-field">

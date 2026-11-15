@@ -1,7 +1,10 @@
 <ng-container>
     <mat-card class="service-card">
         <mat-card-header>
-            <mat-card-title>{{ 'VIEW.SERVICE.TITLE'|translate }}</mat-card-title>
+            <mat-card-title class="title-with-icon">
+                <mat-icon class="title-icon">cloud_queue</mat-icon>
+                <span>{{ 'VIEW.SERVICE.TITLE'|translate }}</span>
+            </mat-card-title>
             <mat-card-subtitle>{{ 'VIEW.SERVICE.SUBTITLE'|translate }}</mat-card-subtitle>
             <mat-card-actions class="align-right">
                 <mat-form-field appearance="outline" subscriptSizing="dynamic" class="search-filter-field">

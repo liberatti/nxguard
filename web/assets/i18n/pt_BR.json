@@ -49,7 +49,8 @@
     "TITLE": "Sobre o NXGuard",
     "SUBTITLE": "API Gateway de Alta Performance & Motor de Segurança",
     "TAB_ABOUT": "Visão Geral",
-    "TAB_RESTORE": "Restaurar Config",
+    "TAB_BACKUP": "Backup",
+    "TAB_RESTORE": "Restaurar",
     "CHOOSE_FILE": "Escolher arquivo JSON de backup",
     "SELECTED_FILE": "Arquivo Selecionado",
     "POWERED_BY": "Desenvolvido com OpenResty & ModSecurity",
@@ -112,12 +113,12 @@
     "TRANSACTION": {
       "LINK": "Atividade de Rede",
       "TITLE": "Transações",
-      "SUBTITLE": "Listar todas as transações"
+      "SUBTITLE": "Listar todos os logs de transações em formato estruturado e bruto"
     },
     "SERVICE": {
       "LINK": "Serviços",
       "TITLE": "Serviços",
-      "SUBTITLE": "Descrever todos os serviços",
+      "SUBTITLE": "Gerenciar serviços de proxy reverso HTTP/HTTPS, hosts virtuais, regras de roteamento e políticas SSL/TLS",
       "FILTER_PLACEHOLDER": "Buscar por nome ou domínio...",
       "NO_DATA": "Nenhum serviço configurado",
       "NO_DATA_DESC": "Adicione um serviço para começar a fazer proxy e proteger o tráfego web.",
@@ -131,7 +132,7 @@
     "UPSTREAM": {
       "LINK": "Upstreams",
       "TITLE": "Upstreams",
-      "SUBTITLE": "Lista de todos os upstreams",
+      "SUBTITLE": "Configurar pools de servidores backend, endereços de destino, algoritmos de balanceamento e checagem de integridade",
       "FILTER_PLACEHOLDER": "Buscar por nome ou descrição...",
       "ERR_TARGET_REQUIRED": "Upstream do tipo backend requer pelo menos um destino.",
       "TARGETS": "Destinos",
@@ -148,23 +149,23 @@
     "CERTIFICATE": {
       "LINK": "Certificados",
       "TITLE": "Certificados",
-      "SUBTITLE": "Lista de todos os certificados"
+      "SUBTITLE": "Gerenciar certificados SSL/TLS, chaves privadas, renovações automáticas ACME e autoridades certificadoras"
     },
     "SENSOR": {
       "LINK": "Sensores",
       "TITLE": "Sensores",
-      "SUBTITLE": "Lista de todos os sensores",
+      "SUBTITLE": "Configurar sensores de inspeção WAF, motores de detecção de ameaças, limitação de taxa e regras de segurança",
       "FILTER_PLACEHOLDER": "Buscar por nome ou descrição..."
     },
     "USER": {
       "LINK": "Usuários",
       "TITLE": "Usuários",
-      "SUBTITLE": "Lista de todos os usuários"
+      "SUBTITLE": "Gerenciar operadores do console, credenciais administrativas, controle de acesso baseado em papéis e permissões"
     },
     "CONFIG": {
       "LINK": "Configurações",
       "TITLE": "Configurações",
-      "SUBTITLE": "Lista de todas as configurações"
+      "SUBTITLE": "Gerenciar parâmetros globais do motor, inteligência de ameaças IPXA, logs e certificados PKI"
     },
     "SYSTEM": {
       "LINK": "Sistema"
@@ -172,7 +173,7 @@
     "RULECAT": {
       "LINK": "Categorias",
       "TITLE": "Categorias de Regras",
-      "SUBTITLE": "Gerencie as categorias de regras do ModSecurity e WAF",
+      "SUBTITLE": "Gerenciar conjuntos de regras ModSecurity CRS, fases de inspeção, categorias customizadas e regras de prevenção",
       "FILTER_PLACEHOLDER": "Buscar categorias por nome, ID ou fase..."
     }
   },
@@ -448,10 +449,42 @@
     "PANEL_POLICY_DESC": "Configure o destino dos logs de transação e o expurgo de retenção no banco de dados",
     "LOGGING_TITLE": "Registro de Transações (Logging)",
     "LOGGING_DESC": "Configure como os logs de transação e auditoria são armazenados. Os logs podem ser salvos localmente no DuckDB ou transmitidos para um cluster externo.",
-    "LOGGING_MODE": "Modo de Logging",
+    "LOGGING_MODE": "Destino do Logging",
     "LOGGING_MODE_HINT": "Destino de armazenamento dos logs de acesso e segurança",
     "LOGGING_MODE_LOCAL": "Armazenamento Local (DuckDB)",
-    "LOGGING_MODE_ELASTICSEARCH": "Elasticsearch",
+    "LOGGING_MODE_ELASTICSEARCH": "Cluster Elasticsearch",
+    "LOGGING_MODE_LOCAL_INFO": "Os logs são gravados localmente no banco embutido DuckDB. Rápido, autocontido e sem dependência de serviços externos.",
+    "LOGGING_MODE_ES_INFO": "Os logs são transmitidos em tempo real para o cluster Elasticsearch/OpenSearch externo com suporte a dashboards.",
+    "SEC_AUDIT_LOG_PARTS": "Partes do Log de Auditoria (ModSecurity)",
+    "SEC_AUDIT_LOG_PARTS_HINT": "Selecione as seções da transação a serem gravadas no log",
+    "SEC_AUDIT_LOG_PARTS_PLACEHOLDER": "Selecione as partes...",
+    "PARTS_SELECTED": "partes selecionadas",
+    "AUDIT_PART_A_NAME": "Cabeçalho de Auditoria",
+    "AUDIT_PART_A_DESC": "Timestamp, ID único da transação, IP do cliente e metadados",
+    "AUDIT_PART_B_NAME": "Cabeçalhos da Requisição",
+    "AUDIT_PART_B_DESC": "Método HTTP, URI da requisição e todos os cabeçalhos do cliente",
+    "AUDIT_PART_C_NAME": "Corpo da Requisição",
+    "AUDIT_PART_C_DESC": "Dados do payload (corpo POST/PUT, JSON, formulários) quando ativado",
+    "AUDIT_PART_E_NAME": "Corpo Intermediário de Resposta",
+    "AUDIT_PART_E_DESC": "Corpo da resposta antes de transformações do WAF",
+    "AUDIT_PART_F_NAME": "Cabeçalhos de Resposta",
+    "AUDIT_PART_F_DESC": "Código de status HTTP final e cabeçalhos enviados pelo servidor",
+    "AUDIT_PART_H_NAME": "Trailer de Auditoria",
+    "AUDIT_PART_H_DESC": "Metadados do ModSecurity, IDs das regras ativadas e ações tomadas",
+    "AUDIT_PART_I_NAME": "Corpo Compacto de Requisição",
+    "AUDIT_PART_I_DESC": "Alternativa ao bloco C excluindo arquivos grandes em upload",
+    "AUDIT_PART_J_NAME": "Metadados de Arquivos Enviados",
+    "AUDIT_PART_J_DESC": "Informações e nomes dos arquivos enviados via multipart",
+    "AUDIT_PART_K_NAME": "Lista de Regras Ativadas",
+    "AUDIT_PART_K_DESC": "Lista completa de regras de segurança disparadas em ordem",
+    "AUDIT_PART_Z_NAME": "Delimitador Final",
+    "AUDIT_PART_Z_DESC": "Delimitador final indicando o término da entrada de log",
+    "PRESET_DEFAULT": "Padrão (ABHF)",
+    "PRESET_FULL": "Inspeção Completa (ABCEFHJKZ)",
+    "ELASTICSEARCH_SECTION_TITLE": "Conexão com Cluster Elasticsearch",
+    "ELASTICSEARCH_SECTION_DESC": "Configure o endpoint e autenticação do cluster remoto para streaming de transações",
+    "DASHBOARD_SECTION_TITLE": "Dashboards & Visualização (Kibana / OpenSearch)",
+    "DASHBOARD_SECTION_DESC": "Configure a URL e credenciais para visualização e análise de transações",
     "LOGGING_TYPE": "Tipo de Motor",
     "INDEX_URL": "URL do Elasticsearch",
     "INDEX_URL_HINT": "URL do endpoint do cluster (ex.: http://elasticsearch:9200)",
@@ -467,7 +500,8 @@
     "PURGE_TITLE": "Expurgo de Transações",
     "PURGE_TOGGLE": "Ativar Expurgo do Banco de Dados",
     "PURGE_DESC": "Remova automaticamente registros antigos do banco local DuckDB para manter alta performance e economizar armazenamento em disco.",
-    "PURGE_AFTER": "Idade Máxima dos Dados (dias)",
+    "PURGE_AFTER": "Idade Máxima dos Dados",
+    "DAYS_SUFFIX": "dias",
     "PANEL_IPXA": "Integração IPXA",
     "PANEL_IPXA_DESC": "Configure o endpoint do serviço de inteligência de ameaças e reputação IPXA",
     "IPXA_URL": "URL do Serviço IPXA",
@@ -479,7 +513,7 @@
   },
   "DASHBOARD_PAGE": {
     "TITLE": "Visão Geral de Segurança",
-    "SUBTITLE": "Monitoramento de ameaças em tempo real e integridade do sistema",
+    "SUBTITLE": "Monitoramento de ameaças em tempo real, vazão de tráfego e integridade dos nós",
     "REFRESH_LABEL": "Atualização",
     "REFRESH_5S": "Atualizar: 5s",
     "REFRESH_10S": "Atualizar: 10s",

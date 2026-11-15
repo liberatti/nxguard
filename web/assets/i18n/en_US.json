@@ -49,7 +49,8 @@
     "TITLE": "About NXGuard",
     "SUBTITLE": "High-Performance API Gateway & Security Engine",
     "TAB_ABOUT": "Overview",
-    "TAB_RESTORE": "Restore Config",
+    "TAB_BACKUP": "Backup",
+    "TAB_RESTORE": "Restore",
     "CHOOSE_FILE": "Choose JSON backup file",
     "SELECTED_FILE": "Selected File",
     "POWERED_BY": "Powered by OpenResty & ModSecurity",
@@ -112,12 +113,12 @@
     "TRANSACTION": {
       "LINK": "Network Activity",
       "TITLE": "Transactions",
-      "SUBTITLE": "List all transactions"
+      "SUBTITLE": "List all transaction logs in parsed and raw format"
     },
     "SERVICE": {
       "LINK": "Services",
       "TITLE": "Services",
-      "SUBTITLE": "Describe all services",
+      "SUBTITLE": "Manage HTTP/HTTPS reverse proxy services, virtual hosts, routing rules and SSL/TLS policies",
       "FILTER_PLACEHOLDER": "Search by name or domain...",
       "NO_DATA": "No services configured",
       "NO_DATA_DESC": "Add a service to start proxying and protecting web traffic.",
@@ -131,7 +132,7 @@
     "UPSTREAM": {
       "LINK": "Upstreams",
       "TITLE": "Upstreams",
-      "SUBTITLE": "List of all upstreams",
+      "SUBTITLE": "Configure backend server pools, target addresses, load balancing algorithms and health checks",
       "FILTER_PLACEHOLDER": "Search by name or description...",
       "ERR_TARGET_REQUIRED": "Backend upstream requires at least one target.",
       "TARGETS": "Targets",
@@ -148,23 +149,23 @@
     "CERTIFICATE": {
       "LINK": "Certificates",
       "TITLE": "Certificates",
-      "SUBTITLE": "List of all certificates"
+      "SUBTITLE": "Manage SSL/TLS certificates, private keys, automatic ACME renewals, and CA authority configurations"
     },
     "SENSOR": {
       "LINK": "Sensors",
       "TITLE": "Sensors",
-      "SUBTITLE": "List of all sensors",
+      "SUBTITLE": "Configure WAF inspection sensors, threat detection engines, rate limiting, and security rules",
       "FILTER_PLACEHOLDER": "Search by name or description..."
     },
     "USER": {
       "LINK": "Users",
       "TITLE": "Users",
-      "SUBTITLE": "List of all users"
+      "SUBTITLE": "Manage console operators, administrative credentials, role-based access control, and user permissions"
     },
     "CONFIG": {
       "LINK": "Configuration",
       "TITLE": "Configuration",
-      "SUBTITLE": "List of all configs"
+      "SUBTITLE": "Manage global engine settings, IPXA threat intelligence, logging and PKI certificates"
     },
     "SYSTEM": {
       "LINK": "System"
@@ -172,7 +173,7 @@
     "RULECAT": {
       "LINK": "Categories",
       "TITLE": "Rule Categories",
-      "SUBTITLE": "Manage ModSecurity and WAF rule categories",
+      "SUBTITLE": "Manage ModSecurity CRS core rule sets, inspection phases, custom categories, and attack prevention rules",
       "FILTER_PLACEHOLDER": "Search categories by name, ID or phase..."
     }
   },
@@ -448,10 +449,42 @@
     "PANEL_POLICY_DESC": "Configure transactional logging targets and database retention purging",
     "LOGGING_TITLE": "Transaction Logging",
     "LOGGING_DESC": "Configure how transaction and security audit logs are stored. Logs can be written locally to DuckDB or streamed to an external cluster.",
-    "LOGGING_MODE": "Logging Mode",
+    "LOGGING_MODE": "Logging Destination",
     "LOGGING_MODE_HINT": "Storage destination for access and security transaction logs",
     "LOGGING_MODE_LOCAL": "Local Storage (DuckDB)",
-    "LOGGING_MODE_ELASTICSEARCH": "Elasticsearch",
+    "LOGGING_MODE_ELASTICSEARCH": "Elasticsearch Cluster",
+    "LOGGING_MODE_LOCAL_INFO": "Logs are stored locally in the embedded DuckDB database. Fast, self-contained, and requires zero external infrastructure.",
+    "LOGGING_MODE_ES_INFO": "Logs are streamed in real time to the remote Elasticsearch/OpenSearch cluster with dashboard support.",
+    "SEC_AUDIT_LOG_PARTS": "ModSecurity Audit Log Parts",
+    "SEC_AUDIT_LOG_PARTS_HINT": "Select transaction sections to record in the audit log",
+    "SEC_AUDIT_LOG_PARTS_PLACEHOLDER": "Select audit parts...",
+    "PARTS_SELECTED": "parts selected",
+    "AUDIT_PART_A_NAME": "Audit Header",
+    "AUDIT_PART_A_DESC": "Timestamp, unique transaction ID, client IP and request metadata",
+    "AUDIT_PART_B_NAME": "Request Headers",
+    "AUDIT_PART_B_DESC": "HTTP method, request URI and all client headers",
+    "AUDIT_PART_C_NAME": "Request Body",
+    "AUDIT_PART_C_DESC": "Payload data (POST/PUT body, JSON, forms) when inspection is enabled",
+    "AUDIT_PART_E_NAME": "Intermediary Response Body",
+    "AUDIT_PART_E_DESC": "Response body before WAF transformations are applied",
+    "AUDIT_PART_F_NAME": "Response Headers",
+    "AUDIT_PART_F_DESC": "Final HTTP status code and server response headers",
+    "AUDIT_PART_H_NAME": "Audit Trailer",
+    "AUDIT_PART_H_DESC": "ModSecurity metadata, matched rule IDs and actions taken",
+    "AUDIT_PART_I_NAME": "Compact Request Body",
+    "AUDIT_PART_I_DESC": "Alternative to part C excluding large file uploads",
+    "AUDIT_PART_J_NAME": "Uploaded Files Info",
+    "AUDIT_PART_J_DESC": "Information and filenames of uploaded multipart files",
+    "AUDIT_PART_K_NAME": "Matched Rules List",
+    "AUDIT_PART_K_DESC": "Complete list of matched security rules in execution order",
+    "AUDIT_PART_Z_NAME": "Final Boundary",
+    "AUDIT_PART_Z_DESC": "Closing boundary marking the end of the audit log entry",
+    "PRESET_DEFAULT": "Standard (ABHF)",
+    "PRESET_FULL": "Full Inspection (ABCEFHJKZ)",
+    "ELASTICSEARCH_SECTION_TITLE": "Elasticsearch Cluster Connection",
+    "ELASTICSEARCH_SECTION_DESC": "Configure remote cluster endpoint and credentials for transaction ingestion",
+    "DASHBOARD_SECTION_TITLE": "Dashboards & Analytics (Kibana / OpenSearch)",
+    "DASHBOARD_SECTION_DESC": "Configure dashboard visualization URL and user access credentials",
     "LOGGING_TYPE": "Engine Type",
     "INDEX_URL": "Elasticsearch URL",
     "INDEX_URL_HINT": "Cluster endpoint URL (e.g. http://elasticsearch:9200)",
@@ -467,7 +500,8 @@
     "PURGE_TITLE": "Transaction Purging",
     "PURGE_TOGGLE": "Enable Database Purging",
     "PURGE_DESC": "Automatically delete outdated transactional records from the local DuckDB database to preserve high performance and disk storage.",
-    "PURGE_AFTER": "Maximum Data Age (days)",
+    "PURGE_AFTER": "Maximum Data Age",
+    "DAYS_SUFFIX": "days",
     "PANEL_IPXA": "IPXA Integration",
     "PANEL_IPXA_DESC": "Configure IPXA threat intelligence and IP reputation service endpoint",
     "IPXA_URL": "IPXA Service URL",
@@ -479,7 +513,7 @@
   },
   "DASHBOARD_PAGE": {
     "TITLE": "Security Overview",
-    "SUBTITLE": "Real-time threat monitoring and system health",
+    "SUBTITLE": "Real-time threat monitoring, traffic throughput, and system health status",
     "REFRESH_LABEL": "Refresh",
     "REFRESH_5S": "Refresh: 5s",
     "REFRESH_10S": "Refresh: 10s",

@@ -1,7 +1,10 @@
 <ng-container>
     <mat-card class="trn-card">
         <mat-card-header>
-            <mat-card-title>{{ 'VIEW.TRANSACTION.TITLE' | translate }}</mat-card-title>
+            <mat-card-title class="title-with-icon">
+                <mat-icon class="title-icon">receipt_long</mat-icon>
+                <span>{{ 'VIEW.TRANSACTION.TITLE' | translate }}</span>
+            </mat-card-title>
             <mat-card-subtitle>{{ 'VIEW.TRANSACTION.SUBTITLE' | translate }}</mat-card-subtitle>
         </mat-card-header>
 

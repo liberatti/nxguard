@@ -2,7 +2,10 @@
     <!-- Dashboard Header -->
     <div class="dashboard-header">
         <div>
-            <h1 class="gradient-text dashboard-title">{{ 'DASHBOARD_PAGE.TITLE' | translate }}</h1>
+            <h1 class="gradient-text dashboard-title">
+                <mat-icon class="dashboard-title-icon">shield</mat-icon>
+                <span>{{ 'DASHBOARD_PAGE.TITLE' | translate }}</span>
+            </h1>
             <p class="text-dim dashboard-subtitle">{{ 'DASHBOARD_PAGE.SUBTITLE' | translate }}</p>
         </div>
         <div class="dashboard-header-actions">

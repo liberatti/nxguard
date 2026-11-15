@@ -136,6 +136,21 @@ html, body {
     margin: 0 !important;
 }
 
+.title-with-icon {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+}
+
+.title-icon {
+    font-size: 22px !important;
+    width: 22px !important;
+    height: 22px !important;
+    color: var(--primary) !important;
+    vertical-align: middle !important;
+    flex-shrink: 0 !important;
+}
+
 .mat-mdc-card-subtitle {
     font-size: var(--font-size-sm) !important;
     font-weight: 400 !important;

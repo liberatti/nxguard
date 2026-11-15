@@ -29,6 +29,12 @@ import { OAuthService } from "../../services/oauth.service";
 
 import { TextFieldModule } from '@angular/cdk/text-field';
 
+export interface AuditLogPartOption {
+    code: string;
+    nameKey: string;
+    descKey: string;
+}
+
 @Component({
     selector: 'app-config-form',
     standalone: true,
@@ -48,6 +54,27 @@ import { TextFieldModule } from '@angular/cdk/text-field';
 })
 export class ConfigFormComponent implements OnInit {
     submitted = false;
+    isSubmitting = false;
+    hideIndexPassword = true;
+    hideDashboardPassword = true;
+    hideIpxaKey = true;
+
+    readonly auditLogPartOptions: AuditLogPartOption[] = [
+        { code: 'A', nameKey: 'CONFIG_PAGE.AUDIT_PART_A_NAME', descKey: 'CONFIG_PAGE.AUDIT_PART_A_DESC' },
+        { code: 'B', nameKey: 'CONFIG_PAGE.AUDIT_PART_B_NAME', descKey: 'CONFIG_PAGE.AUDIT_PART_B_DESC' },
+        { code: 'C', nameKey: 'CONFIG_PAGE.AUDIT_PART_C_NAME', descKey: 'CONFIG_PAGE.AUDIT_PART_C_DESC' },
+        { code: 'E', nameKey: 'CONFIG_PAGE.AUDIT_PART_E_NAME', descKey: 'CONFIG_PAGE.AUDIT_PART_E_DESC' },
+        { code: 'F', nameKey: 'CONFIG_PAGE.AUDIT_PART_F_NAME', descKey: 'CONFIG_PAGE.AUDIT_PART_F_DESC' },
+        { code: 'H', nameKey: 'CONFIG_PAGE.AUDIT_PART_H_NAME', descKey: 'CONFIG_PAGE.AUDIT_PART_H_DESC' },
+        { code: 'I', nameKey: 'CONFIG_PAGE.AUDIT_PART_I_NAME', descKey: 'CONFIG_PAGE.AUDIT_PART_I_DESC' },
+        { code: 'J', nameKey: 'CONFIG_PAGE.AUDIT_PART_J_NAME', descKey: 'CONFIG_PAGE.AUDIT_PART_J_DESC' },
+        { code: 'K', nameKey: 'CONFIG_PAGE.AUDIT_PART_K_NAME', descKey: 'CONFIG_PAGE.AUDIT_PART_K_DESC' },
+        { code: 'Z', nameKey: 'CONFIG_PAGE.AUDIT_PART_Z_NAME', descKey: 'CONFIG_PAGE.AUDIT_PART_Z_DESC' },
+    ];
+    readonly canonicalOrder = ['A', 'B', 'C', 'E', 'F', 'H', 'I', 'J', 'K', 'Z'];
+
+    auditLogPartsControl = new FormControl<string[]>(['A', 'B', 'H', 'F']);
+
     form = new FormGroup({
         _id: new FormControl<string>(''),
         ca_certificate: new FormControl<string>(''),
@@ -89,9 +116,27 @@ export class ConfigFormComponent implements OnInit {
     }
 
     ngOnInit(): void {
+        this.auditLogPartsControl.valueChanges.subscribe(parts => {
+            if (parts) {
+                const sorted = [...parts].sort((a, b) => {
+                    const idxA = this.canonicalOrder.indexOf(a);
+                    const idxB = this.canonicalOrder.indexOf(b);
+                    return (idxA === -1 ? 99 : idxA) - (idxB === -1 ? 99 : idxB);
+                }).join('');
+                if (this.form.get('logging.audit_log_parts')?.value !== sorted) {
+                    this.form.get('logging.audit_log_parts')?.setValue(sorted);
+                    this.form.markAsDirty();
+                }
+            }
+        });
+
         // Fetch active configuration and patch form values
         this.configService.getActive().subscribe(data => {
             const c = (data as any)?.config || data;
+            const rawParts = c.logging?.audit_log_parts || 'ABHF';
+            const partsArray = rawParts.toUpperCase().split('').filter((ch: string) => this.canonicalOrder.includes(ch));
+            this.auditLogPartsControl.setValue(partsArray, { emitEvent: false });
+
             this.form.patchValue({
                 _id: c._id,
                 ca_certificate: c.ca_certificate,
@@ -145,15 +190,29 @@ export class ConfigFormComponent implements OnInit {
             return;
         }
 
+        this.isSubmitting = true;
         const formData = this.form.value as Config;
         this.configService.update(formData._id, formData).subscribe({
             next: () => {
+                this.isSubmitting = false;
                 this.notificationService.openSnackBar(this.translate.instant('CONFIG_PAGE.SUCCESS_SAVE'));
             },
             error: (err) => {
+                this.isSubmitting = false;
                 this.notificationService.openSnackBar(this.translate.instant('CONFIG_PAGE.ERROR_SAVE') + (err?.message ? ': ' + err.message : ''));
             }
         });
+    }
+
+    setAuditLogPreset(preset: string): void {
+        const parts = preset.split('').filter((ch: string) => this.canonicalOrder.includes(ch));
+        this.auditLogPartsControl.setValue(parts);
+        this.form.get('logging.audit_log_parts')?.setValue(preset);
+        this.form.markAsDirty();
+    }
+
+    isAuditPresetActive(preset: string): boolean {
+        return this.form.get('logging.audit_log_parts')?.value === preset;
     }
 
     onAuditLogPartsInput(event: Event): void {

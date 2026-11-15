@@ -62,9 +62,9 @@
                 </div>
             </mat-tab>
 
-            <!-- Backup & Restore Tab -->
-            <mat-tab [label]="'ABOUT.TAB_BACKUP_RESTORE' | translate" id="backup-restore-tab">
-                <div class="tab-content backup-restore-content">
+            <!-- Backup Tab -->
+            <mat-tab [label]="'ABOUT.TAB_BACKUP' | translate" id="backup-tab">
+                <div class="tab-content backup-content">
                     <!-- Backup Section Card -->
                     <mat-card appearance="outlined" class="action-card">
                         <mat-card-header class="action-card-header">
@@ -81,9 +81,14 @@
                             </button>
                         </mat-card-actions>
                     </mat-card>
+                </div>
+            </mat-tab>
 
+            <!-- Restore Tab -->
+            <mat-tab [label]="'ABOUT.TAB_RESTORE' | translate" id="restore-tab">
+                <div class="tab-content restore-content">
                     <!-- Restore Section Card -->
-                    <mat-card appearance="outlined" class="action-card mt-3">
+                    <mat-card appearance="outlined" class="action-card">
                         <mat-card-header class="action-card-header">
                             <mat-icon class="action-card-icon restore-icon">restore</mat-icon>
                             <div>
