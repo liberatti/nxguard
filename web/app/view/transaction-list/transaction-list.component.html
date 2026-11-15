@@ -176,17 +176,25 @@
                     </td>
                 </ng-container>
 
-                <!-- Node Column -->
-                <ng-container matColumnDef="node">
-                    <th mat-header-cell *matHeaderCellDef class="col-node"> Node </th>
-                    <td mat-cell *matCellDef="let element" class="col-node">
-                        @if (element.server_id) {
-                        <span class="node-badge" [matTooltip]="element.server_id">
-                            {{ element.server_id }}
-                        </span>
-                        } @else {
-                        <span class="text-muted">-</span>
-                        }
+                <!-- Status Column -->
+                <ng-container matColumnDef="status">
+                    <th mat-header-cell *matHeaderCellDef class="col-status"> Status </th>
+                    <td mat-cell *matCellDef="let element" class="col-status">
+                        <div class="status-cell-wrapper">
+                            <span class="status-pill status-{{ getStatusClass(getStatusCode(element)) }}">
+                                {{ getStatusCode(element) }}
+                            </span>
+                            @if (element.blocked_by && element.blocked_by !== 'none') {
+                            <span class="blocked-badge badge-{{ element.blocked_by | lowercase }}"
+                                [matTooltip]="('TRANSACTION.BLOCKED_BY' | translate) + ': ' + element.blocked_by">
+                                {{ element.blocked_by }}
+                            </span>
+                            } @else if (element.action === 'blocked' || element.action === 'BLOCKED') {
+                            <span class="blocked-badge badge-waf">
+                                WAF
+                            </span>
+                            }
+                        </div>
                     </td>
                 </ng-container>
 
@@ -195,17 +203,12 @@
                     <th mat-header-cell *matHeaderCellDef class="col-request"> Request </th>
                     <td mat-cell *matCellDef="let element" class="col-request">
                         <div class="request-cell-wrapper">
-                            @if (element.http) {
-                            <span class="request-text" [matTooltip]="element.http.request_line || (element.http.request?.method + ' ' +
-                                (element.http.request?.uri || '/'))">{{ element.http.request_line || (element.http.request?.method + ' ' +
-                                (element.http.request?.uri || '/')) }}</span>
-                            }
-                            @if (element.blocked_by && element.blocked_by !== 'none') {
-                            <span class="blocked-by-chip chip-{{ element.blocked_by | lowercase }}"
-                                [matTooltip]="('TRANSACTION.BLOCKED_BY' | translate) + ': ' + element.blocked_by">
-                                {{ element.blocked_by }}
+                            <span class="method-tag method-{{ getMethod(element) | lowercase }}">
+                                {{ getMethod(element) }}
                             </span>
-                            }
+                            <span class="uri-path" [matTooltip]="element.http?.request_line || (element.http?.request?.method + ' ' + (element.http?.request?.uri || '/'))">
+                                {{ getUri(element) }}
+                            </span>
                         </div>
                     </td>
                 </ng-container>
@@ -228,112 +231,166 @@
                             <mat-expansion-panel [expanded]="true">
                                 <mat-expansion-panel-header>
                                     <mat-panel-title>
-                                        <mat-icon class="panel-icon">arrow_upward</mat-icon>
+                                        <mat-icon class="panel-icon panel-icon-req">arrow_upward</mat-icon>
                                         <b>Request Information</b>
                                     </mat-panel-title>
-                                    <mat-panel-description>
-                                        @if (element.http && element.http.request) {
-                                        <span class="exp-panel-token"><b>Size:</b> {{ (element.http.request.bytes || 0)
-                                            | byteFormat }}</span>
-                                        <span class="exp-panel-token"><b>Duration:</b> {{ (element.http.duration || 0) |
-                                            timeFormat }}</span>
-                                        <span class="exp-panel-token"><b>Action:</b> {{ element.action }}</span>
+                                    <mat-panel-description class="header-tokens-wrapper">
+                                        <span class="exp-token token-action action-{{ element.action | lowercase }}">
+                                            <mat-icon class="token-action-icon">{{ (element.action === 'blocked' || element.action === 'BLOCKED') ? 'block' : 'check_circle' }}</mat-icon>
+                                            {{ element.action | uppercase }}
+                                        </span>
                                         @if (element.blocked_by && element.blocked_by !== 'none') {
-                                        <span class="exp-panel-token token-blocked-by"><b>Blocked By:</b> {{ element.blocked_by | uppercase }}</span>
+                                        <span class="exp-token token-blocked-by">
+                                            <b>Blocked By:</b> {{ element.blocked_by | uppercase }}
+                                        </span>
                                         }
-                                        <span class="exp-panel-token"><b>DoS:</b> {{ element.limit_req_status ||
-                                            element.rate_limit?.action || '-' }}</span>
-                                        <span class="exp-panel-token token-clickable" (click)="onShowGeoIP(element); $event.stopPropagation()"
+                                        <span class="exp-token"><b>Size:</b> {{ (element.http?.request?.bytes || 0) | byteFormat }}</span>
+                                        <span class="exp-token"><b>Duration:</b> {{ (element.http?.duration || 0) | timeFormat }}</span>
+                                        <span class="exp-token"><b>DoS:</b> {{ element.limit_req_status || element.rate_limit?.action || '-' }}</span>
+                                        <span class="exp-token token-clickable" (click)="onShowGeoIP(element); $event.stopPropagation()"
                                             [matTooltip]="'GEOIP_DIALOG.TITLE' | translate">
                                             <b>GeoIP:</b> {{ element.geoip_status || element.geoip?.action || '-' }}
                                             <mat-icon class="token-mini-icon">open_in_new</mat-icon>
                                         </span>
-                                        <span class="exp-panel-token token-clickable" (click)="onShowRBL(element); $event.stopPropagation()"
+                                        <span class="exp-token token-clickable" (click)="onShowRBL(element); $event.stopPropagation()"
                                             [matTooltip]="'RBL_DIALOG.TITLE' | translate">
                                             <b>RBL:</b> {{ element.rbl_status || element.reputation?.action || '-' }}
                                             <mat-icon class="token-mini-icon">open_in_new</mat-icon>
                                         </span>
-                                        }
                                     </mat-panel-description>
                                 </mat-expansion-panel-header>
 
-                                <div class="detail-grid">
-                                    @if (element.user_agent) {
-                                    <div class="detail-item">
-                                        <label>User Agent</label>
-                                        <span>{{ element.user_agent.family }} {{ element.user_agent.major ? 'v' +
-                                            element.user_agent.major : '' }}</span>
+                                <!-- 3-Column Structured Metadata Cards -->
+                                <div class="metadata-sections-grid">
+                                    <!-- Section 1: Client & Network -->
+                                    <div class="meta-section-card">
+                                        <div class="meta-section-header">
+                                            <mat-icon class="meta-sec-icon">travel_explore</mat-icon>
+                                            <span>Client & Network</span>
+                                        </div>
+                                        <div class="meta-card-fields">
+                                            <div class="meta-field">
+                                                <label>Source IP & Port</label>
+                                                <span class="meta-val source-ip-badge-link" (click)="onShowGeoIP(element); $event.stopPropagation()"
+                                                    [matTooltip]="'GEOIP_DIALOG.TITLE' | translate">
+                                                    @if (element.source?.geo?.country && element.source?.geo?.country !== '--') {
+                                                    <span class="fi fi-{{ element.source.geo.country | lowercase }}"></span>
+                                                    }
+                                                    {{ element.source?.ip || '-' }}{{ element.source?.port ? ':' + element.source.port : '' }}
+                                                    <mat-icon class="inline-open-icon">open_in_new</mat-icon>
+                                                </span>
+                                            </div>
+                                            <div class="meta-field">
+                                                <label>User Agent</label>
+                                                <span class="meta-val font-monospace" [matTooltip]="element.user_agent?.family">
+                                                    {{ element.user_agent?.family || 'Other' }} {{ element.user_agent?.major ? 'v' + element.user_agent.major : '' }}
+                                                </span>
+                                            </div>
+                                            <div class="meta-field">
+                                                <label>Destination Host</label>
+                                                <span class="meta-val font-monospace">
+                                                    {{ element.destination?.host || element.destination?.ip || '-' }}{{ element.destination?.port && !(element.destination?.host && element.destination.host.includes(':')) ? ':' + element.destination.port : '' }}
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
-                                    }
-                                    @if (element.source) {
-                                    <div class="detail-item">
-                                        <label>Source IP & Port</label>
-                                        <span class="source-ip-badge-link" (click)="onShowGeoIP(element); $event.stopPropagation()"
-                                            [matTooltip]="'GEOIP_DIALOG.TITLE' | translate">
-                                            @if (element.source.geo?.country && element.source.geo.country !== '--') {
-                                            <span class="fi fi-{{ element.source.geo.country | lowercase }}"></span>
-                                            }
-                                            {{ element.source.ip }}{{ element.source.port ? ':' + element.source.port
-                                                : '' }}
-                                            <mat-icon class="inline-open-icon">open_in_new</mat-icon>
-                                        </span>
+
+                                    <!-- Section 2: Routing & Backend -->
+                                    <div class="meta-section-card">
+                                        <div class="meta-section-header">
+                                            <mat-icon class="meta-sec-icon">alt_route</mat-icon>
+                                            <span>Routing & Backend</span>
+                                        </div>
+                                        <div class="meta-card-fields">
+                                            <div class="meta-field">
+                                                <label>Service / Route</label>
+                                                <span class="meta-val">
+                                                    <b>{{ element.service?.name || element.service?._id || '-' }}</b>
+                                                    @if (element.route_name && element.route_name !== '-') {
+                                                    <span class="route-sub-badge">/ {{ element.route_name }}</span>
+                                                    }
+                                                </span>
+                                            </div>
+                                            <div class="meta-field">
+                                                <label>Upstream Target</label>
+                                                <span class="meta-val">
+                                                    @if (element.upstream) {
+                                                        {{ element.upstream.name || element.upstream._id }}
+                                                        @if (element.upstream.target && element.upstream.target !== '-') {
+                                                            <span class="target-addr">({{ element.upstream.target }})</span>
+                                                        }
+                                                        @if (element.upstream.status) {
+                                                            <span class="upstream-code-pill status-{{ getStatusClass(element.upstream.status) }}">
+                                                                {{ element.upstream.status }}
+                                                            </span>
+                                                        }
+                                                    } @else {
+                                                        <span class="text-muted">-</span>
+                                                    }
+                                                </span>
+                                            </div>
+                                            <div class="meta-field">
+                                                <label>Node / Server</label>
+                                                <span class="meta-val font-monospace">{{ element.server_id || '-' }}</span>
+                                            </div>
+                                        </div>
                                     </div>
-                                    }
-                                    @if (element.destination) {
-                                    <div class="detail-item">
-                                        <label>Destination Host</label>
-                                        <span>{{ element.destination.host || element.destination.ip }}{{
-                                            element.destination.port && !(element.destination.host && element.destination.host.includes(':')) ? ':' + element.destination.port : '' }}</span>
+
+                                    <!-- Section 3: Security & Policies -->
+                                    <div class="meta-section-card">
+                                        <div class="meta-section-header">
+                                            <mat-icon class="meta-sec-icon">shield</mat-icon>
+                                            <span>Security & Policy</span>
+                                        </div>
+                                        <div class="meta-card-fields">
+                                            <div class="meta-field">
+                                                <label>Sensor</label>
+                                                <span class="meta-val">
+                                                    {{ element.sensor?.name || element.sensor?._id || '-' }}
+                                                    @if (element.sensor?.action) {
+                                                        <span class="sensor-tag tag-{{ element.sensor.action | lowercase }}">({{ element.sensor.action }})</span>
+                                                    }
+                                                </span>
+                                            </div>
+                                            <div class="meta-field">
+                                                <label>Anomaly Score</label>
+                                                <span class="meta-val">
+                                                    <span class="score-pill score-{{ element.action | lowercase }}">
+                                                        {{ element.score || 0 }}
+                                                    </span>
+                                                </span>
+                                            </div>
+                                            <div class="meta-field">
+                                                <label>Blocked By</label>
+                                                <span class="meta-val">
+                                                    @if (element.blocked_by && element.blocked_by !== 'none') {
+                                                        <span class="blocked-badge badge-{{ element.blocked_by | lowercase }}">
+                                                            {{ element.blocked_by | uppercase }}
+                                                        </span>
+                                                    } @else if (element.action === 'blocked' || element.action === 'BLOCKED') {
+                                                        <span class="blocked-badge badge-waf">WAF</span>
+                                                    } @else {
+                                                        <span class="text-muted">None (Traffic Allowed)</span>
+                                                    }
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
-                                    }
-                                    @if (element.upstream) {
-                                    <div class="detail-item">
-                                        <label>Upstream Target</label>
-                                        <span>
-                                            {{ element.upstream.name || element.upstream._id }}
-                                            {{ element.upstream.target ? '(' + element.upstream.target + ')' : '' }}
-                                            @if (element.upstream.status) {
-                                            <span class="upstream-status-badge">[Status: {{ element.upstream.status }}]</span>
-                                            }
-                                        </span>
-                                    </div>
-                                    }
-                                    @if (element.blocked_by && element.blocked_by !== 'none') {
-                                    <div class="detail-item">
-                                        <label>{{ 'TRANSACTION.BLOCKED_BY' | translate }}</label>
-                                        <span class="blocked-by-tag blocked-by-{{ element.blocked_by | lowercase }}">
-                                            {{ element.blocked_by | uppercase }}
-                                        </span>
-                                    </div>
-                                    }
-                                    @if (element.route_name && element.route_name !== '-') {
-                                    <div class="detail-item">
-                                        <label>Route</label>
-                                        <span>{{ element.route_name }}</span>
-                                    </div>
-                                    }
-                                    @if (element.sensor) {
-                                    <div class="detail-item">
-                                        <label>Sensor</label>
-                                        <span>
-                                            {{ element.sensor.name || element.sensor._id }}
-                                            @if (element.sensor.action) {
-                                            <span class="sensor-action-badge">({{ element.sensor.action }})</span>
-                                            }
-                                        </span>
-                                    </div>
-                                    }
                                 </div>
 
-                                @if (element.http?.request?.headers && element.http.request.headers.length > 0) {
-                                <div class="headers-section">
-                                    <label class="section-label">Request Headers</label>
-                                    <div class="headers-chips">
-                                        @for (p of element.http.request.headers; track p.name) {
-                                        <div class="header-chip"
-                                            [matTooltip]="p.content">
-                                            <span class="h-name">{{ p.name }}:</span>
-                                            <span class="h-val">{{ p.content }}</span>
+                                <!-- Request Headers -->
+                                @if (filterValidHeaders(element.http?.request?.headers).length > 0) {
+                                <div class="headers-block">
+                                    <div class="headers-block-title">
+                                        <mat-icon class="headers-title-icon">format_list_bulleted</mat-icon>
+                                        <span>Request Headers ({{ filterValidHeaders(element.http.request.headers).length }})</span>
+                                    </div>
+                                    <div class="headers-kv-grid">
+                                        @for (p of filterValidHeaders(element.http.request.headers); track p.name) {
+                                        <div class="header-kv-item" (click)="copyHeader(p.name, p.content)" [matTooltip]="'Click to copy'">
+                                            <span class="h-key">{{ p.name }}:</span>
+                                            <span class="h-value">{{ p.content }}</span>
+                                            <mat-icon class="h-copy-btn">content_copy</mat-icon>
                                         </div>
                                         }
                                     </div>
@@ -346,32 +403,39 @@
                             <mat-expansion-panel>
                                 <mat-expansion-panel-header>
                                     <mat-panel-title>
-                                        <mat-icon class="panel-icon">arrow_downward</mat-icon>
+                                        <mat-icon class="panel-icon panel-icon-resp">arrow_downward</mat-icon>
                                         <b>Response Information</b>
                                     </mat-panel-title>
-                                    <mat-panel-description>
-                                        <span class="exp-panel-token"><b>Code:</b> {{ element.http.response.status_code
-                                            }}</span>
+                                    <mat-panel-description class="header-tokens-wrapper">
+                                        <span class="exp-token status-pill status-{{ getStatusClass(getStatusCode(element)) }}">
+                                            <b>Status:</b> {{ getStatusCode(element) }}
+                                        </span>
                                         @if (element.upstream?.status) {
-                                        <span class="exp-panel-token token-upstream-status"><b>Upstream:</b> {{ element.upstream.status }}</span>
+                                        <span class="exp-token token-upstream status-{{ getStatusClass(element.upstream.status) }}">
+                                            <b>Upstream:</b> {{ element.upstream.status }}
+                                        </span>
+                                        } @else if (element.action === 'blocked' || element.action === 'BLOCKED') {
+                                        <span class="exp-token token-upstream-bypassed">
+                                            <b>Upstream:</b> Bypassed (Blocked by {{ element.blocked_by || 'WAF' }})
+                                        </span>
                                         }
-                                        @if (element.blocked_by && element.blocked_by !== 'none') {
-                                        <span class="exp-panel-token token-blocked-by"><b>Blocked By:</b> {{ element.blocked_by | uppercase }}</span>
-                                        }
-                                        <span class="exp-panel-token"><b>Size:</b> {{ (element.http.response.bytes || 0)
-                                            | byteFormat }}</span>
+                                        <span class="exp-token"><b>Size:</b> {{ (element.http.response.bytes || 0) | byteFormat }}</span>
                                     </mat-panel-description>
                                 </mat-expansion-panel-header>
 
-                                @if (element.http.response.headers && element.http.response.headers.length > 0) {
-                                <div class="headers-section">
-                                    <label class="section-label">Response Headers</label>
-                                    <div class="headers-chips">
-                                        @for (p of element.http.response.headers; track p.name) {
-                                        <div class="header-chip"
-                                            [matTooltip]="p.content">
-                                            <span class="h-name">{{ p.name }}:</span>
-                                            <span class="h-val">{{ p.content }}</span>
+                                <!-- Response Headers -->
+                                @if (filterValidHeaders(element.http.response.headers).length > 0) {
+                                <div class="headers-block">
+                                    <div class="headers-block-title">
+                                        <mat-icon class="headers-title-icon">format_list_bulleted</mat-icon>
+                                        <span>Response Headers ({{ filterValidHeaders(element.http.response.headers).length }})</span>
+                                    </div>
+                                    <div class="headers-kv-grid">
+                                        @for (p of filterValidHeaders(element.http.response.headers); track p.name) {
+                                        <div class="header-kv-item" (click)="copyHeader(p.name, p.content)" [matTooltip]="'Click to copy'">
+                                            <span class="h-key">{{ p.name }}:</span>
+                                            <span class="h-value">{{ p.content }}</span>
+                                            <mat-icon class="h-copy-btn">content_copy</mat-icon>
                                         </div>
                                         }
                                     </div>
@@ -382,39 +446,52 @@
 
                             <!-- Inspection / WAF Panel -->
                             @if (element.audit) {
-                            <mat-expansion-panel>
+                            <mat-expansion-panel [expanded]="element.action === 'blocked' || element.action === 'BLOCKED'">
                                 <mat-expansion-panel-header>
                                     <mat-panel-title>
-                                        <mat-icon class="panel-icon">security</mat-icon>
+                                        <mat-icon class="panel-icon panel-icon-waf">security</mat-icon>
                                         <b>WAF Inspection Details</b>
                                     </mat-panel-title>
-                                    <mat-panel-description>
-                                        <span>{{ element.audit.engine || 'ModSecurity' }}</span>
+                                    <mat-panel-description class="header-tokens-wrapper">
+                                        <span class="exp-token"><b>Engine:</b> {{ element.audit.engine || 'ModSecurity' }}</span>
+                                        @if (element.audit.messages && element.audit.messages.length > 0) {
+                                        <span class="exp-token token-waf-matched">
+                                            <b>Rules Matched:</b> {{ element.audit.messages.length }}
+                                        </span>
+                                        }
                                     </mat-panel-description>
                                 </mat-expansion-panel-header>
 
                                 @if (element.audit.messages && element.audit.messages.length > 0) {
-                                <table mat-table [dataSource]="element.audit.messages" class="audit-table">
-                                    <ng-container matColumnDef="code">
-                                        <th mat-header-cell *matHeaderCellDef class="audit-col-code"> Rule ID </th>
-                                        <td mat-cell *matCellDef="let e1" class="audit-col-code">
-                                            <button mat-stroked-button class="rule-btn"
-                                                (click)="onShowRuleDetails(e1.rule_code || e1.ruleId)">
-                                                {{ e1.rule_code || e1.ruleId }}
-                                            </button>
-                                        </td>
-                                    </ng-container>
+                                <div class="waf-rules-wrapper">
+                                    <table mat-table [dataSource]="element.audit.messages" class="audit-table modern-audit-table">
+                                        <ng-container matColumnDef="code">
+                                            <th mat-header-cell *matHeaderCellDef class="audit-col-code"> Rule ID </th>
+                                            <td mat-cell *matCellDef="let e1" class="audit-col-code">
+                                                <button mat-stroked-button class="rule-btn" [class.trigger-rule-btn]="isTriggerRule(e1.rule_code || e1.ruleId)"
+                                                    (click)="onShowRuleDetails(e1.rule_code || e1.ruleId); $event.stopPropagation()">
+                                                    <mat-icon class="rule-btn-icon">policy</mat-icon>
+                                                    {{ e1.rule_code || e1.ruleId }}
+                                                </button>
+                                            </td>
+                                        </ng-container>
 
-                                    <ng-container matColumnDef="text">
-                                        <th mat-header-cell *matHeaderCellDef> Matched Rule Message </th>
-                                        <td mat-cell *matCellDef="let e1" class="audit-msg-text">
-                                            {{ e1.text || e1.message }}
-                                        </td>
-                                    </ng-container>
+                                        <ng-container matColumnDef="text">
+                                            <th mat-header-cell *matHeaderCellDef class="audit-col-text"> Matched Rule Message </th>
+                                            <td mat-cell *matCellDef="let e1" class="audit-msg-cell">
+                                                <div class="rule-message-line">
+                                                    @if (isTriggerRule(e1.rule_code || e1.ruleId)) {
+                                                    <span class="trigger-rule-pill">BLOCK TRIGGER</span>
+                                                    }
+                                                    <span class="audit-msg-text">{{ e1.text || e1.message }}</span>
+                                                </div>
+                                            </td>
+                                        </ng-container>
 
-                                    <tr mat-header-row *matHeaderRowDef="['code','text']"></tr>
-                                    <tr mat-row *matRowDef="let row; columns: ['code','text'];"></tr>
-                                </table>
+                                        <tr mat-header-row *matHeaderRowDef="['code','text']"></tr>
+                                        <tr mat-row *matRowDef="let row; columns: ['code','text'];" [class.row-trigger]="isTriggerRule(row.rule_code || row.ruleId)"></tr>
+                                    </table>
+                                </div>
                                 } @else {
                                 <p class="no-anomalies">No security anomalies detected for this transaction.</p>
                                 }

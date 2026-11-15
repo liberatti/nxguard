@@ -118,7 +118,7 @@ export class TransactionListComponent implements OnInit {
         return `${startM.format('DD/MM/YY HH:mm')} - ${endM.format('DD/MM/YY HH:mm')}`;
     }
 
-    transactionDC: string[] = ['expand', 'logtime', 'score', 'source', 'service', 'node', 'request_line', 'duration'];
+    transactionDC: string[] = ['expand', 'logtime', 'status', 'score', 'source', 'service', 'request_line', 'duration'];
     transactionDS: MatTableDataSource<TransactionLog>;
     transactionPA = new DefaultPageMeta();
     transactions: Array<TransactionLog> = [];
@@ -301,9 +301,9 @@ export class TransactionListComponent implements OnInit {
         this.responsive.observe([Breakpoints.Small])
             .subscribe(result => {
                 if (result.breakpoints[Breakpoints.Small]) {
-                    this.transactionDC = ['expand', 'logtime', 'source', 'service', 'request_line'];
+                    this.transactionDC = ['expand', 'logtime', 'status', 'source', 'request_line'];
                 } else {
-                    this.transactionDC = ['expand', 'logtime', 'score', 'source', 'service', 'node', 'request_line', 'duration'];
+                    this.transactionDC = ['expand', 'logtime', 'status', 'score', 'source', 'service', 'request_line', 'duration'];
                 }
             });
     }
@@ -638,6 +638,61 @@ export class TransactionListComponent implements OnInit {
                 maxWidth: '90vw',
             });
         });
+    }
+
+    getMethod(trn: TransactionLog): string {
+        if (trn?.http?.request?.method) {
+            return trn.http.request.method.toUpperCase();
+        }
+        if (trn?.http?.request_line) {
+            const parts = trn.http.request_line.trim().split(/\s+/);
+            if (parts.length > 0 && /^[A-Za-z]+$/.test(parts[0])) {
+                return parts[0].toUpperCase();
+            }
+        }
+        return 'GET';
+    }
+
+    getUri(trn: TransactionLog): string {
+        if (trn?.http?.request?.uri) {
+            return trn.http.request.uri;
+        }
+        if (trn?.http?.request_line) {
+            const parts = trn.http.request_line.trim().split(/\s+/);
+            if (parts.length > 1) {
+                return parts[1];
+            }
+        }
+        return '/';
+    }
+
+    getStatusCode(trn: TransactionLog): number {
+        return trn?.http?.response?.status_code || 200;
+    }
+
+    getStatusClass(code: number | string | undefined): string {
+        const num = Number(code) || 200;
+        if (num >= 200 && num < 300) return '2xx';
+        if (num >= 300 && num < 400) return '3xx';
+        if (num >= 400 && num < 500) return '4xx';
+        if (num >= 500) return '5xx';
+        return 'other';
+    }
+
+    copyHeader(name: string, content: string): void {
+        if (!content) return;
+        const text = `${name}: ${content}`;
+        navigator.clipboard?.writeText(text);
+        this.snackBar.open(`Copied: ${name}`, undefined, { duration: 1500 });
+    }
+
+    filterValidHeaders(headers: any[] | undefined): any[] {
+        if (!Array.isArray(headers)) return [];
+        return headers.filter(h => h && h.name && h.content && String(h.content).trim() !== '');
+    }
+
+    isTriggerRule(ruleCode: any): boolean {
+        return String(ruleCode) === '949110';
     }
 
     ngAfterViewInit(): void {
