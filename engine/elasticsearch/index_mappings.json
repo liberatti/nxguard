@@ -266,6 +266,23 @@
             "bytes": {
               "type": "long"
             },
+            "body": {
+              "type": "text"
+            },
+            "files": {
+              "type": "nested",
+              "properties": {
+                "name": {
+                  "type": "keyword"
+                },
+                "size": {
+                  "type": "long"
+                },
+                "filename": {
+                  "type": "keyword"
+                }
+              }
+            },
             "headers": {
               "type": "nested",
               "properties": {
@@ -286,6 +303,9 @@
             },
             "bytes": {
               "type": "long"
+            },
+            "body": {
+              "type": "text"
             },
             "headers": {
               "type": "nested",
@@ -314,6 +334,9 @@
           "type": "keyword"
         },
         "components": {
+          "type": "keyword"
+        },
+        "rulesets": {
           "type": "keyword"
         },
         "messages": {

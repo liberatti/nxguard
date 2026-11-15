@@ -51,17 +51,36 @@ export interface TransactionHttp {
     request_line: string;
 }
 
+export interface TransactionUploadedFile {
+    name?: string;
+    size?: number;
+    filename?: string;
+    [key: string]: any;
+}
+
+export interface TransactionAudit {
+    engine?: string;
+    connector?: string;
+    mode?: string;
+    components?: string[];
+    rulesets?: string[];
+    messages?: TransactionSecMatch[] | any[];
+}
+
 export interface TransactionRequest {
     method: string;
     uri: string;
     headers: Array<TransactionHeader>;
     bytes: number;
+    body?: string;
+    files?: Array<TransactionUploadedFile>;
 }
 
 export interface TransactionResponse {
     status_code: number;
     headers: Array<TransactionHeader>;
     bytes: number;
+    body?: string;
 }
 
 export interface TransactionDestination {
@@ -114,4 +133,5 @@ export interface TransactionLog {
     reputation?: TransactionReputation;
     ipxa?: string;
     score: number;
+    audit?: TransactionAudit;
 }

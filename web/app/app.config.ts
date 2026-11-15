@@ -8,6 +8,7 @@ import { JwtInterceptor } from './interceptors/jwt.interceptor';
 import { environment } from 'environments/environment';
 import { provideMomentDateAdapter } from "@angular/material-moment-adapter";
 import { provideHighlightOptions } from 'ngx-highlightjs';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 
 export const REST_API_URL = new InjectionToken<string>('REST_API_URL');
 export const API_DATA_FORMAT = new InjectionToken<string>('API_DATA_FORMAT');
@@ -53,6 +54,7 @@ const getInitialLang = (): string => {
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    provideAnimationsAsync(),
     { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: { appearance: 'outline' } },
     provideHighlightOptions({
       coreLibraryLoader: () => import('highlight.js/lib/core'),

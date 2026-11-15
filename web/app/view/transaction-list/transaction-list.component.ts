@@ -686,6 +686,12 @@ export class TransactionListComponent implements OnInit {
         this.snackBar.open(`Copied: ${name}`, undefined, { duration: 1500 });
     }
 
+    copyText(text: string | undefined, label: string = 'Content'): void {
+        if (!text) return;
+        navigator.clipboard?.writeText(text);
+        this.snackBar.open(`Copied ${label}`, undefined, { duration: 1500 });
+    }
+
     filterValidHeaders(headers: any[] | undefined): any[] {
         if (!Array.isArray(headers)) return [];
         return headers.filter(h => h && h.name && h.content && String(h.content).trim() !== '');

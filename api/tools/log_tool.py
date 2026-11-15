@@ -263,20 +263,28 @@ class LogParserTool:
             if "request" in trn:
                 request_raw = trn.pop("request")
                 http["version"] = str(request_raw.get("http_version", "1.1"))
-                http["request"] = {
+                req_obj: Dict[str, Any] = {
                     "method": str(request_raw.get("method", "GET")),
                     "uri": str(request_raw.get("uri", "")),
                     "headers": _parse_headers(request_raw.get("headers", {})),
                 }
+                if "body" in request_raw and request_raw["body"] is not None:
+                    req_obj["body"] = request_raw["body"]
+                if "files" in request_raw and request_raw["files"] is not None:
+                    req_obj["files"] = request_raw["files"]
+                http["request"] = req_obj
 
             action = "allowed"
             if "response" in trn:
                 response_raw = trn.pop("response")
                 status_code = _to_int(response_raw.get("http_code", 200), 200)
-                http["response"] = {
+                resp_obj: Dict[str, Any] = {
                     "status_code": status_code,
                     "headers": _parse_headers(response_raw.get("headers", {})),
                 }
+                if "body" in response_raw and response_raw["body"] is not None:
+                    resp_obj["body"] = response_raw["body"]
+                http["response"] = resp_obj
                 action = _resolve_status_code(status_code)
             record.update({"http": http, "action": action})
 
@@ -289,6 +297,7 @@ class LogParserTool:
                         "connector": producer_raw.get("connector", ""),
                         "mode": producer_raw.get("secrules_engine", ""),
                         "components": producer_raw.get("components", []),
+                        "rulesets": producer_raw.get("rulesets", []),
                     }
                 )
 
@@ -671,6 +680,10 @@ class LogParserTool:
                 acc_req["method"] = aud_req["method"]
             if aud_req.get("uri") and not acc_req.get("uri"):
                 acc_req["uri"] = aud_req["uri"]
+            if aud_req.get("body") and not acc_req.get("body"):
+                acc_req["body"] = aud_req["body"]
+            if aud_req.get("files") and not acc_req.get("files"):
+                acc_req["files"] = aud_req["files"]
 
         aud_resp = aud_http.get("response") or {}
         if aud_resp:
@@ -679,6 +692,8 @@ class LogParserTool:
                 acc_resp["headers"] = _parse_headers(aud_resp["headers"])
             if aud_resp.get("status_code") and not acc_resp.get("status_code"):
                 acc_resp["status_code"] = _to_int(aud_resp["status_code"], 200)
+            if aud_resp.get("body") and not acc_resp.get("body"):
+                acc_resp["body"] = aud_resp["body"]
 
     @classmethod
     def _combine(

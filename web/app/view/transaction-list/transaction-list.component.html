@@ -399,6 +399,44 @@
                                     </div>
                                 </div>
                                 }
+
+                                <!-- Request Body (Part C / I) -->
+                                @if (element.http?.request?.body) {
+                                <div class="payload-block">
+                                    <div class="payload-block-header">
+                                        <div class="payload-title-wrap">
+                                            <mat-icon class="payload-icon">data_object</mat-icon>
+                                            <span>Request Body (Payload)</span>
+                                        </div>
+                                        <button mat-icon-button (click)="copyText(element.http.request.body, 'Request Body'); $event.stopPropagation()"
+                                                matTooltip="Copy request body" class="payload-copy-btn">
+                                            <mat-icon>content_copy</mat-icon>
+                                        </button>
+                                    </div>
+                                    <pre class="payload-code-box">{{ element.http.request.body }}</pre>
+                                </div>
+                                }
+
+                                <!-- Uploaded Files (Part J) -->
+                                @if (element.http?.request?.files && element.http.request.files.length > 0) {
+                                <div class="files-block">
+                                    <div class="files-block-header">
+                                        <mat-icon class="files-icon">attach_file</mat-icon>
+                                        <span>Uploaded Files ({{ element.http.request.files.length }})</span>
+                                    </div>
+                                    <div class="files-grid">
+                                        @for (f of element.http.request.files; track f.name || f.filename) {
+                                        <div class="file-item-chip">
+                                            <mat-icon class="file-item-icon">description</mat-icon>
+                                            <span class="file-item-name">{{ f.filename || f.name }}</span>
+                                            @if (f.size) {
+                                            <span class="file-item-size">({{ f.size | byteFormat }})</span>
+                                            }
+                                        </div>
+                                        }
+                                    </div>
+                                </div>
+                                }
                             </mat-expansion-panel>
 
                             <!-- Response Details Panel -->
@@ -414,7 +452,7 @@
                                             <b>Status:</b> {{ getStatusCode(element) }}
                                         </span>
                                         @if (element.upstream?.status) {
-                                        <span class="exp-token token-upstream status-{{ getStatusClass(element.upstream.status) }}">
+                                         <span class="exp-token token-upstream status-{{ getStatusClass(element.upstream.status) }}">
                                             <b>Upstream:</b> {{ element.upstream.status }}
                                         </span>
                                         } @else if (element.action === 'blocked' || element.action === 'BLOCKED') {
@@ -444,6 +482,23 @@
                                     </div>
                                 </div>
                                 }
+
+                                <!-- Response Body (Part E) -->
+                                @if (element.http?.response?.body) {
+                                <div class="payload-block">
+                                    <div class="payload-block-header">
+                                        <div class="payload-title-wrap">
+                                            <mat-icon class="payload-icon">data_object</mat-icon>
+                                            <span>Response Body</span>
+                                        </div>
+                                        <button mat-icon-button (click)="copyText(element.http.response.body, 'Response Body'); $event.stopPropagation()"
+                                                matTooltip="Copy response body" class="payload-copy-btn">
+                                            <mat-icon>content_copy</mat-icon>
+                                        </button>
+                                    </div>
+                                    <pre class="payload-code-box">{{ element.http.response.body }}</pre>
+                                </div>
+                                }
                             </mat-expansion-panel>
                             }
 
@@ -457,6 +512,11 @@
                                     </mat-panel-title>
                                     <mat-panel-description class="header-tokens-wrapper">
                                         <span class="exp-token"><b>Engine:</b> {{ element.audit.engine || 'ModSecurity' }}</span>
+                                        @if (element.audit.rulesets && element.audit.rulesets.length > 0) {
+                                        <span class="exp-token token-rulesets">
+                                            <b>Rulesets:</b> {{ element.audit.rulesets.join(', ') }}
+                                        </span>
+                                        }
                                         @if (element.audit.messages && element.audit.messages.length > 0) {
                                         <span class="exp-token token-waf-matched">
                                             <b>Rules Matched:</b> {{ element.audit.messages.length }}
