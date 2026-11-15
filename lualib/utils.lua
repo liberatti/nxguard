@@ -47,7 +47,9 @@ end
 
 function _M.respond(code, _msg)
     local request_id = ngx.var.request_id
+    ngx.header["X-NXG-Blocked"] = "true"
     ngx.header["X-Message"] = _msg
+    ngx.ctx.blocked_by = "sensor"
     --ngx.log(ngx.ERR, "[block] [", request_id, "]: ", _msg)
     return ngx.exit(code)
 end

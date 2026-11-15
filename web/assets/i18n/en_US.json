@@ -525,6 +525,8 @@
     "COPY_JSON": "Copy JSON",
     "COPY_CLIPBOARD": "Copy JSON to clipboard",
     "COPIED": "Copied",
+    "BLOCKED_BY": "Blocked By",
+    "UPSTREAM_STATUS": "Upstream Status",
     "CHART": {
       "TITLE": "Transaction Traffic by Action",
       "SUBTITLE": "Time-series volume and request rate broken down by security action",
@@ -562,9 +564,11 @@
       "CLEAR_VALUE": "Clear value",
       "FIELDS": {
         "ACTION": "Security Action",
+        "BLOCKED_BY": "Blocked By / Origin",
         "SERVICE_NAME": "Service",
         "ROUTE_NAME": "Route Name",
         "UPSTREAM_NAME": "Upstream",
+        "UPSTREAM_STATUS": "Upstream Status",
         "SENSOR_NAME": "Sensor",
         "SOURCE_IP": "Source IP",
         "SOURCE_PORT": "Source Port",

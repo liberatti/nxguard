@@ -99,6 +99,15 @@ export class TransactionFilterDialogComponent implements OnInit {
             placeholder: 'e.g. NXGuard_Frontend',
         },
         {
+            key: 'upstream.status',
+            labelKey: 'TRANSACTION.FILTER.FIELDS.UPSTREAM_STATUS',
+            category: 'ROUTING',
+            icon: 'sync_alt',
+            type: 'number',
+            presets: [200, 201, 301, 400, 401, 403, 404, 500, 502, 503],
+            placeholder: 'e.g. 200, 403, 502',
+        },
+        {
             key: 'sensor.name',
             labelKey: 'TRANSACTION.FILTER.FIELDS.SENSOR_NAME',
             category: 'ROUTING',
@@ -187,6 +196,14 @@ export class TransactionFilterDialogComponent implements OnInit {
         },
 
         // SECURITY
+        {
+            key: 'blocked_by',
+            labelKey: 'TRANSACTION.FILTER.FIELDS.BLOCKED_BY',
+            category: 'SECURITY',
+            icon: 'shield',
+            type: 'enum',
+            options: ['sensor', 'waf', 'upstream', 'rate_limit', 'none'],
+        },
         {
             key: 'rate_limit.action',
             labelKey: 'TRANSACTION.FILTER.FIELDS.RATE_LIMIT_ACTION',

@@ -95,6 +95,7 @@ export interface TransactionReputation {
 export interface TransactionLog {
     _id: string;
     action: string;
+    blocked_by?: string;
     logtime: Date;
     route_name: string;
     unique_id: string;
@@ -104,8 +105,8 @@ export interface TransactionLog {
     source: TransactionSource;
     user_agent: TransactionUserAgent;
     service: Service;
-    upstream: Upstream;
-    sensor: Sensor;
+    upstream: Upstream | any;
+    sensor: Sensor | any;
     isExpanded: boolean;
     limit_req_status: string;
     geoip_status: string;

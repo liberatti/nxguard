@@ -194,11 +194,19 @@
                 <ng-container matColumnDef="request_line">
                     <th mat-header-cell *matHeaderCellDef class="col-request"> Request </th>
                     <td mat-cell *matCellDef="let element" class="col-request">
-                        @if (element.http) {
-                        <span class="request-text" [matTooltip]="element.http.request_line || (element.http.request?.method + ' ' +
-                            (element.http.request?.uri || '/'))">{{ element.http.request_line || (element.http.request?.method + ' ' +
-                            (element.http.request?.uri || '/')) }}</span>
-                        }
+                        <div class="request-cell-wrapper">
+                            @if (element.http) {
+                            <span class="request-text" [matTooltip]="element.http.request_line || (element.http.request?.method + ' ' +
+                                (element.http.request?.uri || '/'))">{{ element.http.request_line || (element.http.request?.method + ' ' +
+                                (element.http.request?.uri || '/')) }}</span>
+                            }
+                            @if (element.blocked_by && element.blocked_by !== 'none') {
+                            <span class="blocked-by-chip chip-{{ element.blocked_by | lowercase }}"
+                                [matTooltip]="('TRANSACTION.BLOCKED_BY' | translate) + ': ' + element.blocked_by">
+                                {{ element.blocked_by }}
+                            </span>
+                            }
+                        </div>
                     </td>
                 </ng-container>
 
@@ -230,6 +238,9 @@
                                         <span class="exp-panel-token"><b>Duration:</b> {{ (element.http.duration || 0) |
                                             timeFormat }}</span>
                                         <span class="exp-panel-token"><b>Action:</b> {{ element.action }}</span>
+                                        @if (element.blocked_by && element.blocked_by !== 'none') {
+                                        <span class="exp-panel-token token-blocked-by"><b>Blocked By:</b> {{ element.blocked_by | uppercase }}</span>
+                                        }
                                         <span class="exp-panel-token"><b>DoS:</b> {{ element.limit_req_status ||
                                             element.rate_limit?.action || '-' }}</span>
                                         <span class="exp-panel-token token-clickable" (click)="onShowGeoIP(element); $event.stopPropagation()"
@@ -278,8 +289,21 @@
                                     @if (element.upstream) {
                                     <div class="detail-item">
                                         <label>Upstream Target</label>
-                                        <span>{{ element.upstream.name || element.upstream._id }} {{
-                                            element.upstream.target ? '(' + element.upstream.target + ')' : '' }}</span>
+                                        <span>
+                                            {{ element.upstream.name || element.upstream._id }}
+                                            {{ element.upstream.target ? '(' + element.upstream.target + ')' : '' }}
+                                            @if (element.upstream.status) {
+                                            <span class="upstream-status-badge">[Status: {{ element.upstream.status }}]</span>
+                                            }
+                                        </span>
+                                    </div>
+                                    }
+                                    @if (element.blocked_by && element.blocked_by !== 'none') {
+                                    <div class="detail-item">
+                                        <label>{{ 'TRANSACTION.BLOCKED_BY' | translate }}</label>
+                                        <span class="blocked-by-tag blocked-by-{{ element.blocked_by | lowercase }}">
+                                            {{ element.blocked_by | uppercase }}
+                                        </span>
                                     </div>
                                     }
                                     @if (element.route_name && element.route_name !== '-') {
@@ -291,7 +315,12 @@
                                     @if (element.sensor) {
                                     <div class="detail-item">
                                         <label>Sensor</label>
-                                        <span>{{ element.sensor.name || element.sensor._id }}</span>
+                                        <span>
+                                            {{ element.sensor.name || element.sensor._id }}
+                                            @if (element.sensor.action) {
+                                            <span class="sensor-action-badge">({{ element.sensor.action }})</span>
+                                            }
+                                        </span>
                                     </div>
                                     }
                                 </div>
@@ -323,6 +352,12 @@
                                     <mat-panel-description>
                                         <span class="exp-panel-token"><b>Code:</b> {{ element.http.response.status_code
                                             }}</span>
+                                        @if (element.upstream?.status) {
+                                        <span class="exp-panel-token token-upstream-status"><b>Upstream:</b> {{ element.upstream.status }}</span>
+                                        }
+                                        @if (element.blocked_by && element.blocked_by !== 'none') {
+                                        <span class="exp-panel-token token-blocked-by"><b>Blocked By:</b> {{ element.blocked_by | uppercase }}</span>
+                                        }
                                         <span class="exp-panel-token"><b>Size:</b> {{ (element.http.response.bytes || 0)
                                             | byteFormat }}</span>
                                     </mat-panel-description>

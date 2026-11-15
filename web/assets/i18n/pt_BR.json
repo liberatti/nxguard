@@ -525,6 +525,8 @@
     "COPY_JSON": "Copiar JSON",
     "COPY_CLIPBOARD": "Copiar JSON para área de transferência",
     "COPIED": "Copiado",
+    "BLOCKED_BY": "Bloqueado Por",
+    "UPSTREAM_STATUS": "Status do Upstream",
     "CHART": {
       "TITLE": "Tráfego de Transações por Ação",
       "SUBTITLE": "Volume temporal e taxa de requisições por ação de segurança",
@@ -562,9 +564,11 @@
       "CLEAR_VALUE": "Limpar valor",
       "FIELDS": {
         "ACTION": "Ação de Segurança",
+        "BLOCKED_BY": "Bloqueado Por / Origem",
         "SERVICE_NAME": "Serviço",
         "ROUTE_NAME": "Nome da Rota",
         "UPSTREAM_NAME": "Upstream",
+        "UPSTREAM_STATUS": "Status do Upstream",
         "SENSOR_NAME": "Sensor",
         "SOURCE_IP": "IP de Origem",
         "SOURCE_PORT": "Porta de Origem",

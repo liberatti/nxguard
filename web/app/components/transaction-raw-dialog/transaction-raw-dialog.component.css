@@ -119,6 +119,20 @@
     color: #d97706;
 }
 
+.meta-badge.blocked-by {
+    background: #fdf2f8;
+    color: #db2777;
+    border: 1px solid #fbcfe8;
+    font-weight: 700;
+}
+
+.meta-badge.upstream-status {
+    background: #eff6ff;
+    color: #2563eb;
+    border: 1px solid #bfdbfe;
+    font-weight: 600;
+}
+
 .header-actions {
     display: flex;
     align-items: center;

@@ -136,7 +136,6 @@ def _generate_sensors(
                     "trusted": ",".join(sensor["security"]["trusted"]),
                 }
             )
-            # TODO create test step for lua sensor
             _render_template_to_file(
                 env,
                 "lua/sensor.lua",

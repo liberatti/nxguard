@@ -17,6 +17,8 @@ http {
   merge_slashes on;
   {%- if config.dns_resolver %}
   resolver {{ config.dns_resolver }} valid=30s;
+  {%- else %}
+  resolver 127.0.0.11 8.8.8.8 valid=30s ipv6=off;
   {%- endif %}
   uninitialized_variable_warn off;
   lua_shared_dict log_buffer 2m;
@@ -24,7 +26,17 @@ http {
 
   init_worker_by_lua_block {
     local flush = require "nxguard.log_flush"
+    {%- if config.logging and config.logging.mode == 'elasticsearch' and config.logging.index_url %}
+    flush.start_remote({
+      url = "{{ config.logging.index_url }}",
+      username = "{{ config.logging.index_username or '' }}",
+      password = "{{ config.logging.index_password or '' }}",
+      index = "{{ config.logging.index or 'nxguard_trn' }}",
+      timeout = 5000
+    }, 2)
+    {%- else %}
     flush.start("{{BASE_PATH}}", 2)
+    {%- endif %}
   }
 
   client_body_temp_path {{BASE_PATH}}/temp/client_body;
@@ -36,7 +48,7 @@ http {
   access_log off;
   error_log /dev/null crit;
 
-  proxy_intercept_errors on;
+  proxy_intercept_errors off;
   include mime.types;
   default_type application/octet-stream;
   sendfile on;

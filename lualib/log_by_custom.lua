@@ -9,6 +9,26 @@ local map = {
 local raw_status = ngx.var.limit_req_status
 local rate_limit_action = map[raw_status] or raw_status or "-"
 
+local status_code = tonumber(ngx.var.status) or 0
+local upstream_status = ngx.var.upstream_status
+local is_upstream = (upstream_status ~= nil and upstream_status ~= "" and upstream_status ~= "-")
+
+local blocked_by = "none"
+if status_code == 403 then
+    if is_upstream then
+        blocked_by = "upstream"
+    elseif (ngx.ctx.sensor and ngx.ctx.sensor.action == "blocked")
+        or ngx.ctx.geoip_action == "blocked"
+        or ngx.ctx.reputation_action == "blocked"
+        or ngx.ctx.blocked_by == "sensor" then
+        blocked_by = "sensor"
+    else
+        blocked_by = "waf"
+    end
+elseif status_code == 429 then
+    blocked_by = "rate_limit"
+end
+
 local log_data = {
     time = ngx.localtime(),
     uniqueid = ngx.var.request_id or "-",
@@ -16,7 +36,8 @@ local log_data = {
     route = ngx.var.route or "-",
     upstream = {
         name = ngx.var.upstream or "-",
-        target = ngx.var.upstream_addr or "-"
+        target = ngx.var.upstream_addr or "-",
+        status = tonumber(upstream_status) or upstream_status or "-"
     },
     host = ngx.var.host or ngx.var.http_host or "-",
     remote_addr = ngx.var.remote_addr or "-",
@@ -25,7 +46,8 @@ local log_data = {
     server_port = tonumber(ngx.var.server_port) or 0,
     request_line = ngx.var.request or "-",
     method = ngx.var.real_method or ngx.var.request_method or "-",
-    status = tonumber(ngx.var.status) or 0,
+    status = status_code,
+    blocked_by = blocked_by,
     bytes_in = tonumber(ngx.var.request_length) or 0,
     bytes_out = tonumber(ngx.var.body_bytes_sent) or 0,
     duration = tonumber(ngx.var.request_time) or 0,
@@ -34,8 +56,9 @@ local log_data = {
     referer = ngx.var.http_referer or "-",
     user_agent = ngx.var.http_user_agent or "-",
     sensor = {
-        _id = ngx.var.sensor or "-",
-        name = ngx.var.sensor or "-"
+        _id = (ngx.ctx.sensor and (ngx.ctx.sensor._id or ngx.ctx.sensor.name)) or ngx.var.sensor or "-",
+        name = (ngx.ctx.sensor and ngx.ctx.sensor.name) or ngx.var.sensor or "-",
+        action = (ngx.ctx.sensor and ngx.ctx.sensor.action) or (blocked_by == "sensor" and "blocked") or "allowed"
     },
     rate_limit = {
         action = rate_limit_action

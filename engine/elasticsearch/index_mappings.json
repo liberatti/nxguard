@@ -18,6 +18,9 @@
         }
       }
     },
+    "blocked_by": {
+      "type": "keyword"
+    },
     "limit_req_status": {
       "type": "keyword"
     },
@@ -83,6 +86,12 @@
               "type": "keyword"
             }
           }
+        },
+        "action": {
+          "type": "keyword"
+        },
+        "blocked_by": {
+          "type": "keyword"
         }
       }
     },
@@ -98,6 +107,12 @@
               "type": "keyword"
             }
           }
+        },
+        "target": {
+          "type": "keyword"
+        },
+        "status": {
+          "type": "keyword"
         }
       }
     },

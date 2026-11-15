@@ -19,12 +19,35 @@ local message = ngx.header["X-Message"] or default_error
 ngx.header["X-Message"] = nil
 local request_id = ngx.var.request_id
 
+local upstream_status = ngx.var.upstream_status
+local is_upstream = (upstream_status ~= nil and upstream_status ~= "" and upstream_status ~= "-")
+
+local blocked_by = nil
+if status == 403 then
+    if is_upstream then
+        blocked_by = "upstream"
+    elseif (ngx.ctx.sensor and ngx.ctx.sensor.action == "blocked")
+        or ngx.ctx.geoip_action == "blocked"
+        or ngx.ctx.reputation_action == "blocked"
+        or ngx.ctx.blocked_by == "sensor" then
+        blocked_by = "sensor"
+    else
+        blocked_by = "waf"
+    end
+end
+
 ngx.status = status
 ngx.header.content_type = "application/json"
-ngx.say(cjson.encode({
+
+local payload = {
     status = status,
     error = default_error,
     message = message,
     request_id = request_id
-}))
+}
+if blocked_by then
+    payload.blocked_by = blocked_by
+end
+
+ngx.say(cjson.encode(payload))
 return ngx.exit(ngx.HTTP_OK)

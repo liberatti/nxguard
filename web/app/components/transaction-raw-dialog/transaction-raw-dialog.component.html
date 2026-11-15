@@ -22,6 +22,12 @@
                 @if (data.action) {
                     <span class="meta-badge action-{{ data.action | lowercase }}">{{ data.action }}</span>
                 }
+                @if (data.blocked_by && data.blocked_by !== 'none') {
+                    <span class="meta-badge blocked-by">{{ data.blocked_by }}</span>
+                }
+                @if (data.upstream && data.upstream.status) {
+                    <span class="meta-badge upstream-status">Upstream: {{ data.upstream.status }}</span>
+                }
             </div>
         </div>
 

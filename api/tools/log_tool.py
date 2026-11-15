@@ -173,6 +173,12 @@ class LogParserTool:
                 if not dto.get("method") and req_parts:
                     req_method = req_parts[0]
 
+            blocked_by = dto.get("blocked_by")
+            if blocked_by == "upstream":
+                action = "allowed"
+            else:
+                action = _resolve_status_code(status_code)
+
             return {
                 "logtime": _parse_logtime(dto.get("time")),
                 "unique_id": dto.get("uniqueid") or dto.get("unique_id"),
@@ -181,7 +187,7 @@ class LogParserTool:
                 "route_name": route_name,
                 "upstream": upstream_obj,
                 "sensor": sensor_obj,
-                "action": _resolve_status_code(status_code),
+                "action": action,
                 "rate_limit": rate_limit_obj,
                 "geoip": geoip_obj,
                 "reputation": reputation_obj,
