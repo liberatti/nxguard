@@ -43,6 +43,7 @@ class ServiceDao(DuckDAO):
 
     def from_dict(self, vo: Dict[str, Any]) -> Dict[str, Any]:
         vo = dict(vo)
+        vo.pop("render_name", None)
         for field in [
             "bindings",
             "headers",

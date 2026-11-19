@@ -21,3 +21,5 @@ Jinja2~=3.1.4
 requests
 duckdb
 PyJWT~=2.10.1
+jsonpatch~=1.33
+deepdiff~=9.2.1

@@ -178,6 +178,10 @@ def init_from_data(data_dir=None, data_file="init-data.json", data=None):
             for u in data["upstreams"]:
                 u_clean = dict(u)
                 u_clean.pop("healthy", None)
+                u_clean.pop("render_name", None)
+                if isinstance(u_clean.get("persist"), dict):
+                    u_clean["persist"] = dict(u_clean["persist"])
+                    u_clean["persist"].pop("cookie_var", None)
                 cleaned_upstreams.append(u_clean)
             dao.persist_many(cleaned_upstreams)
             logger.info(f"Upstreams: {len(cleaned_upstreams)}")
@@ -191,14 +195,24 @@ def init_from_data(data_dir=None, data_file="init-data.json", data=None):
     if "sensors" in data:
         with SensorDao() as dao:
             dao.delete_all()
-            dao.persist_many(data["sensors"])
-            logger.info(f"Sensors: {len(data['sensors'])}")
+            cleaned_sensors = []
+            for s in data["sensors"]:
+                s_clean = dict(s)
+                s_clean.pop("render_name", None)
+                cleaned_sensors.append(s_clean)
+            dao.persist_many(cleaned_sensors)
+            logger.info(f"Sensors: {len(cleaned_sensors)}")
 
     if "services" in data:
         with ServiceDao() as dao:
             dao.delete_all()
-            dao.persist_many(data["services"])
-            logger.info(f"Services: {len(data['services'])}")
+            cleaned_services = []
+            for s in data["services"]:
+                s_clean = dict(s)
+                s_clean.pop("render_name", None)
+                cleaned_services.append(s_clean)
+            dao.persist_many(cleaned_services)
+            logger.info(f"Services: {len(cleaned_services)}")
 
 
 def validate(data):

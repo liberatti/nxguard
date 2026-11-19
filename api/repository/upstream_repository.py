@@ -89,6 +89,8 @@ class UpstreamDao(DuckDAO):
 
     def from_dict(self, vo: Dict[str, Any]) -> Dict[str, Any]:
         vo = dict(vo)
+        vo.pop("render_name", None)
+        vo.pop("healthy", None)
         if "type" not in vo:
             vo.update({"type": "backend"})
         if "targets" in vo and isinstance(vo["targets"], list):

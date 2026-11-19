@@ -49,6 +49,24 @@ export class ConfigService extends APIService<Config, string> {
     get_geo_countries(): Observable<any[]> {
         return this.httpClient.get<any[]>(this.END_POINT + "/geo");
     }
+
+    getHistory(page: number = 1, perPage: number = 20): Observable<any> {
+        return this.httpClient.get<any>(`${this.END_POINT}/history`, {
+            params: { page: page.toString(), per_page: perPage.toString() }
+        });
+    }
+
+    getVersionDiff(scn: string, baseScn?: string): Observable<any> {
+        const params: any = {};
+        if (baseScn) {
+            params.base_scn = baseScn;
+        }
+        return this.httpClient.get<any>(`${this.END_POINT}/history/${scn}/diff`, { params });
+    }
+
+    applyHistoryVersion(scn: string): Observable<any> {
+        return this.httpClient.post<any>(`${this.END_POINT}/history/${scn}/apply`, {});
+    }
 }
 
 @Injectable({

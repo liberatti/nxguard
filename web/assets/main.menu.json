@@ -46,7 +46,14 @@
       {
         "label": "VIEW.CONFIG.LINK",
         "route": "/config",
-        "icon": "settings"
+        "icon": "settings",
+        "exact": true
+      },
+      {
+        "label": "VIEW.CONFIG_AUDIT.LINK",
+        "route": "/config/audit",
+        "icon": "history",
+        "exact": true
       }
     ]
   }

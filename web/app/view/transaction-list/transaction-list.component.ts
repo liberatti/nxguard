@@ -212,8 +212,16 @@ export class TransactionListComponent implements OnInit {
                     callbacks: {
                         title: (tooltipItems: any[]) => {
                             if (!tooltipItems || tooltipItems.length === 0) return '';
-                            const raw = tooltipItems[0].raw?.x ?? tooltipItems[0].label;
-                            return moment(raw).format('DD/MM/YYYY HH:mm:ss');
+                            const item = tooltipItems[0];
+                            const labelItem = this.chartConfig.data?.labels?.[item.dataIndex];
+                            if (moment.isMoment(labelItem)) {
+                                return labelItem.format('DD/MM/YYYY HH:mm:ss');
+                            }
+                            const rawTimestamp = item.parsed?.x ?? item.raw?.x;
+                            if (rawTimestamp != null && !isNaN(Number(rawTimestamp))) {
+                                return moment(Number(rawTimestamp)).format('DD/MM/YYYY HH:mm:ss');
+                            }
+                            return item.label || '';
                         },
                         label: (context: any) => {
                             const val = context.parsed.y ?? 0;

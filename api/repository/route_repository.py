@@ -38,6 +38,21 @@ class RouteDao(DuckDAO):
         """
         )
 
+    ROUTE_COLS = {
+        "_id",
+        "service_id",
+        "upstream_id",
+        "sensor_id",
+        "monitor_only",
+        "name",
+        "type",
+        "paths",
+        "cache_methods",
+        "allowed_methods",
+        "allowed_content_type",
+        "redirect",
+    }
+
     def from_dict(self, vo: Dict[str, Any]) -> Dict[str, Any]:
         vo = vo.copy()
         for field in [
@@ -70,6 +85,7 @@ class RouteDao(DuckDAO):
                     if sensor_record:
                         vo["sensor_id"] = sensor_record["_id"]
 
+        vo = {k: v for k, v in vo.items() if k in self.ROUTE_COLS}
         return super().from_dict(vo)
 
     def to_dict(self, vo: Optional[Dict[str, Any]], dependents: bool = True) -> Optional[Dict[str, Any]]:

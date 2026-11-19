@@ -66,4 +66,5 @@ export interface MenuLink {
     icon?: string;
     menu?: Array<MenuLink>;
     expanded?: boolean;
+    exact?: boolean;
 }

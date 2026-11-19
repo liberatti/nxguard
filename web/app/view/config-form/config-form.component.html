@@ -361,6 +361,10 @@
         </mat-card-content>
 
         <mat-card-actions align="end" class="bottom-actions">
+            <button type="button" mat-stroked-button [routerLink]="['/config/audit']" id="audit-btn" class="mr-2">
+                <mat-icon>history</mat-icon>
+                <span>{{ 'VIEW.CONFIG_AUDIT.LINK' | translate }}</span>
+            </button>
             @if (oauth.isRole('superuser')) {
             <button type="button" mat-flat-button color="primary" (click)="onSubmit()"
                 [disabled]="isSubmitting" id="save-btn" class="save-submit-btn">

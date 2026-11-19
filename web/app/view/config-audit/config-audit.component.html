@@ -1,0 +1,137 @@
+<ng-container>
+    <mat-card id="config-audit-card">
+        <mat-card-header>
+            <mat-card-title class="title-with-icon">
+                <mat-icon class="title-icon">history</mat-icon>
+                <span>{{ 'CONFIG_AUDIT.TITLE' | translate }}</span>
+            </mat-card-title>
+            <mat-card-subtitle>{{ 'CONFIG_AUDIT.SUBTITLE' | translate }}</mat-card-subtitle>
+            <mat-card-actions class="align-right">
+                <button mat-flat-button color="primary" (click)="loadHistory()" [disabled]="isLoading()"
+                    id="refresh-history-btn">
+                    <mat-icon>{{ isLoading() ? 'hourglass_top' : 'refresh' }}</mat-icon>
+                    <span>{{ 'ACTIONS.REFRESH' | translate }}</span>
+                </button>
+            </mat-card-actions>
+        </mat-card-header>
+
+        @if (isLoading()) {
+            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        }
+
+        <mat-card-content class="audit-table-content">
+            <table mat-table [dataSource]="history()" class="audit-table full-width">
+                <!-- Status Column -->
+                <ng-container matColumnDef="status">
+                    <th mat-header-cell *matHeaderCellDef>{{ 'CONFIG_AUDIT.STATUS' | translate }}</th>
+                    <td mat-cell *matCellDef="let element">
+                        @if (element.is_active || element.scn === activeScn()) {
+                            <span class="status-chip active-chip">
+                                <mat-icon class="chip-icon">check_circle</mat-icon>
+                                {{ 'CONFIG_AUDIT.ACTIVE' | translate }}
+                            </span>
+                        } @else {
+                            <span class="status-chip archived-chip">
+                                {{ 'CONFIG_AUDIT.ARCHIVED' | translate }}
+                            </span>
+                        }
+                    </td>
+                </ng-container>
+
+                <!-- SCN Column -->
+                <ng-container matColumnDef="scn">
+                    <th mat-header-cell *matHeaderCellDef>{{ 'CONFIG_AUDIT.SCN' | translate }}</th>
+                    <td mat-cell *matCellDef="let element">
+                        <span class="scn-cell">
+                            <code>{{ element.scn }}</code>
+                        </span>
+                    </td>
+                </ng-container>
+
+                <!-- Created At Column -->
+                <ng-container matColumnDef="created_at">
+                    <th mat-header-cell *matHeaderCellDef>{{ 'CONFIG_AUDIT.CREATED_AT' | translate }}</th>
+                    <td mat-cell *matCellDef="let element">
+                        <span class="created-at-text">{{ element.created_at | date:'yyyy-MM-dd HH:mm:ss' }}</span>
+                    </td>
+                </ng-container>
+
+                <!-- RFC 8785 Hash Column -->
+                <ng-container matColumnDef="hash">
+                    <th mat-header-cell *matHeaderCellDef>{{ 'CONFIG_AUDIT.HASH_RFC8785' | translate }}</th>
+                    <td mat-cell *matCellDef="let element">
+                        <span class="hash-pill" [matTooltip]="element.jcs_hash || ''">
+                            <code>{{ (element.jcs_hash || '').substring(0, 10) }}...</code>
+                            <button mat-icon-button class="mini-copy-btn" (click)="$event.stopPropagation(); copyHash(element.jcs_hash)" [matTooltip]="'ACTIONS.COPY' | translate">
+                                <mat-icon class="mini-icon">content_copy</mat-icon>
+                            </button>
+                        </span>
+                    </td>
+                </ng-container>
+
+                <!-- Entity Counts Column -->
+                <ng-container matColumnDef="counts">
+                    <th mat-header-cell *matHeaderCellDef>{{ 'CONFIG_AUDIT.ENTITIES' | translate }}</th>
+                    <td mat-cell *matCellDef="let element">
+                        <div class="entity-badges">
+                            <span class="entity-badge" [matTooltip]="'Serviços'"><mat-icon class="entity-icon">layers</mat-icon>{{ element.counts?.services || 0 }}</span>
+                            <span class="entity-badge" [matTooltip]="'Upstreams'"><mat-icon class="entity-icon">alt_route</mat-icon>{{ element.counts?.upstreams || 0 }}</span>
+                            <span class="entity-badge" [matTooltip]="'Sensores'"><mat-icon class="entity-icon">shield</mat-icon>{{ element.counts?.sensors || 0 }}</span>
+                            <span class="entity-badge" [matTooltip]="'Certificados'"><mat-icon class="entity-icon">verified_user</mat-icon>{{ element.counts?.certificates || 0 }}</span>
+                        </div>
+                    </td>
+                </ng-container>
+
+                <!-- RFC 6902 Patch Diff Column -->
+                <ng-container matColumnDef="patch">
+                    <th mat-header-cell *matHeaderCellDef>{{ 'CONFIG_AUDIT.TAB_CHANGES' | translate }}</th>
+                    <td mat-cell *matCellDef="let element">
+                        @if (element.patch_summary?.total > 0) {
+                            <div class="diff-summary-badges">
+                                @if (element.patch_summary?.add > 0) {
+                                    <span class="patch-badge patch-badge-add" [matTooltip]="'CONFIG_AUDIT.STATS_ADD' | translate">+{{ element.patch_summary.add }}</span>
+                                }
+                                @if (element.patch_summary?.replace > 0) {
+                                    <span class="patch-badge patch-badge-replace" [matTooltip]="'CONFIG_AUDIT.STATS_REPLACE' | translate">~{{ element.patch_summary.replace }}</span>
+                                }
+                                @if (element.patch_summary?.remove > 0) {
+                                    <span class="patch-badge patch-badge-remove" [matTooltip]="'CONFIG_AUDIT.STATS_REMOVE' | translate">-{{ element.patch_summary.remove }}</span>
+                                }
+                            </div>
+                        } @else {
+                            <span class="baseline-tag">Baseline</span>
+                        }
+                    </td>
+                </ng-container>
+
+                <!-- Actions Column -->
+                <ng-container matColumnDef="actions">
+                    <th mat-header-cell *matHeaderCellDef class="actions-header">{{ 'ATTR.ACTIONS' | translate }}</th>
+                    <td mat-cell *matCellDef="let element" class="actions-cell">
+                        <div class="table-actions">
+                            <button mat-stroked-button color="primary" class="diff-btn" (click)="$event.stopPropagation(); openDiffDialog(element)">
+                                <mat-icon>compare_arrows</mat-icon>
+                                <span>{{ 'CONFIG_AUDIT.BTN_VIEW_DIFF' | translate }}</span>
+                            </button>
+                            @if (oauth.isRole('superuser')) {
+                                <button mat-icon-button [disabled]="element.is_active || element.scn === activeScn()" (click)="$event.stopPropagation(); confirmRestore(element)" [matTooltip]="'CONFIG_AUDIT.BTN_APPLY_VERSION' | translate" class="restore-icon-btn">
+                                    <mat-icon>restore</mat-icon>
+                                </button>
+                            }
+                            <button mat-icon-button (click)="$event.stopPropagation(); downloadVersion(element)" [matTooltip]="'Download JSON'">
+                                <mat-icon>download</mat-icon>
+                            </button>
+                        </div>
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="clickable-row" (click)="openDiffDialog(row)"></tr>
+            </table>
+
+            <mat-paginator [length]="total()" [pageSize]="perPage()" [pageSizeOptions]="[10, 20, 50]"
+                (page)="onPageChange($event)" showFirstLastButtons class="audit-paginator">
+            </mat-paginator>
+        </mat-card-content>
+    </mat-card>
+</ng-container>

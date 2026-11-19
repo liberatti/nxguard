@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import json
 import os
 import socket
 import time
@@ -167,14 +168,50 @@ def update_upstream_states() -> None:
 
 def update_main_config():
     """Applies configuration in background thread when ConfigDao SCN differs from latest ConfigBackupDao SCN."""
+    from api.services.config_audit_service import compute_deepdiff, compute_rfc6902_patch
+
     with ConfigDao() as config_dao, ConfigBackupDao() as backup_dao:
         active_scn = config_dao.get_active_scn()
         latest_backup = backup_dao.get_latest()
         backup_scn = latest_backup.get("scn") if latest_backup else None
 
     if not latest_backup or active_scn != backup_scn:
-        logger.info("Configuration change detected. Rebuilding config...")
+        logger.info(
+            f"Configuration change detected (active_scn={active_scn}, backup_scn={backup_scn}). Rebuilding config..."
+        )
         conf = c_builder.get_config()
+
+        if latest_backup and "data" in latest_backup:
+            try:
+                old_data = latest_backup["data"]
+                if isinstance(old_data, str):
+                    old_data = json.loads(old_data)
+                elif not isinstance(old_data, dict):
+                    old_data = {}
+
+                deepdiff_res = compute_deepdiff(old_data, conf)
+                if deepdiff_res.get("changes"):
+                    change_lines = []
+                    for ch in deepdiff_res["changes"][:20]:
+                        line = f"  • [{ch['type'].upper()}] {ch['human_path']}"
+                        if ch["type"] == "changed":
+                            line += f": {ch.get('old_value')} ➔ {ch.get('new_value')}"
+                        change_lines.append(line)
+                    logger.info(
+                        f"Configuration Semantic Diff (DeepDiff, {len(deepdiff_res['changes'])} changes):\n"
+                        + "\n".join(change_lines)
+                    )
+
+                patch_ops = compute_rfc6902_patch(old_data, conf)
+                logger.info(
+                    f"Configuration diff (RFC 6902, {len(patch_ops)} operations):\n"
+                    f"{json.dumps(patch_ops, indent=2, ensure_ascii=False, default=lambda o: o.isoformat() if hasattr(o, 'isoformat') else str(o))}"
+                )
+            except Exception as ex:
+                logger.warning(f"Could not calculate configuration diff: {ex}")
+        else:
+            logger.info("Configuration baseline created (no previous backup found).")
+
         val = c_admin.validate(conf)
         if val and val.get("status") == "ok":
             cst = c_admin.apply(val["scn"])

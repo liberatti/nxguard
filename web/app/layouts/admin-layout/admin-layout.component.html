@@ -16,7 +16,7 @@
             <!-- Notifications / Apply Icon Button -->
             <button mat-icon-button (click)="onApply()" id="navbar-apply-btn"
                 class="nav-icon-btn notification-apply-btn" [matTooltip]="'APPLY_DIALOG.TITLE' | translate">
-                <mat-icon [matBadge]="changes.length || null" matBadgeColor="warn" [matBadgeHidden]="!changes.length"
+                <mat-icon aria-hidden="false" [matBadge]="changes.length || null" matBadgeColor="warn" [matBadgeHidden]="!changes.length"
                     [class.has-notifications]="trackingEvt">
                     notifications
                 </mat-icon>
@@ -56,7 +56,8 @@
                     @for (link of menu; track link.label) {
                     <div class="menu-item-group">
                         @if (link.route) {
-                        <a mat-list-item [routerLink]="[link.route]" routerLinkActive="active-link" (click)="onMenuClick()"
+                        <a mat-list-item [routerLink]="[link.route]" routerLinkActive="active-link"
+                            [routerLinkActiveOptions]="{ exact: !!link.exact }" (click)="onMenuClick()"
                             class="nav-link-item">
                             <mat-icon matListItemIcon class="nav-link-icon">{{ link.icon }}</mat-icon>
                             <span matListItemTitle class="nav-link-title">{{ link.label | translate }}</span>
@@ -72,6 +73,7 @@
                         <div class="submenu-container">
                             @for (subLink of link.menu; track subLink.label) {
                             <a mat-list-item [routerLink]="[subLink.route]" routerLinkActive="active-link"
+                                [routerLinkActiveOptions]="{ exact: subLink.exact ?? (subLink.route === '/config') }"
                                 (click)="onMenuClick()" class="subnav-link-item">
                                 <mat-icon matListItemIcon class="subnav-link-icon">{{ subLink.icon }}</mat-icon>
                                 <span matListItemTitle class="subnav-link-title">{{ subLink.label | translate }}</span>

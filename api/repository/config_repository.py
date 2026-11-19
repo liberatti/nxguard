@@ -71,6 +71,33 @@ class ConfigBackupDao(DuckDAO):
             )
             return None
 
+    def get_history(self, limit: int = 50, offset: int = 0) -> list:
+        try:
+            query = f"SELECT * FROM {self.table_name} ORDER BY _id DESC LIMIT ? OFFSET ?"
+            rs = self._query(query, (limit, offset), fetch=True)
+            return [self.to_dict(r) for r in rs] if rs else []
+        except Exception as e:
+            logger.error(f"Error retrieving configuration history: {str(e)}")
+            return []
+
+    def count_all(self) -> int:
+        try:
+            query = f"SELECT COUNT(*) AS total FROM {self.table_name}"
+            rs = self._query(query, fetch=True)
+            return rs[0]["total"] if rs else 0
+        except Exception as e:
+            logger.error(f"Error counting configuration history: {str(e)}")
+            return 0
+
+    def get_predecessor(self, id_val: int) -> Optional[Dict[str, Any]]:
+        try:
+            query = f"SELECT * FROM {self.table_name} WHERE _id < ? ORDER BY _id DESC LIMIT 1"
+            rs = self._query(query, (id_val,), fetch=True)
+            return self.to_dict(rs[0]) if rs else None
+        except Exception as e:
+            logger.error(f"Error retrieving predecessor backup for ID {id_val}: {str(e)}")
+            return None
+
     def from_dict(self, vo):
         if "created_at" not in vo:
             vo.update({"created_at": datetime.datetime.now()})

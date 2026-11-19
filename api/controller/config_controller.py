@@ -17,6 +17,7 @@ import engine.build as c_builder
 from api.repository.config_repository import ChangeDao, ConfigDao
 from api.repository.upstream_repository import NodeStatusDao
 from api.services.elasticsearch_service import ElasticsearchService
+from api.services.config_audit_service import ConfigAuditService
 from api.tasks import renew_certificates
 
 routes = Blueprint("config", __name__)
@@ -207,3 +208,38 @@ def get_geo_countries() -> Response:
     with FeedService() as feed_service:
         feed = feed_service.get_geo_countries()
         return response_data(feed) if feed else response_error_404()
+
+
+@routes.route("/history", methods=["GET"])
+@has_any_authority(authorities=["viewer", "superuser"])
+def get_config_history() -> Response:
+    page = request.args.get("page", 1, type=int)
+    per_page = request.args.get("per_page", 20, type=int)
+    with ConfigAuditService() as audit_service:
+        history = audit_service.get_history(page=page, per_page=per_page)
+        return response_data(history)
+
+
+@routes.route("/history/<scn>/diff", methods=["GET"])
+@has_any_authority(authorities=["viewer", "superuser"])
+def get_config_diff(scn: str) -> Response:
+    base_scn = request.args.get("base_scn")
+    with ConfigAuditService() as audit_service:
+        diff_data = audit_service.get_version_diff(scn=scn, base_scn=base_scn)
+        if not diff_data:
+            return response_error_404()
+        return response_data(diff_data)
+
+
+@routes.route("/history/<scn>/apply", methods=["POST"])
+@has_any_authority(authorities=["superuser"])
+def apply_history_version(scn: str) -> Response:
+    try:
+        with ConfigAuditService() as audit_service:
+            result = audit_service.restore_version(scn=scn)
+            return response_data(result)
+    except ValueError as ve:
+        return response_error(str(ve))
+    except Exception as ex:
+        logger.error(f"Failed to restore configuration version {scn}: {ex}")
+        return response_error(f"Failed to apply configuration version: {str(ex)}")

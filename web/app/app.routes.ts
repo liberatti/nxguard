@@ -18,6 +18,7 @@ import {UserListComponent} from "./view/user-list/user-list.component";
 import {UserFormComponent} from "./view/user-form/user-form.component";
 import {RuleCategoryListComponent} from "./view/rulecat-list/rulecat-list.component";
 import {RuleCategoryFormComponent} from "./view/rulecat-form/rulecat-form.component";
+import {ConfigAuditComponent} from "./view/config-audit/config-audit.component";
 
 export const routes: Routes = [
     {
@@ -84,6 +85,7 @@ export const routes: Routes = [
             },
             {path: 'account', component: AccountComponent},
             {path: 'config', component: ConfigFormComponent},
+            {path: 'config/audit', component: ConfigAuditComponent},
         ]
     },
     {

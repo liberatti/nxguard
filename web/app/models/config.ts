@@ -55,3 +55,87 @@ export interface EngineNode {
 export interface Health {
     nodes: EngineNode[];
 }
+
+export interface ConfigAuditHistoryItem {
+    _id: number;
+    scn: string;
+    created_at: string;
+    is_active: boolean;
+    jcs_hash: string;
+    counts: {
+        services: number;
+        upstreams: number;
+        sensors: number;
+        certificates: number;
+    };
+    patch_summary: {
+        total: number;
+        add: number;
+        remove: number;
+        replace: number;
+        move?: number;
+        copy?: number;
+        affected_paths: string[];
+    };
+    deepdiff_summary?: DeepDiffSummary;
+}
+
+export interface DeepDiffChange {
+    type: 'changed' | 'added' | 'removed';
+    category: string;
+    path: string;
+    human_path: string;
+    old_value?: any;
+    new_value?: any;
+}
+
+export interface DeepDiffSummary {
+    total: number;
+    values_changed: number;
+    items_added: number;
+    items_removed: number;
+    type_changes?: number;
+}
+
+export interface DeepDiffResult {
+    available: boolean;
+    raw: Record<string, any>;
+    summary: DeepDiffSummary;
+    changes: DeepDiffChange[];
+}
+
+export interface JsonPatchOperation {
+    op: 'add' | 'remove' | 'replace' | 'move' | 'copy' | 'test' | string;
+    path: string;
+    value?: any;
+    from?: string;
+    from_value?: any;
+}
+
+export interface ConfigVersionDiff {
+    target: {
+        _id: number;
+        scn: string;
+        created_at: string;
+        jcs_hash: string;
+        canonical_json: string;
+        raw_data: any;
+    };
+    base: {
+        _id?: number;
+        scn?: string;
+        created_at?: string;
+        jcs_hash?: string;
+        canonical_json?: string;
+        raw_data?: any;
+    };
+    rfc6902_patch: JsonPatchOperation[];
+    patch_summary: {
+        total: number;
+        add: number;
+        remove: number;
+        replace: number;
+        affected_paths: string[];
+    };
+    deepdiff?: DeepDiffResult;
+}
