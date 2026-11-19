@@ -3,15 +3,16 @@ upstream acme {
 }
 
 {%- for u in upstreams %}
+{%- if u.targets and u.targets|length > 0 %}
 upstream {{ u.render_name if u.render_name else u.name }} {
-  check interval=5000 fall=3 rise=1 default_down=true type=tcp;
   {%- if u.persist %}
   {%- if u.persist.type == 'COOKIE' %}
-  sticky name={{u.persist.cookie_name}} path={{u.persist.cookie_path}} hash=md5;
+  hash $cookie_{{ (u.persist.cookie_var or u.persist.cookie_name or 'LB_X_NxGuard') | replace('-', '_') }} consistent;
   {%- endif %}
   {%- endif %}
   {%- for t in u.targets %}
   server {{t.host}}:{{t.port}} max_fails=3 weight={{t.weight}} fail_timeout=300 {{t.state}};
   {%- endfor %}
 }
+{%- endif %}
 {%- endfor %}

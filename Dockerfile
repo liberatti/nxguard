@@ -14,16 +14,38 @@ RUN dnf -y install 'dnf-command(config-manager)' \
 
 WORKDIR /root/rpmbuild/BUILD
 
-RUN	wget https://openresty.org/download/openresty-1.31.8.1.tar.gz\
-    && tar -xf openresty-1.31.8.1.tar.gz
+RUN wget https://nginx.org/download/nginx-1.31.9.tar.gz \
+    && tar -xf nginx-1.31.9.tar.gz
+RUN wget https://github.com/openresty/luajit2/archive/refs/tags/v2.1-20240815.tar.gz -O luajit2-2.1-20240815.tar.gz \
+    && tar -xf luajit2-2.1-20240815.tar.gz
+RUN wget https://github.com/vision5/ngx_devel_kit/archive/refs/tags/v0.3.3.tar.gz -O ngx_devel_kit-0.3.3.tar.gz \
+    && tar -xf ngx_devel_kit-0.3.3.tar.gz
+RUN wget https://github.com/openresty/lua-nginx-module/archive/refs/tags/v0.10.32rc7.tar.gz -O lua-nginx-module-0.10.32rc7.tar.gz \
+    && tar -xf lua-nginx-module-0.10.32rc7.tar.gz
+RUN wget https://github.com/openresty/lua-upstream-nginx-module/archive/refs/tags/v0.08.tar.gz -O lua-upstream-nginx-module-0.08.tar.gz \
+    && tar -xf lua-upstream-nginx-module-0.08.tar.gz
+RUN wget https://github.com/openresty/headers-more-nginx-module/archive/refs/tags/v0.38.tar.gz -O headers-more-nginx-module-0.38.tar.gz \
+    && tar -xf headers-more-nginx-module-0.38.tar.gz
+RUN wget https://github.com/openresty/lua-resty-core/archive/refs/tags/v0.1.35rc3.tar.gz -O lua-resty-core-0.1.35rc3.tar.gz \
+    && tar -xf lua-resty-core-0.1.35rc3.tar.gz
+RUN wget https://github.com/openresty/lua-resty-lrucache/archive/refs/tags/v0.15.tar.gz -O lua-resty-lrucache-0.15.tar.gz \
+    && tar -xf lua-resty-lrucache-0.15.tar.gz
+RUN wget https://github.com/openresty/lua-cjson/archive/refs/tags/2.1.0.14.tar.gz -O lua-cjson-2.1.0.14.tar.gz \
+    && tar -xf lua-cjson-2.1.0.14.tar.gz
+RUN wget https://github.com/openresty/lua-tablepool/archive/refs/tags/v0.02.tar.gz -O lua-tablepool-0.02.tar.gz \
+    && tar -xf lua-tablepool-0.02.tar.gz
+RUN wget https://github.com/openresty/lua-resty-string/archive/refs/tags/v0.15.tar.gz -O lua-resty-string-0.15.tar.gz \
+    && tar -xf lua-resty-string-0.15.tar.gz
+RUN wget https://github.com/openresty/lua-resty-lock/archive/refs/tags/v0.09.tar.gz -O lua-resty-lock-0.09.tar.gz \
+    && tar -xf lua-resty-lock-0.09.tar.gz
+RUN wget https://github.com/openresty/lua-resty-limit-traffic/archive/refs/tags/v0.09.tar.gz -O lua-resty-limit-traffic-0.09.tar.gz \
+    && tar -xf lua-resty-limit-traffic-0.09.tar.gz
+RUN wget https://github.com/openresty/lua-resty-upstream-healthcheck/archive/refs/tags/v0.10.tar.gz -O lua-resty-upstream-healthcheck-0.10.tar.gz \
+    && tar -xf lua-resty-upstream-healthcheck-0.10.tar.gz
 RUN wget https://github.com/SpiderLabs/ModSecurity/releases/download/v3.0.14/modsecurity-v3.0.14.tar.gz\
     && tar -xf modsecurity-v3.0.14.tar.gz
 RUN wget https://github.com/SpiderLabs/ModSecurity-nginx/releases/download/v1.0.4/modsecurity-nginx-v1.0.4.tar.gz\
     && tar -xf modsecurity-nginx-v1.0.4.tar.gz
-RUN wget https://github.com/liberatti/nginx-sticky-module-ng/archive/refs/tags/v1.2.7.tar.gz\
-    && tar -xf v1.2.7.tar.gz
-RUN wget https://github.com/liberatti/nginx_upstream_check_module/archive/refs/tags/v0.4.2.tar.gz\
-    && tar -xf v0.4.2.tar.gz
 RUN wget https://github.com/liberatti/nginx_ajp_module/archive/refs/tags/v1.0.0.tar.gz\
     && tar -xf v1.0.0.tar.gz
 RUN wget https://www.lua.org/ftp/lua-5.1.5.tar.gz\

@@ -61,3 +61,11 @@ suspects = features[features["anomaly_label"] == -1].sort_values(
 )
 print(suspects)
 ```
+
+# Config history
+
+Criar no frontend uma view para apresentar o historico de configuração, segundo RFC 8785 & RFC 6902. Ajustar se necessário o config_controller para já seguir essas rfc.
+
+Permitir aplicar qualquer uma das versões, visto que já é armazenado o json completo.
+
+em [tasks.py](file;file:///home/liberatti/workspace/github.com/liberatti/nxguard/api/tasks.py) update_main_config ao identificar uma mudança de configuração "if not latest_backup or active_scn != backup_scn:" gostaria de apresentar no log o diff de configuração para ajudar na depuração
