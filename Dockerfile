@@ -14,8 +14,8 @@ RUN dnf -y install 'dnf-command(config-manager)' \
 
 WORKDIR /root/rpmbuild/BUILD
 
-RUN	wget https://openresty.org/download/openresty-1.29.2.5.tar.gz\
-    && tar -xf openresty-1.29.2.5.tar.gz
+RUN	wget https://openresty.org/download/openresty-1.31.8.1.tar.gz\
+    && tar -xf openresty-1.31.8.1.tar.gz
 RUN wget https://github.com/SpiderLabs/ModSecurity/releases/download/v3.0.14/modsecurity-v3.0.14.tar.gz\
     && tar -xf modsecurity-v3.0.14.tar.gz
 RUN wget https://github.com/SpiderLabs/ModSecurity-nginx/releases/download/v1.0.4/modsecurity-nginx-v1.0.4.tar.gz\

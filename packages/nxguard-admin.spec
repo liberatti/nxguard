@@ -7,7 +7,7 @@ License:	Apache-2.0
 Source0:	%{name}-%{version}.tar.gz    
 
 BuildRequires:	python3.12-pip
-#Requires:	nxguard-engine>=1.29.2
+#Requires:	nxguard-engine>=1.31.8
 
 %description
 nxguard admin console and API.
@@ -31,6 +31,9 @@ cp -r %{_builddir}/luajit/* %{buildroot}/opt/nxguard/luajit/share/lua/5.1/nxguar
 %attr(0755, nxguard, nxguard) /opt/nxguard/luajit/share/lua/5.1/nxguard
 
 %changelog
+* Thu Nov 19 2026 Gustavo Liberatti <gustavo@liberatti.com.br> - 1.0.8-1
+- Update build dependencies and packaging configuration
+
 * Thu Aug 06 2026 Gustavo Liberatti <gustavo@liberatti.com.br> - 1.0.7-1
 - Update build dependencies and packaging configuration
 

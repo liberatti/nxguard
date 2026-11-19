@@ -1,5 +1,5 @@
 Name:		nxguard-engine
-Version:	1.29.2
+Version:	1.31.8
 Release:	4%{?dist}
 Summary:	nxguard engine powered by openresty
 
@@ -16,11 +16,11 @@ Requires: bash, lua, ssdeep = 2.14.1, shadow-utils, util-linux, sudo
 
 cd /root/rpmbuild/BUILD
 
-install -d openresty-1.29.2.5/modules
-mv ModSecurity-nginx-v1.0.4 openresty-1.29.2.5/modules/modsecurity-nginx-v1.0.4
-mv nginx-sticky-module-ng-1.2.7 openresty-1.29.2.5/modules/
-mv nginx_upstream_check_module-0.4.2 openresty-1.29.2.5/modules/
-mv nginx_ajp_module-1.0.0 openresty-1.29.2.5/modules/
+install -d openresty-1.31.8.1/modules
+mv ModSecurity-nginx-v1.0.4 openresty-1.31.8.1/modules/modsecurity-nginx-v1.0.4
+mv nginx-sticky-module-ng-1.2.7 openresty-1.31.8.1/modules/
+mv nginx_upstream_check_module-0.4.2 openresty-1.31.8.1/modules/
+mv nginx_ajp_module-1.0.0 openresty-1.31.8.1/modules/
 
 
 %build
@@ -32,7 +32,7 @@ cd /root/rpmbuild/BUILD/modsecurity-v3.0.14
 make -j 4
 make install
 
-cd /root/rpmbuild/BUILD/openresty-1.29.2.5
+cd /root/rpmbuild/BUILD/openresty-1.31.8.1
 ./configure --with-compat\
     --with-http_ssl_module\
     --with-stream \
@@ -76,61 +76,61 @@ install -p -m 0755 lua luac %{buildroot}/opt/nxguard/luajit/bin
 install -p -m 0644 lua.h luaconf.h lualib.h lauxlib.h ../etc/lua.hpp %{buildroot}/opt/nxguard/luajit/include/lua-5.1
 install -p -m 0644 liblua.a %{buildroot}/opt/nxguard/luajit/lib/lua/5.1
 
-install /root/rpmbuild/BUILD/openresty-1.29.2.5/COPYRIGHT %{buildroot}/opt/nxguard/
+install /root/rpmbuild/BUILD/openresty-1.31.8.1/COPYRIGHT %{buildroot}/opt/nxguard/
 
-cd /root/rpmbuild/BUILD/openresty-1.29.2.5/build/LuaJIT-2.1-*/src
+cd /root/rpmbuild/BUILD/openresty-1.31.8.1/build/LuaJIT-2.1-*/src
 install -m 0755 luajit %{buildroot}/opt/nxguard/luajit/bin/luajit-2.1.ROLLING
 install -m 0644 libluajit.a %{buildroot}/opt/nxguard/luajit/lib/libluajit-5.1.a || :
 install -m 0755 libluajit.so %{buildroot}/opt/nxguard/luajit/lib/libluajit-5.1.so.2.1.ROLLING
 install -m 0644 lua.h lualib.h lauxlib.h luaconf.h lua.hpp luajit.h  %{buildroot}/opt/nxguard/luajit/include/luajit-2.1
 
-cd /root/rpmbuild/BUILD/openresty-1.29.2.5/build/LuaJIT-2.1-*/src/jit
+cd /root/rpmbuild/BUILD/openresty-1.31.8.1/build/LuaJIT-2.1-*/src/jit
 install -m 0644 bc.lua bcsave.lua dump.lua p.lua v.lua zone.lua dis_x86.lua dis_x64.lua dis_arm.lua dis_arm64.lua dis_arm64be.lua dis_ppc.lua dis_mips.lua dis_mipsel.lua dis_mips64.lua dis_mips64el.lua dis_mips64r6.lua dis_mips64r6el.lua vmdef.lua %{buildroot}/opt/nxguard/luajit/share/luajit-2.1/jit
 
-cd /root/rpmbuild/BUILD/openresty-1.29.2.5/build/lua-cjson-*
+cd /root/rpmbuild/BUILD/openresty-1.31.8.1/build/lua-cjson-*
 install -m 0644 cjson.so %{buildroot}/opt/nxguard/lualib/cjson.so
 install -m 0644 lua/*.lua %{buildroot}/opt/nxguard/lualib/
 install -m 0644 lua/cjson/*.lua %{buildroot}/opt/nxguard/lualib/cjson/
 
-cd /root/rpmbuild/BUILD/openresty-1.29.2.5/build/lua-resty-signal-*
+cd /root/rpmbuild/BUILD/openresty-1.31.8.1/build/lua-resty-signal-*
 install -d %{buildroot}/opt/nxguard/lualib/resty
 install lib/resty/*.lua %{buildroot}/opt/nxguard/lualib/resty
 install librestysignal.so %{buildroot}/opt/nxguard/lualib/
 
-cd /root/rpmbuild/BUILD/openresty-1.29.2.5/build/lua-rds-parser-*
+cd /root/rpmbuild/BUILD/openresty-1.31.8.1/build/lua-rds-parser-*
 install -d %{buildroot}/opt/nxguard/lualib/rds
 install parser.so %{buildroot}/opt/nxguard/lualib/rds
 
-cd /root/rpmbuild/BUILD/openresty-1.29.2.5/build/lua-resty-dns-*
+cd /root/rpmbuild/BUILD/openresty-1.31.8.1/build/lua-resty-dns-*
 install -d %{buildroot}/opt/nxguard/lualib/resty/dns/
 install lib/resty/dns/*.lua %{buildroot}/opt/nxguard/lualib/resty/dns/
 
-cd /root/rpmbuild/BUILD/openresty-1.29.2.5/build/lua-resty-memcached-*
+cd /root/rpmbuild/BUILD/openresty-1.31.8.1/build/lua-resty-memcached-*
 install -d %{buildroot}/opt/nxguard/lualib/resty
 install lib/resty/*.lua %{buildroot}/opt/nxguard/lualib/resty
 
-cd /root/rpmbuild/BUILD/openresty-1.29.2.5/build/lua-resty-string-*
+cd /root/rpmbuild/BUILD/openresty-1.31.8.1/build/lua-resty-string-*
 install -d %{buildroot}/opt/nxguard/lualib/resty
 install lib/resty/*.lua %{buildroot}/opt/nxguard/lualib/resty
 
-cd /root/rpmbuild/BUILD/openresty-1.29.2.5/build/lua-resty-upload-*
+cd /root/rpmbuild/BUILD/openresty-1.31.8.1/build/lua-resty-upload-*
 install -d %{buildroot}/opt/nxguard/lualib/resty
 install lib/resty/*.lua %{buildroot}/opt/nxguard/lualib/resty
 
-cd /root/rpmbuild/BUILD/openresty-1.29.2.5/build/lua-resty-websocket-*
+cd /root/rpmbuild/BUILD/openresty-1.31.8.1/build/lua-resty-websocket-*
 install -d %{buildroot}/opt/nxguard/lualib/resty/websocket
 install lib/resty/websocket/*.lua %{buildroot}/opt/nxguard/lualib/resty/websocket/
 
-cd /root/rpmbuild/BUILD/openresty-1.29.2.5/build/lua-resty-lock-*
+cd /root/rpmbuild/BUILD/openresty-1.31.8.1/build/lua-resty-lock-*
 install -d %{buildroot}/opt/nxguard/lualib/resty/
 install lib/resty/*.lua %{buildroot}/opt/nxguard/lualib/resty/
 
-cd /root/rpmbuild/BUILD/openresty-1.29.2.5/build/lua-resty-lrucache-*
+cd /root/rpmbuild/BUILD/openresty-1.31.8.1/build/lua-resty-lrucache-*
 install -d %{buildroot}/opt/nxguard/lualib/resty/lrucache
 install lib/resty/*.lua %{buildroot}/opt/nxguard/lualib/resty/
 install lib/resty/lrucache/*.lua %{buildroot}/opt/nxguard/lualib/resty/lrucache/
 
-cd /root/rpmbuild/BUILD/openresty-1.29.2.5/build/lua-resty-core-*
+cd /root/rpmbuild/BUILD/openresty-1.31.8.1/build/lua-resty-core-*
 install -d %{buildroot}/opt/nxguard/lualib/resty/core/
 install -d %{buildroot}/opt/nxguard/lualib/ngx/
 install -d %{buildroot}/opt/nxguard/lualib/ngx/ssl
@@ -139,32 +139,32 @@ install lib/resty/core/*.lua %{buildroot}/opt/nxguard/lualib/resty/core/
 install lib/ngx/*.lua %{buildroot}/opt/nxguard/lualib/ngx/
 install lib/ngx/ssl/*.lua %{buildroot}/opt/nxguard/lualib/ngx/ssl/
 
-cd /root/rpmbuild/BUILD/openresty-1.29.2.5/build/lua-resty-upstream-healthcheck-*
+cd /root/rpmbuild/BUILD/openresty-1.31.8.1/build/lua-resty-upstream-healthcheck-*
 install -d %{buildroot}/opt/nxguard/lualib/resty/upstream/
 install lib/resty/upstream/*.lua %{buildroot}/opt/nxguard/lualib/resty/upstream/
 
-cd /root/rpmbuild/BUILD/openresty-1.29.2.5/build/lua-resty-limit-traffic-*
+cd /root/rpmbuild/BUILD/openresty-1.31.8.1/build/lua-resty-limit-traffic-*
 install -d %{buildroot}/opt/nxguard/lualib/resty/limit/
 install lib/resty/limit/*.lua %{buildroot}/opt/nxguard/lualib/resty/limit/
 
-cd /root/rpmbuild/BUILD/openresty-1.29.2.5/build/lua-resty-shell-*
+cd /root/rpmbuild/BUILD/openresty-1.31.8.1/build/lua-resty-shell-*
 install -d %{buildroot}/opt/nxguard/lualib/resty/
 install lib/resty/*.lua %{buildroot}/opt/nxguard/lualib/resty/
 
-cd /root/rpmbuild/BUILD/openresty-1.29.2.5/build/lua-tablepool-*
+cd /root/rpmbuild/BUILD/openresty-1.31.8.1/build/lua-tablepool-*
 install lib/*.lua %{buildroot}/opt/nxguard/lualib/
 
-cd /root/rpmbuild/BUILD/openresty-1.29.2.5/build/opm-*
+cd /root/rpmbuild/BUILD/openresty-1.31.8.1/build/opm-*
 install -d %{buildroot}/opt/nxguard/bin
 install bin/* %{buildroot}/opt/nxguard/bin/
 
-cd /root/rpmbuild/BUILD/openresty-1.29.2.5/build/resty-cli-*
+cd /root/rpmbuild/BUILD/openresty-1.31.8.1/build/resty-cli-*
 install bin/* %{buildroot}/opt/nxguard/bin/
 
-cp /root/rpmbuild/BUILD/openresty-1.29.2.5/build/resty.index  %{buildroot}/opt/nxguard/
-cp -r /root/rpmbuild/BUILD/openresty-1.29.2.5/build/pod %{buildroot}/opt/nxguard/
+cp /root/rpmbuild/BUILD/openresty-1.31.8.1/build/resty.index  %{buildroot}/opt/nxguard/
+cp -r /root/rpmbuild/BUILD/openresty-1.31.8.1/build/pod %{buildroot}/opt/nxguard/
 
-#export LUA_INCDIR=/root/rpmbuild/BUILD/openresty-1.29.2.5/LuaJIT-2.1-20260311/src/
+#export LUA_INCDIR=/root/rpmbuild/BUILD/openresty-1.31.8.1/LuaJIT-2.1-20260311/src/
 luarocks config lua_dir %{buildroot}/opt/nxguard/luajit
 luarocks install --tree=/root/rpmbuild/BUILD/lualib lualdap --lua-version=5.1
 
@@ -179,7 +179,7 @@ cp -r /root/rpmbuild/BUILD/lualib/share/lua/5.1/resty/* %{buildroot}/opt/nxguard
 
 install /root/rpmbuild/BUILD/lualib/lib64/lua/5.1/* %{buildroot}/opt/nxguard/lualib/
 
-cd /root/rpmbuild/BUILD/openresty-1.29.2.5/build/nginx-1.29.2
+cd /root/rpmbuild/BUILD/openresty-1.31.8.1/build/nginx-1.31.8
 install -c objs/nginx %{buildroot}/opt/nxguard/nginx/sbin/nginx
 install -c objs/*_module.so %{buildroot}/opt/nxguard/nginx/modules/
 
