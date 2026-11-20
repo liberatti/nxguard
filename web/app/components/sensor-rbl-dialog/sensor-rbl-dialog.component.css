@@ -110,24 +110,6 @@
     gap: 16px;
 }
 
-.toggle-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.toggle-label {
-    font-size: 0.8125rem;
-    font-weight: 600;
-    color: var(--text-main, #334155);
-    user-select: none;
-}
-
-:host-context(.dark-theme) .toggle-label,
-:host-context([data-theme="dark"]) .toggle-label {
-    color: #cbd5e1;
-}
-
 .btn-header-close {
     color: var(--text-dim, #64748b) !important;
 }
@@ -273,11 +255,6 @@
     max-height: 58vh;
     box-sizing: border-box;
     transition: opacity 0.2s ease;
-}
-
-.dialog-body-scroll.blocking-disabled {
-    opacity: 0.55;
-    pointer-events: none;
 }
 
 .categories-list {

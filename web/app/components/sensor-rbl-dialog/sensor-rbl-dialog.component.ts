@@ -13,7 +13,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -51,7 +50,6 @@ export interface SensorRblDialogResult {
         MatFormFieldModule,
         MatInputModule,
         MatCheckboxModule,
-        MatSlideToggleModule,
         MatTooltipModule,
         MatProgressSpinnerModule,
         TranslatePipe
@@ -59,7 +57,6 @@ export interface SensorRblDialogResult {
 })
 export class SensorRblDialogComponent implements OnInit {
     searchQuery: string = '';
-    isBlockingActive: boolean = true;
     selectedFeeds: Set<string> = new Set<string>();
     expandedCategories: Record<string, boolean> = {
         tor: true,
@@ -83,7 +80,6 @@ export class SensorRblDialogComponent implements OnInit {
     ngOnInit(): void {
         const rawFeeds = this.data?.reputation || this.data?.sensor?.security?.reputation || [];
         this.selectedFeeds = new Set<string>(rawFeeds.map(f => (f || '').trim()));
-        this.isBlockingActive = this.selectedFeeds.size > 0 || this.data?.editable !== false;
 
         if (this.data?.availableFeeds && this.data.availableFeeds.length > 0) {
             this.availableFeedsList = [...this.data.availableFeeds];
@@ -199,7 +195,7 @@ export class SensorRblDialogComponent implements OnInit {
     }
 
     onSave(): void {
-        const updatedFeeds = this.isBlockingActive ? Array.from(this.selectedFeeds) : [];
+        const updatedFeeds = Array.from(this.selectedFeeds);
         const sensorId = this.data?.sensorId || this.data?.sensor?._id;
 
         if (sensorId) {

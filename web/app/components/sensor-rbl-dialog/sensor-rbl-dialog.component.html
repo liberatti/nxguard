@@ -13,15 +13,6 @@
         </div>
 
         <div class="header-right">
-            <div class="toggle-wrapper" id="rbl-block-toggle-wrapper">
-                <span class="toggle-label">{{ 'SENSOR.ENABLE_BLOCK' | translate }}</span>
-                <mat-slide-toggle
-                    color="primary"
-                    [(ngModel)]="isBlockingActive"
-                    id="rbl-block-active-toggle"
-                    [attr.aria-label]="'SENSOR.ENABLE_BLOCK' | translate">
-                </mat-slide-toggle>
-            </div>
             <button mat-icon-button type="button" class="btn-header-close" (click)="onClose()" [matTooltip]="'ACTIONS.CLOSE' | translate">
                 <mat-icon>close</mat-icon>
             </button>
@@ -53,7 +44,7 @@
     </div>
 
     <!-- Categories & Feeds Content -->
-    <div class="dialog-body-scroll" [class.blocking-disabled]="!isBlockingActive">
+    <div class="dialog-body-scroll">
         <div class="categories-list">
             @for (category of categories; track category.name) {
                 <div class="category-card" [class.is-expanded]="isCategoryExpanded(category.id)" [ngClass]="category.colorClass">
