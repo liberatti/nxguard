@@ -6,6 +6,8 @@ Summary:        Fuzzy hashing API and fuzzy hashing tool
 License:        GPL-2.0
 BuildRequires:  gcc gcc-c++ make automake libtool zlib-devel openssl-devel
 
+%global debug_package %{nil}
+
 %description
 ssdeep is a fuzzy hashing API and tool.
 
@@ -20,12 +22,12 @@ rm -rf %{buildroot}
 cd ssdeep-release-%{version}
 
 make install DESTDIR=%{buildroot}
+rm -f %{buildroot}%{_libdir}/*.la
 
 %files
 /usr/bin/ssdeep
 /usr/lib*/libfuzzy.so*
 /usr/lib*/libfuzzy.a
-/usr/lib*/libfuzzy.la
 /usr/include/fuzzy.h
 /usr/include/edit_dist.h
 /usr/share/man/man1/ssdeep.1*

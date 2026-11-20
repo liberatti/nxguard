@@ -2,7 +2,9 @@ name: CI / documentation
 
 on:
   push:
-    branches: ["main"]
+    branches: [ "v*-rc", "v*-fix"]
+    paths:
+      - ".github/pages/**"
   workflow_dispatch:
 
 permissions:

@@ -2,7 +2,7 @@
 
 ## 🛡️ Supported Versions
 
-We release patches and security fixes for currently supported versions of NXGuard.
+We provide patches and security fixes for the currently supported versions of NXGuard.
 
 | Version | Supported          |
 | ------- | ------------------ |
@@ -13,41 +13,42 @@ We release patches and security fixes for currently supported versions of NXGuar
 
 ## 🚨 Reporting a Vulnerability
 
-The NXGuard team takes security vulnerabilities seriously. We appreciate your efforts to responsibly disclose any findings.
+The NXGuard team takes security reports seriously and appreciates responsible disclosure.
 
 ### Private Reporting (Recommended)
 
-Please **do not** open public issues or pull requests for security vulnerabilities.
+Please **do not** report security vulnerabilities through public issues or pull requests.
 
-Instead, please report security issues through one of the following methods:
+Instead, use one of the following private reporting methods:
 
-1. **GitHub Security Advisory:** Submit a report via [GitHub Private Vulnerability Reporting](https://github.com/liberatti/nxguard/security/advisories/new).
-2. **Email Disclosure:** If private reporting is unavailable, reach out directly to the maintainer at [gustavo@liberatti.net](mailto:gustavo@liberatti.net) with details.
+1. **GitHub Security Advisory:** Submit a report through [GitHub Private Vulnerability Reporting](https://github.com/liberatti/nxguard/security/advisories/new).
+2. **Email:** If private reporting is unavailable, email the maintainer at [gustavo@liberatti.net](mailto:gustavo@liberatti.net) with the details.
 
 ### What to Include in Your Report
 
-To help us investigate and reproduce the issue quickly, please include:
+To help us investigate and reproduce the issue, include:
+
 - A clear description of the vulnerability and its potential impact.
-- Step-by-step instructions or Proof of Concept (PoC) to reproduce the issue.
-- The affected component (e.g., OpenResty engine, ModSecurity rules, Management API, Web UI).
-- Relevant environment details (OS, Docker version, deployment configuration).
+- Step-by-step reproduction instructions or a proof of concept (PoC).
+- The affected component (for example, the OpenResty engine, ModSecurity rules, Management API, or web UI).
+- Relevant environment details, such as the operating system, Docker version, and deployment configuration.
 - Any proposed remediation or mitigation steps, if available.
 
 ### Response & Disclosure Process
 
-- **Acknowledgment:** We will acknowledge receipt of your report within 48 hours.
-- **Assessment & Triage:** We will validate and determine the severity of the vulnerability.
+- **Acknowledgment:** We aim to acknowledge your report within 48 hours.
+- **Assessment & Triage:** We will validate the report and assess the vulnerability's severity.
 - **Fix & Testing:** We will develop and verify a security patch.
-- **Public Disclosure:** A new release containing the patch and a security advisory will be published coordinately.
+- **Public Disclosure:** Once a fix is ready, we will publish a release containing the patch along with a security advisory.
 
 ---
 
 ## 🔒 Security Best Practices for NXGuard Deployments
 
-When deploying NXGuard in production environments, ensure you follow these recommendations:
+When deploying NXGuard in production, follow these recommendations:
 
-1. **Default Credentials:** Immediately change the default admin credentials (`admin@nxguard.local` / `admin`) after initial deployment.
-2. **Secret Management:** Never commit sensitive configuration files, API tokens, or session secrets to version control. Use environment variables or secret managers.
-3. **TLS/SSL Encryption:** Ensure HTTPS (TLS 1.2+) is enforced on all external-facing endpoints and management interfaces.
-4. **WAF Rule Maintenance:** Keep the ModSecurity engine and OWASP Core Rule Set (CRS) updated to protect against newly emerging threat vectors.
+1. **Default Credentials:** Change the default administrator credentials (`admin@nxguard.local` / `admin`) immediately after deployment.
+2. **Secret Management:** Never commit sensitive configuration files, API tokens, or session secrets to version control. Store them in environment variables or a secrets manager.
+3. **TLS Encryption:** Require HTTPS (TLS 1.2 or later) for all externally accessible endpoints and management interfaces.
+4. **WAF Rule Maintenance:** Keep the ModSecurity engine and OWASP Core Rule Set (CRS) up to date to address newly emerging threats.
 5. **Network Isolation:** Restrict access to internal ports and administrative interfaces to trusted networks or internal VPCs.

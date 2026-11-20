@@ -6,10 +6,12 @@ Summary:	nxguard engine powered by nginx
 License:	Apache-2.0
 Source0:	%{name}-%{version}.tar.gz    
 
-BuildRequires: openldap-devel luarocks openssl-devel gcc gcc-c++ zlib-devel openssl-devel make automake libtool readline-devel libinput libcurl-devel pcre2-devel libxml2-devel libxslt-devel libgcrypt-devel gd-devel perl-ExtUtils-Embed
+BuildRequires: openldap-devel luarocks gcc gcc-c++ zlib-devel openssl-devel make automake libtool readline-devel libinput libcurl-devel pcre2-devel libxml2-devel libxslt-devel libgcrypt-devel gd-devel perl-ExtUtils-Embed
 Requires: bash, lua, ssdeep = 2.14.1, shadow-utils, util-linux, sudo
 
-%undefine __brp_mangle_shebangs 
+%undefine __brp_mangle_shebangs
+%global debug_package %{nil}
+%global __arch_install_post %(echo %{__arch_install_post} | sed -e 's#/usr/lib/rpm/check-buildroot##g; s#/usr/lib/rpm/check-rpaths##g') 
 
 %description
 nxguard engine core based on NGINX with LuaJIT and ModSecurity.
@@ -62,10 +64,11 @@ export LUAJIT_INC=/root/rpmbuild/BUILD/luajit-build/opt/nxguard/luajit/include/l
     --conf-path=/opt/nxguard/nginx/conf/nginx.conf \
     --sbin-path=/opt/nxguard/nginx/sbin/nginx \
     --modules-path=/opt/nxguard/nginx/modules
-sed -i 's/-Werror//g' objs/Makefile
+sed -i 's/ -Werror / /g; s/ -Werror$//g' objs/Makefile
 make -j 4
 
 %install
+export QA_RPATHS=0x0003
 install -d %{buildroot}/opt/nxguard/html
 install -d %{buildroot}/opt/nxguard/logs
 install -d %{buildroot}/opt/nxguard/run
@@ -98,12 +101,14 @@ cd /root/rpmbuild/BUILD/lua-5.1.5/src
 install -p -m 0755 lua luac %{buildroot}/opt/nxguard/luajit/bin
 install -p -m 0644 lua.h luaconf.h lualib.h lauxlib.h ../etc/lua.hpp %{buildroot}/opt/nxguard/luajit/include/lua-5.1
 install -p -m 0644 liblua.a %{buildroot}/opt/nxguard/luajit/lib/lua/5.1
+install -d /root/rpmbuild/BUILD/luajit-build/opt/nxguard/luajit/include/lua-5.1
+install -p -m 0644 lua.h luaconf.h lualib.h lauxlib.h ../etc/lua.hpp /root/rpmbuild/BUILD/luajit-build/opt/nxguard/luajit/include/lua-5.1
 
 cd /root/rpmbuild/BUILD/luajit2-2.1-20240815
 make install PREFIX=/opt/nxguard/luajit DESTDIR=%{buildroot}
 
 cd /root/rpmbuild/BUILD/lua-cjson-2.1.0.14
-make LUA_INCLUDE_DIR=%{buildroot}/opt/nxguard/luajit/include/luajit-2.1
+make LUA_INCLUDE_DIR=/root/rpmbuild/BUILD/luajit-build/opt/nxguard/luajit/include/luajit-2.1
 install -m 0755 cjson.so %{buildroot}/opt/nxguard/lualib/cjson.so
 install -m 0644 lua/cjson/*.lua %{buildroot}/opt/nxguard/lualib/cjson/ || :
 
@@ -135,7 +140,7 @@ cd /root/rpmbuild/BUILD/lua-resty-upstream-healthcheck-0.10
 install -d %{buildroot}/opt/nxguard/lualib/resty/upstream
 install lib/resty/upstream/*.lua %{buildroot}/opt/nxguard/lualib/resty/upstream/
 
-luarocks config lua_dir %{buildroot}/opt/nxguard/luajit
+luarocks config lua_dir /root/rpmbuild/BUILD/luajit-build/opt/nxguard/luajit
 luarocks install --tree=/root/rpmbuild/BUILD/lualib lualdap --lua-version=5.1
 luarocks install --tree=/root/rpmbuild/BUILD/lualib base64 --lua-version=5.1
 install /root/rpmbuild/BUILD/lualib/share/lua/5.1/*.lua %{buildroot}/opt/nxguard/lualib/
@@ -175,6 +180,8 @@ install -c -m 644 modsecurity.pc %{buildroot}/opt/nxguard/modsec/lib/pkgconfig/
 %attr(0744, nxguard, nxguard) /opt/nxguard/logs
 %attr(0744, nxguard, nxguard) /opt/nxguard/run
 %attr(0744, nxguard, nxguard) /opt/nxguard/cache
+%attr(0744, nxguard, nxguard) /opt/nxguard/data
+%attr(0744, nxguard, nxguard) /opt/nxguard/temp
 
 %post
 PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/sbin"

@@ -1,13 +1,16 @@
 Name:		nxguard-admin
-Version:	1.0.7
+Version:	1.0.8
 Release:	1%{?dist}
 Summary:	nxguard admin console
 
 License:	Apache-2.0
 Source0:	%{name}-%{version}.tar.gz    
 
-BuildRequires:	python3.12-pip
+BuildRequires:	python3-pip
 #Requires:	nxguard-engine>=1.31.8
+
+%undefine __brp_mangle_shebangs
+%global debug_package %{nil}
 
 %description
 nxguard admin console and API.

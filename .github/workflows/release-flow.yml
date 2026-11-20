@@ -19,7 +19,7 @@ jobs:
       version: ${{ steps.get_version.outputs.version }}
       branch: ${{ steps.get_version.outputs.branch }}
     steps:
-      - uses: actions/checkout@v4  # nosemgrep: yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -43,49 +43,115 @@ jobs:
           fi
 
   build-app-image:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.runner }}
     needs: checkout
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux/amd64
+            runner: ubuntu-latest
+            arch: x86_64
+          - platform: linux/arm64
+            runner: ubuntu-24.04-arm
+            arch: aarch64
     steps:
-      - uses: actions/checkout@v4  # nosemgrep: yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag
+      - uses: actions/checkout@v4
 
       - name: Log in to Docker Hub
-        uses: docker/login-action@v3  # nosemgrep: yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3  # nosemgrep: yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag
-
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3  # nosemgrep: yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag
+        uses: docker/setup-buildx-action@v3
 
-      - name: Extract image metadata
-        id: meta
-        uses: docker/metadata-action@v5  # nosemgrep: yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag
-        with:
-          images: liberatti/nxguard
-          tags: |
-            type=raw,value=${{ needs.checkout.outputs.version }}
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v6  # nosemgrep: yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag
+      - name: Build and push Docker image by digest
+        id: build
+        uses: docker/build-push-action@v6
         with:
           context: .
-          platforms: linux/amd64,linux/arm64
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha,scope=main
-          cache-to: type=gha,mode=max,scope=main
+          platforms: ${{ matrix.platform }}
+          outputs: type=image,name=liberatti/nxguard,push-by-digest=true,name-canonical=true,push=true
+          cache-from: type=gha,scope=main-${{ matrix.arch }}
+          cache-to: type=gha,mode=max,scope=main-${{ matrix.arch }}
+
+      - name: Export RPMs from Docker build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: ${{ matrix.platform }}
+          target: rpms
+          outputs: type=local,dest=./dist/rpms
+          cache-from: type=gha,scope=main-${{ matrix.arch }}
+
+      - name: Upload RPM Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: nxguard-rpms-${{ needs.checkout.outputs.version }}-${{ matrix.arch }}
+          path: ./dist/rpms/**/*.rpm
+          retention-days: 30
+
+      - name: Export digest
+        run: |
+          mkdir -p ${{ runner.temp }}/digests
+          digest="${{ steps.build.outputs.digest }}"
+          touch "${{ runner.temp }}/digests/${digest#sha256:}"
+
+      - name: Upload digest
+        uses: actions/upload-artifact@v4
+        with:
+          name: digests-${{ matrix.arch }}
+          path: ${{ runner.temp }}/digests/*
+          retention-days: 1
 
   publish-tag:
     needs: [checkout, build-app-image]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4  # nosemgrep: yaml.github-actions.security.github-actions-mutable-action-tag.github-actions-mutable-action-tag
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Download digests
+        uses: actions/download-artifact@v4
+        with:
+          path: ${{ runner.temp }}/digests
+          pattern: digests-*
+          merge-multiple: true
+
+      - name: Download all RPM Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: nxguard-rpms-*
+          path: ./dist/rpms
+          merge-multiple: true
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Create multi-platform manifest and push
+        working-directory: ${{ runner.temp }}/digests
+        run: |
+          DIGESTS=""
+          for digest in *; do
+            DIGESTS="$DIGESTS liberatti/nxguard@sha256:$digest"
+          done
+          docker buildx imagetools create \
+            -t liberatti/nxguard:${{ needs.checkout.outputs.version }} \
+            -t liberatti/nxguard:latest \
+            $DIGESTS
+
+      - name: Inspect final multi-arch image
+        run: |
+          docker buildx imagetools inspect liberatti/nxguard:${{ needs.checkout.outputs.version }}
 
       - name: Create and push tag
         run: |
@@ -98,7 +164,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create ${{ needs.checkout.outputs.version }} --title "${{ needs.checkout.outputs.version }}" --generate-notes
+          shopt -s globstar nullglob
+          RPM_FILES=(./dist/rpms/**/*.rpm)
+          gh release create ${{ needs.checkout.outputs.version }} "${RPM_FILES[@]}" --title "${{ needs.checkout.outputs.version }}" --generate-notes
 
       - name: Delete source branch
         run: |
