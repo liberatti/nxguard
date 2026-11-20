@@ -2,7 +2,8 @@
 
 import getpass
 import sys
-from urllib.request import urlopen
+import bcrypt
+import requests
 
 import config
 from api.repository.oauth_repository import UserDao
@@ -66,18 +67,6 @@ def reset_admin():
         sys.exit(1)
 
 
-
-def health_check():
-    try:
-        with urlopen("http://localhost:5000", timeout=5) as response:
-            if response.getcode() != 200:
-                print("Health check failed")
-            else:
-                print("Health check passed")
-    except Exception as e:
-        print(f"Health check failed: {e}")
-
-
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         print(
@@ -90,6 +79,9 @@ if __name__ == "__main__":
         "install": install,
         "index": indexer.index,
         "healthcheck": health_check,
+        "health_check": health_check,
+        "reset_admin": reset_admin,
+        "reset-admin": reset_admin,
     }
 
     fn = switch.get(sys.argv[1])

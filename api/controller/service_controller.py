@@ -13,9 +13,9 @@ from api.middleware.controllers.base_controller import (
 )
 
 
-from nxcore.middleware.socket_manager import emit_event
-from api.model.config_model import ChangeDao
-from api.model.service_model import ServiceDao
+from api.middleware.socket_manager import emit_event
+from api.repository.config_repository import ChangeDao
+from api.repository.service_repository import ServiceDao
 
 routes = Blueprint("service", __name__)
 
@@ -102,6 +102,8 @@ def search() -> Response:
     )
     with ServiceDao() as dao:
         result = dao.search(query=query, pagination=get_pagination())
+        for service in result["data"]:
+            service.pop("certificate", None)
         return (
             response_data(result, dao.pageSchema)
             if result["metadata"]["total_elements"] > 0

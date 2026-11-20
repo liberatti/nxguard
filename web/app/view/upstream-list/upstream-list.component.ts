@@ -48,6 +48,7 @@ export class UpstreamListComponent implements OnInit {
     upstreamDS: MatTableDataSource<Upstream>;
     upstreamPA = new DefaultPageMeta();
     searchQuery: string = '';
+    isLoading: boolean = false;
 
     constructor(
         private notificationService: NotificationService,
@@ -98,8 +99,10 @@ export class UpstreamListComponent implements OnInit {
     }
 
     updateGridTable() {
+        this.isLoading = true;
         this.upstreamService.get(this.upstreamPA, this.searchQuery).subscribe({
             next: (data) => {
+                this.isLoading = false;
                 if (data && data.metadata) {
                     this.upstreamDS.data = data.data || [];
                     this.upstreamPA.total_elements = data.metadata.total_elements;
@@ -109,6 +112,7 @@ export class UpstreamListComponent implements OnInit {
                 }
             },
             error: () => {
+                this.isLoading = false;
                 this.upstreamDS.data = [];
                 this.upstreamPA.total_elements = 0;
             }

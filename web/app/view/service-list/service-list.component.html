@@ -11,9 +11,9 @@
                     <mat-icon matPrefix>search</mat-icon>
                     <input matInput id="service-filter-input" [(ngModel)]="searchQuery"
                            (keyup.enter)="applyFilter()"
-                           [placeholder]="'view.service.filter_placeholder' | translate">
+                           [placeholder]="'VIEW.SERVICE.FILTER_PLACEHOLDER' | translate">
                     @if (searchQuery) {
-                    <button matSuffix mat-icon-button id="service-filter-clear-btn" (click)="clearFilter()">
+                    <button matSuffix mat-icon-button id="service-filter-clear-btn" (click)="clearFilter()" [attr.aria-label]="'ACTIONS.CLOSE' | translate">
                         <mat-icon>close</mat-icon>
                     </button>
                     }
@@ -73,37 +73,69 @@
                         </td>
                     </ng-container>
 
-                <ng-container matColumnDef="sans">
-                    <th mat-header-cell *matHeaderCellDef> {{ 'attr.domains'|translate }}</th>
-                    <td mat-cell *matCellDef="let element" id="service-sans-{{element._id}}">
-                        @if (element.sans) {
-                        <mat-chip-listbox>
-                            @for (r of element.sans; track r) {
-                            <mat-chip-row id="service-san-{{element._id}}-{{r}}">
-                                {{ r }}
-                            </mat-chip-row>
+                    <!-- Domains (SANs) Column -->
+                    <ng-container matColumnDef="sans">
+                        <th mat-header-cell *matHeaderCellDef> {{ 'ATTR.DOMAINS'|translate }}</th>
+                        <td mat-cell *matCellDef="let element" id="service-sans-{{element._id}}" class="domains-column-cell">
+                            @if (!element.sans || element.sans.length === 0) {
+                                <span class="fallback-sans-badge" [matTooltip]="'VIEW.SERVICE.ALL_DOMAINS' | translate">
+                                    <mat-icon class="san-icon">public</mat-icon>
+                                    <span class="san-text">{{ 'VIEW.SERVICE.ALL_DOMAINS' | translate }}</span>
+                                </span>
+                            } @else {
+                                <div class="sans-wrapper">
+                                    @for (r of getPrimarySans(element); track r) {
+                                    <span class="san-chip" id="service-san-{{element._id}}-{{r}}">
+                                        <mat-icon class="san-icon">language</mat-icon>
+                                        <span class="san-text">{{ r }}</span>
+                                    </span>
+                                    }
+                                    @if (getRemainingSansCount(element) > 0) {
+                                    <span class="san-more-pill"
+                                          [matTooltip]="getAllSansTooltip(element)"
+                                          matTooltipClass="pre-line-tooltip">
+                                        +{{ getRemainingSansCount(element) }}
+                                    </span>
+                                    }
+                                </div>
                             }
-                        </mat-chip-listbox>
-                        }
-                    </td>
-                </ng-container>
-                <ng-container matColumnDef="routes">
-                    <th mat-header-cell *matHeaderCellDef> {{ 'attr.routes'|translate }}</th>
-                    <td mat-cell *matCellDef="let element; let i = index" id="service-routes-{{i}}">
-                        <mat-chip-listbox>
-                            @for (r of element.routes; track r.name || r._id) {
-                            <mat-chip-row id="service-route-{{i}}">
-                                {{ r.name }}
-                            </mat-chip-row>
+                        </td>
+                    </ng-container>
+
+                    <!-- Routes Column -->
+                    <ng-container matColumnDef="routes">
+                        <th mat-header-cell *matHeaderCellDef> {{ 'ATTR.ROUTES'|translate }}</th>
+                        <td mat-cell *matCellDef="let element; let i = index" id="service-routes-{{i}}" class="routes-column-cell">
+                            @if (!element.routes || element.routes.length === 0) {
+                                <span class="empty-cell-dash">-</span>
+                            } @else {
+                                <div class="routes-wrapper">
+                                    @for (r of getPrimaryRoutes(element); track r.name || r._id) {
+                                    <span class="route-chip" id="service-route-{{i}}" [matTooltip]="getRouteTooltip(r)" matTooltipClass="pre-line-tooltip">
+                                        <mat-icon class="route-icon">alt_route</mat-icon>
+                                        <span class="route-name">{{ r.name }}</span>
+                                        @if (r.type) {
+                                        <span class="route-type-pill" [class]="'route-type-' + (r.type | lowercase)">{{ r.type }}</span>
+                                        }
+                                    </span>
+                                    }
+                                    @if (getRemainingRoutesCount(element) > 0) {
+                                    <span class="route-more-pill"
+                                          [matTooltip]="getAllRoutesTooltip(element)"
+                                          matTooltipClass="pre-line-tooltip">
+                                        +{{ getRemainingRoutesCount(element) }}
+                                    </span>
+                                    }
+                                </div>
                             }
-                        </mat-chip-listbox>
-                    </td>
-                </ng-container>
-                <ng-container matColumnDef="action">
-                    <th mat-header-cell *matHeaderCellDef class="text-right">{{ 'attr.actions' | translate }}</th>
-                    <td mat-cell *matCellDef="let element; let i = index" class="text-right">
-                        <div class="table-cell-actions">
-                            <div class="toggle-container no-border">
+                        </td>
+                    </ng-container>
+
+                    <!-- Actions Column -->
+                    <ng-container matColumnDef="action">
+                        <th mat-header-cell *matHeaderCellDef class="text-right">{{ 'ATTR.ACTIONS' | translate }}</th>
+                        <td mat-cell *matCellDef="let element; let i = index" class="text-right">
+                            <div class="table-cell-actions">
                                 <mat-slide-toggle color="primary"
                                                   [checked]="element.active"
                                                   (change)="toggleServiceActive(i,$event)"
@@ -112,18 +144,25 @@
                                                   [attr.aria-label]="'VIEW.SERVICE.TOGGLE_ACTIVE' | translate"
                                                   class="service-switch-toggle">
                                 </mat-slide-toggle>
-                                <button mat-button [matMenuTriggerFor]="menu" id="service-menu-{{i}}">
+
+                                <button mat-icon-button
+                                        [matMenuTriggerFor]="menu"
+                                        id="service-menu-{{i}}"
+                                        class="action-btn"
+                                        [matTooltip]="'ATTR.ACTIONS' | translate"
+                                        [attr.aria-label]="'ATTR.ACTIONS' | translate">
                                     <mat-icon>more_vert</mat-icon>
                                 </button>
+
                                 <mat-menu #menu="matMenu" xPosition="before">
                                     <button mat-menu-item type="button" [routerLink]="['edit',element._id]" id="edit-service-{{i}}">
                                         <mat-icon>edit</mat-icon>
                                         <span>{{ 'ACTIONS.EDIT'|translate }}</span>
                                     </button>
                                     @if (oauth.isRole('superuser')) {
-                                    <button mat-menu-item type="button" (click)="onRemove(element)" id="delete-service-{{i}}">
-                                        <mat-icon>delete</mat-icon>
-                                        {{ 'actions.remove'|translate }}
+                                    <button mat-menu-item type="button" (click)="onRemove(element)" id="delete-service-{{i}}" class="delete-menu-item">
+                                        <mat-icon color="warn">delete</mat-icon>
+                                        <span class="text-warn">{{ 'ACTIONS.REMOVE'|translate }}</span>
                                     </button>
                                     }
                                 </mat-menu>

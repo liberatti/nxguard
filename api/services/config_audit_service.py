@@ -2,7 +2,7 @@ import copy
 import hashlib
 import json
 import re
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
 try:
     from deepdiff import DeepDiff

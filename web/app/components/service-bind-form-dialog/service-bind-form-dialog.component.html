@@ -30,18 +30,11 @@
                         }
                     </mat-select>
                 </mat-form-field>
-            </div>
-            <div class="mat-col-6">
-                <mat-form-field class="full-width">
-                    <mat-label>Port</mat-label>
-                    <input matInput type="number" formControlName="port" id="service-bind-port-input">
-                    @if (f['port'].errors) {
-                        @if (f['port'].errors['required']) {
-                        <mat-error class="error-message">
-                            Required
-                        </mat-error>
-                        }
-                    }
+
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>{{ 'SERVICE.PORT' | translate }}</mat-label>
+                    <mat-icon matPrefix class="field-icon">numbers</mat-icon>
+                    <input matInput type="number" formControlName="port" min="1" max="65535" id="service-bind-port-input" required>
                 </mat-form-field>
             </div>
 
@@ -80,14 +73,4 @@
             {{ 'ACTIONS.SAVE' | translate }}
         </button>
     </div>
-</div>
-<div mat-dialog-actions align="end" class="dialog-actions">
-    <button type="button" mat-stroked-button (click)="onCancel()" id="cancel-service-bind-btn">
-        <mat-icon>keyboard_return</mat-icon>
-        {{ 'actions.cancel' | translate }}
-    </button>
-    <button type="button" (click)="onSubmit()" mat-flat-button color="primary" id="save-service-bind-btn">
-        <mat-icon>save</mat-icon>
-        {{ 'actions.save' | translate }}
-    </button>
 </div>

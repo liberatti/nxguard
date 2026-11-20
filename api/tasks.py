@@ -1,22 +1,22 @@
 from datetime import datetime, timedelta
+import json
 import os
 import socket
-import subprocess
 import time
 import traceback
 
 import requests
-from nxcore.common_utils import get_server_id, replace_tz
-from nxcore.middleware.logging_manager import logger
+from api.middleware.common_utils import get_server_id, replace_tz
+from api.middleware.logging_manager import logger
 
 import config
 import engine.admin as c_admin
 import engine.build as c_builder
 import engine.seclang.seclang_indexer as seclang_indexer
-from api.model.config_model import ConfigBackupDao, ConfigDao
-from api.model.upstream_model import NodeStatusDao, UpstreamDao, UpstreamStatesDao
-from api.model.certificate_model import CertificateDao
-from api.model.service_model import ServiceDao
+from api.repository.config_repository import ConfigBackupDao, ConfigDao
+from api.repository.upstream_repository import NodeStatusDao, UpstreamDao, UpstreamStatesDao
+from api.repository.certificate_repository import CertificateDao
+from api.services.config_audit_service import compute_deepdiff, ConfigAuditService
 from api.tools.acme_tool import AcmeTool
 
 
@@ -215,22 +215,19 @@ def update_main_config():
 def install():
     """Initializes NXGuard database schema and indexes SecLanguage rules."""
     logger.info("Installing NXGuard")
-    try:
-        subprocess.run(f"sudo chmod -R 777 {config.DB_PATH}", shell=True)
-    except Exception:
-        pass
     os.makedirs(config.DB_PATH, exist_ok=True)
-    if os.path.exists(f"{config.DB_PATH}/app.duckdb"):
+    db_file = os.path.join(config.DB_PATH, "app.duckdb")
+    if os.path.exists(db_file):
         try:
-            os.remove(f"{config.DB_PATH}/app.duckdb")
-        except Exception:
-            subprocess.run(f"sudo rm -f {config.DB_PATH}/app.duckdb", shell=True)
+            os.remove(db_file)
+        except Exception as e:
+            logger.warning(f"Failed to remove existing database file {db_file}: {e}")
     c_builder.create_db()
     seclang_indexer.index()
 
 
 def renew_certificates():
-    with CertificateDao() as dao_c, ServiceDao() as dao_s:
+    with CertificateDao() as dao_c:
         crt_c1 = 0
         crt_c2 = 0
         certificates = dao_c.get_all()["data"]
@@ -256,3 +253,13 @@ def renew_certificates():
             f"{crt_c1} SELF certificates renewed, {crt_c2} MANAGED certificates renewed"
         )
         update_main_config()
+
+
+def prune_config_history() -> None:
+    """Daily task to prune configuration history exceeding retain_versions, consolidating a baseline."""
+    try:
+        with ConfigAuditService() as audit_service:
+            res = audit_service.consolidate_and_prune_history()
+            logger.info(f"Daily config history prune completed: {res.get('message')}")
+    except Exception as ex:
+        logger.error(f"Error in daily config history prune: {ex}")

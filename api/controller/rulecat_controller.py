@@ -17,6 +17,7 @@ from engine.seclang.seclang_schema import RuleCategorySchema
 
 routes = Blueprint("rulecat", __name__)
 
+
 @routes.after_request
 def after(response: Response) -> Response:
     """
@@ -36,7 +37,6 @@ def after(response: Response) -> Response:
                 dao.persist({"name": "rulecat"})
             emit_event("tracking_evt")
     return response
-
 
 
 @routes.route("/<cat_id>", methods=["GET"])

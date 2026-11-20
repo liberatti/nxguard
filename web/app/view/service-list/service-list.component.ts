@@ -50,6 +50,7 @@ export class ServiceListComponent implements OnInit {
     serviceDS: MatTableDataSource<Service>;
     servicePA = new DefaultPageMeta();
     searchQuery: string = '';
+    isLoading: boolean = false;
 
     constructor(
         private notificationService: NotificationService,
@@ -76,8 +77,10 @@ export class ServiceListComponent implements OnInit {
     }
 
     updateGridTable() {
+        this.isLoading = true;
         this.serviceService.get(this.servicePA, this.searchQuery).subscribe({
             next: (data) => {
+                this.isLoading = false;
                 if (data && data.metadata) {
                     this.serviceDS.data = data.data || [];
                     this.servicePA.total_elements = data.metadata.total_elements;
@@ -87,6 +90,7 @@ export class ServiceListComponent implements OnInit {
                 }
             },
             error: () => {
+                this.isLoading = false;
                 this.serviceDS.data = [];
                 this.servicePA.total_elements = 0;
             }

@@ -36,11 +36,11 @@
             <mat-menu #userMenu="matMenu" class="premium-menu" xPosition="before">
                 <a mat-menu-item [routerLink]="['/account']">
                     <mat-icon>person</mat-icon>
-                    <span>{{ 'nav.account' | translate }}</span>
+                    <span>{{ 'NAV.ACCOUNT' | translate }}</span>
                 </a>
                 <a mat-menu-item (click)="signOut()">
                     <mat-icon>exit_to_app</mat-icon>
-                    <span>{{ 'nav.logout' | translate }}</span>
+                    <span>{{ 'NAV.LOGOUT' | translate }}</span>
                 </a>
             </mat-menu>
         </div>
@@ -56,7 +56,8 @@
                     @for (link of menu; track link.label) {
                     <div class="menu-item-group">
                         @if (link.route) {
-                        <a mat-list-item [routerLink]="[link.route]" routerLinkActive="active-link" (click)="onMenuClick()"
+                        <a mat-list-item [routerLink]="[link.route]" routerLinkActive="active-link"
+                            [routerLinkActiveOptions]="{ exact: !!link.exact }" (click)="onMenuClick()"
                             class="nav-link-item">
                             <mat-icon matListItemIcon class="nav-link-icon">{{ link.icon }}</mat-icon>
                             <span matListItemTitle class="nav-link-title">{{ link.label | translate }}</span>
@@ -72,6 +73,7 @@
                         <div class="submenu-container">
                             @for (subLink of link.menu; track subLink.label) {
                             <a mat-list-item [routerLink]="[subLink.route]" routerLinkActive="active-link"
+                                [routerLinkActiveOptions]="{ exact: subLink.exact ?? (subLink.route === '/config') }"
                                 (click)="onMenuClick()" class="subnav-link-item">
                                 <mat-icon matListItemIcon class="subnav-link-icon">{{ subLink.icon }}</mat-icon>
                                 <span matListItemTitle class="subnav-link-title">{{ subLink.label | translate }}</span>
@@ -87,7 +89,7 @@
                 <div class="sidenav-footer">
                     <button mat-button class="about-discreet-btn" (click)="showAbout()" id="sidenav-about-btn">
                         <mat-icon class="about-icon">info_outline</mat-icon>
-                        <span>{{ 'nav.about' | translate }} NXGUARD</span>
+                        <span>{{ 'NAV.ABOUT' | translate }} NXGUARD</span>
                     </button>
                 </div>
             </div>
@@ -100,7 +102,7 @@
             </div>
 
             <footer class="admin-footer">
-                <div [innerHTML]="'content.copy' | translate"></div>
+                <div [innerHTML]="'CONTENT.COPY' | translate"></div>
                 <div class="engine-version-text">NXGUARD Engine {{ version }}</div>
             </footer>
         </mat-sidenav-content>

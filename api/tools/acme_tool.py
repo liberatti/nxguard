@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from acme import errors as ACMEerrors
 
 import config
-from nxcore.middleware.logging_manager import logger
+from api.middleware.logging_manager import logger
 
 from api.repository.acme_repository import ChallengeDao
 from api.repository.certificate_repository import CertificateDao

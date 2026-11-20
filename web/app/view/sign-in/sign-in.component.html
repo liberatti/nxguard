@@ -6,69 +6,26 @@
     <div class="vmware-bg-glow"></div>
     <div class="vmware-bg-pattern"></div>
 
-    <div class="vmware-login-box" id="sign-in-card">
-        <!-- Left Brand Pane (VMware Clarity Dark Blue Panel) -->
-        <div class="vmware-brand-pane">
-            <div class="brand-top-content">
-                <div class="brand-icon-wrapper">
-                    <img class="brand-logo-img" src="assets/logo.png" alt="NXGuard Logo">
-                </div>
-                <h1 class="brand-title">{{ 'AUTH.TITLE' | translate }}</h1>
-                <p class="brand-subtitle">{{ 'AUTH.SUBTITLE' | translate }}</p>
-            </div>
-
-            <div class="brand-bottom-status">
-                <div class="engine-version">{{ 'AUTH.VERSION' | translate }} {{ version }}</div>
-            </div>
+    <!-- Top Navigation Bar -->
+    <header class="vmware-top-nav">
+        <div class="top-nav-brand">
+            <span class="top-brand-text">{{ 'AUTH.TITLE' | translate }}</span>
+            <span class="top-brand-separator">/</span>
+            <span class="top-brand-edition">{{ 'AUTH.HOST_CLIENT' | translate }}</span>
         </div>
-
-        <!-- Right Login Form Pane (VMware Clarity Clean Form Panel) -->
-        <div class="vmware-form-pane">
-            <div class="form-header">
-                <div class="form-header-row">
-                    <div>
-                        <h2 class="form-title">{{ 'AUTH.SIGN_IN' | translate }}</h2>
-                        <p class="form-subtitle">{{ 'AUTH.SUBTITLE_LOGIN' | translate }}</p>
-                    </div>
-                    <mat-form-field appearance="outline" class="language-select-field" subscriptSizing="dynamic">
-                        <mat-icon matPrefix class="lang-icon">language</mat-icon>
-                        <mat-select [formControl]="form.controls.locale" (selectionChange)="onLocaleChange($event.value)" id="sign-in-language-select">
-                            @for (loc of locales; track loc.id) {
-                            <mat-option [value]="loc.id" id="lang-option-{{loc.id}}">
-                                {{ loc.name }}
-                            </mat-option>
-                            }
-                        </mat-select>
-                    </mat-form-field>
-                </div>
-            </div>
-
-            <form [formGroup]="form" id="sign-in-form" class="login-form">
-                <!-- Username / Email -->
-                <mat-form-field appearance="outline" class="full-width form-field-custom">
-                    <mat-label>{{ 'AUTH.EMAIL' | translate }}</mat-label>
-                    <input id="sign-in-email" matInput formControlName="email" autocomplete="username email"
-                        type="email" placeholder="admin@nxguard.local">
-                    <mat-icon matSuffix class="input-icon">person</mat-icon>
-                </mat-form-field>
-
-                <!-- Password -->
-                <mat-form-field appearance="outline" class="full-width form-field-custom">
-                    <mat-label>{{ 'AUTH.PASSWORD' | translate }}</mat-label>
-                    <input id="sign-in-password" matInput formControlName="password"
-                        [type]="hidePassword ? 'password' : 'text'" autocomplete="current-password"
-                        placeholder="••••••••">
-                    <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" type="button"
-                        class="password-toggle-btn" [attr.aria-label]="'Hide password'">
-                        <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
-                    </button>
-                </mat-form-field>
-
-                <!-- Action Button -->
-                <button mat-flat-button id="sign-in-button" class="vmware-submit-btn" (click)="login()"
-                    [disabled]="form.invalid">
-                    <mat-icon class="btn-icon">login</mat-icon>
-                    <span>{{ 'AUTH.SIGN_IN_BTN' | translate }}</span>
+        <div class="top-nav-actions">
+            <!-- Language Selector -->
+            <button type="button" class="vmware-lang-btn" [matMenuTriggerFor]="langMenu" id="sign-in-language-btn"
+                [attr.aria-label]="'AUTH.SELECT_LANGUAGE' | translate">
+                <mat-icon class="lang-icon">language</mat-icon>
+                <span class="lang-label">{{ currentLangCode }}</span>
+                <mat-icon class="chevron-icon">arrow_drop_down</mat-icon>
+            </button>
+            <mat-menu #langMenu="matMenu" class="vmware-menu-panel">
+                @for (loc of locales; track loc.id) {
+                <button mat-menu-item (click)="onLocaleChange(loc.id)" id="lang-option-{{loc.id}}"
+                    [class.is-active]="currentLangCode === (loc.id.startsWith('pt') ? 'PT' : 'EN')">
+                    <span>{{ loc.name }}</span>
                 </button>
                 }
             </mat-menu>

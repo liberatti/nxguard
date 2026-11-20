@@ -53,6 +53,13 @@ import {DateRangeDialogComponent} from 'app/components/date-range-dialog/date-ra
 import {GeoipDetailsDialogComponent} from 'app/components/geoip-details-dialog/geoip-details-dialog.component';
 import {RblDetailsDialogComponent} from 'app/components/rbl-details-dialog/rbl-details-dialog.component';
 
+export interface ActionStat {
+    action: string;
+    count: number;
+    percentage: number;
+    color: { border: string; bg: string; point: string };
+}
+
 @Component({
     selector: 'app-transaction-list',
     standalone: true,
@@ -120,10 +127,15 @@ export class TransactionListComponent implements OnInit {
     expandedElement: TransactionLog | null = null;
 
     actionColors: Record<string, { border: string; bg: string; point: string }> = {
+        ALLOWED: { border: '#10b981', bg: 'rgba(16, 185, 129, 0.12)', point: '#10b981' },
+        allowed: { border: '#10b981', bg: 'rgba(16, 185, 129, 0.12)', point: '#10b981' },
+        BLOCKED: { border: '#ef4444', bg: 'rgba(239, 68, 68, 0.12)', point: '#ef4444' },
+        blocked: { border: '#ef4444', bg: 'rgba(239, 68, 68, 0.12)', point: '#ef4444' },
+        WARN: { border: '#f59e0b', bg: 'rgba(245, 158, 11, 0.12)', point: '#f59e0b' },
+        warn: { border: '#f59e0b', bg: 'rgba(245, 158, 11, 0.12)', point: '#f59e0b' },
         PASSED: { border: '#10b981', bg: 'rgba(16, 185, 129, 0.12)', point: '#10b981' },
         ALLOW: { border: '#06b6d4', bg: 'rgba(6, 182, 212, 0.12)', point: '#06b6d4' },
         PASS: { border: '#10b981', bg: 'rgba(16, 185, 129, 0.12)', point: '#10b981' },
-        WARN: { border: '#f59e0b', bg: 'rgba(245, 158, 11, 0.12)', point: '#f59e0b' },
         DENY: { border: '#ef4444', bg: 'rgba(239, 68, 68, 0.12)', point: '#ef4444' },
         BLOCK: { border: '#dc2626', bg: 'rgba(220, 38, 38, 0.12)', point: '#dc2626' },
         REJECTED: { border: '#f97316', bg: 'rgba(249, 115, 22, 0.12)', point: '#f97316' },
@@ -136,6 +148,18 @@ export class TransactionListComponent implements OnInit {
         { border: '#14b8a6', bg: 'rgba(20, 184, 166, 0.12)', point: '#14b8a6' },
         { border: '#64748b', bg: 'rgba(100, 116, 139, 0.12)', point: '#64748b' },
     ];
+
+    private hexToRgba(hex: string, alpha: number): string {
+        if (!hex) return `rgba(100, 116, 139, ${alpha})`;
+        const cleanHex = hex.replace('#', '');
+        if (cleanHex.length === 6) {
+            const r = parseInt(cleanHex.substring(0, 2), 16);
+            const g = parseInt(cleanHex.substring(2, 4), 16);
+            const b = parseInt(cleanHex.substring(4, 6), 16);
+            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        }
+        return hex;
+    }
 
     chart: any;
     chartConfig = {
@@ -187,6 +211,19 @@ export class TransactionListComponent implements OnInit {
                     boxHeight: 8,
                     usePointStyle: true,
                     callbacks: {
+                        title: (tooltipItems: any[]) => {
+                            if (!tooltipItems || tooltipItems.length === 0) return '';
+                            const item = tooltipItems[0];
+                            const labelItem = this.chartConfig.data?.labels?.[item.dataIndex];
+                            if (moment.isMoment(labelItem)) {
+                                return labelItem.format('DD/MM/YYYY HH:mm:ss');
+                            }
+                            const rawTimestamp = item.parsed?.x ?? item.raw?.x;
+                            if (rawTimestamp != null && !isNaN(Number(rawTimestamp))) {
+                                return moment(Number(rawTimestamp)).format('DD/MM/YYYY HH:mm:ss');
+                            }
+                            return item.label || '';
+                        },
                         label: (context: any) => {
                             const val = context.parsed.y ?? 0;
                             return ` ${context.dataset.label}: ${this.formatService.tpm(val)}`;
@@ -348,28 +385,69 @@ export class TransactionListComponent implements OnInit {
         });
     }
 
+    resetChartZoom(): void {
+        this.form.get('start')?.setValue(this.savedDateRange.start);
+        this.form.get('end')?.setValue(this.savedDateRange.end);
+        this.isChartZoomed = false;
+        this.onSearch();
+    }
+
+    toggleDataset(action: string): void {
+        if (!this.chart || !this.chart.data || !this.chart.data.datasets) return;
+        const datasetIndex = this.chart.data.datasets.findIndex(
+            (ds: any) => ds.label?.toUpperCase() === action.toUpperCase()
+        );
+        if (datasetIndex !== -1) {
+            const isVisible = this.chart.isDatasetVisible(datasetIndex);
+            this.chart.setDatasetVisibility(datasetIndex, !isVisible);
+            this.chart.update();
+        }
+    }
+
+    isDatasetHidden(action: string): boolean {
+        if (!this.chart || !this.chart.data || !this.chart.data.datasets) return false;
+        const datasetIndex = this.chart.data.datasets.findIndex(
+            (ds: any) => ds.label?.toUpperCase() === action.toUpperCase()
+        );
+        if (datasetIndex !== -1) {
+            return !this.chart.isDatasetVisible(datasetIndex);
+        }
+        return false;
+    }
+
     renderTpmChart(data: any[]): void {
         if (this.chart != null) {
             this.chart.destroy();
+            this.chart = null;
         }
 
         const labels: any[] = [];
         let datasets: any[] = [];
+        let totalCount = 0;
+        const statsMap: Record<string, number> = {};
+
+        const canvas = document.getElementById('trn-chart') as HTMLCanvasElement;
+        const ctx = canvas ? canvas.getContext('2d') : null;
 
         if (data && Array.isArray(data) && data.length > 0) {
             for (let i = 0; i < data.length; i++) {
                 labels.push(moment(data[i].logtime));
+                totalCount += (data[i].count || 0);
             }
 
             const actionSet = new Set<string>();
             for (const d of data) {
                 if (d.actions) {
-                    Object.keys(d.actions).forEach((a) => actionSet.add(a.toUpperCase()));
+                    Object.keys(d.actions).forEach((a) => {
+                        const upper = a.toUpperCase();
+                        actionSet.add(upper);
+                        statsMap[upper] = (statsMap[upper] || 0) + (d.actions[a] || 0);
+                    });
                 }
             }
 
             if (actionSet.size > 0) {
-                const order = ['PASSED', 'ALLOW', 'WARN', 'REJECTED', 'DENY', 'BLOCK'];
+                const order = ['ALLOWED', 'BLOCKED', 'WARN', 'PASSED', 'ALLOW', 'PASS', 'REJECTED', 'DENY', 'BLOCK'];
                 const sortedActions = Array.from(actionSet).sort((a, b) => {
                     const idxA = order.indexOf(a);
                     const idxB = order.indexOf(b);
@@ -379,50 +457,113 @@ export class TransactionListComponent implements OnInit {
                     return a.localeCompare(b);
                 });
 
+                const calculatedActionTotal = Object.values(statsMap).reduce((sum, c) => sum + c, 0);
+                const effectiveTotal = calculatedActionTotal > 0 ? calculatedActionTotal : totalCount;
+                this.totalTransactions = effectiveTotal;
+
                 let fallbackIdx = 0;
+                this.actionStats = sortedActions.map((action) => {
+                    const colorConfig =
+                        this.actionColors[action] ||
+                        this.fallbackPalette[fallbackIdx++ % this.fallbackPalette.length];
+                    const count = statsMap[action] || 0;
+                    const percentage = effectiveTotal > 0 ? (count / effectiveTotal) * 100 : 0;
+                    return {
+                        action,
+                        count,
+                        percentage,
+                        color: colorConfig,
+                    };
+                });
+
+                fallbackIdx = 0;
                 datasets = sortedActions.map((action) => {
                     const colorConfig =
                         this.actionColors[action] ||
                         this.fallbackPalette[fallbackIdx++ % this.fallbackPalette.length];
-                    const seriesData = data.map((d: any) =>
-                        d.actions && d.actions[action] != null ? d.actions[action] : 0
-                    );
+                    const seriesData = data.map((d: any) => {
+                        if (!d.actions) return 0;
+                        if (d.actions[action] != null) return d.actions[action];
+                        const lower = action.toLowerCase();
+                        if (d.actions[lower] != null) return d.actions[lower];
+                        return 0;
+                    });
+
+                    let bgFill: any = colorConfig.bg;
+                    if (ctx) {
+                        const grad = ctx.createLinearGradient(0, 0, 0, 190);
+                        grad.addColorStop(0, this.hexToRgba(colorConfig.border, 0.22));
+                        grad.addColorStop(0.75, this.hexToRgba(colorConfig.border, 0.03));
+                        grad.addColorStop(1, this.hexToRgba(colorConfig.border, 0.0));
+                        bgFill = grad;
+                    }
 
                     return {
                         label: action,
                         data: seriesData,
                         borderColor: colorConfig.border,
-                        backgroundColor: colorConfig.bg,
-                        fill: false,
-                        tension: 0.3,
+                        backgroundColor: bgFill,
+                        fill: true,
+                        tension: 0.35,
                         borderWidth: 2,
-                        pointRadius: 2,
-                        pointHoverRadius: 5,
+                        pointRadius: 0,
+                        pointHoverRadius: 6,
                         pointBackgroundColor: colorConfig.point,
                         pointBorderColor: '#ffffff',
-                        pointBorderWidth: 1.5,
+                        pointBorderWidth: 2,
+                        pointHoverBorderWidth: 2,
+                        pointHoverBorderColor: '#ffffff',
                     };
                 });
             } else {
+                this.totalTransactions = totalCount;
+                this.actionStats = [
+                    {
+                        action: 'TOTAL',
+                        count: totalCount,
+                        percentage: 100,
+                        color: { border: '#0284c7', bg: 'rgba(2, 132, 199, 0.12)', point: '#0284c7' },
+                    }
+                ];
+
+                let bgFill: any = 'rgba(2, 132, 199, 0.15)';
+                if (ctx) {
+                    const grad = ctx.createLinearGradient(0, 0, 0, 190);
+                    grad.addColorStop(0, 'rgba(2, 132, 199, 0.25)');
+                    grad.addColorStop(0.75, 'rgba(2, 132, 199, 0.03)');
+                    grad.addColorStop(1, 'rgba(2, 132, 199, 0.0)');
+                    bgFill = grad;
+                }
+
                 datasets = [
                     {
                         label: 'TPM',
                         data: data.map((d: any) => d.count || 0),
                         borderColor: '#0284c7',
-                        backgroundColor: 'rgba(2, 132, 199, 0.15)',
+                        backgroundColor: bgFill,
                         fill: true,
-                        tension: 0.3,
+                        tension: 0.35,
                         borderWidth: 2,
-                        pointRadius: 2,
-                        pointHoverRadius: 5,
+                        pointRadius: 0,
+                        pointHoverRadius: 6,
+                        pointBackgroundColor: '#0284c7',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
                     },
                 ];
             }
+            this.hasChartData = this.totalTransactions > 0;
+        } else {
+            this.totalTransactions = 0;
+            this.actionStats = [];
+            this.hasChartData = false;
         }
 
         this.chartConfig.data.labels = labels;
         this.chartConfig.data.datasets = datasets;
-        this.chart = new Chart('trn-chart', this.chartConfig);
+        if (canvas) {
+            this.chart = new Chart('trn-chart', this.chartConfig);
+        }
     }
 
     onSearch() {
@@ -431,9 +572,11 @@ export class TransactionListComponent implements OnInit {
         this.isLoadingChart = true;
         this.transactionService.getTpm(filter).subscribe({
             next: (data) => {
+                this.isLoadingChart = false;
                 this.renderTpmChart(data || []);
             },
             error: () => {
+                this.isLoadingChart = false;
                 this.renderTpmChart([]);
             }
         });

@@ -50,6 +50,7 @@ export class SensorListComponent implements OnInit {
     sensorDS: MatTableDataSource<Sensor>;
     sensorPA = new DefaultPageMeta();
     searchQuery: string = '';
+    isLoading: boolean = false;
 
     constructor(
         private notificationService: NotificationService,
@@ -150,8 +151,10 @@ export class SensorListComponent implements OnInit {
     }
 
     updateGridTable() {
+        this.isLoading = true;
         this.sensorService.get(this.sensorPA, this.searchQuery).subscribe({
             next: (data) => {
+                this.isLoading = false;
                 if (data && data.metadata) {
                     this.sensorDS.data = data.data || [];
                     this.sensorPA.total_elements = data.metadata.total_elements;
@@ -161,6 +164,7 @@ export class SensorListComponent implements OnInit {
                 }
             },
             error: () => {
+                this.isLoading = false;
                 this.sensorDS.data = [];
                 this.sensorPA.total_elements = 0;
             }

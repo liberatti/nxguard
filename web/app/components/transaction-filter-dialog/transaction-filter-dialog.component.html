@@ -54,68 +54,93 @@
                 </mat-chip-listbox>
             </div>
 
-            <!-- Field Selection -->
-            <mat-form-field appearance="outline" class="full-width-field" subscriptSizing="dynamic">
-                <mat-label>{{ 'TRANSACTION.FILTER.FIELD_LABEL' | translate }}</mat-label>
-                <mat-select formControlName="field">
-                    <mat-select-trigger>
-                        <div class="select-trigger-content">
-                            <mat-icon class="field-select-icon">{{ currentField.icon }}</mat-icon>
-                            <span>{{ currentField.labelKey | translate }}</span>
-                            <span class="field-key-badge">({{ currentField.key }})</span>
-                        </div>
-                    </mat-select-trigger>
-                    @for (f of filteredFields; track f.key) {
-                    <mat-option [value]="f.key">
-                        <div class="option-content">
-                            <mat-icon class="option-icon">{{ f.icon }}</mat-icon>
-                            <span class="option-label">{{ f.labelKey | translate }}</span>
-                            <span class="option-key">({{ f.key }})</span>
-                        </div>
-                    </mat-option>
+            <!-- Form Fields Grid (2 Columns: Field on left, Value on right) -->
+            <div class="form-grid">
+                <!-- Field Selection Column -->
+                <div class="form-col field-col">
+                    <mat-form-field appearance="outline" class="full-width-field" subscriptSizing="dynamic">
+                        <mat-label>{{ 'TRANSACTION.FILTER.FIELD_LABEL' | translate }}</mat-label>
+                        <mat-select formControlName="field" panelClass="filter-select-panel">
+                            <mat-select-trigger>
+                                <div class="select-trigger-content">
+                                    <mat-icon class="field-select-icon">{{ currentField.icon }}</mat-icon>
+                                    <span class="field-label-text">{{ currentField.labelKey | translate }}</span>
+                                    <span class="field-key-badge">{{ currentField.key }}</span>
+                                </div>
+                            </mat-select-trigger>
+                            @for (f of filteredFields; track f.key) {
+                            <mat-option [value]="f.key" class="field-select-option">
+                                <div class="option-content">
+                                    <div class="option-left">
+                                        <mat-icon class="option-icon">{{ f.icon }}</mat-icon>
+                                        <span class="option-label">{{ f.labelKey | translate }}</span>
+                                    </div>
+                                    <span class="option-key">{{ f.key }}</span>
+                                </div>
+                            </mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+
+                <!-- Value Selection Column -->
+                <div class="form-col value-col">
+                    <!-- 1. Enum / Boolean select -->
+                    @if (currentField.type === 'enum' || currentField.type === 'boolean') {
+                    <mat-form-field appearance="outline" class="full-width-field" subscriptSizing="dynamic">
+                        <mat-label>{{ 'TRANSACTION.FILTER.VALUE_LABEL' | translate }}</mat-label>
+                        <mat-select formControlName="value" panelClass="filter-select-panel">
+                            <mat-select-trigger>
+                                @if (filterForm.get('value')?.value) {
+                                <span class="enum-badge enum-{{ filterForm.get('value')?.value | lowercase }}">
+                                    {{ filterForm.get('value')?.value }}
+                                </span>
+                                }
+                            </mat-select-trigger>
+                            @for (opt of currentField.options; track opt) {
+                            <mat-option [value]="opt" class="enum-select-option">
+                                <span class="enum-badge enum-{{ opt | lowercase }}">{{ opt }}</span>
+                            </mat-option>
+                            }
+                        </mat-select>
+                    </mat-form-field>
                     }
-                </mat-select>
-            </mat-form-field>
 
-            <!-- Value Input (Dynamic based on field type) -->
-            <div class="value-input-section">
-                <!-- 1. Enum select -->
-                @if (currentField.type === 'enum' || currentField.type === 'boolean') {
-                <mat-form-field appearance="outline" class="full-width-field" subscriptSizing="dynamic">
-                    <mat-label>{{ 'TRANSACTION.FILTER.VALUE_LABEL' | translate }}</mat-label>
-                    <mat-select formControlName="value">
-                        @for (opt of currentField.options; track opt) {
-                        <mat-option [value]="opt">
-                            <span class="enum-badge enum-{{ opt | lowercase }}">{{ opt }}</span>
-                        </mat-option>
-                        }
-                    </mat-select>
-                </mat-form-field>
-                }
-
-                <!-- 2. Text or Number input -->
-                @if (currentField.type === 'text' || currentField.type === 'number') {
-                <mat-form-field appearance="outline" class="full-width-field" subscriptSizing="dynamic">
-                    <mat-label>{{ 'TRANSACTION.FILTER.VALUE_LABEL' | translate }}</mat-label>
-                    <input matInput [type]="currentField.type === 'number' ? 'number' : 'text'"
-                        formControlName="value"
-                        [placeholder]="currentField.placeholder || ('TRANSACTION.FILTER.VALUE_PLACEHOLDER' | translate)">
-                    <mat-icon matSuffix>{{ currentField.icon }}</mat-icon>
-                </mat-form-field>
-                }
-
-                <!-- Quick Presets -->
-                @if (currentField.presets && currentField.presets.length > 0) {
-                <div class="presets-container">
-                    <span class="presets-label">{{ 'TRANSACTION.FILTER.PRESETS' | translate }}:</span>
-                    <div class="presets-chips">
-                        @for (preset of currentField.presets; track preset) {
-                        <button type="button" mat-stroked-button color="primary" class="preset-chip"
-                            (click)="onSelectPreset(preset)">
-                            {{ preset }}
+                    <!-- 2. Text or Number input -->
+                    @if (currentField.type === 'text' || currentField.type === 'number') {
+                    <mat-form-field appearance="outline" class="full-width-field" subscriptSizing="dynamic">
+                        <mat-label>{{ 'TRANSACTION.FILTER.VALUE_LABEL' | translate }}</mat-label>
+                        <input matInput [type]="currentField.type === 'number' ? 'number' : 'text'"
+                            formControlName="value"
+                            [placeholder]="currentField.placeholder || ('TRANSACTION.FILTER.VALUE_PLACEHOLDER' | translate)">
+                        @if (filterForm.get('value')?.value) {
+                        <button mat-icon-button matSuffix type="button" class="val-clear-btn"
+                            (click)="filterForm.get('value')?.setValue('')"
+                            [matTooltip]="'TRANSACTION.FILTER.CLEAR_VALUE' | translate">
+                            <mat-icon class="clear-icon">close</mat-icon>
                         </button>
                         }
+                    </mat-form-field>
+                    }
+
+                    <!-- Quick Presets -->
+                    @if (currentField.presets && currentField.presets.length > 0) {
+                    <div class="presets-container">
+                        <span class="presets-label">
+                            <mat-icon class="presets-icon">bolt</mat-icon>
+                            {{ 'TRANSACTION.FILTER.PRESETS' | translate }}:
+                        </span>
+                        <div class="presets-chips">
+                            @for (preset of currentField.presets; track preset) {
+                            <button type="button" class="preset-chip"
+                                [class.active]="filterForm.get('value')?.value === preset || filterForm.get('value')?.value === '' + preset"
+                                (click)="onSelectPreset(preset)">
+                                {{ preset }}
+                            </button>
+                            }
+                        </div>
                     </div>
+                    }
                 </div>
             </div>
 
@@ -135,12 +160,12 @@
 
     <!-- Dialog Actions -->
     <mat-dialog-actions align="end" class="dialog-actions">
-        <button mat-stroked-button (click)="onCancel()" class="action-btn">
+        <button mat-stroked-button (click)="onCancel()" class="action-btn-cancel">
             <mat-icon>keyboard_return</mat-icon>
             {{ 'TRANSACTION.FILTER.CANCEL' | translate }}
         </button>
-        <button mat-flat-button color="primary" (click)="onApply()" [disabled]="filterForm.invalid" class="action-btn">
-            <mat-icon>check</mat-icon>
+        <button mat-flat-button color="primary" (click)="onApply()" [disabled]="filterForm.invalid" class="action-btn-apply">
+            <mat-icon>add_circle_outline</mat-icon>
             {{ 'TRANSACTION.FILTER.APPLY' | translate }}
         </button>
     </mat-dialog-actions>

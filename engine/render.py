@@ -204,31 +204,30 @@ def _generate_sensors(
                                 + "\n"
                             }
                         )
-                        #TODO: Create attachment support on engine.index to copy attachment files to modsec/coreruleset folder
-                        """for r in rules:
-                            att = r.get("attachment")
-                            raw = r.get("raw") or ""
-                            if att:
-                                for match in re.finditer(
-                                    r"@(pmFromFile|ipMatchFromFile|pmf)\s+([^\s\"\'\)]+)",
-                                    raw,
-                                ):
-                                    data_file_name = os.path.basename(
-                                        match.group(2).strip().strip("\"'")
-                                    )
-                                    target_data_file = (
-                                        f"{output_dir}/modsec/coreruleset/{data_file_name}"
-                                    )
-                                    if not os.path.exists(target_data_file):
-                                        os.makedirs(
-                                            os.path.dirname(target_data_file),
-                                            exist_ok=True,
-                                        )
-                                        with open(
-                                            target_data_file, "w", encoding="utf-8"
-                                        ) as df:
-                                            df.write(att)
-                        """
+                        # TODO: Create attachment support on engine.index to copy attachment files to modsec/coreruleset folder
+                        # for r in rules:
+                        #     att = r.get("attachment")
+                        #     raw = r.get("raw") or ""
+                        #     if att:
+                        #         for match in re.finditer(
+                        #             r"@(pmFromFile|ipMatchFromFile|pmf)\s+([^\s\"\'\)]+)",
+                        #             raw,
+                        #         ):
+                        #             data_file_name = os.path.basename(
+                        #                 match.group(2).strip().strip("\"'")
+                        #             )
+                        #             target_data_file = (
+                        #                 f"{output_dir}/modsec/coreruleset/{data_file_name}"
+                        #             )
+                        #             if not os.path.exists(target_data_file):
+                        #                 os.makedirs(
+                        #                     os.path.dirname(target_data_file),
+                        #                     exist_ok=True,
+                        #                 )
+                        #                 with open(
+                        #                     target_data_file, "w", encoding="utf-8"
+                        #                 ) as df:
+                        #                     df.write(att)
                     categories.append(c)
 
             sensor.update({"categories": categories})
@@ -258,6 +257,11 @@ def _normalize_entities(data: dict) -> None:
             for item in data[key]:
                 if isinstance(item, dict):
                     item["render_name"] = _normalize_name_for_render(item)
+                    if key == "upstreams":
+                        persist = item.get("persist")
+                        if isinstance(persist, dict) and persist.get("type") == "COOKIE":
+                            cookie_name = persist.get("cookie_name") or "LB_X_NxGuard"
+                            persist["cookie_var"] = cookie_name.replace("-", "_")
 
 
 def __resolve_sensor_by_name(sensor_name, data):

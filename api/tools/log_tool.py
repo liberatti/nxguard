@@ -9,13 +9,27 @@ from typing import Any, Dict, List, Optional
 
 from api.middleware.logging_manager import logger
 
-from nxcore.middleware.logging_manager import logger
-from api.model.transaction_model import TransactionDao
-from config import MASKED_HEADERS
-
-
-def get_server_id():
-    return socket.gethostname()
+from api.repository.config_repository import ConfigDao
+from api.repository.transaction_repository import TransactionDao
+from api.repository.upstream_repository import NodeStatusDao
+from api.services.elasticsearch_service import ElasticsearchService
+from api.tools.http_parse_tool import (
+    parse_agent as _parse_agent,
+    parse_headers as _parse_headers,
+    resolve_status_code as _resolve_status_code,
+)
+from api.tools.network_tool import _is_ip
+from api.tools.type_parse_tool import (
+    parse_logtime as _parse_logtime,
+    to_float as _to_float,
+    to_int as _to_int,
+)
+from config import (
+    SCORE_REGEX,
+    SEVERITY_WEIGHTS,
+    SERVER_ID,
+    TZ,
+)
 
 
 class LogParserTool:
@@ -31,88 +45,8 @@ class LogParserTool:
         return line
 
     @classmethod
-    def resolve_status_code(cls, code):
-        try:
-            c = int(code)
-        except (ValueError, TypeError):
-            return "PASSED"
-        if c == 403:
-            return "DENY"
-        elif c in [404, 401, 500, 502, 503, 504]:
-            return "WARN"
-        elif c in [200, 201, 204, 301, 302, 304]:
-            return "PASSED"
-        return "PASSED"
-
-    @classmethod
-    def parse_agent(cls, user_agent_str):
-        if not user_agent_str or user_agent_str == "-":
-            return {"family": "Unknown", "major": 0, "minor": 0}
-
-        if ua_parse is not None:
-            try:
-                ua = ua_parse(user_agent_str)
-                return {
-                    "family": ua.browser.family or "Unknown",
-                    "major": (
-                        int(ua.browser.version[0])
-                        if ua.browser.version and len(ua.browser.version) > 0
-                        else 0
-                    ),
-                    "minor": (
-                        int(ua.browser.version[1])
-                        if ua.browser.version and len(ua.browser.version) > 1
-                        else 0
-                    ),
-                }
-            except Exception:
-                pass
-
-        try:
-            family = "Unknown"
-            major = 0
-            minor = 0
-            match = re.search(
-                r"(Firefox|Chrome|Safari|Edg(?:e)?|OPR|Opera|PostmanRuntime|curl|Python-requests|Wget)/(\d+)(?:\.(\d+))?",
-                user_agent_str,
-                re.IGNORECASE,
-            )
-            if match:
-                family = match.group(1)
-                major = int(match.group(2))
-                minor = int(match.group(3)) if match.group(3) else 0
-            elif "Mozilla" in user_agent_str:
-                family = "Mozilla"
-            return {"family": family, "major": major, "minor": minor}
-        except Exception:
-            return {"family": "Unknown", "major": 0, "minor": 0}
-
-    @classmethod
-    def parse_headers(cls, headers_dict):
-        if not headers_dict or not isinstance(headers_dict, dict):
-            return []
-        headers_list = []
-        for k, v in headers_dict.items():
-            headers_list.append({"name": str(k), "content": str(v)})
-        return headers_list
-
-    @classmethod
-    def _filter_headers(cls, headers):
-        if not headers:
-            return headers
-        masked = {h.lower() for h in MASKED_HEADERS}
-        if isinstance(headers, list):
-            return [
-                h
-                for h in headers
-                if not (isinstance(h, dict) and h.get("name", "").lower() in masked)
-            ]
-        if isinstance(headers, dict):
-            return {k: v for k, v in headers.items() if k.lower() not in masked}
-        return headers
-
-    @classmethod
-    def _extract_json_objects(cls, line: str) -> List[Dict[str, Any]]:
+    def access_log(cls, line: str) -> Optional[Dict[str, Any]]:
+        """Parses a line containing Nginx access log JSON."""
         line = line.strip()
         if not line:
             return None
@@ -340,82 +274,31 @@ class LogParserTool:
                     req_obj["files"] = request_raw["files"]
                 http["request"] = req_obj
 
-                now = time.time()
-                merged_records = []
-                logger.debug(
-                    f"\n\n{ service_name} Access records: {len(access_records)}, Audit records: {len(audit_records)}"
-                )
+            action = "allowed"
+            if "response" in trn:
+                response_raw = trn.pop("response")
+                status_code = _to_int(response_raw.get("http_code", 200), 200)
+                resp_obj: Dict[str, Any] = {
+                    "status_code": status_code,
+                    "headers": _parse_headers(response_raw.get("headers", {})),
+                }
+                if "body" in response_raw and response_raw["body"] is not None:
+                    resp_obj["body"] = response_raw["body"]
+                http["response"] = resp_obj
+                action = _resolve_status_code(status_code)
+            record.update({"http": http, "action": action})
 
-                # Correlate incoming access records
-                for acc in access_records:
-                    uid = acc.get("unique_id")
-                    if uid:
-                        if uid in pending_audit:
-                            aud, _ = pending_audit.pop(uid)
-                            merged = cls._combine_access_and_audit(
-                                acc, aud, service_name
-                            )
-                            merged_records.append(merged)
-                        else:
-                            pending_access[uid] = (acc, now)
-                    else:
-                        if not acc.get("service") or not acc["service"].get("name"):
-                            clean_name = service_name.rsplit("_", 1)[0] if ("_" in service_name and service_name.rsplit("_", 1)[1].isdigit()) else service_name
-                            acc["service"] = {"_id": service_name, "name": clean_name}
-                        merged_records.append(acc)
-
-                # Correlate incoming audit records
-                for aud in audit_records:
-                    uid = aud.get("unique_id")
-                    if uid:
-                        if uid in pending_access:
-                            acc, _ = pending_access.pop(uid)
-                            merged = cls._combine_access_and_audit(
-                                acc, aud, service_name
-                            )
-                            merged_records.append(merged)
-                        else:
-                            pending_audit[uid] = (aud, now)
-                    else:
-                        standalone = cls._audit_to_transaction(aud, service_name)
-                        merged_records.append(standalone)
-
-                # Flush pending access records older than 4 seconds
-                expired_access_uids = [
-                    uid for uid, (_, t) in pending_access.items() if now - t > 4.0
-                ]
-                for uid in expired_access_uids:
-                    acc, _ = pending_access.pop(uid)
-                    if not acc.get("service") or not acc["service"].get("name"):
-                        clean_name = service_name.rsplit("_", 1)[0] if ("_" in service_name and service_name.rsplit("_", 1)[1].isdigit()) else service_name
-                        acc["service"] = {"_id": service_name, "name": clean_name}
-                    merged_records.append(acc)
-
-                # Flush pending audit records older than 4 seconds
-                expired_audit_uids = [
-                    uid for uid, (_, t) in pending_audit.items() if now - t > 4.0
-                ]
-                for uid in expired_audit_uids:
-                    aud, _ = pending_audit.pop(uid)
-                    standalone = cls._audit_to_transaction(aud, service_name)
-                    merged_records.append(standalone)
-
-                if merged_records:
-                    with TransactionDao() as model:
-                        for record in merged_records:
-                            try:
-                                model.upsert_by_unique_id(record)
-                            except Exception as e:
-                                logger.error(
-                                    f"Error persisting merged transaction: {e}"
-                                )
-                    logger.debug(
-                        f"Merged {len(merged_records)} transactions for {service_name}"
-                    )
-
-            except Exception as e:
-                logger.error(
-                    f"Error merging transactions for {service_name}: {e} {traceback.format_exc()}"
+            audit = {}
+            if "producer" in trn:
+                producer_raw = trn.pop("producer")
+                audit.update(
+                    {
+                        "engine": producer_raw.get("modsecurity", ""),
+                        "connector": producer_raw.get("connector", ""),
+                        "mode": producer_raw.get("secrules_engine", ""),
+                        "components": producer_raw.get("components", []),
+                        "rulesets": producer_raw.get("rulesets", []),
+                    }
                 )
 
             if "messages" in trn:
@@ -460,123 +343,24 @@ class LogParserTool:
 
                 audit["messages"] = messages
 
-        if service_name and (
-            not merged.get("service") or not merged["service"].get("name")
-        ):
-            clean_name = service_name.rsplit("_", 1)[0] if ("_" in service_name and service_name.rsplit("_", 1)[1].isdigit()) else service_name
-            merged["service"] = {"_id": service_name, "name": clean_name}
-
-        if "http" in audit and audit["http"]:
-            aud_http = audit["http"]
-            acc_http = merged.get("http", {})
-            if "request" in aud_http and aud_http["request"]:
-                if "headers" in aud_http["request"] and aud_http["request"]["headers"]:
-                    acc_http.setdefault("request", {})["headers"] = cls._filter_headers(
-                        aud_http["request"]["headers"]
+                if "score" not in record and messages:
+                    record["score"] = sum(
+                        SEVERITY_WEIGHTS.get(str(m.get("severity") or ""), 0)
+                        for m in messages
                     )
-                if "method" in aud_http["request"] and not acc_http.get(
-                    "request", {}
-                ).get("method"):
-                    acc_http.setdefault("request", {})["method"] = aud_http["request"][
-                        "method"
-                    ]
-                if "uri" in aud_http["request"] and not acc_http.get("request", {}).get(
-                    "uri"
+
+                if str(record.get("action") or "").lower() not in (
+                    "blocked",
+                    "deny",
+                    "block",
                 ):
                     if any(
                         str(m.get("severity") or "") in ("2", "3") for m in messages
                     ):
                         record["action"] = "blocked"
 
-            if "response" in aud_http and aud_http["response"]:
-                if (
-                    "headers" in aud_http["response"]
-                    and aud_http["response"]["headers"]
-                ):
-                    acc_http.setdefault("response", {})["headers"] = cls._filter_headers(
-                        aud_http["response"]["headers"]
-                    )
-                if "status_code" in aud_http["response"] and not acc_http.get(
-                    "response", {}
-                ).get("status_code"):
-                    acc_http.setdefault("response", {})["status_code"] = aud_http[
-                        "response"
-                    ]["status_code"]
-
-            merged["http"] = acc_http
-
-        return merged
-
-    @classmethod
-    def _audit_to_transaction(
-        cls, audit: Dict[str, Any], service_name: str
-    ) -> Dict[str, Any]:
-        server_id = get_server_id()
-        remote_ip = audit.get("source", {}).get("ip", "")
-        geo_info = {"ip": remote_ip, "country": "--"}
-
-        status_code = audit.get("http", {}).get("response", {}).get("status_code", 403)
-        action = audit.get("action") or cls.resolve_status_code(status_code)
-
-        clean_name = service_name.rsplit("_", 1)[0] if ("_" in service_name and service_name.rsplit("_", 1)[1].isdigit()) else service_name
-        http_data = audit.get("http", {})
-        if "request" in http_data and "headers" in http_data["request"]:
-            http_data["request"]["headers"] = cls._filter_headers(
-                http_data["request"]["headers"]
-            )
-        if "response" in http_data and "headers" in http_data["response"]:
-            http_data["response"]["headers"] = cls._filter_headers(
-                http_data["response"]["headers"]
-            )
-
-        record = {
-            "logtime": audit.get("logtime") or datetime.now(),
-            "unique_id": audit.get("unique_id", ""),
-            "server_id": audit.get("server_id") or server_id,
-            "service": {"_id": service_name, "name": clean_name},
-            "route_name": "-",
-            "upstream": None,
-            "sensor": None,
-            "action": action,
-            "limit_req_status": "",
-            "geoip_status": "",
-            "rbl_status": "",
-            "rate_limit": {},
-            "geoip": {},
-            "reputation": {},
-            "mtls": {},
-            "score": audit.get("score", 0),
-            "user_agent": {"family": "Unknown", "major": 0, "minor": 0},
-            "source": {
-                "ip": remote_ip,
-                "port": audit.get("source", {}).get("port", 0),
-                "geo": geo_info,
-            },
-            "destination": {
-                "ip": audit.get("destination", {}).get("ip", ""),
-                "port": audit.get("destination", {}).get("port", 443),
-                "host": "",
-            },
-            "http": http_data,
-            "audit": audit.get("audit", {}),
-        }
-        return record
-
-    @classmethod
-    def _parse_and_cache_line(cls, log_type: str, line: str, cache):
-        records = []
-        try:
-            if log_type == "ERROR":
-                r = cls.error_log(line)
-            elif log_type == "ACCESS":
-                r = cls.access_log(line)
-            elif log_type == "AUDIT":
-                r = cls.audit_log(line)
-            else:
-                r = None
-
-            if r:
-                records = [r] if not isinstance(r, list) else r
+            record.update({"audit": audit})
+            return record
         except Exception as e:
             logger.error(f"Error parsing audit log item: {e}")
             return None

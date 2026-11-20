@@ -3,7 +3,6 @@ from flask import Blueprint, request, Response
 from api.middleware.controllers.base_controller import (
     response_data,
     response_error_404,
-    get_pagination,
     has_any_authority,
 )
 

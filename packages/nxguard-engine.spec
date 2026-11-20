@@ -51,7 +51,6 @@ export LUAJIT_INC=/root/rpmbuild/BUILD/luajit-build/opt/nxguard/luajit/include/l
     --with-stream_ssl_preread_module \
     --with-http_stub_status_module \
     --with-http_v2_module \
-    --with-debug \
     --with-cc-opt='-D FD_SETSIZE=32768 -Wno-error' \
     --with-ld-opt='-Wl,-rpath,/opt/nxguard/luajit/lib' \
     --add-module=modules/ngx_devel_kit-0.3.3 \

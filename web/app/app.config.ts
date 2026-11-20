@@ -54,7 +54,8 @@ const getInitialLang = (): string => {
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: { appearance: 'outline' } },
+    provideAnimationsAsync(),
+    { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: { appearance: 'outline', floatLabel: 'always' } },
     provideHighlightOptions({
       coreLibraryLoader: () => import('highlight.js/lib/core'),
       lineNumbersLoader: () => import('ngx-highlightjs/line-numbers'), // Optional, add line numbers if needed
@@ -78,7 +79,7 @@ export const appConfig: ApplicationConfig = {
         suffix: '.json'
       }),
       fallbackLang: 'en_US',
-      lang: (typeof window !== 'undefined' && (localStorage.getItem('lang') || JSON.parse(localStorage.getItem('ui_config') || '{}')?.locale)) || 'en_US'
+      lang: getInitialLang()
     })
   ]
 };

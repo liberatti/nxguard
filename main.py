@@ -12,7 +12,6 @@ from flask_cors import CORS
 from flask_marshmallow import Marshmallow
 from flask_restful import Api
 
-import config
 from api.routes import register as register_api_routes
 
 app = Flask(__name__)

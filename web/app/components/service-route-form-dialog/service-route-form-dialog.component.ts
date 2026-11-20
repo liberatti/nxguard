@@ -49,7 +49,13 @@ export function nginxRegexValidator(): ValidatorFn {
             return { invalidRegex: true };
         }
 
+        if (trimmed.length > 512) {
+            return { invalidRegex: true };
+        }
+
         try {
+            // Safe: Instantiated only to validate regex syntax compilation in form validation; never executed for matching.
+            // nosemgrep: javascript.lang.security.audit.detect-non-literal-regexp.detect-non-literal-regexp
             new RegExp(trimmed);
         } catch {
             return { invalidRegex: true };
@@ -59,6 +65,8 @@ export function nginxRegexValidator(): ValidatorFn {
     };
 }
 
+
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
     selector: 'app-service-route-form-dialog',

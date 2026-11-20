@@ -2,8 +2,6 @@ import { ProtocolType, SessionPersistenceEntity, TargetEntity, UpstreamType } fr
 
 export type UpstreamHealthStatus = 'healthy' | 'partially_healthy' | 'unhealthy' | 'invalid';
 
-export type UpstreamHealthStatus = 'healthy' | 'partially_healthy' | 'unhealthy' | 'invalid';
-
 export interface Upstream {
     _id: string;
     name: string;

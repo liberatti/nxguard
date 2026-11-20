@@ -62,8 +62,11 @@
 
                                 <mat-form-field class="full-width">
                                     <mat-label>{{ 'CONFIG_PAGE.IPXA_KEY' | translate }}</mat-label>
-                                    <input matInput type="password" formControlName="key" id="ipxa-key-input">
-                                    <mat-icon matSuffix class="field-icon">vpn_key</mat-icon>
+                                    <input matInput [type]="hideIpxaKey ? 'password' : 'text'" formControlName="key" id="ipxa-key-input">
+                                    <button type="button" mat-icon-button matSuffix (click)="hideIpxaKey = !hideIpxaKey"
+                                        [attr.aria-label]="'Toggle IPXA key visibility'" class="password-toggle-btn">
+                                        <mat-icon>{{ hideIpxaKey ? 'visibility_off' : 'visibility' }}</mat-icon>
+                                    </button>
                                     <mat-hint>{{ 'CONFIG_PAGE.IPXA_KEY_HINT' | translate }}</mat-hint>
                                 </mat-form-field>
                             </div>
@@ -118,72 +121,279 @@
                         </mat-expansion-panel-header>
 
                         <div class="panel-content-body policy-stack">
-                            <!-- Archiving Card -->
-                            <mat-card appearance="outlined" formGroupName="archive" class="policy-card">
-                                <mat-card-header class="policy-header">
-                                    <div class="policy-title-group">
-                                        <mat-icon class="policy-icon">archive</mat-icon>
-                                        <span class="policy-title">{{ 'CONFIG_PAGE.ARCHIVE_TITLE' | translate }}</span>
-                                    </div>
-                                    <mat-slide-toggle labelPosition="before" formControlName="enabled" id="archive-toggle" color="primary">
-                                        {{ 'CONFIG_PAGE.ARCHIVE_TOGGLE' | translate }}
-                                    </mat-slide-toggle>
-                                </mat-card-header>
-
-                                <mat-card-content class="policy-body">
-                                    <p class="policy-desc">{{ 'CONFIG_PAGE.ARCHIVE_DESC' | translate }}</p>
-
-                                    @if (form.get('archive.enabled')?.value) {
-                                    <div class="policy-fields">
-                                        <div class="fields-grid-3">
-                                            <mat-form-field class="full-width">
-                                                <mat-label>{{ 'CONFIG_PAGE.ARCHIVE_AFTER' | translate }}</mat-label>
-                                                <input matInput type="number" formControlName="archive_after" id="archive-after-input">
-                                                <mat-icon matSuffix class="field-icon">timer</mat-icon>
-                                            </mat-form-field>
-
-                                            <mat-form-field class="full-width span-2">
-                                                <mat-label>{{ 'CONFIG_PAGE.CLUSTER_URL' | translate }}</mat-label>
-                                                <input matInput formControlName="url" id="elasticsearch-url-input" placeholder="http://elasticsearch:9200">
-                                                <mat-icon matSuffix class="field-icon">dns</mat-icon>
-                                            </mat-form-field>
+                            <!-- Card 1: Transaction Logging Card -->
+                            <mat-card appearance="outlined" formGroupName="logging" class="policy-card">
+                                <div class="policy-card-header">
+                                    <div class="policy-header-left">
+                                        <div class="policy-icon-badge">
+                                            <mat-icon>receipt_long</mat-icon>
                                         </div>
                                         <div class="policy-header-title-wrap">
                                             <h3 class="policy-card-title">{{ 'CONFIG_PAGE.LOGGING_TITLE' | translate }}</h3>
                                             <p class="policy-card-subtitle">{{ 'CONFIG_PAGE.LOGGING_DESC' | translate }}</p>
                                         </div>
                                     </div>
+                                </div>
+
+                                <div class="policy-card-body">
+                                    <!-- Destination & Audit Scope Section -->
+                                    <div class="policy-main-grid">
+                                        <!-- Column 1: Mode Selection & Info -->
+                                        <div class="mode-selection-col">
+                                            <mat-form-field class="full-width" subscriptSizing="dynamic">
+                                                <mat-label>{{ 'CONFIG_PAGE.LOGGING_MODE' | translate }}</mat-label>
+                                                <mat-select formControlName="mode" id="logging-mode-select">
+                                                    <mat-select-trigger>
+                                                        <div class="select-trigger-item">
+                                                            <mat-icon class="trigger-icon">{{ form.get('logging.mode')?.value === 'local' ? 'storage' : 'cloud_sync' }}</mat-icon>
+                                                            <span class="trigger-text">{{ form.get('logging.mode')?.value === 'local' ? ('CONFIG_PAGE.LOGGING_MODE_LOCAL' | translate) : ('CONFIG_PAGE.LOGGING_MODE_ELASTICSEARCH' | translate) }}</span>
+                                                        </div>
+                                                    </mat-select-trigger>
+                                                    <mat-option value="local">
+                                                        <div class="select-option-item">
+                                                            <mat-icon class="option-icon">storage</mat-icon>
+                                                            <span>{{ 'CONFIG_PAGE.LOGGING_MODE_LOCAL' | translate }}</span>
+                                                        </div>
+                                                    </mat-option>
+                                                    <mat-option value="elasticsearch">
+                                                        <div class="select-option-item">
+                                                            <mat-icon class="option-icon">cloud_sync</mat-icon>
+                                                            <span>{{ 'CONFIG_PAGE.LOGGING_MODE_ELASTICSEARCH' | translate }}</span>
+                                                        </div>
+                                                    </mat-option>
+                                                </mat-select>
+                                                <mat-icon matSuffix class="field-icon">tune</mat-icon>
+                                                <mat-hint>{{ 'CONFIG_PAGE.LOGGING_MODE_HINT' | translate }}</mat-hint>
+                                            </mat-form-field>
+
+                                            <!-- Contextual Mode Info Callout -->
+                                            <div class="mode-callout" [class.callout-local]="form.get('logging.mode')?.value === 'local'" [class.callout-es]="form.get('logging.mode')?.value === 'elasticsearch'">
+                                                <mat-icon class="callout-icon">{{ form.get('logging.mode')?.value === 'local' ? 'info_outline' : 'cloud_done' }}</mat-icon>
+                                                <p class="callout-text">
+                                                    {{ form.get('logging.mode')?.value === 'local' ? ('CONFIG_PAGE.LOGGING_MODE_LOCAL_INFO' | translate) : ('CONFIG_PAGE.LOGGING_MODE_ES_INFO' | translate) }}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <!-- Column 2: ModSecurity Audit Log Parts Multi-Select -->
+                                        <div class="audit-parts-col">
+                                            <mat-form-field class="full-width" subscriptSizing="dynamic">
+                                                <mat-label>{{ 'CONFIG_PAGE.SEC_AUDIT_LOG_PARTS' | translate }}</mat-label>
+                                                <mat-select [formControl]="auditLogPartsControl" multiple id="sec-audit-log-parts-select"
+                                                            [placeholder]="'CONFIG_PAGE.SEC_AUDIT_LOG_PARTS_PLACEHOLDER' | translate">
+                                                    <mat-select-trigger>
+                                                        <div class="audit-select-trigger">
+                                                            <div class="trigger-code-badges">
+                                                                @for (part of auditLogPartsControl.value; track part) {
+                                                                <span class="trigger-badge">{{ part }}</span>
+                                                                }
+                                                            </div>
+                                                            <span class="trigger-count">({{ auditLogPartsControl.value?.length || 0 }} {{ 'CONFIG_PAGE.PARTS_SELECTED' | translate }})</span>
+                                                        </div>
+                                                    </mat-select-trigger>
+
+                                                    @for (part of auditLogPartOptions; track part.code) {
+                                                    <mat-option [value]="part.code" class="audit-part-option">
+                                                        <div class="audit-option-content">
+                                                            <div class="audit-option-header">
+                                                                <span class="part-badge">{{ part.code }}</span>
+                                                                <span class="part-name">{{ part.nameKey | translate }}</span>
+                                                            </div>
+                                                            <span class="part-desc">{{ part.descKey | translate }}</span>
+                                                        </div>
+                                                    </mat-option>
+                                                    }
+                                                </mat-select>
+                                                <mat-icon matSuffix class="field-icon">rule</mat-icon>
+                                                <mat-hint>{{ 'CONFIG_PAGE.SEC_AUDIT_LOG_PARTS_HINT' | translate }}</mat-hint>
+                                            </mat-form-field>
+
+                                            <!-- Preset Quick Fill Chips -->
+                                            <div class="preset-chips-group">
+                                                <span class="preset-label">Presets:</span>
+                                                <button type="button" class="preset-chip" [class.active-preset]="isAuditPresetActive('ABHF')"
+                                                    (click)="setAuditLogPreset('ABHF')">
+                                                    {{ 'CONFIG_PAGE.PRESET_DEFAULT' | translate }}
+                                                </button>
+                                                <button type="button" class="preset-chip" [class.active-preset]="isAuditPresetActive('ABCEFHJKZ')"
+                                                    (click)="setAuditLogPreset('ABCEFHJKZ')">
+                                                    {{ 'CONFIG_PAGE.PRESET_FULL' | translate }}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Elasticsearch Cluster Section (when mode === 'elasticsearch') -->
+                                    @if (form.get('logging.mode')?.value === 'elasticsearch') {
+                                    <div class="remote-cluster-config">
+                                        <!-- Cluster Connection Box -->
+                                        <div class="sub-section-box">
+                                            <div class="sub-section-header">
+                                                <div class="sub-section-title-wrap">
+                                                    <mat-icon class="sub-section-icon">dns</mat-icon>
+                                                    <div>
+                                                        <h4 class="sub-section-title">{{ 'CONFIG_PAGE.ELASTICSEARCH_SECTION_TITLE' | translate }}</h4>
+                                                        <p class="sub-section-desc">{{ 'CONFIG_PAGE.ELASTICSEARCH_SECTION_DESC' | translate }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="sub-section-body">
+                                                <div class="fields-grid">
+                                                    <mat-form-field class="full-width">
+                                                        <mat-label>{{ 'CONFIG_PAGE.INDEX_URL' | translate }}</mat-label>
+                                                        <input matInput formControlName="index_url" id="logging-index-url-input" placeholder="http://elasticsearch:9200">
+                                                        <mat-icon matSuffix class="field-icon">dns</mat-icon>
+                                                        <mat-hint>{{ 'CONFIG_PAGE.INDEX_URL_HINT' | translate }}</mat-hint>
+                                                    </mat-form-field>
+
+                                                    <mat-form-field class="full-width">
+                                                        <mat-label>{{ 'CONFIG_PAGE.LOGGING_TYPE' | translate }}</mat-label>
+                                                        <mat-select formControlName="type" id="logging-type-select">
+                                                            <mat-option value="elasticsearch">Elasticsearch / OpenSearch</mat-option>
+                                                        </mat-select>
+                                                        <mat-icon matSuffix class="field-icon">category</mat-icon>
+                                                    </mat-form-field>
+                                                </div>
+
+                                                <div class="fields-grid mt-3">
+                                                    <mat-form-field class="full-width">
+                                                        <mat-label>{{ 'CONFIG_PAGE.INDEX_USERNAME' | translate }}</mat-label>
+                                                        <input matInput formControlName="index_username" id="logging-index-username-input" autocomplete="username">
+                                                        <mat-icon matSuffix class="field-icon">person</mat-icon>
+                                                    </mat-form-field>
+
+                                                    <mat-form-field class="full-width">
+                                                        <mat-label>{{ 'CONFIG_PAGE.INDEX_PASSWORD' | translate }}</mat-label>
+                                                        <input matInput [type]="hideIndexPassword ? 'password' : 'text'" formControlName="index_password"
+                                                            id="logging-index-password-input" autocomplete="current-password">
+                                                        <button type="button" mat-icon-button matSuffix (click)="hideIndexPassword = !hideIndexPassword"
+                                                            [attr.aria-label]="'Toggle password visibility'" class="password-toggle-btn">
+                                                            <mat-icon>{{ hideIndexPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+                                                        </button>
+                                                    </mat-form-field>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Dashboards / Kibana Connection Box -->
+                                        <div class="sub-section-box mt-4">
+                                            <div class="sub-section-header">
+                                                <div class="sub-section-title-wrap">
+                                                    <mat-icon class="sub-section-icon dashboard-icon">dashboard</mat-icon>
+                                                    <div>
+                                                        <h4 class="sub-section-title">{{ 'CONFIG_PAGE.DASHBOARD_SECTION_TITLE' | translate }}</h4>
+                                                        <p class="sub-section-desc">{{ 'CONFIG_PAGE.DASHBOARD_SECTION_DESC' | translate }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="sub-section-body">
+                                                <div class="fields-grid-single">
+                                                    <mat-form-field class="full-width">
+                                                        <mat-label>{{ 'CONFIG_PAGE.DASHBOARD_URL' | translate }}</mat-label>
+                                                        <input matInput formControlName="dashboard_url" id="logging-dashboard-url-input" placeholder="http://kibana:5601">
+                                                        <mat-icon matSuffix class="field-icon">dashboard</mat-icon>
+                                                        <mat-hint>{{ 'CONFIG_PAGE.DASHBOARD_URL_HINT' | translate }}</mat-hint>
+                                                    </mat-form-field>
+                                                </div>
+
+                                                <div class="fields-grid mt-3">
+                                                    <mat-form-field class="full-width">
+                                                        <mat-label>{{ 'CONFIG_PAGE.DASHBOARD_USERNAME' | translate }}</mat-label>
+                                                        <input matInput formControlName="dashboard_username" id="logging-dashboard-username-input" autocomplete="username">
+                                                        <mat-icon matSuffix class="field-icon">person_outline</mat-icon>
+                                                    </mat-form-field>
+
+                                                    <mat-form-field class="full-width">
+                                                        <mat-label>{{ 'CONFIG_PAGE.DASHBOARD_PASSWORD' | translate }}</mat-label>
+                                                        <input matInput [type]="hideDashboardPassword ? 'password' : 'text'" formControlName="dashboard_password"
+                                                            id="logging-dashboard-password-input" autocomplete="current-password">
+                                                        <button type="button" mat-icon-button matSuffix (click)="hideDashboardPassword = !hideDashboardPassword"
+                                                            [attr.aria-label]="'Toggle password visibility'" class="password-toggle-btn">
+                                                            <mat-icon>{{ hideDashboardPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+                                                        </button>
+                                                    </mat-form-field>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                     }
-                                </mat-card-content>
+                                </div>
                             </mat-card>
 
                             <!-- Card 2: Purging Card -->
                             <mat-card appearance="outlined" formGroupName="purge" class="policy-card">
-                                <mat-card-header class="policy-header">
-                                    <div class="policy-title-group">
-                                        <mat-icon class="policy-icon">auto_delete</mat-icon>
-                                        <span class="policy-title">{{ 'CONFIG_PAGE.PURGE_TITLE' | translate }}</span>
-                                    </div>
-                                    <mat-slide-toggle labelPosition="before" formControlName="enabled" id="purge-toggle" color="primary">
-                                        {{ 'CONFIG_PAGE.PURGE_TOGGLE' | translate }}
-                                    </mat-slide-toggle>
-                                </mat-card-header>
-
-                                <mat-card-content class="policy-body">
-                                    <p class="policy-desc">{{ 'CONFIG_PAGE.PURGE_DESC' | translate }}</p>
-
-                                    @if (form.get('purge.enabled')?.value) {
-                                    <div class="policy-fields">
-                                        <div class="fields-grid-single">
-                                            <mat-form-field class="max-w-md">
-                                                <mat-label>{{ 'CONFIG_PAGE.PURGE_AFTER' | translate }}</mat-label>
-                                                <input matInput type="number" formControlName="purge_after" id="purge-after-input">
-                                                <mat-icon matSuffix class="field-icon">calendar_today</mat-icon>
-                                            </mat-form-field>
+                                <div class="policy-card-header">
+                                    <div class="policy-header-left">
+                                        <div class="policy-icon-badge purge-badge">
+                                            <mat-icon>auto_delete</mat-icon>
+                                        </div>
+                                        <div class="policy-header-title-wrap">
+                                            <h3 class="policy-card-title">{{ 'CONFIG_PAGE.PURGE_TITLE' | translate }}</h3>
+                                            <p class="policy-card-subtitle">{{ 'CONFIG_PAGE.PURGE_DESC' | translate }}</p>
                                         </div>
                                     </div>
-                                    }
-                                </mat-card-content>
+                                    <div class="policy-header-toggle">
+                                        <mat-slide-toggle formControlName="enabled" id="purge-toggle" color="primary">
+                                            {{ 'CONFIG_PAGE.PURGE_TOGGLE' | translate }}
+                                        </mat-slide-toggle>
+                                    </div>
+                                </div>
+
+                                @if (form.get('purge.enabled')?.value) {
+                                <div class="policy-card-body">
+                                    <div class="purge-fields-wrap">
+                                        <mat-form-field class="max-w-md">
+                                            <mat-label>{{ 'CONFIG_PAGE.PURGE_AFTER' | translate }}</mat-label>
+                                            <input matInput type="number" formControlName="purge_after" id="purge-after-input" min="1">
+                                            <span matSuffix class="field-suffix-text">{{ 'CONFIG_PAGE.DAYS_SUFFIX' | translate }}</span>
+                                            <mat-icon matSuffix class="field-icon">calendar_today</mat-icon>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                                }
+                            </mat-card>
+                        </div>
+                    </mat-expansion-panel>
+
+                    <!-- Panel 5: Audit & History Retention -->
+                    <mat-expansion-panel [expanded]="true" id="audit-history-panel" class="custom-panel">
+                        <mat-expansion-panel-header>
+                            <mat-panel-title class="panel-title-group">
+                                <mat-icon class="panel-icon">manage_history</mat-icon>
+                                <span>{{ 'CONFIG_PAGE.PANEL_AUDIT_HISTORY' | translate }}</span>
+                            </mat-panel-title>
+                            <mat-panel-description class="panel-desc">
+                                {{ 'CONFIG_PAGE.PANEL_AUDIT_HISTORY_DESC' | translate }}
+                            </mat-panel-description>
+                        </mat-expansion-panel-header>
+
+                        <div class="panel-content-body policy-stack">
+                            <mat-card appearance="outlined" formGroupName="audit" class="policy-card">
+                                <div class="policy-card-header">
+                                    <div class="policy-header-left">
+                                        <div class="policy-icon-badge audit-badge">
+                                            <mat-icon>history_toggle_off</mat-icon>
+                                        </div>
+                                        <div class="policy-header-title-wrap">
+                                            <h3 class="policy-card-title">{{ 'CONFIG_PAGE.AUDIT_RETENTION_TITLE' | translate }}</h3>
+                                            <p class="policy-card-subtitle">{{ 'CONFIG_PAGE.AUDIT_RETENTION_DESC' | translate }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="policy-card-body">
+                                    <div class="audit-fields-wrap">
+                                        <mat-form-field appearance="outline" class="max-w-md">
+                                            <mat-label>{{ 'CONFIG_PAGE.AUDIT_RETAIN_VERSIONS' | translate }}</mat-label>
+                                            <mat-icon matPrefix class="field-icon">layers</mat-icon>
+                                            <input matInput type="number" formControlName="retain_versions" id="audit-retain-versions-input" min="1" max="1000" required>
+                                            <span matSuffix class="field-suffix-text">{{ 'CONFIG_PAGE.VERSIONS_SUFFIX' | translate }}</span>
+                                            <mat-hint>{{ 'CONFIG_PAGE.AUDIT_RETAIN_VERSIONS_HINT' | translate }}</mat-hint>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
                             </mat-card>
                         </div>
                     </mat-expansion-panel>
@@ -191,12 +401,16 @@
             </form>
         </mat-card-content>
 
-        <mat-card-actions align="end" class="mat-mdc-card-actions bottom-actions">
+        <mat-card-actions align="end" class="bottom-actions">
+            <button type="button" mat-stroked-button [routerLink]="['/config/audit']" id="audit-btn" class="mr-2">
+                <mat-icon>history</mat-icon>
+                <span>{{ 'VIEW.CONFIG_AUDIT.LINK' | translate }}</span>
+            </button>
             @if (oauth.isRole('superuser')) {
             <button type="button" mat-flat-button color="primary" (click)="onSubmit()"
-                id="save-btn">
-                <mat-icon>save</mat-icon>
-                {{ 'ACTIONS.SAVE' | translate }}
+                [disabled]="isSubmitting" id="save-btn" class="save-submit-btn">
+                <mat-icon>{{ isSubmitting ? 'hourglass_top' : 'save' }}</mat-icon>
+                <span>{{ 'ACTIONS.SAVE' | translate }}</span>
             </button>
             }
         </mat-card-actions>
