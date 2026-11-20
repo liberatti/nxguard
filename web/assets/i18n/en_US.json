@@ -23,13 +23,12 @@
     "SIGN_IN_BTN": "Login to Dashboard",
     "EMAIL": "Email",
     "PASSWORD": "Password",
-    "PLACEHOLDER_EMAIL": "your@email.com",
-    "PLACEHOLDER_PASSWORD": "Enter your password",
-    "SELECT_LANGUAGE": "Select language",
+    "LANGUAGE": "Language",
     "SUBTITLE_LOGIN": "Enter your credentials to access the console",
-    "ENTERPRISE_PLATFORM": "ENTERPRISE INTELLIGENCE PLATFORM",
-    "BRAND_DESCRIPTION": "Advanced IP Intelligence",
-    "TOGGLE_PASSWORD": "Hide password"
+    "FOOTER_NOTICE": "Authorized access only. All activities are monitored and logged.",
+    "VERSION": "Version",
+    "LICENSE_NOTICE": "Licensed under the",
+    "LICENSE_NAME": "Apache License 2.0"
   },
   "ABOUT": {
     "TITLE": "About NXGuard",
@@ -90,10 +89,21 @@
       "TOGGLE_ACTIVE": "Toggle service status"
     },
     "UPSTREAM": {
-      "LINK": "Upstreams",
-      "TITLE": "Upstreams",
-      "SUBTITLE": "Configure backend server pools, target addresses, load balancing algorithms and health checks",
-      "FILTER_PLACEHOLDER": "Search by name or description..."
+      "LINK": "Upstream",
+      "TITLE": "Upstream",
+      "SUBTITLE": "List of all upstreams",
+      "FILTER_PLACEHOLDER": "Filter upstreams by name or description...",
+      "ERR_TARGET_REQUIRED": "Backend upstream requires at least one target.",
+      "TARGETS": "Targets",
+      "TARGET_HOST": "Network Address",
+      "TARGET_PORT": "Service Port",
+      "TARGET_WEIGHT": "Weight",
+      "NO_TARGETS": "No targets configured. Add at least one target for this backend."
+    },
+    "HOSTNAME": {
+      "LINK": "Hostname",
+      "TITLE": "Hostname",
+      "SUBTITLE": "List of all Hostnames"
     },
     "CERTIFICATE": {
       "LINK": "Certificates",
@@ -131,14 +141,7 @@
     "FORCE_RENEW": "Pending Renewal",
     "RENEW_PENDING": "Pending renewal",
     "RENEW_SCHEDULED": "Renewal scheduled",
-    "RENEW_NOT_SCHEDULED": "No renewal scheduled",
-    "IN_USE": "In Use",
-    "IN_USE_COUNT_ONE": "{{ count }} service",
-    "IN_USE_COUNT": "{{ count }} services",
-    "NOT_IN_USE": "Not in use",
-    "IN_USE_TIP_ONE": "Used by {{ count }} service",
-    "IN_USE_TIP": "Used by {{ count }} services",
-    "NOT_IN_USE_TIP": "No service is using this certificate"
+    "RENEW_NOT_SCHEDULED": "No renewal scheduled"
   },
   "ROUTE": {
     "ALLOWED_METHODS": "Allowed HTTP Methods",
@@ -149,20 +152,10 @@
     "UPSTREAM": "Upstream",
     "SECURITY_SENSOR": "Security Sensor",
     "MONITOR_ONLY": "Monitor Only",
+    "REQUEST_METHODS": "Request Methods",
     "CACHE_METHODS": "Cache Methods",
     "INVALID_REGEX": "Invalid NGINX regex pattern",
-    "PATH_HINT": "e.g. ^/api/v1/.* or /static/",
-    "PRIORITY": "Priority",
-    "TARGET": "Destination",
-    "NO_SENSOR": "No Sensor",
-    "ADD_TITLE": "Add Route",
-    "EDIT_TITLE": "Edit Route",
-    "DIALOG_SUBTITLE": "Define URL matching rules, target destination, and security sensor inspection.",
-    "SECTION_GENERAL": "Routing Target & Identity",
-    "SECTION_PATH": "URL Path Matching",
-    "SECTION_SECURITY": "Security & WAF Policy",
-    "SECTION_HTTP": "HTTP Methods & Content",
-    "MONITOR_HINT": "Inspect and log security anomalies without blocking requests"
+    "PATH_HINT": "e.g. ^/api/v1/.* or /static/"
   },
   "SENSOR": {
     "IP_REPUTATION": "IP Reputation",
@@ -196,61 +189,11 @@
     "CONTROL_RULE": "Engine Control / Paranoia Gate",
     "VIEW_DETAILS": "View rule details",
     "NO_CATEGORIES_SELECTED": "No categories added to this sensor yet",
+    "FILTER_FEEDS_PLACEHOLDER": "Filter selected feeds...",
     "NO_FEEDS_SELECTED": "No feeds selected yet. Select from the dropdown above.",
-    "NO_BYPASS_SELECTED": "No bypass feeds selected yet. Select from the dropdown above.",
-    "BYPASS_COUNT_BADGE": "{{ count }} ByPass Feeds",
-    "BYPASS_COUNT_BADGE_ONE": "1 ByPass Feed",
     "FILTER_GEO_PLACEHOLDER": "Filter selected countries...",
     "NO_GEO_SELECTED": "No geo-blocked countries selected.",
     "CLEAR_ALL": "Clear all",
-    "VIEW_GEO_PROFILE": "Click to view full GeoIP country profile",
-    "VIEW_RBL_PROFILE": "Click to view full RBL threat intelligence profile",
-    "ADD_TITLE": "Add Sensor",
-    "EDIT_TITLE": "Edit Sensor",
-    "GENERAL": "General",
-    "GEO_COUNT_BADGE": "GeoIP: {{ count }} Countries",
-    "GEO_COUNT_BADGE_ONE": "GeoIP: 1 Country",
-    "RBL_COUNT_BADGE": "{{ count }} RBL Providers",
-    "RBL_COUNT_BADGE_ONE": "1 RBL Provider",
-    "RULES_COUNT_SUMMARY": "{{ filtered }} / {{ total }} Rules",
-    "NO_MATCHING_COUNTRIES": "No countries found matching your filter",
-    "SELECT_RULE": "Select rule {{ code }}",
-    "GEO_BLOCK_TITLE": "GeoIP Block",
-    "GEO_BLOCK_SUBTITLE": "Select regions and countries to block traffic.",
-    "RBL_BLOCK_TITLE": "RBL Threat Feeds Block",
-    "RBL_BLOCK_SUBTITLE": "Select threat intelligence feeds and reputation lists to block.",
-    "BYPASS_BLOCK_TITLE": "RBL ByPass & Trusted Feeds",
-    "BYPASS_BLOCK_SUBTITLE": "Select trusted intelligence and network feeds to bypass security filters.",
-    "SEARCH_GEO_PLACEHOLDER": "Search country or region...",
-    "LOADING_GEO_DATA": "Loading geographic data...",
-    "NO_GEO_DATA": "No geographic data available",
-    "GEO_LOAD_ERROR": "Unable to load countries and regions. Please try again.",
-    "NO_GEO_MATCH": "No countries or regions match your search",
-    "SEARCH_RBL_PLACEHOLDER": "Search threat feed or category...",
-    "SEARCH_BYPASS_PLACEHOLDER": "Search bypass feed or category...",
-    "VIEW_BYPASS_PROFILE": "Click to view full ByPass feed profile",
-    "VIEW_EDIT": "View/Edit",
-    "SELECT_ALL": "Select All",
-    "DESELECT_ALL": "Deselect All",
-    "EXPAND_REGION": "Expand {{ name }}",
-    "EXPAND_CATEGORY": "Expand {{ name }}",
-    "GEO_SELECTION_RATIO": "({{ selected }} / {{ total }} selected)",
-    "GEO_SELECTED_RATIO_BADGE": "{{ selected }} of {{ total }} selected",
-    "GEO_DRAWER_COUNT": "{{ selected }} / {{ total }} selected",
-    "GEO_TOTAL_SUMMARY": "{{ count }} countries selected",
-    "GEO_TOTAL_SUMMARY_ONE": "1 country selected",
-    "RBL_TOTAL_SUMMARY": "{{ count }} feeds selected",
-    "RBL_TOTAL_SUMMARY_ONE": "1 feed selected",
-    "BYPASS_TOTAL_SUMMARY": "{{ count }} bypass feeds selected",
-    "BYPASS_TOTAL_SUMMARY_ONE": "1 bypass feed selected",
-    "CONTINENTS": {
-      "AFRICA": "Africa",
-      "NORTH_AMERICA": "North America",
-      "SOUTH_AMERICA": "South America",
-      "ASIA": "Asia",
-      "EUROPE": "Europe",
-      "OCEANIA": "Oceania"
-    },
     "SAVED_SUCCESS": "Sensor saved successfully",
     "UPDATED_SUCCESS": "Sensor updated successfully",
     "TITLE": "Sensor"
@@ -315,6 +258,7 @@
   "GEOIP_DIALOG": {
     "TITLE": "GeoIP Information",
     "SUBTITLE": "Geographic and network intelligence for source IP",
+    "IP_ADDRESS": "IP Address",
     "COUNTRY": "Country",
     "STATUS": "GeoIP Action",
     "ORGANIZATION": "Organization / ISP",
@@ -427,57 +371,17 @@
     "PURGE_TITLE": "Transaction Purging",
     "PURGE_TOGGLE": "Enable Database Purging",
     "PURGE_DESC": "Automatically delete outdated transactional records from the local DuckDB database to preserve high performance and disk storage.",
-    "PURGE_AFTER": "Maximum Data Age",
-    "DAYS_SUFFIX": "days",
-    "PANEL_AUDIT_HISTORY": "Audit & History",
-    "PANEL_AUDIT_HISTORY_DESC": "Configure version retention and baseline consolidation policies for configuration audit history",
-    "AUDIT_RETENTION_TITLE": "Configuration History Retention",
-    "AUDIT_RETENTION_DESC": "Specify how many historical configuration versions to preserve in Audit & History. Older versions are automatically pruned daily, consolidating a new baseline to support the retained versions.",
-    "AUDIT_RETAIN_VERSIONS": "Versions to Retain",
-    "AUDIT_RETAIN_VERSIONS_HINT": "Number of historical snapshots kept in the timeline (default: 50)",
-    "VERSIONS_SUFFIX": "versions",
+    "PURGE_AFTER": "Maximum Data Age (days)",
     "PANEL_IPXA": "IPXA Integration",
     "PANEL_IPXA_DESC": "Configure IPXA threat intelligence and IP reputation service endpoint",
     "IPXA_URL": "IPXA Service URL",
     "IPXA_URL_HINT": "Endpoint URL of the IPXA threat intelligence service (e.g. http://ipxa:5000)",
     "IPXA_KEY": "IPXA API Key",
-    "IPXA_KEY_HINT": "Secret API key for authenticating with IPXA service",
-    "SUCCESS_SAVE": "Global configuration updated successfully",
-    "ERROR_SAVE": "Failed to update configuration"
-  },
-  "CONFIG_AUDIT": {
-    "TITLE": "Configuration Audit & History",
-    "SUBTITLE": "Configuration timeline and version rollbacks",
-    "SCN": "SCN",
-    "HASH_RFC8785": "RFC 8785 Hash",
-    "CREATED_AT": "Created At",
-    "STATUS": "Status",
-    "ACTIVE": "ACTIVE",
-    "ARCHIVED": "ARCHIVED",
-    "ENTITIES": "Configured Entities",
-    "DIFF_TITLE": "Differences",
-    "NO_CHANGES": "No changes detected against baseline version.",
-    "BTN_APPLY_VERSION": "Restore This Version",
-    "CONFIRM_RESTORE_TITLE": "Restore Configuration Version?",
-    "CONFIRM_RESTORE_MSG": "Are you sure you want to restore and apply configuration version {{ scn }} ({{ date }})? This will replace the active running configuration.",
-    "RESTORE_SUCCESS": "Configuration version {{ scn }} restored and applied successfully.",
-    "STATS_ADD": "Added",
-    "STATS_CHANGED": "Changed",
-    "STATS_REMOVE": "Removed",
-    "HASH_COPIED": "Hash copied to clipboard",
-    "BTN_VIEW_DIFF": "View Diff",
-    "DIFF_DIALOG_TITLE": "Configuration Difference",
-    "BASELINE_LABEL": "Baseline",
-    "TARGET_LABEL": "Target",
-    "SEARCH_CHANGES": "Filter changes...",
-    "EXPAND_ALL": "Expand All",
-    "COLLAPSE_ALL": "Collapse All",
-    "VALUE_BEFORE": "Before",
-    "VALUE_AFTER": "After"
+    "IPXA_KEY_HINT": "Secret API key for authenticating with IPXA service"
   },
   "DASHBOARD_PAGE": {
     "TITLE": "Security Overview",
-    "SUBTITLE": "Real-time threat monitoring, traffic throughput, and system health status",
+    "SUBTITLE": "Real-time threat monitoring and system health",
     "REFRESH_LABEL": "Refresh",
     "REFRESH_5S": "Refresh: 5s",
     "REFRESH_10S": "Refresh: 10s",
@@ -496,14 +400,6 @@
     "HEALTHY": "HEALTHY",
     "DEGRADED": "DEGRADED",
     "ACTIVE_NODES": "{{count}} Active Nodes",
-    "IPXA_TITLE": "IPXA Intelligence",
-    "IPXA_ONLINE": "ONLINE",
-    "IPXA_OFFLINE": "OFFLINE",
-    "IPXA_UNAVAILABLE": "Service Unavailable",
-    "IPXA_GEOIP_LABEL": "GeoIP Database",
-    "IPXA_RBL_LABEL": "RBL Threat Rules",
-    "IPXA_FEEDS_LABEL": "Threat Feeds",
-    "IPXA_DETAILS_TOOLTIP": "GeoIP: {{geoip}} entries | RBL: {{rbl}} rules | Feeds: {{bypass}} bypass, {{rep}} reputation | Cache: {{cache}} entries",
     "BANDWIDTH_TITLE": "Bandwidth Throughput",
     "BANDWIDTH_DESC": "Data volume transferred (Bytes In vs Bytes Out)",
     "BYTES_IN": "BYTES IN",
@@ -667,21 +563,104 @@
     "MINUTE": "Minute",
     "SECOND": "Second"
   },
+  "UPSTREAM": {
+    "ERR_TARGET_REQUIRED": "Backend upstream requires at least one target.",
+    "TARGETS": {
+      "TITLE": "Targets",
+      "ADD_BTN": "Add Target",
+      "NETWORK_ADDRESS": "Network Address",
+      "SERVICE_PORT": "Service Port",
+      "DISTRIBUTION_WEIGHT": "Distribution Weight",
+      "ACTIONS": "Actions",
+      "EDIT_TOOLTIP": "Edit target",
+      "REMOVE_TOOLTIP": "Remove target",
+      "MODAL_TITLE_ADD": "Add Upstream Target",
+      "MODAL_TITLE_EDIT": "Edit Upstream Target",
+      "EMPTY_MESSAGE": "No targets configured. Add at least one target for this backend."
+    },
+    "STATES": {
+      "TITLE": "Upstream Health Status",
+      "NODE": "Node",
+      "STATUS": "Status",
+      "LAST_CHECK": "Last Check",
+      "LATENCY": "Latency",
+      "HEALTHY": "Healthy",
+      "PARTIALLY_HEALTHY": "Partially Healthy",
+      "UNHEALTHY": "Unhealthy",
+      "INVALID": "Unverified",
+      "NO_STATES": "No health check states recorded yet for this upstream.",
+      "WARNING_TOOLTIP": "One or more targets are in failure state"
+    }
+  },
+  "DATETIME": {
+    "HOUR": "Hour",
+    "MINUTE": "Minute",
+    "SECOND": "Second"
+  },
   "FORMAT": {
     "DISPLAY": {
       "DATETIME": "DD/MM/YYYY HH:mm:ss"
     }
   },
-  "RULECAT": {
-    "TITLE": "Rule Categories",
-    "SUBTITLE": "Manage ModSecurity and WAF rule categories",
-    "CREATE": "Create Category",
-    "EDIT": "Edit Category",
-    "VIEW": "View Category",
-    "READONLY_FEED_NOTICE": "This category originates from an official feed and is in read-only mode.",
-    "SRCTYPES": {
-      "FEED": "Official Feed",
-      "USER": "Custom"
+  "actions": {
+    "edit": "Edit",
+    "remove": "Remove",
+    "create": "Create",
+    "save": "Save",
+    "refresh": "Refresh",
+    "close": "Close",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "next": "Next",
+    "back": "Back",
+    "add": "Add",
+    "delete": "Delete",
+    "apply": "Apply",
+    "backup": "Backup",
+    "restore": "Restore"
+  },
+  "about": {
+    "title": "About NXGuard",
+    "subtitle": "High-Performance API Gateway & Security Engine",
+    "tab_about": "Overview",
+    "tab_backup_restore": "Backup & Restore",
+    "backup_title": "Export Configuration (Backup)",
+    "backup_desc": "Download a complete backup of all services, upstreams, and security rules in JSON format.",
+    "backup_btn": "Download Backup",
+    "restore_title": "Import Configuration (Restore)",
+    "restore_desc": "Upload a previously exported JSON backup to restore system configuration.",
+    "choose_file": "Choose JSON backup file",
+    "selected_file": "Selected File",
+    "powered_by": "Powered by OpenResty & ModSecurity",
+    "api_docs": "REST API",
+    "api_docs_sub": "OpenAPI / Swagger documentation",
+    "github_title": "GitHub Repository",
+    "github_sub": "Source code, releases & issue tracking",
+    "architecture_title": "Core Architecture"
+  },
+  "attr": {
+    "active": "Active",
+    "name": "Name",
+    "domains": "Domains",
+    "routes": "Routes",
+    "description": "Description",
+    "protocol": "Protocol",
+    "targets": "Targets",
+    "actions": "Actions"
+  },
+  "content": {
+    "copy": "&copy; 2026 nxguard. All rights reserved. This solution is built on top of OpenResty.",
+    "about": "This is a proxy server built on OpenResty with ModSecurity for advanced protection.",
+    "restore_notice": "Configuration Restore Notice: All existing data will be overwritten by the restored configuration."
+  },
+  "nav": {
+    "about": "About",
+    "account": "Account",
+    "logout": "Log Out"
+  },
+  "view": {
+    "backup": {
+      "link": "backup"
     },
     "EMPTY": "No rule categories found",
     "FIELDS": {
@@ -711,51 +690,55 @@
       "5": "Phase 5 - Response Body (Blocking Evaluation)",
       "6": "Phase 6 - Correlation & Logging"
     },
-    "SCOPES": {
-      "REQUEST": "Request",
-      "RESPONSE": "Response"
+    "service": {
+      "link": "Services",
+      "title": "Services",
+      "subtitle": "Describe all services",
+      "filter_placeholder": "Search by name or domain..."
     },
-    "TAB_DETAILS": "Details",
-    "TAB_RULES": "Rules",
-    "ADD_RULE": "Add Rule",
-    "NO_RULES_ADD_MODE": "Rules will be available after saving the category.",
-    "NO_RULES_USER": "No rules registered in this category. Click the button above to add the first rule.",
-    "RULES_SECTION_TITLE": "Category Rules",
-    "RULES_SECTION_SUBTITLE": "ModSecurity rules contained in this category",
-    "RULES_COUNT": "{{ count }} rule(s)",
-    "SEARCH_RULES_PLACEHOLDER": "Filter rules by code, message, tag or action...",
-    "VIEW_RAW": "View Raw Rule",
-    "CONFIRM_DELETE_TITLE": "Confirm Category Removal",
-    "RULE_DIALOG": {
-      "CREATE_TITLE": "New Security Rule",
-      "EDIT_TITLE": "Edit Security Rule",
-      "SUBTITLE": "Define the parameters and SecRule statement for this rule",
-      "CODE": "Rule ID / Code",
-      "CODE_HINT": "Numeric rule identifier (e.g. 1001)",
-      "ACTION": "Action",
-      "PHASE": "Execution Phase",
-      "SEVERITY": "Severity",
-      "MSG": "Description / Message",
-      "MSG_HINT": "Descriptive message (e.g. Unauthorized access blocked)",
-      "SCOPE": "Targets / Variables (Scope)",
-      "SCOPE_HINT": "Target variables (e.g. REQUEST_URI, ARGS, REQUEST_HEADERS)",
-      "OPERATOR": "Operator",
-      "PATTERN": "Pattern / Expression",
-      "PATTERN_HINT": "Pattern to check (e.g. (?i)(?:union|select))",
-      "RAW": "SecRule Statement (Raw)",
-      "RAW_HINT": "Complete ModSecurity SecRule statement",
-      "TAGS": "Tags",
-      "TAGS_HINT": "Comma-separated tags (e.g. custom, attack-generic)",
-      "COMMENT": "Notes / Comment",
-      "TAB_STRUCTURED": "Configuration",
-      "TAB_RAW": "Raw SecRule",
-      "ADD_BUTTON": "Add Rule",
-      "SAVE_BUTTON": "Save Rule"
+    "upstream": {
+      "link": "Upstreams",
+      "title": "Upstreams",
+      "subtitle": "List of all upstreams",
+      "filter_placeholder": "Search by name or description..."
     },
-    "NOTIFICATIONS": {
-      "SAVED": "Rule category saved successfully",
-      "UPDATED": "Rule category updated successfully",
-      "REMOVED": "Rule category removed successfully"
+    "hostname": {
+      "link": "Hostnames",
+      "title": "Hostnames",
+      "subtitle": "List of all hostnames"
+    },
+    "certificate": {
+      "link": "Certificates",
+      "title": "Certificates",
+      "subtitle": "List of all certificates"
+    },
+    "sensor": {
+      "link": "Sensors",
+      "title": "Sensors",
+      "subtitle": "List of all sensors",
+      "filter_placeholder": "Search by name or description..."
+    },
+    "user": {
+      "link": "Users",
+      "title": "Users",
+      "subtitle": "List of all users"
+    },
+    "config": {
+      "link": "Configuration",
+      "title": "Configuration",
+      "subtitle": "List of all configs"
+    },
+    "system": {
+      "link": "System"
+    }
+  },
+  "aboutMessage": "Thanks",
+  "format": {
+    "display": {
+      "datetime": "DD/MM/YYYY HH:mm:ss",
+      "monthYearLabel": "MMM YYYY",
+      "dateA11yLabel": "LL",
+      "monthYearA11yLabel": "MMMM YYYY"
     }
   }
 }

@@ -25,7 +25,7 @@ simplicity.
 
 ### Dashboard
 ![NXGuard Dashboard](.github/pages/src/assets/dashboard.png)
-*A modern management interface for controlling your API security.*
+*Modern, intuitive management interface for full control over your API security.*
 
 ### Transaction Monitoring
 ![Transactions Log](.github/pages/src/assets/transactions.png)
@@ -33,17 +33,17 @@ simplicity.
 
 ### Request & Rule Inspection
 ![Transaction Raw Details](.github/pages/src/assets/transaction-raw.png)
-*Detailed inspection of raw requests and responses.*
+*Detailed raw request and response inspection.*
 
 ![Transaction Rule Details](.github/pages/src/assets/transaction-rule-raw.png)
-*Detailed ModSecurity rule matches and trigger analysis.*
+*Granular ModSecurity rule match details and trigger analysis.*
 
 ---
 
 ## 🏗️ Architecture
 
 ![NXGuard Architecture Diagram](.github/pages/src/assets/architecture_diagram.png)
-*An architecture that integrates OpenResty, ModSecurity, and IPXA.*
+*High-performance architecture integrating OpenResty, ModSecurity, and IPXA.*
 
 ---
 

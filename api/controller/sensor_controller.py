@@ -12,11 +12,11 @@ from api.middleware.controllers.base_controller import (
 )
 
 
-from api.middleware.socket_manager import emit_event
-from api.repository.config_repository import ChangeDao
-from api.repository.sensor_repository import SensorDao
-from api.repository.service_repository import ServiceDao
-from api.services.feed_service import GeoService
+from nxcore.middleware.socket_manager import emit_event
+from api.model.config_model import ChangeDao
+from api.model.sensor_model import SensorDao
+from api.model.service_model import ServiceDao
+from api.services.ipxa_services import IPXAService
 
 routes = Blueprint("sensor", __name__)
 

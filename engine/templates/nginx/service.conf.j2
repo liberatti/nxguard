@@ -151,5 +151,5 @@ server {
 
   access_log off;
   error_log /opt/nxguard/logs/error-{{render_name if render_name else name}}.log warn;
-  log_by_lua_file {{BASE_PATH}}/luajit/share/lua/5.1/nxguard/handlers/access_logger.lua;
+  log_by_lua_file {{BASE_PATH}}/luajit/share/lua/5.1/nxguard/log_by_custom.lua;
 }

@@ -19,8 +19,7 @@ import { RouteService } from '../../services/route.service';
 import { ServiceService } from '../../services/service.service';
 import { TransactionService } from '../../services/transaction.service';
 import { UpstreamService } from '../../services/upstream.service';
-import { IpxaService } from '../../services/ipxa.service';
-import { EngineNode, Health, IpxaStats } from '../../models/config';
+import { EngineNode, Health } from '../../models/config';
 import { TransactionLog } from '../../models/transaction';
 import { DateFormatPipe } from '../../pipes/date_format.pipe';
 import { ByteFormatPipe } from '../../pipes/format_bytes.pipe';
@@ -165,7 +164,6 @@ export class DashboardHomeComponent implements OnInit, AfterViewInit, OnDestroy 
     refresh(): void {
         this.isRefreshing = true;
         this.loadHealth();
-        this.loadIpxaStats();
         this.loadUpstreams();
         this.loadProtectedAssets();
         this.loadRequestStats();
@@ -199,6 +197,25 @@ export class DashboardHomeComponent implements OnInit, AfterViewInit, OnDestroy 
             error: () => {
                 this.ipxaStats = null;
                 this.ipxaStatus = 'OFFLINE';
+                this.cdr.markForCheck();
+            },
+        });
+    }
+
+    loadUpstreams(): void {
+        this.upstreamService.get().subscribe({
+            next: (res: any) => {
+                this.totalUpstreams =
+                    res?.metadata?.total_elements ??
+                    (Array.isArray(res?.data)
+                        ? res.data.length
+                        : Array.isArray(res)
+                            ? res.length
+                            : 0);
+                this.cdr.markForCheck();
+            },
+            error: () => {
+                this.totalUpstreams = 0;
                 this.cdr.markForCheck();
             },
         });

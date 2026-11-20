@@ -65,14 +65,6 @@ export class SignInComponent implements OnInit {
                 private translate: TranslateService) {
     }
 
-    private sanitizeLang(lang: any): string {
-        if (!lang) return 'en_US';
-        if (typeof lang === 'object') {
-            return String(lang.key || lang.id || 'en_US').replace(/['"]+/g, '').trim();
-        }
-        return String(lang).replace(/['"]+/g, '').trim() || 'en_US';
-    }
-
     ngOnInit() {
         this.logout();
         this.locales = [
@@ -81,18 +73,13 @@ export class SignInComponent implements OnInit {
         ];
         const uiConfig = this.localStorage.get('ui_config');
         const uiLocale = uiConfig?.locale ? (typeof uiConfig.locale === 'object' ? (uiConfig.locale.key || uiConfig.locale.id) : uiConfig.locale) : null;
-        const savedLang = this.sanitizeLang(this.localStorage.get('lang') || uiLocale || 'en_US');
+        const savedLang = this.localStorage.get('lang') || uiLocale || 'en_US';
         this.translate.use(savedLang);
         this.form.controls.locale.setValue(savedLang);
-        this.updateLangCode(savedLang);
-    }
-
-    updateLangCode(lang: string) {
-        this.currentLangCode = lang && lang.toLowerCase().startsWith('pt') ? 'PT' : 'EN';
     }
 
     onLocaleChange(lang: string) {
-        const selectedLang = this.sanitizeLang(lang || 'en_US');
+        const selectedLang = lang || 'en_US';
         this.translate.use(selectedLang);
         this.localStorage.set('lang', selectedLang);
 
@@ -109,7 +96,6 @@ export class SignInComponent implements OnInit {
         }
         this.localStorage.set('ui_config', uiConfig);
         this.form.controls.locale.setValue(selectedLang);
-        this.updateLangCode(selectedLang);
     }
 
     login() {

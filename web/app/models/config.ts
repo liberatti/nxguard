@@ -19,21 +19,9 @@ export interface ConfigPurge {
     purge_after: number;
 }
 
-export interface ConfigAuditSettings {
-    retain_versions: number;
-}
-
 export interface ConfigIpxa {
     url?: string;
     key?: string;
-}
-
-export interface IpxaStats {
-    cache_size: number;
-    feeds_bypass: number;
-    feeds_reputation: number;
-    geoip_entries: number;
-    rbl_size: number;
 }
 
 export interface Config {
@@ -42,9 +30,8 @@ export interface Config {
     ca_private: string;
     acme_directory_url: string;
     dns_resolver?: string;
-    logging?: ConfigLogging;
+    archive: ConfigArchive;
     purge: ConfigPurge;
-    audit?: ConfigAuditSettings;
     ipxa?: ConfigIpxa;
 }
 export interface EngineNode {

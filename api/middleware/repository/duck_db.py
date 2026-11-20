@@ -310,7 +310,7 @@ class DuckDAO:
         vo = self.from_dict(vo)
         if not vo:
             return True
-        keys = ", ".join([f"{quote_identifier(k)} = ?" for k in vo.keys()])
+        keys = ", ".join([f"{k} = ?" for k in vo.keys()])
         sql = f"UPDATE {self.table_name} SET {keys} WHERE _id = ?"
         values = list(vo.values()) + [_id]
         self._query(sql, values)

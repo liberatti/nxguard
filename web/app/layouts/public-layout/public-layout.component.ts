@@ -33,8 +33,7 @@ export class PublicLayoutComponent implements AfterViewInit {
             this.config = <FrontendConfig>{ locale: savedLang || 'en_US', navResource: "transaction", sidenavOpened: false };
             this.localStorage.set('ui_config', this.config);
         }
-        const rawLangKey = savedLang || (typeof this.config.locale === 'object' ? (this.config.locale?.key || this.config.locale?.id || 'en_US') : (this.config.locale || 'en_US'));
-        const langKey = String(rawLangKey).replace(/['"]+/g, '').trim() || 'en_US';
+        const langKey = savedLang || (typeof this.config.locale === 'object' ? (this.config.locale?.key || this.config.locale?.id || 'en_US') : (this.config.locale || 'en_US'));
         this.translate.use(langKey);
         moment.locale(langKey);
     }

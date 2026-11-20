@@ -2,51 +2,22 @@
     <!-- Dashboard Header -->
     <div class="dashboard-header">
         <div>
-            <h1 class="gradient-text dashboard-title">
-                <mat-icon class="dashboard-title-icon">shield</mat-icon>
-                <span>{{ 'DASHBOARD_PAGE.TITLE' | translate }}</span>
-            </h1>
+            <h1 class="gradient-text dashboard-title">{{ 'DASHBOARD_PAGE.TITLE' | translate }}</h1>
             <p class="text-dim dashboard-subtitle">{{ 'DASHBOARD_PAGE.SUBTITLE' | translate }}</p>
         </div>
         <div class="dashboard-header-actions">
-            <div class="refresh-control-pill glass-effect">
-                <button mat-icon-button class="manual-refresh-btn" (click)="refresh()" [matTooltip]="'DASHBOARD_PAGE.REFRESH_LABEL' | translate">
-                    <mat-icon class="refresh-icon" [class.spinning]="isRefreshing">autorenew</mat-icon>
-                </button>
-                <div class="refresh-control-divider"></div>
-                <button mat-button class="refresh-menu-trigger" [matMenuTriggerFor]="refreshMenu" [matTooltip]="'DASHBOARD_PAGE.REFRESH_LABEL' | translate">
-                    <span class="refresh-label">{{ currentRefreshLabel | translate }}</span>
-                    <mat-icon class="dropdown-caret">expand_more</mat-icon>
-                </button>
-            </div>
-
-            <mat-menu #refreshMenu="matMenu" xPosition="before" class="refresh-dropdown-panel">
-                <button mat-menu-item (click)="onRefreshIntervalChange(5)" [class.selected-interval]="refreshIntervalSeconds === 5">
-                    <mat-icon class="menu-check-icon">{{ refreshIntervalSeconds === 5 ? 'check' : '' }}</mat-icon>
-                    <span>{{ 'DASHBOARD_PAGE.REFRESH_5S' | translate }}</span>
-                </button>
-                <button mat-menu-item (click)="onRefreshIntervalChange(10)" [class.selected-interval]="refreshIntervalSeconds === 10">
-                    <mat-icon class="menu-check-icon">{{ refreshIntervalSeconds === 10 ? 'check' : '' }}</mat-icon>
-                    <span>{{ 'DASHBOARD_PAGE.REFRESH_10S' | translate }}</span>
-                </button>
-                <button mat-menu-item (click)="onRefreshIntervalChange(15)" [class.selected-interval]="refreshIntervalSeconds === 15">
-                    <mat-icon class="menu-check-icon">{{ refreshIntervalSeconds === 15 ? 'check' : '' }}</mat-icon>
-                    <span>{{ 'DASHBOARD_PAGE.REFRESH_15S' | translate }}</span>
-                </button>
-                <button mat-menu-item (click)="onRefreshIntervalChange(30)" [class.selected-interval]="refreshIntervalSeconds === 30">
-                    <mat-icon class="menu-check-icon">{{ refreshIntervalSeconds === 30 ? 'check' : '' }}</mat-icon>
-                    <span>{{ 'DASHBOARD_PAGE.REFRESH_30S' | translate }}</span>
-                </button>
-                <button mat-menu-item (click)="onRefreshIntervalChange(60)" [class.selected-interval]="refreshIntervalSeconds === 60">
-                    <mat-icon class="menu-check-icon">{{ refreshIntervalSeconds === 60 ? 'check' : '' }}</mat-icon>
-                    <span>{{ 'DASHBOARD_PAGE.REFRESH_60S' | translate }}</span>
-                </button>
-                <mat-divider></mat-divider>
-                <button mat-menu-item (click)="onRefreshIntervalChange(0)" [class.selected-interval]="refreshIntervalSeconds === 0">
-                    <mat-icon class="menu-check-icon">{{ refreshIntervalSeconds === 0 ? 'check' : '' }}</mat-icon>
-                    <span>{{ 'DASHBOARD_PAGE.REFRESH_OFF' | translate }}</span>
-                </button>
-            </mat-menu>
+            <mat-form-field appearance="outline" class="refresh-select-field" subscriptSizing="dynamic">
+                <mat-icon matPrefix class="refresh-icon">autorenew</mat-icon>
+                <mat-select [(value)]="refreshIntervalSeconds"
+                    (selectionChange)="onRefreshIntervalChange($event.value)">
+                    <mat-option [value]="5">{{ 'DASHBOARD_PAGE.REFRESH_5S' | translate }}</mat-option>
+                    <mat-option [value]="10">{{ 'DASHBOARD_PAGE.REFRESH_10S' | translate }}</mat-option>
+                    <mat-option [value]="15">{{ 'DASHBOARD_PAGE.REFRESH_15S' | translate }}</mat-option>
+                    <mat-option [value]="30">{{ 'DASHBOARD_PAGE.REFRESH_30S' | translate }}</mat-option>
+                    <mat-option [value]="60">{{ 'DASHBOARD_PAGE.REFRESH_60S' | translate }}</mat-option>
+                    <mat-option [value]="0">{{ 'DASHBOARD_PAGE.REFRESH_OFF' | translate }}</mat-option>
+                </mat-select>
+            </mat-form-field>
         </div>
     </div>
 
@@ -149,25 +120,13 @@
                     <p class="text-dim chart-desc">{{ 'DASHBOARD_PAGE.BANDWIDTH_DESC' | translate }}</p>
                 </div>
                 <div class="badge-group">
-                    <div class="legend-badge legend-badge-inbound"
-                        (click)="toggleDataset('bandwidth', 0)"
-                        [class.dataset-hidden]="!isDatasetVisible('bandwidth', 0)"
-                        [matTooltip]="'DASHBOARD_PAGE.BYTES_IN' | translate">
-                        <span class="legend-color-dot inbound-dot"></span>
-                        <div class="legend-text-col">
-                            <span class="legend-badge-label">{{ 'DASHBOARD_PAGE.BYTES_IN' | translate }}</span>
-                            <span class="legend-badge-value">{{ totalBytesIn | byteFormat }}</span>
-                        </div>
+                    <div class="stat-badge stat-badge-inbound">
+                        <span class="stat-badge-label">{{ 'DASHBOARD_PAGE.BYTES_IN' | translate }}</span>
+                        <span class="stat-badge-value">{{ totalBytesIn | byteFormat }}</span>
                     </div>
-                    <div class="legend-badge legend-badge-outbound"
-                        (click)="toggleDataset('bandwidth', 1)"
-                        [class.dataset-hidden]="!isDatasetVisible('bandwidth', 1)"
-                        [matTooltip]="'DASHBOARD_PAGE.BYTES_OUT' | translate">
-                        <span class="legend-color-dot outbound-dot"></span>
-                        <div class="legend-text-col">
-                            <span class="legend-badge-label">{{ 'DASHBOARD_PAGE.BYTES_OUT' | translate }}</span>
-                            <span class="legend-badge-value">{{ totalBytesOut | byteFormat }}</span>
-                        </div>
+                    <div class="stat-badge stat-badge-outbound">
+                        <span class="stat-badge-label">{{ 'DASHBOARD_PAGE.BYTES_OUT' | translate }}</span>
+                        <span class="stat-badge-value">{{ totalBytesOut | byteFormat }}</span>
                     </div>
                     <span class="time-range-pill">{{ 'DASHBOARD_PAGE.LAST_24H' | translate }}</span>
                 </div>
@@ -187,25 +146,13 @@
                     <p class="text-dim chart-desc">{{ 'DASHBOARD_PAGE.REQUESTS_DESC' | translate }}</p>
                 </div>
                 <div class="badge-group">
-                    <div class="legend-badge legend-badge-req"
-                        (click)="toggleDataset('requests', 0)"
-                        [class.dataset-hidden]="!isDatasetVisible('requests', 0)"
-                        [matTooltip]="'DASHBOARD_PAGE.PEAK' | translate">
-                        <span class="legend-color-dot req-dot"></span>
-                        <div class="legend-text-col">
-                            <span class="legend-badge-label">{{ 'DASHBOARD_PAGE.PEAK' | translate }}</span>
-                            <span class="legend-badge-value">{{ peakTpm }} <small>{{ 'DASHBOARD_PAGE.REQ_PER_MIN' | translate }}</small></span>
-                        </div>
+                    <div class="stat-badge">
+                        <span class="stat-badge-label">{{ 'DASHBOARD_PAGE.PEAK' | translate }}</span>
+                        <span class="stat-badge-value">{{ peakTpm }} <small>{{ 'DASHBOARD_PAGE.REQ_PER_MIN' | translate }}</small></span>
                     </div>
-                    <div class="legend-badge legend-badge-req"
-                        (click)="toggleDataset('requests', 0)"
-                        [class.dataset-hidden]="!isDatasetVisible('requests', 0)"
-                        [matTooltip]="'DASHBOARD_PAGE.AVG' | translate">
-                        <span class="legend-color-dot req-dot"></span>
-                        <div class="legend-text-col">
-                            <span class="legend-badge-label">{{ 'DASHBOARD_PAGE.AVG' | translate }}</span>
-                            <span class="legend-badge-value">{{ avgTpm }} <small>{{ 'DASHBOARD_PAGE.REQ_PER_MIN' | translate }}</small></span>
-                        </div>
+                    <div class="stat-badge">
+                        <span class="stat-badge-label">{{ 'DASHBOARD_PAGE.AVG' | translate }}</span>
+                        <span class="stat-badge-value">{{ avgTpm }} <small>{{ 'DASHBOARD_PAGE.REQ_PER_MIN' | translate }}</small></span>
                     </div>
                     <span class="time-range-pill">{{ 'DASHBOARD_PAGE.LAST_24H' | translate }}</span>
                 </div>

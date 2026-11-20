@@ -81,25 +81,17 @@ export class ConfigFormComponent implements OnInit {
         ca_private: new FormControl<string>(''),
         acme_directory_url: new FormControl<string>(''),
         dns_resolver: new FormControl<string>(''),
-        logging: new FormGroup({
-            mode: new FormControl<string>('local'),
-            audit_log_parts: new FormControl<string>('ABHF'),
-            type: new FormControl<string>('elasticsearch'),
-            index_url: new FormControl<string>(''),
-            index_username: new FormControl<string>(''),
-            index_password: new FormControl<string>(''),
-            dashboard_url: new FormControl<string>(''),
-            dashboard_username: new FormControl<string>(''),
-            dashboard_password: new FormControl<string>(''),
+        archive: new FormGroup({
+            enabled: new FormControl<boolean>(false),
+            archive_after: new FormControl<number>(1800),
+            type: new FormControl<string>('opensearch'),
+            url: new FormControl<string>(''),
+            username: new FormControl<string>(''),
+            password: new FormControl<string>(''),
         }),
         purge: new FormGroup({
             enabled: new FormControl<boolean>(false),
             purge_after: new FormControl<number>(1800)
-        }),
-        audit: new FormGroup({
-            retain_versions: new FormControl<number>(50, {
-                validators: [Validators.required, Validators.min(1)]
-            })
         }),
         ipxa: new FormGroup({
             url: new FormControl<string>(''),
@@ -138,39 +130,14 @@ export class ConfigFormComponent implements OnInit {
         // Fetch active configuration and patch form values
         this.configService.getActive().subscribe(data => {
             const c = (data as any)?.config || data;
-            const rawParts = c.logging?.audit_log_parts || 'ABHF';
-            const partsArray = rawParts.toUpperCase().split('').filter((ch: string) => this.canonicalOrder.includes(ch));
-            this.auditLogPartsControl.setValue(partsArray, { emitEvent: false });
-
             this.form.patchValue({
                 _id: c._id,
                 ca_certificate: c.ca_certificate,
                 ca_private: c.ca_private,
                 acme_directory_url: c.acme_directory_url,
                 dns_resolver: c.dns_resolver,
-                logging: c.logging ? {
-                    mode: c.logging.mode || 'local',
-                    audit_log_parts: c.logging.audit_log_parts || 'ABHF',
-                    type: c.logging.type || 'elasticsearch',
-                    index_url: c.logging.index_url ?? c.logging.url ?? '',
-                    index_username: c.logging.index_username ?? c.logging.username ?? '',
-                    index_password: c.logging.index_password ?? c.logging.password ?? '',
-                    dashboard_url: c.logging.dashboard_url ?? '',
-                    dashboard_username: c.logging.dashboard_username ?? '',
-                    dashboard_password: c.logging.dashboard_password ?? ''
-                } : {
-                    mode: 'local',
-                    audit_log_parts: 'ABHF',
-                    type: 'elasticsearch',
-                    index_url: '',
-                    index_username: '',
-                    index_password: '',
-                    dashboard_url: '',
-                    dashboard_username: '',
-                    dashboard_password: ''
-                },
+                archive: c.archive || {},
                 purge: c.purge || {},
-                audit: c.audit || { retain_versions: 50 },
                 ipxa: c.ipxa || {}
             });
         });

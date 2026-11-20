@@ -1,24 +1,21 @@
 <div class="target-dialog-container">
-    <div class="dialog-header">
-        <div class="header-left">
-            <div class="header-icon-box">
-                <mat-icon class="header-icon">hub</mat-icon>
-            </div>
+    <div class="target-dialog-header">
+        <div class="header-title-group">
+            <mat-icon class="header-icon">hub</mat-icon>
             <div>
-                <h2 mat-dialog-title class="dialog-title">
+                <h2 class="dialog-title" mat-dialog-title>
                     {{ (isAddMode ? 'UPSTREAM.TARGETS.MODAL_TITLE_ADD' : 'UPSTREAM.TARGETS.MODAL_TITLE_EDIT') | translate }}
                 </h2>
-                <p class="dialog-subtitle">{{ 'UPSTREAM.TARGETS.MODAL_SUBTITLE' | translate }}</p>
             </div>
         </div>
-        <button mat-icon-button type="button" class="btn-header-close" (click)="cancel()" [matTooltip]="'ACTIONS.CLOSE' | translate" id="btn-close-target-dialog">
+        <button mat-icon-button type="button" (click)="cancel()" [matTooltip]="'ACTIONS.CLOSE' | translate" id="btn-close-target-dialog">
             <mat-icon>close</mat-icon>
         </button>
     </div>
 
-    <mat-dialog-content class="dialog-content-body">
+    <mat-dialog-content class="target-dialog-content">
         <form [formGroup]="form" id="upstream-target-form" (ngSubmit)="onSubmit()">
-            <div class="field-row">
+            <div class="field-row mt-1">
                 <mat-form-field appearance="outline" class="full-width">
                     <mat-label>{{ 'UPSTREAM.TARGETS.NETWORK_ADDRESS' | translate }}</mat-label>
                     <mat-icon matPrefix class="field-icon">dns</mat-icon>
@@ -26,7 +23,7 @@
                 </mat-form-field>
             </div>
 
-            <div class="field-grid-2">
+            <div class="field-grid-2 mt-1">
                 <mat-form-field appearance="outline" class="full-width">
                     <mat-label>{{ 'UPSTREAM.TARGETS.SERVICE_PORT' | translate }}</mat-label>
                     <mat-icon matPrefix class="field-icon">numbers</mat-icon>
@@ -42,14 +39,14 @@
         </form>
     </mat-dialog-content>
 
-    <div mat-dialog-actions align="end" class="dialog-actions">
+    <mat-dialog-actions align="end" class="target-dialog-actions">
         <button id="cancel-upstream-target-btn" mat-stroked-button type="button" (click)="cancel()">
-            <mat-icon>keyboard_return</mat-icon>
+            <mat-icon>close</mat-icon>
             {{ 'ACTIONS.CANCEL' | translate }}
         </button>
         <button id="save-upstream-target-btn" type="button" (click)="onSubmit()" mat-flat-button color="primary" [disabled]="form.invalid" cdkFocusInitial>
             <mat-icon>save</mat-icon>
             {{ 'ACTIONS.SAVE' | translate }}
         </button>
-    </div>
+    </mat-dialog-actions>
 </div>

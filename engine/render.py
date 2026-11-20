@@ -258,11 +258,6 @@ def _normalize_entities(data: dict) -> None:
             for item in data[key]:
                 if isinstance(item, dict):
                     item["render_name"] = _normalize_name_for_render(item)
-                    if key == "upstreams":
-                        persist = item.get("persist")
-                        if isinstance(persist, dict) and persist.get("type") == "COOKIE":
-                            cookie_name = persist.get("cookie_name") or "LB_X_NxGuard"
-                            persist["cookie_var"] = cookie_name.replace("-", "_")
 
 
 def __resolve_sensor_by_name(sensor_name, data):

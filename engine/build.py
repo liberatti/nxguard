@@ -7,14 +7,14 @@ import bcrypt
 from api.middleware.common_utils import gen_random_string
 
 import config
-from api.repository.certificate_repository import CertificateDao
-from api.repository.config_repository import ConfigDao, ConfigBackupDao, ChangeDao
-from api.repository.oauth_repository import UserDao
-from api.repository.sensor_repository import SensorDao
-from api.repository.service_repository import ServiceDao
-from api.repository.route_repository import RouteDao
-from api.repository.upstream_repository import UpstreamDao, NodeStatusDao, UpstreamStatesDao
-from api.repository.transaction_repository import TransactionDao
+from api.model.certificate_model import CertificateDao
+from api.model.config_model import ConfigDao, ConfigBackupDao, ChangeDao
+from api.model.oauth_model import UserDao
+from api.model.sensor_model import SensorDao
+from api.model.service_model import ServiceDao
+from api.model.route_model import RouteDao
+from api.model.upstream_model import UpstreamDao, NodeStatusDao, UpstreamStatesDao
+from api.model.transaction_model import TransactionDao
 from api.tools.network_tool import NetworkTool
 from api.tools.ssl_tool import SSLTool
 from api.middleware.logging_manager import logger
@@ -136,22 +136,22 @@ def init_from_data(data_dir=None, data_file="init-data.json", data=None):
             )
             if not conf.get("ca_certificate") or not conf.get("ca_private"):
                 try:
+                    from api.tools.ssl_tool import SSLTool
+
                     ca_dict = SSLTool.gen_ca("nxguard-CA")
                     conf["ca_certificate"] = SSLTool.crt_to_pem(ca_dict["certificate"])
                     conf["ca_private"] = SSLTool.private_to_pem(ca_dict["private_key"])
                 except Exception as e:
                     logger.error(f"Error generating default CA during init: {e}")
-            if "logging" not in conf or conf.get("logging") is None:
-                conf["logging"] = {
-                    "mode": "local",
-                    "type": "elasticsearch",
-                    "audit_log_parts": "ABHF",
+            if "archive" not in conf or conf.get("archive") is None:
+                conf["archive"] = {
+                    "enabled": False,
+                    "archive_after": 1800,
+                    "type": "opensearch",
                     "url": "",
                     "username": "",
                     "password": "",
                 }
-            elif "audit_log_parts" not in conf["logging"]:
-                conf["logging"]["audit_log_parts"] = "ABHF"
             if "purge" not in conf or conf.get("purge") is None:
                 conf["purge"] = {
                     "enabled": False,
@@ -182,10 +182,6 @@ def init_from_data(data_dir=None, data_file="init-data.json", data=None):
             for u in data["upstreams"]:
                 u_clean = dict(u)
                 u_clean.pop("healthy", None)
-                u_clean.pop("render_name", None)
-                if isinstance(u_clean.get("persist"), dict):
-                    u_clean["persist"] = dict(u_clean["persist"])
-                    u_clean["persist"].pop("cookie_var", None)
                 cleaned_upstreams.append(u_clean)
             dao.persist_many(cleaned_upstreams)
             logger.info(f"Upstreams: {len(cleaned_upstreams)}")

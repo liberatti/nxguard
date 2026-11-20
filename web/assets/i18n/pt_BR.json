@@ -23,13 +23,12 @@
     "SIGN_IN_BTN": "Entrar no Painel",
     "EMAIL": "E-mail",
     "PASSWORD": "Senha",
-    "PLACEHOLDER_EMAIL": "seu@email.com",
-    "PLACEHOLDER_PASSWORD": "Digite sua senha",
-    "SELECT_LANGUAGE": "Selecionar idioma",
+    "LANGUAGE": "Idioma",
     "SUBTITLE_LOGIN": "Digite suas credenciais para acessar o console",
-    "ENTERPRISE_PLATFORM": "PLATAFORMA DE INTELIGÊNCIA CORPORATIVA",
-    "BRAND_DESCRIPTION": "Inteligência IP Avançada",
-    "TOGGLE_PASSWORD": "Ocultar senha"
+    "FOOTER_NOTICE": "Acesso autorizado apenas. Todas as atividades são monitoradas e registradas.",
+    "VERSION": "Versão",
+    "LICENSE_NOTICE": "Licenciado sob a",
+    "LICENSE_NAME": "Apache License 2.0"
   },
   "ABOUT": {
     "TITLE": "Sobre o NXGuard",
@@ -57,18 +56,30 @@
     "TARGETS": "Destinos"
   },
   "CONTENT": {
-    "COPY": "&copy; 2026 NXGuard. Todos os direitos reservados. Esta solução é desenvolvida sobre NGINX com módulos OpenResty e ModSecurity.",
-    "ABOUT": "Este é um servidor proxy construído com NGINX, módulos OpenResty e ModSecurity para proteção avançada.",
+    "COPY": "&copy; 2026 nxguard. Todos os direitos reservados. Esta solução é desenvolvida sobre o OpenResty.",
+    "ABOUT": "Este é um servidor proxy construído sobre o OpenResty com ModSecurity para proteção avançada.",
     "RESTORE_NOTICE": "Aviso de Restauração de Configuração: Todos os dados existentes serão sobrescritos pela configuração restaurada."
   },
   "NAV": {
     "ABOUT": "Sobre",
+    "DASHBOARD": "Painel",
+    "SYSTEM": "Sistema",
+    "HOSTNAMES": "Hostnames",
+    "CERTIFICATES": "Certificados",
+    "DICTIONARIES": "Dicionários",
+    "GATEWAY": "Gateway",
+    "TRANSACTIONS": "Transações",
     "ACCOUNT": "Conta",
     "LOGOUT": "Sair"
   },
   "VIEW": {
+    "BACKUP": {
+      "LINK": "backup",
+      "TITLE": "Backup"
+    },
     "DASHBOARD": {
-      "LINK": "Visão Geral de Segurança"
+      "LINK": "Dashboard",
+      "TITLE": "Painel"
     },
     "TRANSACTION": {
       "LINK": "Log de Detecção de Ameaças",
@@ -92,19 +103,29 @@
     "UPSTREAM": {
       "LINK": "Upstreams",
       "TITLE": "Upstreams",
-      "SUBTITLE": "Configurar pools de servidores backend, endereços de destino, algoritmos de balanceamento e checagem de integridade",
-      "FILTER_PLACEHOLDER": "Buscar por nome ou descrição..."
+      "SUBTITLE": "Lista de todos os upstreams",
+      "FILTER_PLACEHOLDER": "Filtrar upstreams por nome ou descrição...",
+      "ERR_TARGET_REQUIRED": "Upstream do tipo backend requer pelo menos um destino.",
+      "TARGETS": "Destinos",
+      "TARGET_HOST": "Endereço de Rede",
+      "TARGET_PORT": "Porta do Serviço",
+      "TARGET_WEIGHT": "Peso",
+      "NO_TARGETS": "Nenhum destino configurado. Adicione pelo menos um destino para este backend."
+    },
+    "HOSTNAME": {
+      "LINK": "Hostnames",
+      "TITLE": "Hostnames",
+      "SUBTITLE": "Lista de todos os Hostnames"
     },
     "CERTIFICATE": {
       "LINK": "Certificados",
       "TITLE": "Certificados",
-      "SUBTITLE": "Gerenciar certificados SSL/TLS, chaves privadas, renovações automáticas ACME e autoridades certificadoras"
+      "SUBTITLE": "Lista de todos os certificados"
     },
     "SENSOR": {
       "LINK": "Sensores",
       "TITLE": "Sensores",
-      "SUBTITLE": "Configurar sensores de inspeção WAF, motores de detecção de ameaças, limitação de taxa e regras de segurança",
-      "FILTER_PLACEHOLDER": "Buscar por nome ou descrição..."
+      "SUBTITLE": "Lista de todos os sensores"
     },
     "USER": {
       "LINK": "Usuários",
@@ -112,10 +133,9 @@
       "SUBTITLE": "Gerenciar operadores do console, credenciais administrativas, controle de acesso baseado em papéis e permissões"
     },
     "CONFIG": {
-      "LINK": "Configurações"
-    },
-    "CONFIG_AUDIT": {
-      "LINK": "Auditoria & Histórico"
+      "LINK": "Configuração",
+      "TITLE": "Configurações",
+      "SUBTITLE": "Lista de todas as configurações"
     },
     "SYSTEM": {
       "LINK": "Sistema"
@@ -131,14 +151,7 @@
     "FORCE_RENEW": "Pendente de Renovação",
     "RENEW_PENDING": "Renovação pendente",
     "RENEW_SCHEDULED": "Renovação agendada",
-    "RENEW_NOT_SCHEDULED": "Sem renovação agendada",
-    "IN_USE": "Em Uso",
-    "IN_USE_COUNT_ONE": "{{ count }} serviço",
-    "IN_USE_COUNT": "{{ count }} serviços",
-    "NOT_IN_USE": "Não utilizado",
-    "IN_USE_TIP_ONE": "Utilizado por {{ count }} serviço",
-    "IN_USE_TIP": "Utilizado por {{ count }} serviços",
-    "NOT_IN_USE_TIP": "Nenhum serviço está utilizando este certificado"
+    "RENEW_NOT_SCHEDULED": "Sem renovação agendada"
   },
   "ROUTE": {
     "ALLOWED_METHODS": "Métodos HTTP Permitidos",
@@ -149,20 +162,10 @@
     "UPSTREAM": "Upstream",
     "SECURITY_SENSOR": "Sensor de Segurança",
     "MONITOR_ONLY": "Apenas Monitorar",
+    "REQUEST_METHODS": "Métodos de Requisição",
     "CACHE_METHODS": "Métodos de Cache",
     "INVALID_REGEX": "Padrão de regex inválido para NGINX",
-    "PATH_HINT": "ex.: ^/api/v1/.* ou /static/",
-    "PRIORITY": "Prioridade",
-    "TARGET": "Destino",
-    "NO_SENSOR": "Sem Sensor",
-    "ADD_TITLE": "Adicionar Rota",
-    "EDIT_TITLE": "Editar Rota",
-    "DIALOG_SUBTITLE": "Defina regras de correspondência de URL, destino da rota e inspeção de segurança.",
-    "SECTION_GENERAL": "Destino & Identificação",
-    "SECTION_PATH": "Caminhos de URL",
-    "SECTION_SECURITY": "Segurança & WAF",
-    "SECTION_HTTP": "Métodos HTTP & Conteúdo",
-    "MONITOR_HINT": "Inspecionar e registrar anomalias de segurança sem bloquear requisições"
+    "PATH_HINT": "ex.: ^/api/v1/.* ou /static/"
   },
   "SENSOR": {
     "IP_REPUTATION": "Reputação de IP",
@@ -192,65 +195,17 @@
     "RULE_DESCRIPTION": "Descrição",
     "ACTION": "Ação",
     "ACTIVE": "Ativo",
+    "ALL_RULES": "Todas as Regras",
     "NO_RULES_FOUND": "Nenhuma regra encontrada correspondente ao filtro",
+    "TOTAL_RULES": "Regras",
     "CONTROL_RULE": "Controle do Motor / Gate de Paranoia",
     "VIEW_DETAILS": "Ver detalhes da regra",
     "NO_CATEGORIES_SELECTED": "Nenhuma categoria adicionada a este sensor ainda",
+    "FILTER_FEEDS_PLACEHOLDER": "Filtrar feeds selecionados...",
     "NO_FEEDS_SELECTED": "Nenhum feed selecionado ainda. Selecione na lista acima.",
-    "NO_BYPASS_SELECTED": "Nenhum feed de liberação selecionado ainda. Selecione na lista acima.",
-    "BYPASS_COUNT_BADGE": "{{ count }} Feeds ByPass",
-    "BYPASS_COUNT_BADGE_ONE": "1 Feed ByPass",
     "FILTER_GEO_PLACEHOLDER": "Filtrar países selecionados...",
     "NO_GEO_SELECTED": "Nenhum país bloqueado selecionado.",
     "CLEAR_ALL": "Limpar todos",
-    "VIEW_GEO_PROFILE": "Clique para visualizar o perfil completo de países GeoIP",
-    "VIEW_RBL_PROFILE": "Clique para visualizar o perfil completo de inteligência de ameaças RBL",
-    "ADD_TITLE": "Adicionar Sensor",
-    "EDIT_TITLE": "Editar Sensor",
-    "GENERAL": "Geral",
-    "GEO_COUNT_BADGE": "GeoIP: {{ count }} Países",
-    "GEO_COUNT_BADGE_ONE": "GeoIP: 1 País",
-    "RBL_COUNT_BADGE": "{{ count }} Provedores RBL",
-    "RBL_COUNT_BADGE_ONE": "1 Provedor RBL",
-    "RULES_COUNT_SUMMARY": "{{ filtered }} / {{ total }} Regras",
-    "NO_MATCHING_COUNTRIES": "Nenhum país encontrado correspondente ao filtro",
-    "SELECT_RULE": "Selecionar regra {{ code }}",
-    "GEO_BLOCK_TITLE": "Bloqueio por GeoIP (GeoIP Block)",
-    "GEO_BLOCK_SUBTITLE": "Selecione as regiões e países para bloquear o tráfego.",
-    "RBL_BLOCK_TITLE": "Bloqueio por Feeds RBL",
-    "RBL_BLOCK_SUBTITLE": "Selecione listas de inteligência de ameaças e reputação para bloqueio.",
-    "BYPASS_BLOCK_TITLE": "Liberação por RBL (ByPass & Feeds Confiáveis)",
-    "BYPASS_BLOCK_SUBTITLE": "Selecione feeds e redes confiáveis para liberar e ignorar filtros de segurança.",
-    "SEARCH_GEO_PLACEHOLDER": "Buscar país ou região...",
-    "LOADING_GEO_DATA": "Carregando dados geográficos...",
-    "NO_GEO_DATA": "Nenhum dado geográfico disponível",
-    "GEO_LOAD_ERROR": "Não foi possível carregar os países e regiões. Por favor, tente novamente.",
-    "NO_GEO_MATCH": "Nenhum país ou região corresponde à sua pesquisa",
-    "SEARCH_RBL_PLACEHOLDER": "Buscar feed ou categoria de ameaça...",
-    "SEARCH_BYPASS_PLACEHOLDER": "Buscar feed de liberação ou categoria...",
-    "VIEW_BYPASS_PROFILE": "Clique para visualizar o perfil completo de feeds ByPass",
-    "VIEW_EDIT": "Ver/Editar",
-    "SELECT_ALL": "Selecionar Todos",
-    "DESELECT_ALL": "Desmarcar Todos",
-    "EXPAND_REGION": "Expandir {{ name }}",
-    "EXPAND_CATEGORY": "Expandir {{ name }}",
-    "GEO_SELECTION_RATIO": "({{ selected }} / {{ total }} selecionados)",
-    "GEO_SELECTED_RATIO_BADGE": "{{ selected }} de {{ total }} selecionados",
-    "GEO_DRAWER_COUNT": "{{ selected }} / {{ total }} selecionados",
-    "GEO_TOTAL_SUMMARY": "{{ count }} países selecionados",
-    "GEO_TOTAL_SUMMARY_ONE": "1 país selecionado",
-    "RBL_TOTAL_SUMMARY": "{{ count }} feeds selecionados",
-    "RBL_TOTAL_SUMMARY_ONE": "1 feed selecionado",
-    "BYPASS_TOTAL_SUMMARY": "{{ count }} feeds de liberação selecionados",
-    "BYPASS_TOTAL_SUMMARY_ONE": "1 feed de liberação selecionado",
-    "CONTINENTS": {
-      "AFRICA": "África",
-      "NORTH_AMERICA": "América do Norte",
-      "SOUTH_AMERICA": "América do Sul",
-      "ASIA": "Ásia",
-      "EUROPE": "Europa",
-      "OCEANIA": "Oceania"
-    },
     "SAVED_SUCCESS": "Sensor salvo com sucesso",
     "UPDATED_SUCCESS": "Sensor atualizado com sucesso",
     "TITLE": "Sensor"
@@ -315,6 +270,7 @@
   "GEOIP_DIALOG": {
     "TITLE": "Informações GeoIP",
     "SUBTITLE": "Inteligência geográfica e de rede do IP de origem",
+    "IP_ADDRESS": "Endereço IP",
     "COUNTRY": "País",
     "STATUS": "Ação GeoIP",
     "ORGANIZATION": "Organização / Provedor",
@@ -375,109 +331,29 @@
     "PANEL_CA_DESC": "Gerencie o certificado CA raiz e chave privada para certificados de cliente e inspeção TLS",
     "CA_CERT": "Certificado CA Raiz (PEM)",
     "CA_KEY": "Chave Privada CA Raiz (PEM)",
-    "PANEL_POLICY": "Políticas de Transações & Armazenamento",
-    "PANEL_POLICY_DESC": "Configure o destino dos logs de transação e o expurgo de retenção no banco de dados",
-    "LOGGING_TITLE": "Registro de Transações (Logging)",
-    "LOGGING_DESC": "Configure como os logs de transação e auditoria são armazenados. Os logs podem ser salvos localmente no DuckDB ou transmitidos para um cluster externo.",
-    "LOGGING_MODE": "Destino do Logging",
-    "LOGGING_MODE_HINT": "Destino de armazenamento dos logs de acesso e segurança",
-    "LOGGING_MODE_LOCAL": "Armazenamento Local (DuckDB)",
-    "LOGGING_MODE_ELASTICSEARCH": "Cluster Elasticsearch",
-    "LOGGING_MODE_LOCAL_INFO": "Os logs são gravados localmente no banco embutido DuckDB. Rápido, autocontido e sem dependência de serviços externos.",
-    "LOGGING_MODE_ES_INFO": "Os logs são transmitidos em tempo real para o cluster Elasticsearch/OpenSearch externo com suporte a dashboards.",
-    "SEC_AUDIT_LOG_PARTS": "Partes do Log de Auditoria (ModSecurity)",
-    "SEC_AUDIT_LOG_PARTS_HINT": "Selecione as seções da transação a serem gravadas no log",
-    "SEC_AUDIT_LOG_PARTS_PLACEHOLDER": "Selecione as partes...",
-    "PARTS_SELECTED": "partes selecionadas",
-    "AUDIT_PART_A_NAME": "Cabeçalho de Auditoria",
-    "AUDIT_PART_A_DESC": "Timestamp, ID único da transação, IP do cliente e metadados",
-    "AUDIT_PART_B_NAME": "Cabeçalhos da Requisição",
-    "AUDIT_PART_B_DESC": "Método HTTP, URI da requisição e todos os cabeçalhos do cliente",
-    "AUDIT_PART_C_NAME": "Corpo da Requisição",
-    "AUDIT_PART_C_DESC": "Dados do payload (corpo POST/PUT, JSON, formulários) quando ativado",
-    "AUDIT_PART_E_NAME": "Corpo Intermediário de Resposta",
-    "AUDIT_PART_E_DESC": "Corpo da resposta antes de transformações do WAF",
-    "AUDIT_PART_F_NAME": "Cabeçalhos de Resposta",
-    "AUDIT_PART_F_DESC": "Código de status HTTP final e cabeçalhos enviados pelo servidor",
-    "AUDIT_PART_H_NAME": "Trailer de Auditoria",
-    "AUDIT_PART_H_DESC": "Metadados do ModSecurity, IDs das regras ativadas e ações tomadas",
-    "AUDIT_PART_I_NAME": "Corpo Compacto de Requisição",
-    "AUDIT_PART_I_DESC": "Alternativa ao bloco C excluindo arquivos grandes em upload",
-    "AUDIT_PART_J_NAME": "Metadados de Arquivos Enviados",
-    "AUDIT_PART_J_DESC": "Informações e nomes dos arquivos enviados via multipart",
-    "AUDIT_PART_K_NAME": "Lista de Regras Ativadas",
-    "AUDIT_PART_K_DESC": "Lista completa de regras de segurança disparadas em ordem",
-    "AUDIT_PART_Z_NAME": "Delimitador Final",
-    "AUDIT_PART_Z_DESC": "Delimitador final indicando o término da entrada de log",
-    "PRESET_DEFAULT": "Padrão (ABHF)",
-    "PRESET_FULL": "Inspeção Completa (ABCEFHJKZ)",
-    "ELASTICSEARCH_SECTION_TITLE": "Conexão com Cluster Elasticsearch",
-    "ELASTICSEARCH_SECTION_DESC": "Configure o endpoint e autenticação do cluster remoto para streaming de transações",
-    "DASHBOARD_SECTION_TITLE": "Dashboards & Visualização (Kibana / OpenSearch)",
-    "DASHBOARD_SECTION_DESC": "Configure a URL e credenciais para visualização e análise de transações",
-    "LOGGING_TYPE": "Tipo de Motor",
-    "INDEX_URL": "URL do Elasticsearch",
-    "INDEX_URL_HINT": "URL do endpoint do cluster (ex.: http://elasticsearch:9200)",
-    "INDEX_USERNAME": "Usuário do Elasticsearch",
-    "INDEX_PASSWORD": "Senha do Elasticsearch",
-    "DASHBOARD_URL": "URL do Dashboards",
-    "DASHBOARD_URL_HINT": "URL do endpoint do Kibana (ex.: http://kibana:5601)",
-    "DASHBOARD_USERNAME": "Usuário do Dashboard",
-    "DASHBOARD_PASSWORD": "Senha do Dashboard",
+    "PANEL_POLICY": "Políticas de Transações",
+    "PANEL_POLICY_DESC": "Configure arquivamento automatizado e expurgo de retenção de banco de dados",
+    "ARCHIVE_TITLE": "Arquivamento de Transações",
+    "ARCHIVE_TOGGLE": "Ativar Arquivamento",
+    "ARCHIVE_DESC": "Transfira e arquive automaticamente a telemetria de transações para um cluster Elasticsearch / OpenSearch externo para conformidade de auditoria.",
+    "ARCHIVE_AFTER": "Arquivar após (minutos)",
+    "CLUSTER_URL": "URL do Cluster",
+    "CLUSTER_USER": "Usuário",
+    "CLUSTER_PASS": "Senha",
     "PURGE_TITLE": "Expurgo de Transações",
     "PURGE_TOGGLE": "Ativar Expurgo do Banco de Dados",
     "PURGE_DESC": "Remova automaticamente registros antigos do banco local DuckDB para manter alta performance e economizar armazenamento em disco.",
-    "PURGE_AFTER": "Idade Máxima dos Dados",
-    "DAYS_SUFFIX": "dias",
-    "PANEL_AUDIT_HISTORY": "Auditoria e Histórico",
-    "PANEL_AUDIT_HISTORY_DESC": "Configure as políticas de retenção de versões e consolidação de baseline para o histórico de auditoria",
-    "AUDIT_RETENTION_TITLE": "Retenção de Histórico de Configuração",
-    "AUDIT_RETENTION_DESC": "Especifique a quantidade de versões históricas de configuração a serem mantidas em Auditoria e Histórico. Versões antigas são removidas automaticamente diariamente, consolidando uma nova baseline para suportar as versões mantidas.",
-    "AUDIT_RETAIN_VERSIONS": "Versões a Manter",
-    "AUDIT_RETAIN_VERSIONS_HINT": "Quantidade de snapshots históricos mantidos na linha do tempo (padrão: 50)",
-    "VERSIONS_SUFFIX": "versões",
+    "PURGE_AFTER": "Idade Máxima dos Dados (dias)",
     "PANEL_IPXA": "Integração IPXA",
     "PANEL_IPXA_DESC": "Configure o endpoint do serviço de inteligência de ameaças e reputação IPXA",
     "IPXA_URL": "URL do Serviço IPXA",
     "IPXA_URL_HINT": "Endpoint URL do serviço de inteligência de ameaças IPXA (ex.: http://ipxa:5000)",
     "IPXA_KEY": "Chave de API do IPXA",
-    "IPXA_KEY_HINT": "Chave secreta de API para autenticação com o serviço IPXA",
-    "SUCCESS_SAVE": "Configuração global atualizada com sucesso",
-    "ERROR_SAVE": "Falha ao atualizar a configuração"
-  },
-  "CONFIG_AUDIT": {
-    "TITLE": "Auditoria e Histórico de Configuração",
-    "SUBTITLE": "Linha do tempo de configurações e rollback de versões",
-    "SCN": "SCN",
-    "HASH_RFC8785": "Hash RFC 8785",
-    "CREATED_AT": "Data de Criação",
-    "STATUS": "Status",
-    "ACTIVE": "ATIVA",
-    "ARCHIVED": "ARQUIVADA",
-    "ENTITIES": "Entidades Configuradas",
-    "DIFF_TITLE": "Diferenças",
-    "NO_CHANGES": "Nenhuma alteração identificada em relação à versão base.",
-    "BTN_APPLY_VERSION": "Restaurar Esta Versão",
-    "CONFIRM_RESTORE_TITLE": "Restaurar Versão de Configuração?",
-    "CONFIRM_RESTORE_MSG": "Tem certeza que deseja restaurar e aplicar a versão de configuração {{ scn }} ({{ date }})? Esta ação substituirá a configuração ativa em execução.",
-    "RESTORE_SUCCESS": "Versão de configuração {{ scn }} restaurada e aplicada com sucesso.",
-    "STATS_ADD": "Adicionados",
-    "STATS_CHANGED": "Modificado",
-    "STATS_REMOVE": "Removidos",
-    "HASH_COPIED": "Hash copiado para a área de transferência",
-    "BTN_VIEW_DIFF": "Ver Diferença",
-    "DIFF_DIALOG_TITLE": "Diferença de Configuração",
-    "BASELINE_LABEL": "Base",
-    "TARGET_LABEL": "Alvo",
-    "SEARCH_CHANGES": "Filtrar alterações...",
-    "EXPAND_ALL": "Expandir Tudo",
-    "COLLAPSE_ALL": "Recolher Tudo",
-    "VALUE_BEFORE": "Antes",
-    "VALUE_AFTER": "Depois"
+    "IPXA_KEY_HINT": "Chave secreta de API para autenticação com o serviço IPXA"
   },
   "DASHBOARD_PAGE": {
     "TITLE": "Visão Geral de Segurança",
-    "SUBTITLE": "Monitoramento de ameaças em tempo real, vazão de tráfego e integridade dos nós",
+    "SUBTITLE": "Monitoramento de ameaças em tempo real e integridade do sistema",
     "REFRESH_LABEL": "Atualização",
     "REFRESH_5S": "Atualizar: 5s",
     "REFRESH_10S": "Atualizar: 10s",
@@ -496,14 +372,6 @@
     "HEALTHY": "SAUDÁVEL",
     "DEGRADED": "DEGRADADO",
     "ACTIVE_NODES": "{{count}} Nós Ativos",
-    "IPXA_TITLE": "Inteligência IPXA",
-    "IPXA_ONLINE": "ONLINE",
-    "IPXA_OFFLINE": "OFFLINE",
-    "IPXA_UNAVAILABLE": "Serviço Indisponível",
-    "IPXA_GEOIP_LABEL": "Base GeoIP",
-    "IPXA_RBL_LABEL": "Regras RBL",
-    "IPXA_FEEDS_LABEL": "Feeds de Ameaças",
-    "IPXA_DETAILS_TOOLTIP": "GeoIP: {{geoip}} registros | RBL: {{rbl}} regras | Feeds: {{bypass}} bypass, {{rep}} reputação | Cache: {{cache}} registros",
     "BANDWIDTH_TITLE": "Vazão de Largura de Banda",
     "BANDWIDTH_DESC": "Volume de dados transferidos (Bytes Recebidos vs Bytes Enviados)",
     "BYTES_IN": "BYTES RECEBIDOS",
@@ -567,31 +435,33 @@
       },
       "CLEAR_VALUE": "Limpar valor",
       "FIELDS": {
-        "ACTION": "Ação de Segurança",
-        "BLOCKED_BY": "Bloqueado Por / Origem",
-        "SERVICE_NAME": "Serviço",
-        "ROUTE_NAME": "Nome da Rota",
-        "UPSTREAM_NAME": "Upstream",
-        "UPSTREAM_STATUS": "Status do Upstream",
-        "SENSOR_NAME": "Sensor",
-        "SOURCE_IP": "IP de Origem",
-        "SOURCE_PORT": "Porta de Origem",
-        "GEOIP_COUNTRY": "País de Origem",
-        "DESTINATION_HOST": "Host de Destino",
-        "DESTINATION_PORT": "Porta de Destino",
-        "HTTP_METHOD": "Método HTTP",
-        "HTTP_URI": "URI da Requisição HTTP",
-        "STATUS_CODE": "Código de Status HTTP",
-        "SCORE": "Score de Anomalia",
-        "RATE_LIMIT_ACTION": "Ação de Limite de Taxa",
-        "GEOIP_ACTION": "Ação GeoIP",
-        "REPUTATION_ACTION": "Ação de Reputação",
-        "IPXA": "Status IPXA",
-        "MTLS_VERIFIED": "mTLS Verificado",
-        "AUDIT_RULE_CODE": "Código / ID da Regra WAF",
-        "USER_AGENT": "Família User Agent",
-        "SERVER_ID": "ID do Nó / Servidor",
-        "UNIQUE_ID": "ID Único da Transação"
+        "ACTION": "Ação de Segurança (action)",
+        "SERVICE_ID": "Serviço (service._id)",
+        "ROUTE_NAME": "Nome da Rota (route_name)",
+        "UPSTREAM_ID": "Upstream (upstream._id)",
+        "SOURCE_IP": "IP de Origem (source.ip)",
+        "SOURCE_PORT": "Porta de Origem (source.port)",
+        "GEOIP_COUNTRY": "País de Origem (geoip.country_code)",
+        "DESTINATION_HOST": "Host de Destino (destination.host)",
+        "DESTINATION_IP": "IP de Destino (destination.ip)",
+        "DESTINATION_PORT": "Porta de Destino (destination.port)",
+        "HTTP_METHOD": "Método HTTP (http.request.method)",
+        "HTTP_URI": "URI da Requisição HTTP (http.request.uri)",
+        "STATUS_CODE": "Código de Status HTTP (http.response.status_code)",
+        "DURATION": "Duração em segundos (http.duration)",
+        "SCORE": "Score de Anomalia (score)",
+        "RATE_LIMIT_ACTION": "Ação de Limite de Taxa (rate_limit.action)",
+        "LIMIT_REQ_STATUS": "Status de Limite de Requisição (limit_req_status)",
+        "GEOIP_STATUS": "Status GeoIP (geoip_status)",
+        "RBL_STATUS": "Status RBL (rbl_status)",
+        "IPXA": "Status IPXA (ipxa)",
+        "MTLS_ENABLED": "mTLS Ativo (mtls.enabled)",
+        "MTLS_VERIFIED": "mTLS Verificado (mtls.verified)",
+        "AUDIT_RULE_CODE": "Código / ID da Regra WAF (rule_code)",
+        "USER_AGENT": "Família User Agent (user_agent.family)",
+        "SERVER_ID": "ID do Nó / Servidor (server_id)",
+        "UNIQUE_ID": "ID Único da Transação (unique_id)",
+        "ARCHIVED": "Status de Arquivamento (archived)"
       }
     },
     "DATE_RANGE": {
@@ -667,95 +537,165 @@
     "MINUTE": "Minuto",
     "SECOND": "Segundo"
   },
-  "FORMAT": {
-    "DISPLAY": {
-      "DATETIME": "DD/MM/YYYY HH:mm:ss"
+  "UPSTREAM": {
+    "ERR_TARGET_REQUIRED": "Upstream do tipo backend requer pelo menos um destino.",
+    "TARGETS": {
+      "TITLE": "Destinos",
+      "ADD_BTN": "Adicionar Destino",
+      "NETWORK_ADDRESS": "Endereço de Rede",
+      "SERVICE_PORT": "Porta do Serviço",
+      "DISTRIBUTION_WEIGHT": "Peso de Distribuição",
+      "ACTIONS": "Ações",
+      "EDIT_TOOLTIP": "Editar destino",
+      "REMOVE_TOOLTIP": "Remover destino",
+      "MODAL_TITLE_ADD": "Adicionar Destino de Upstream",
+      "MODAL_TITLE_EDIT": "Editar Destino de Upstream",
+      "EMPTY_MESSAGE": "Nenhum destino configurado. Adicione pelo menos um destino para este backend."
+    },
+    "STATES": {
+      "TITLE": "Status de Saúde do Upstream",
+      "NODE": "Nó",
+      "STATUS": "Status",
+      "LAST_CHECK": "Última Checagem",
+      "LATENCY": "Latência",
+      "HEALTHY": "Saudável",
+      "PARTIALLY_HEALTHY": "Parcialmente Saudável",
+      "UNHEALTHY": "Com falha",
+      "INVALID": "Não verificado",
+      "NO_STATES": "Nenhum estado de checagem registrado ainda para este upstream.",
+      "WARNING_TOOLTIP": "Um ou mais destinos estão em estado de falha"
     }
   },
-  "RULECAT": {
-    "TITLE": "Categorias de Regras",
-    "SUBTITLE": "Gerencie as categorias de regras do ModSecurity e WAF",
-    "CREATE": "Criar Categoria",
-    "EDIT": "Editar Categoria",
-    "VIEW": "Visualizar Categoria",
-    "READONLY_FEED_NOTICE": "Esta categoria é originada de feed oficial e está disponível apenas para visualização.",
-    "SRCTYPES": {
-      "FEED": "Feed Oficial",
-      "USER": "Personalizada"
+  "DATETIME": {
+    "HOUR": "Hora",
+    "MINUTE": "Minuto",
+    "SECOND": "Segundo"
+  },
+  "FORMAT": {
+    "DISPLAY": {
+      "DATETIME": "DD/MM/YYYY HH:mm:ss",
+      "MONTH_YEAR_LABEL": "MMM YYYY",
+      "DATE_A11Y_LABEL": "LL",
+      "MONTH_YEAR_A11Y_LABEL": "MMMM YYYY"
+    }
+  },
+  "actions": {
+    "edit": "Editar",
+    "remove": "Remover",
+    "create": "Criar",
+    "save": "Salvar",
+    "refresh": "Atualizar",
+    "close": "Fechar",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "next": "Próximo",
+    "back": "Voltar",
+    "add": "Adicionar",
+    "delete": "Excluir",
+    "apply": "Aplicar",
+    "backup": "Backup",
+    "restore": "Restaurar"
+  },
+  "about": {
+    "title": "Sobre o NXGuard",
+    "subtitle": "API Gateway de Alta Performance & Motor de Segurança",
+    "tab_about": "Visão Geral",
+    "tab_backup_restore": "Backup & Restauração",
+    "backup_title": "Exportar Configuração (Backup)",
+    "backup_desc": "Baixe um backup completo de todos os serviços, upstreams e regras de segurança em formato JSON.",
+    "backup_btn": "Baixar Backup",
+    "restore_title": "Importar Configuração (Restaurar)",
+    "restore_desc": "Envie um arquivo JSON de backup previamente exportado para restaurar a configuração do sistema.",
+    "choose_file": "Escolher arquivo JSON de backup",
+    "selected_file": "Arquivo Selecionado",
+    "powered_by": "Desenvolvido com OpenResty & ModSecurity",
+    "api_docs": "API REST",
+    "api_docs_sub": "Documentação OpenAPI / Swagger",
+    "github_title": "Repositório GitHub",
+    "github_sub": "Código fonte, versões e problemas",
+    "architecture_title": "Arquitetura Principal"
+  },
+  "attr": {
+    "active": "Ativo",
+    "name": "Nome",
+    "domains": "Domínios",
+    "routes": "Rotas",
+    "description": "Descrição",
+    "protocol": "Protocolo",
+    "targets": "Destinos",
+    "actions": "Ações"
+  },
+  "content": {
+    "copy": "&copy; 2025 nxguard. Todos os direitos reservados. Esta solução é desenvolvida sobre o OpenResty.",
+    "about": "Este é um servidor proxy construído sobre o OpenResty com ModSecurity para proteção avançada.",
+    "restore_notice": "Aviso de Restauração de Configuração: Todos os dados existentes serão sobrescritos pela configuração restaurada."
+  },
+  "nav": {
+    "about": "Sobre",
+    "account": "Conta",
+    "logout": "Sair"
+  },
+  "view": {
+    "backup": {
+      "link": "backup"
     },
-    "EMPTY": "Nenhuma categoria de regra encontrada",
-    "FIELDS": {
-      "ID": "ID",
-      "ID_HINT": "Identificador numérico ou prefixo (ex: 945)",
-      "NAME": "Nome da Categoria",
-      "NAME_HINT": "Nome descritivo da categoria (ex: 945-NGGUARD-CUSTOM-RULES)",
-      "PHASE": "Fase",
-      "SCOPE": "Escopo",
-      "SEQ": "Sequência",
-      "SEQ_HINT": "Ordem sequencial de execução",
-      "FILE": "Arquivo de Regra",
-      "FILE_HINT": "Arquivo de configuração da regra (ex: REQUEST-945-NGGUARD-CUSTOM-RULES.conf)",
-      "SYSTEM": "Protegido pelo Sistema",
-      "SYSTEM_DESC": "Categorias protegidas pelo sistema não podem ser modificadas sem permissão de superusuário",
-      "PROVIDER": "Fornecedor",
-      "ACTIONS": "Ações",
-      "TYPE": "Tipo",
-      "PROVIDER_DESC": "Provedor da categoria de regras ou feed",
-      "REQUIRED": "Campo obrigatório"
-    },
-    "PHASES": {
-      "1": "Fase 1 - Cabeçalhos da Requisição (Config e Exceções)",
-      "2": "Fase 2 - Corpo da Requisição (Regras e Ataques)",
-      "3": "Fase 3 - Avaliação de Bloqueio da Requisição",
-      "4": "Fase 4 - Cabeçalhos da Resposta (Vazamento de Dados)",
-      "5": "Fase 5 - Corpo da Resposta (Avaliação de Bloqueio)",
-      "6": "Fase 6 - Correlação e Logs"
+    "dashboard": {
+      "link": "Dashboard",
+      "title": "Dashboard"
     },
     "SCOPES": {
       "REQUEST": "Requisição",
       "RESPONSE": "Resposta"
     },
-    "TAB_DETAILS": "Detalhes",
-    "TAB_RULES": "Regras",
-    "ADD_RULE": "Adicionar Regra",
-    "NO_RULES_ADD_MODE": "As regras estarão disponíveis após salvar a categoria.",
-    "NO_RULES_USER": "Nenhuma regra cadastrada nesta categoria. Clique no botão acima para adicionar a primeira regra.",
-    "RULES_SECTION_TITLE": "Regras da Categoria",
-    "RULES_SECTION_SUBTITLE": "Regras do ModSecurity contidas nesta categoria",
-    "RULES_COUNT": "{{ count }} regra(s)",
-    "SEARCH_RULES_PLACEHOLDER": "Filtrar regras por código, mensagem, tag ou ação...",
-    "VIEW_RAW": "Ver Regra Bruta",
-    "CONFIRM_DELETE_TITLE": "Confirmar Remoção da Categoria",
-    "RULE_DIALOG": {
-      "CREATE_TITLE": "Nova Regra de Segurança",
-      "EDIT_TITLE": "Editar Regra de Segurança",
-      "SUBTITLE": "Defina os parâmetros e a instrução SecRule desta regra",
-      "CODE": "Código / ID da Regra",
-      "CODE_HINT": "Identificador numérico da regra (ex: 1001)",
-      "ACTION": "Ação",
-      "PHASE": "Fase de Execução",
-      "SEVERITY": "Severidade",
-      "MSG": "Descrição / Mensagem",
-      "MSG_HINT": "Mensagem descritiva (ex: Bloqueio de acesso não autorizado)",
-      "SCOPE": "Alvos / Variáveis (Scope)",
-      "SCOPE_HINT": "Variáveis alvo (ex: REQUEST_URI, ARGS, REQUEST_HEADERS)",
-      "OPERATOR": "Operador",
-      "PATTERN": "Padrão / Expressão",
-      "PATTERN_HINT": "Padrão a verificar (ex: (?i)(?:union|select))",
-      "RAW": "Instrução SecRule (Bruta)",
-      "RAW_HINT": "Declaração SecRule completa do ModSecurity",
-      "TAGS": "Tags",
-      "TAGS_HINT": "Tags separadas por vírgula (ex: custom, attack-generic)",
-      "COMMENT": "Observações / Comentário",
-      "TAB_STRUCTURED": "Configuração",
-      "TAB_RAW": "SecRule Bruta",
-      "ADD_BUTTON": "Adicionar Regra",
-      "SAVE_BUTTON": "Salvar Regra"
+    "service": {
+      "link": "Serviços",
+      "title": "Serviços",
+      "subtitle": "Descrever todos os serviços",
+      "filter_placeholder": "Buscar por nome ou domínio..."
     },
-    "NOTIFICATIONS": {
-      "SAVED": "Categoria de regra salva com sucesso",
-      "UPDATED": "Categoria de regra atualizada com sucesso",
-      "REMOVED": "Categoria de regra removida com sucesso"
+    "upstream": {
+      "link": "Upstreams",
+      "title": "Upstreams",
+      "subtitle": "Lista de todos os upstreams",
+      "filter_placeholder": "Buscar por nome ou descrição..."
+    },
+    "hostname": {
+      "link": "Hostnames",
+      "title": "Hostnames",
+      "subtitle": "Lista de todos os hostnames"
+    },
+    "certificate": {
+      "link": "Certificados",
+      "title": "Certificados",
+      "subtitle": "Lista de todos os certificados"
+    },
+    "sensor": {
+      "link": "Sensores",
+      "title": "Sensores",
+      "subtitle": "Lista de todos os sensores",
+      "filter_placeholder": "Buscar por nome ou descrição..."
+    },
+    "user": {
+      "link": "Usuários",
+      "title": "Usuários",
+      "subtitle": "Lista de todos os usuários"
+    },
+    "config": {
+      "link": "Configurações",
+      "title": "Configurações",
+      "subtitle": "Lista de todas as configurações"
+    },
+    "system": {
+      "link": "Sistema"
+    }
+  },
+  "aboutMessage": "Obrigado",
+  "format": {
+    "display": {
+      "datetime": "DD/MM/YYYY HH:mm:ss",
+      "monthYearLabel": "MMM YYYY",
+      "dateA11yLabel": "LL",
+      "monthYearA11yLabel": "MMMM YYYY"
     }
   }
 }

@@ -166,6 +166,10 @@ def is_running() -> bool:
 
 def restart():
     """Reloads Nginx if running, or starts Nginx if stopped."""
+    subprocess.run(
+        f"sudo chown -R nxguard:nxguard {BASE_PATH}/logs && sudo chmod -R 777 {BASE_PATH}/logs",
+        shell=True,
+    )
     if is_running():
         logger.info("Nginx is running, reload required")
         # nosemgrep: python.lang.security.audit.subprocess-shell-true.subprocess-shell-true

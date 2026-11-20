@@ -22,6 +22,9 @@ import { OAuthService } from 'app/services/oauth.service';
 import { FeedService } from 'app/services/feed.service';
 import { RuleCategoryService, SensorService } from 'app/services/sensor.service';
 import { CommonModule } from '@angular/common';
+import { FormaterService } from "app/services/formater.service";
+import { MatMomentDateModule } from "@angular/material-moment-adapter";
+
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { RuleDetailsDialogComponent } from 'app/components/rule-details-dialog/rule-details-dialog.component';
@@ -35,29 +38,13 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 @Component({
     selector: 'app-sensor-form',
     standalone: true,
-    imports: [
-        RouterModule,
-        CommonModule,
-        FormsModule,
-        ReactiveFormsModule,
-        TranslatePipe,
-        MatIconModule,
-        MatButtonModule,
-        MatCardModule,
-        MatInputModule,
-        MatTableModule,
-        MatSortModule,
-        MatTooltipModule,
-        MatSelectModule,
-        MatPaginatorModule,
-        MatSlideToggleModule,
-        MatCheckboxModule,
-        MatFormFieldModule,
-        MatChipsModule,
-        MatExpansionModule,
-        MatDialogModule,
-        MatStepperModule
-    ],
+    imports: [RouterModule, CommonModule, FormsModule,
+        ReactiveFormsModule, TranslatePipe,
+        MatMomentDateModule, MatSidenavModule, MatIconModule, MatButtonModule,
+        MatListModule, MatCardModule, MatProgressBarModule, MatInputModule,
+        MatTableModule, MatMenuModule, MatSortModule, MatTabsModule, MatGridListModule,
+        MatTooltipModule, MatSelectModule, MatPaginatorModule, MatSlideToggleModule, MatCheckboxModule,
+        MatFormFieldModule, MatChipsModule, MatExpansionModule, MatDialogModule, MatStepperModule],
     templateUrl: './sensor-form.component.html',
     styleUrl: './sensor-form.component.css'
 })
@@ -83,6 +70,8 @@ export class SensorFormComponent implements OnInit, AfterViewInit {
     ruleCH: number[] = [];
     selectedCategory: string | null = null;
     ruleSearchQuery: string = '';
+    blockSearchQuery: string = '';
+    bypassSearchQuery: string = '';
     geoSearchQuery: string = '';
     pageSizeOptions: number[] = [10, 15, 25, 50, 100];
 
@@ -197,8 +186,22 @@ export class SensorFormComponent implements OnInit, AfterViewInit {
         return (this.form.get('security.reputation')?.value as string[]) || [];
     }
 
+    getFilteredReputation(): string[] {
+        const list = this.getReputation();
+        if (!this.blockSearchQuery) return list;
+        const q = this.blockSearchQuery.toLowerCase();
+        return list.filter(item => item.toLowerCase().includes(q));
+    }
+
     getTrusted(): string[] {
         return (this.form.get('security.trusted')?.value as string[]) || [];
+    }
+
+    getFilteredTrusted(): string[] {
+        const list = this.getTrusted();
+        if (!this.bypassSearchQuery) return list;
+        const q = this.bypassSearchQuery.toLowerCase();
+        return list.filter(item => item.toLowerCase().includes(q));
     }
 
     onClearAllBlock(): void {
@@ -214,79 +217,6 @@ export class SensorFormComponent implements OnInit, AfterViewInit {
     onClearAllGeo(): void {
         this.form.get('security.geo_codes')?.setValue([]);
         this.form.markAsTouched();
-    }
-
-    openGeoipDialog(): void {
-        const dialogRef = this.dialog.open(SensorGeoipDialogComponent, {
-            data: {
-                sensorId: this.form.value._id || this.route.snapshot.params['id'],
-                sensorName: this.form.value.name || 'Sensor GeoIP',
-                geo_codes: this.getGeoCodes(),
-                editable: true
-            },
-            width: '800px',
-            maxWidth: '95vw',
-            maxHeight: '90vh'
-        });
-
-        dialogRef.afterClosed().subscribe(result => {
-            if (result && result.updated && result.geo_codes) {
-                this.form.get('security.geo_codes')?.setValue(result.geo_codes);
-                this.form.markAsTouched();
-            }
-        });
-    }
-
-    openRblDialog(): void {
-        const dialogRef = this.dialog.open(SensorRblDialogComponent, {
-            data: {
-                sensorId: this.form.value._id || this.route.snapshot.params['id'],
-                sensorName: this.form.value.name || 'Sensor RBL',
-                reputation: this.getReputation(),
-                availableFeeds: this._rbl_feeds.map(f => f.name || f._id || ''),
-                editable: true
-            },
-            width: '800px',
-            maxWidth: '95vw',
-            maxHeight: '90vh'
-        });
-
-        dialogRef.afterClosed().subscribe(result => {
-            if (result && result.updated && result.reputation) {
-                this.form.get('security.reputation')?.setValue(result.reputation);
-                this.form.markAsTouched();
-            }
-        });
-    }
-
-    openBypassDialog(): void {
-        const dialogRef = this.dialog.open(SensorBypassDialogComponent, {
-            data: {
-                sensorId: this.form.value._id || this.route.snapshot.params['id'],
-                sensorName: this.form.value.name || 'Sensor ByPass',
-                trusted: this.getTrusted(),
-                availableFeeds: this._bypass_feeds.map(f => f.name || f._id || ''),
-                editable: true
-            },
-            width: '800px',
-            maxWidth: '95vw',
-            maxHeight: '90vh'
-        });
-
-        dialogRef.afterClosed().subscribe(result => {
-            if (result && result.updated && result.trusted) {
-                this.form.get('security.trusted')?.setValue(result.trusted);
-                this.form.markAsTouched();
-            }
-        });
-    }
-
-    getProviderInfo(providerName: string): RblProviderInfo {
-        return this.rblThreatService.getProviderInfo(providerName);
-    }
-
-    getBypassInfo(feedName: string): BypassFeedInfo {
-        return this.bypassFeedService.getFeedInfo(feedName);
     }
 
     onSave() {

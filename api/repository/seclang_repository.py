@@ -161,7 +161,7 @@ class RuleCategoryDao(DuckDAO):
         vo.pop("rules", None)
         return super().from_dict(vo)
 
-    def to_dict(self, row, dependents=False):
+    def to_dict(self, row, dependents=True):
         if row:
             row = row.copy()
             if "exclusions_json" in row:
@@ -201,7 +201,7 @@ class RuleCategoryDao(DuckDAO):
             sql = f"SELECT * FROM {self.table_name} WHERE (system IS NULL OR system = FALSE) AND name LIKE ? AND phase IN ({placeholders})  order by seq asc"
             params = [f"%{name}%"] + phases
         rs = self._query(sql, params, fetch=True)
-        return [self.to_dict(row, dependents=dependents) for row in rs]
+        return [self.to_dict(row, dependents=False) for row in rs]
 
     def get_by_phases(self, phases: List[int], dependents: bool = False) -> List[Dict[str, Any]]:
         if not phases:
@@ -211,4 +211,4 @@ class RuleCategoryDao(DuckDAO):
             placeholders = ", ".join(["?"] * len(phases))
             sql = f"SELECT * FROM {self.table_name} WHERE (system IS NULL OR system = FALSE) AND phase IN ({placeholders})  order by seq asc"
             rs = self._query(sql, phases, fetch=True)
-        return [self.to_dict(row, dependents=dependents) for row in rs]
+        return [self.to_dict(row, dependents=False) for row in rs]

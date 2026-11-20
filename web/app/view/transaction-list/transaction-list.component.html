@@ -32,7 +32,7 @@
                 <button mat-flat-button color="primary" class="search-btn" (click)="onRefresh()"
                     [matTooltip]="'ACTIONS.REFRESH' | translate">
                     <mat-icon>refresh</mat-icon>
-                    <span>{{ 'ACTIONS.REFRESH' | translate }}</span>
+                    <span>{{ 'actions.refresh' | translate }}</span>
                 </button>
             </div>
 
@@ -183,42 +183,34 @@
                     </td>
                 </ng-container>
 
-                <!-- Status Column -->
-                <ng-container matColumnDef="status">
-                    <th mat-header-cell *matHeaderCellDef class="col-status"> Status </th>
-                    <td mat-cell *matCellDef="let element" class="col-status">
-                        <div class="status-cell-wrapper">
-                            <span class="status-pill status-{{ getStatusClass(getStatusCode(element)) }}">
-                                {{ getStatusCode(element) }}
-                            </span>
-                            @if (element.blocked_by && element.blocked_by !== 'none') {
-                            <span class="blocked-badge badge-{{ element.blocked_by | lowercase }}"
-                                [matTooltip]="('TRANSACTION.BLOCKED_BY' | translate) + ': ' + element.blocked_by">
-                                {{ element.blocked_by }}
-                            </span>
-                            } @else if (element.action === 'blocked' || element.action === 'BLOCKED') {
-                            <span class="blocked-badge badge-waf">
-                                WAF
-                            </span>
-                            }
-                        </div>
-                    </td>
-                </ng-container>
+            <!-- Score Column -->
+            <ng-container matColumnDef="score">
+                <mat-header-cell *matHeaderCellDef> Score </mat-header-cell>
+                <mat-cell *matCellDef="let element">
+                    <span class="score_chip score-clickable {{ element.action | lowercase }}"
+                        (click)="onShowRBL(element); $event.stopPropagation()"
+                        [matTooltip]="('RBL_DIALOG.TITLE' | translate) + ' - ' + ('RBL_DIALOG.SCORE' | translate) + ': ' + (element.score || 0)">
+                        {{ element.score || 0 }}
+                    </span>
+                </mat-cell>
+            </ng-container>
 
-                <!-- Request Column -->
-                <ng-container matColumnDef="request_line">
-                    <th mat-header-cell *matHeaderCellDef class="col-request"> Request </th>
-                    <td mat-cell *matCellDef="let element" class="col-request">
-                        <div class="request-cell-wrapper">
-                            <span class="method-tag method-{{ getMethod(element) | lowercase }}">
-                                {{ getMethod(element) }}
-                            </span>
-                            <span class="uri-path" [matTooltip]="element.http?.request_line || (element.http?.request?.method + ' ' + (element.http?.request?.uri || '/'))">
-                                {{ getUri(element) }}
-                            </span>
-                        </div>
-                    </td>
-                </ng-container>
+            <!-- Source Column -->
+            <ng-container matColumnDef="source">
+                <mat-header-cell *matHeaderCellDef> Source </mat-header-cell>
+                <mat-cell *matCellDef="let element">
+                    @if (element.source) {
+                    <span class="source-ip">{{ element.source.ip }}</span>
+                    @if (element.source.geo?.country && element.source.geo.country !== '--') {
+                    <span class="fi fi-{{ element.source.geo.country | lowercase }} flag-clickable"
+                        (click)="onShowGeoIP(element); $event.stopPropagation()"
+                        [matTooltip]="('GEOIP_DIALOG.TITLE' | translate) + ': ' + element.source.geo.country"
+                        matTooltipPosition="below" matTooltipHideDelay="2000">
+                    </span>
+                    }
+                    }
+                </mat-cell>
+            </ng-container>
 
                 <!-- Duration Column -->
                 <ng-container matColumnDef="duration">
@@ -241,14 +233,24 @@
                                         <mat-icon class="panel-icon panel-icon-req">arrow_upward</mat-icon>
                                         <b>Request Information</b>
                                     </mat-panel-title>
-                                    <mat-panel-description class="header-tokens-wrapper">
-                                        <span class="exp-token token-action action-{{ element.action | lowercase }}">
-                                            <mat-icon class="token-action-icon">{{ (element.action === 'blocked' || element.action === 'BLOCKED') ? 'block' : 'check_circle' }}</mat-icon>
-                                            {{ element.action | uppercase }}
+                                    <mat-panel-description>
+                                        @if (element.http && element.http.request) {
+                                        <span class="exp-panel-token"><b>Size:</b> {{ (element.http.request.bytes || 0)
+                                            | byteFormat }}</span>
+                                        <span class="exp-panel-token"><b>Duration:</b> {{ (element.http.duration || 0) |
+                                            timeFormat }}</span>
+                                        <span class="exp-panel-token"><b>Action:</b> {{ element.action }}</span>
+                                        <span class="exp-panel-token"><b>DoS:</b> {{ element.limit_req_status ||
+                                            element.rate_limit?.action || '-' }}</span>
+                                        <span class="exp-panel-token token-clickable" (click)="onShowGeoIP(element); $event.stopPropagation()"
+                                            [matTooltip]="'GEOIP_DIALOG.TITLE' | translate">
+                                            <b>GeoIP:</b> {{ element.geoip_status || element.geoip?.action || '-' }}
+                                            <mat-icon class="token-mini-icon">open_in_new</mat-icon>
                                         </span>
-                                        @if (element.blocked_by && element.blocked_by !== 'none') {
-                                        <span class="exp-token token-blocked-by">
-                                            <b>Blocked By:</b> {{ element.blocked_by | uppercase }}
+                                        <span class="exp-panel-token token-clickable" (click)="onShowRBL(element); $event.stopPropagation()"
+                                            [matTooltip]="'RBL_DIALOG.TITLE' | translate">
+                                            <b>RBL:</b> {{ element.rbl_status || element.reputation?.action || '-' }}
+                                            <mat-icon class="token-mini-icon">open_in_new</mat-icon>
                                         </span>
                                         }
                                         <span class="exp-token"><b>Size:</b> {{ (element.http?.request?.bytes || 0) | byteFormat }}</span>
@@ -301,46 +303,19 @@
                                             </div>
                                         </div>
                                     </div>
-
-                                    <!-- Section 2: Routing & Backend -->
-                                    <div class="meta-section-card">
-                                        <div class="meta-section-header">
-                                            <mat-icon class="meta-sec-icon">alt_route</mat-icon>
-                                            <span>Routing & Backend</span>
-                                        </div>
-                                        <div class="meta-card-fields">
-                                            <div class="meta-field">
-                                                <label>Service / Route</label>
-                                                <span class="meta-val">
-                                                    <b>{{ element.service?.name || element.service?._id || '-' }}</b>
-                                                    @if (element.route_name && element.route_name !== '-') {
-                                                    <span class="route-sub-badge">/ {{ element.route_name }}</span>
-                                                    }
-                                                </span>
-                                            </div>
-                                            <div class="meta-field">
-                                                <label>Upstream Target</label>
-                                                <span class="meta-val">
-                                                    @if (element.upstream) {
-                                                        {{ element.upstream.name || element.upstream._id }}
-                                                        @if (element.upstream.target && element.upstream.target !== '-') {
-                                                            <span class="target-addr">({{ element.upstream.target }})</span>
-                                                        }
-                                                        @if (element.upstream.status) {
-                                                            <span class="upstream-code-pill status-{{ getStatusClass(element.upstream.status) }}">
-                                                                {{ element.upstream.status }}
-                                                            </span>
-                                                        }
-                                                    } @else {
-                                                        <span class="text-muted">-</span>
-                                                    }
-                                                </span>
-                                            </div>
-                                            <div class="meta-field">
-                                                <label>Node / Server</label>
-                                                <span class="meta-val font-monospace">{{ element.server_id || '-' }}</span>
-                                            </div>
-                                        </div>
+                                    }
+                                    @if (element.source) {
+                                    <div class="detail-item">
+                                        <label>Source IP & Port</label>
+                                        <span class="source-ip-badge-link" (click)="onShowGeoIP(element); $event.stopPropagation()"
+                                            [matTooltip]="'GEOIP_DIALOG.TITLE' | translate">
+                                            @if (element.source.geo?.country && element.source.geo.country !== '--') {
+                                            <span class="fi fi-{{ element.source.geo.country | lowercase }}"></span>
+                                            }
+                                            {{ element.source.ip }}{{ element.source.port ? ':' + element.source.port
+                                                : '' }}
+                                            <mat-icon class="inline-open-icon">open_in_new</mat-icon>
+                                        </span>
                                     </div>
 
                                     <!-- Section 3: Security & Policies -->
@@ -385,57 +360,15 @@
                                     </div>
                                 </div>
 
-                                <!-- Request Headers -->
-                                @if (filterValidHeaders(element.http?.request?.headers).length > 0) {
-                                <div class="headers-block">
-                                    <div class="headers-block-title">
-                                        <mat-icon class="headers-title-icon">format_list_bulleted</mat-icon>
-                                        <span>Request Headers ({{ filterValidHeaders(element.http.request.headers).length }})</span>
-                                    </div>
-                                    <div class="headers-kv-grid">
-                                        @for (p of filterValidHeaders(element.http.request.headers); track p.name) {
-                                        <div class="header-kv-item" (click)="copyHeader(p.name, p.content)" [matTooltip]="'Click to copy'">
-                                            <span class="h-key">{{ p.name }}:</span>
-                                            <span class="h-value">{{ p.content }}</span>
-                                            <mat-icon class="h-copy-btn">content_copy</mat-icon>
-                                        </div>
-                                        }
-                                    </div>
-                                </div>
-                                }
-
-                                <!-- Request Body (Part C / I) -->
-                                @if (element.http?.request?.body) {
-                                <div class="payload-block">
-                                    <div class="payload-block-header">
-                                        <div class="payload-title-wrap">
-                                            <mat-icon class="payload-icon">data_object</mat-icon>
-                                            <span>Request Body (Payload)</span>
-                                        </div>
-                                        <button mat-icon-button (click)="copyText(element.http.request.body, 'Request Body'); $event.stopPropagation()"
-                                                matTooltip="Copy request body" class="payload-copy-btn">
-                                            <mat-icon>content_copy</mat-icon>
-                                        </button>
-                                    </div>
-                                    <pre class="payload-code-box">{{ element.http.request.body }}</pre>
-                                </div>
-                                }
-
-                                <!-- Uploaded Files (Part J) -->
-                                @if (element.http?.request?.files && element.http.request.files.length > 0) {
-                                <div class="files-block">
-                                    <div class="files-block-header">
-                                        <mat-icon class="files-icon">attach_file</mat-icon>
-                                        <span>Uploaded Files ({{ element.http.request.files.length }})</span>
-                                    </div>
-                                    <div class="files-grid">
-                                        @for (f of element.http.request.files; track f.name || f.filename) {
-                                        <div class="file-item-chip">
-                                            <mat-icon class="file-item-icon">description</mat-icon>
-                                            <span class="file-item-name">{{ f.filename || f.name }}</span>
-                                            @if (f.size) {
-                                            <span class="file-item-size">({{ f.size | byteFormat }})</span>
-                                            }
+                                @if (element.http?.request?.headers && element.http.request.headers.length > 0) {
+                                <div class="headers-section">
+                                    <label class="section-label">Request Headers</label>
+                                    <div class="headers-chips">
+                                        @for (p of element.http.request.headers; track p.name) {
+                                        <div class="header-chip"
+                                            [matTooltip]="p.content">
+                                            <span class="h-name">{{ p.name }}:</span>
+                                            <span class="h-val">{{ p.content }}</span>
                                         </div>
                                         }
                                     </div>
@@ -468,12 +401,17 @@
                                     </mat-panel-description>
                                 </mat-expansion-panel-header>
 
-                                <!-- Response Headers -->
-                                @if (filterValidHeaders(element.http.response.headers).length > 0) {
-                                <div class="headers-block">
-                                    <div class="headers-block-title">
-                                        <mat-icon class="headers-title-icon">format_list_bulleted</mat-icon>
-                                        <span>Response Headers ({{ filterValidHeaders(element.http.response.headers).length }})</span>
+                                @if (element.http.response.headers && element.http.response.headers.length > 0) {
+                                <div class="headers-section">
+                                    <label class="section-label">Response Headers</label>
+                                    <div class="headers-chips">
+                                        @for (p of element.http.response.headers; track p.name) {
+                                        <div class="header-chip"
+                                            [matTooltip]="p.content">
+                                            <span class="h-name">{{ p.name }}:</span>
+                                            <span class="h-val">{{ p.content }}</span>
+                                        </div>
+                                        }
                                     </div>
                                     <div class="headers-kv-grid">
                                         @for (p of filterValidHeaders(element.http.response.headers); track p.name) {

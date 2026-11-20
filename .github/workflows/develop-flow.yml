@@ -38,7 +38,7 @@ jobs:
           flake8 . --exclude=web --count --exit-zero --max-complexity=20 --max-line-length=256 --statistics
 
   build-app-image:
-    runs-on: ${{ matrix.runner }}
+    runs-on: ubuntu-latest
     needs: code-check
     strategy:
       fail-fast: false
@@ -136,6 +136,14 @@ jobs:
           done
           docker buildx imagetools create -t liberatti/nxguard:latest $DIGESTS
 
-      - name: Inspect final multi-arch image
-        run: |
-          docker buildx imagetools inspect liberatti/nxguard:latest
+      - name: Build and push Docker image
+        if: github.event_name == 'push'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha,scope=v-branches
+          cache-to: type=gha,scope=v-branches

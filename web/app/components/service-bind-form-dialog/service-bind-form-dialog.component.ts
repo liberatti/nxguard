@@ -15,8 +15,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { Bind, ProtocolType } from 'app/models/service';
 import { MatSelectModule } from '@angular/material/select';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatChipsModule } from '@angular/material/chips';
 import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
@@ -33,13 +33,9 @@ import { TranslatePipe } from '@ngx-translate/core';
         MatDialogTitle,
         MatDialogContent,
         MatDialogActions,
-        MatFormFieldModule,
-        MatInputModule,
-        MatIconModule,
-        MatSelectModule,
-        MatSlideToggleModule,
-        MatTooltipModule,
-        TranslatePipe,
+        MatChipsModule,
+        MatIconModule, MatSelectModule, MatCheckboxModule,
+        TranslatePipe
     ],
 })
 export class ServiceBindFormDialogComponent implements OnInit {

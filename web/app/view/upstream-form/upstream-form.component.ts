@@ -153,8 +153,7 @@ export class UpstreamFormComponent implements OnInit {
 
                     // Handle persistence
                     if (typeof data.persist !== 'undefined' && data.persist) {
-                        const hasCookie = data.persist.type && data.persist.type !== SessionPersistenceType.NONE;
-                        this.persistEnabledControl.setValue(hasCookie, { emitEvent: false });
+                        this.persistEnabledControl.setValue(data.persist.type !== SessionPersistenceType.NONE);
                     }
                 }
 

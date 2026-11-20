@@ -1,23 +1,20 @@
 import json
-from api.services.feed_service import FeedService
+import threading
 from flask import Blueprint, Response, request
 from marshmallow import ValidationError
-from api.middleware.controllers.base_controller import (
+from nxcore.controllers.base_controller import (
     response_data,
     response_error,
-    response_error_404,
     response_error_parse,
     has_any_authority,
 )
-from api.middleware.socket_manager import emit_event
-from api.middleware.logging_manager import logger
+from nxcore.middleware.socket_manager import emit_event
+from nxcore.middleware.logging_manager import logger
 
 import engine.admin as c_admin
 import engine.build as c_builder
-from api.repository.config_repository import ChangeDao, ConfigDao
-from api.repository.upstream_repository import NodeStatusDao
-from api.services.elasticsearch_service import ElasticsearchService
-from api.services.config_audit_service import ConfigAuditService
+from api.model.config_model import ChangeDao, ConfigDao
+from api.model.upstream_model import NodeStatusDao
 from api.tasks import renew_certificates
 
 routes = Blueprint("config", __name__)
@@ -82,19 +79,6 @@ def apply_config() -> Response:
             with ChangeDao() as change_dao:
                 if change_dao.has_certificate_change():
                     renew_certificates()
-
-                active_cfg = conf.get("config", {}) if isinstance(conf, dict) else {}
-                logging_conf = (
-                    active_cfg.get("logging") if isinstance(active_cfg, dict) else None
-                )
-                if (
-                    isinstance(logging_conf, dict)
-                    and logging_conf.get("mode") == "elasticsearch"
-                ):
-                    es_service = ElasticsearchService(logging_conf=logging_conf)
-                    if es_service.is_configured():
-                        es_service.ensure_structures(force=True)
-
                 change_dao.delete_all()
 
             emit_event("tracking_aply")
@@ -134,7 +118,7 @@ def update(_id=None) -> Response:
 @routes.route("/backup", methods=["GET"])
 @has_any_authority(authorities=["viewer", "superuser"])
 def backup_export() -> Response:
-    conf = c_builder.get_config(dependents=False)
+    conf = c_builder.get_config()
     upstreams = []
     for u in conf.get("upstreams", []):
         u_copy = dict(u)
@@ -201,57 +185,3 @@ def backup_import() -> Response:
     except Exception as e:
         logger.error(f"Error importing configuration: {e}")
         return response_error(f"Failed to import configuration: {str(e)}")
-
-@routes.route("/geo", methods=["GET"])
-@has_any_authority(authorities=["viewer", "superuser"])
-def get_geo_countries() -> Response:
-    with FeedService() as feed_service:
-        feed = feed_service.get_geo_countries()
-        return response_data(feed) if feed else response_error_404()
-
-
-@routes.route("/history", methods=["GET"])
-@has_any_authority(authorities=["viewer", "superuser"])
-def get_config_history() -> Response:
-    page = request.args.get("page", 1, type=int)
-    per_page = request.args.get("per_page", 20, type=int)
-    with ConfigAuditService() as audit_service:
-        history = audit_service.get_history(page=page, per_page=per_page)
-        return response_data(history)
-
-
-@routes.route("/history/<scn>/diff", methods=["GET"])
-@has_any_authority(authorities=["viewer", "superuser"])
-def get_config_diff(scn: str) -> Response:
-    base_scn = request.args.get("base_scn")
-    with ConfigAuditService() as audit_service:
-        diff_data = audit_service.get_version_diff(scn=scn, base_scn=base_scn)
-        if not diff_data:
-            return response_error_404()
-        return response_data(diff_data)
-
-
-@routes.route("/history/<scn>/apply", methods=["POST"])
-@has_any_authority(authorities=["superuser"])
-def apply_history_version(scn: str) -> Response:
-    try:
-        with ConfigAuditService() as audit_service:
-            result = audit_service.restore_version(scn=scn)
-            return response_data(result)
-    except ValueError as ve:
-        return response_error(str(ve))
-    except Exception as ex:
-        logger.error(f"Failed to restore configuration version {scn}: {ex}")
-        return response_error(f"Failed to apply configuration version: {str(ex)}")
-
-
-@routes.route("/history/prune", methods=["POST"])
-@has_any_authority(authorities=["superuser"])
-def prune_history() -> Response:
-    try:
-        with ConfigAuditService() as audit_service:
-            result = audit_service.consolidate_and_prune_history()
-            return response_data(result)
-    except Exception as ex:
-        logger.error(f"Failed to prune configuration history: {ex}")
-        return response_error(f"Failed to prune history: {str(ex)}")

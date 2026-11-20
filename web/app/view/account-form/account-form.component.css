@@ -139,12 +139,11 @@
     margin-top: 8px;
 }
 
-.save-btn {
-    height: 38px;
-    padding: 0 20px;
-    font-weight: 600;
-    border-radius: var(--btn-radius);
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
+/* Bottom Actions */
+.bottom-actions {
+    padding: 16px 24px !important;
+    display: flex;
+    gap: 10px;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
 }

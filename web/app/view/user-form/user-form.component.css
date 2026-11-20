@@ -128,10 +128,7 @@
 .bottom-actions {
     padding: 16px 24px !important;
     display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 12px;
-    background: var(--bg-main);
-    border-top: 1px solid var(--border-dim);
-    margin: 0 !important;
+    gap: 10px;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
 }
