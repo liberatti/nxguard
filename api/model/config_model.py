@@ -33,6 +33,10 @@ class ConfigIpxaSchema(Schema):
     key = fields.String(allow_none=True)
 
 
+class ConfigAuditSettingsSchema(Schema):
+    retain_versions = fields.Integer(load_default=50, dump_default=50)
+
+
 class ConfigSchema(Schema):
     class Meta:
         unknown = EXCLUDE
@@ -48,6 +52,7 @@ class ConfigSchema(Schema):
     logging = fields.Nested(ConfigLoggingSchema, allow_none=True)
     purge = fields.Nested(ConfigPurgeSchema, allow_none=True)
     ipxa = fields.Nested(ConfigIpxaSchema, allow_none=True)
+    audit = fields.Nested(ConfigAuditSettingsSchema, allow_none=True)
 
 
 class ConfigBackupSchema(Schema):

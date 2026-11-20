@@ -19,6 +19,10 @@ export interface ConfigPurge {
     purge_after: number;
 }
 
+export interface ConfigAuditSettings {
+    retain_versions: number;
+}
+
 export interface ConfigIpxa {
     url?: string;
     key?: string;
@@ -40,6 +44,7 @@ export interface Config {
     dns_resolver?: string;
     logging?: ConfigLogging;
     purge: ConfigPurge;
+    audit?: ConfigAuditSettings;
     ipxa?: ConfigIpxa;
 }
 export interface EngineNode {

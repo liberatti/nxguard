@@ -1,6 +1,6 @@
 import datetime
 import json
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 
 import config
 from api.middleware.logging_manager import logger
@@ -98,6 +98,19 @@ class ConfigBackupDao(DuckDAO):
             logger.error(f"Error retrieving predecessor backup for ID {id_val}: {str(e)}")
             return None
 
+    def delete_versions_by_ids(self, ids: List[int]) -> int:
+        """Deletes backup configuration records matching the specified list of _id values."""
+        if not ids:
+            return 0
+        try:
+            placeholders = ",".join(["?"] * len(ids))
+            query = f"DELETE FROM {self.table_name} WHERE _id IN ({placeholders})"
+            self._query(query, ids)
+            return len(ids)
+        except Exception as e:
+            logger.error(f"Error deleting backup configuration versions: {str(e)}")
+            return 0
+
     def from_dict(self, vo):
         if "created_at" not in vo:
             vo.update({"created_at": datetime.datetime.now()})
@@ -135,6 +148,10 @@ class ConfigDao(DuckDAO):
             self.ddl(f"ALTER TABLE {self.table_name} ADD COLUMN IF NOT EXISTS logging_json TEXT;")
         except Exception:
             pass
+        try:
+            self.ddl(f"ALTER TABLE {self.table_name} ADD COLUMN IF NOT EXISTS audit_json TEXT;")
+        except Exception:
+            pass
 
     def from_dict(self, vo):
         if "archive" in vo:
@@ -147,6 +164,8 @@ class ConfigDao(DuckDAO):
             vo.update({"cache_json": json.dumps(vo.pop("cache"), default=str)})
         if "ipxa" in vo:
             vo.update({"ipxa_json": json.dumps(vo.pop("ipxa"), default=str)})
+        if "audit" in vo:
+            vo.update({"audit_json": json.dumps(vo.pop("audit"), default=str)})
         return super().from_dict(vo)
 
     def to_dict(self, row):
@@ -166,6 +185,11 @@ class ConfigDao(DuckDAO):
             if "ipxa_json" in row:
                 val = row.pop("ipxa_json")
                 row.update({"ipxa": json.loads(val) if val else None})
+            if "audit_json" in row:
+                val = row.pop("audit_json")
+                row.update({"audit": json.loads(val) if val else {"retain_versions": 50}})
+            elif "audit" not in row:
+                row.update({"audit": {"retain_versions": 50}})
         return super().to_dict(row)
 
     def get_active(self) -> Optional[Dict[str, Any]]:

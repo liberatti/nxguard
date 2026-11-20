@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
 import { ConfigService } from 'app/services/config.service';
 import { NotificationService } from 'app/services/notification.service';
@@ -96,6 +96,11 @@ export class ConfigFormComponent implements OnInit {
             enabled: new FormControl<boolean>(false),
             purge_after: new FormControl<number>(1800)
         }),
+        audit: new FormGroup({
+            retain_versions: new FormControl<number>(50, {
+                validators: [Validators.required, Validators.min(1)]
+            })
+        }),
         ipxa: new FormGroup({
             url: new FormControl<string>(''),
             key: new FormControl<string>('')
@@ -165,6 +170,7 @@ export class ConfigFormComponent implements OnInit {
                     dashboard_password: ''
                 },
                 purge: c.purge || {},
+                audit: c.audit || { retain_versions: 50 },
                 ipxa: c.ipxa || {}
             });
         });

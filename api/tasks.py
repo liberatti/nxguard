@@ -17,7 +17,7 @@ import engine.seclang.seclang_indexer as seclang_indexer
 from api.repository.config_repository import ConfigBackupDao, ConfigDao
 from api.repository.upstream_repository import NodeStatusDao, UpstreamDao, UpstreamStatesDao
 from api.repository.certificate_repository import CertificateDao
-from api.services.config_audit_service import compute_deepdiff, compute_rfc6902_patch
+from api.services.config_audit_service import compute_deepdiff, compute_rfc6902_patch, ConfigAuditService
 from api.tools.acme_tool import AcmeTool
 
 
@@ -260,3 +260,13 @@ def renew_certificates():
             f"{crt_c1} SELF certificates renewed, {crt_c2} MANAGED certificates renewed"
         )
         update_main_config()
+
+
+def prune_config_history() -> None:
+    """Daily task to prune configuration history exceeding retain_versions, consolidating a baseline."""
+    try:
+        with ConfigAuditService() as audit_service:
+            res = audit_service.consolidate_and_prune_history()
+            logger.info(f"Daily config history prune completed: {res.get('message')}")
+    except Exception as ex:
+        logger.error(f"Error in daily config history prune: {ex}")

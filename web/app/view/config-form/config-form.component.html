@@ -356,6 +356,47 @@
                             </mat-card>
                         </div>
                     </mat-expansion-panel>
+
+                    <!-- Panel 5: Audit & History Retention -->
+                    <mat-expansion-panel [expanded]="true" id="audit-history-panel" class="custom-panel">
+                        <mat-expansion-panel-header>
+                            <mat-panel-title class="panel-title-group">
+                                <mat-icon class="panel-icon">manage_history</mat-icon>
+                                <span>{{ 'CONFIG_PAGE.PANEL_AUDIT_HISTORY' | translate }}</span>
+                            </mat-panel-title>
+                            <mat-panel-description class="panel-desc">
+                                {{ 'CONFIG_PAGE.PANEL_AUDIT_HISTORY_DESC' | translate }}
+                            </mat-panel-description>
+                        </mat-expansion-panel-header>
+
+                        <div class="panel-content-body policy-stack">
+                            <mat-card appearance="outlined" formGroupName="audit" class="policy-card">
+                                <div class="policy-card-header">
+                                    <div class="policy-header-left">
+                                        <div class="policy-icon-badge audit-badge">
+                                            <mat-icon>history_toggle_off</mat-icon>
+                                        </div>
+                                        <div class="policy-header-title-wrap">
+                                            <h3 class="policy-card-title">{{ 'CONFIG_PAGE.AUDIT_RETENTION_TITLE' | translate }}</h3>
+                                            <p class="policy-card-subtitle">{{ 'CONFIG_PAGE.AUDIT_RETENTION_DESC' | translate }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="policy-card-body">
+                                    <div class="audit-fields-wrap">
+                                        <mat-form-field appearance="outline" class="max-w-md">
+                                            <mat-label>{{ 'CONFIG_PAGE.AUDIT_RETAIN_VERSIONS' | translate }}</mat-label>
+                                            <mat-icon matPrefix class="field-icon">layers</mat-icon>
+                                            <input matInput type="number" formControlName="retain_versions" id="audit-retain-versions-input" min="1" max="1000" required>
+                                            <span matSuffix class="field-suffix-text">{{ 'CONFIG_PAGE.VERSIONS_SUFFIX' | translate }}</span>
+                                            <mat-hint>{{ 'CONFIG_PAGE.AUDIT_RETAIN_VERSIONS_HINT' | translate }}</mat-hint>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                            </mat-card>
+                        </div>
+                    </mat-expansion-panel>
                 </mat-accordion>
             </form>
         </mat-card-content>

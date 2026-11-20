@@ -647,3 +647,85 @@ class ConfigAuditService:
             "active_scn": val["scn"],
             "message": "Configuration successfully restored and applied",
         }
+
+    def consolidate_and_prune_history(
+        self, retain_versions: Optional[int] = None
+    ) -> Dict[str, Any]:
+        """Prunes historical configuration versions exceeding the retention limit while consolidating a baseline.
+
+        - Preserves the active running configuration SCN.
+        - Retains the most recent `retain_versions` (default 50).
+        - Identifies the predecessor of the oldest retained version and preserves it as the consolidated baseline.
+        - Deletes all versions older than the consolidated baseline.
+        """
+        with ConfigDao() as config_dao, ConfigBackupDao() as backup_dao:
+            active_cfg = config_dao.get_active() or {}
+            active_scn = active_cfg.get("active_scn")
+            if retain_versions is None or retain_versions <= 0:
+                audit_cfg = active_cfg.get("audit") or {}
+                if isinstance(audit_cfg, dict):
+                    retain_versions = audit_cfg.get("retain_versions", 50)
+                else:
+                    retain_versions = 50
+            retain_versions = max(1, int(retain_versions))
+
+            all_backups = backup_dao.get_history(limit=10000, offset=0)
+            total_records = len(all_backups)
+
+            if total_records <= retain_versions:
+                return {
+                    "status": "ok",
+                    "total": total_records,
+                    "retained": total_records,
+                    "pruned": 0,
+                    "baseline_scn": None,
+                    "message": f"Total versions ({total_records}) does not exceed retention limit ({retain_versions}). No pruning needed.",
+                }
+
+            retained_records = all_backups[:retain_versions]
+            retained_ids = {r["_id"] for r in retained_records if "_id" in r}
+
+            oldest_retained = retained_records[-1]
+            oldest_retained_id = oldest_retained.get("_id", 0)
+
+            baseline_record = backup_dao.get_predecessor(oldest_retained_id)
+            baseline_id = baseline_record.get("_id") if baseline_record else None
+            baseline_scn = baseline_record.get("scn") if baseline_record else None
+
+            active_record_id = None
+            if active_scn:
+                for b in all_backups:
+                    if b.get("scn") == active_scn:
+                        active_record_id = b.get("_id")
+                        break
+
+            keep_ids = set(retained_ids)
+            if baseline_id is not None:
+                keep_ids.add(baseline_id)
+            if active_record_id is not None:
+                keep_ids.add(active_record_id)
+
+            ids_to_prune = [
+                b["_id"]
+                for b in all_backups
+                if b.get("_id") is not None and b["_id"] not in keep_ids
+            ]
+
+            pruned_count = 0
+            if ids_to_prune:
+                pruned_count = backup_dao.delete_versions_by_ids(ids_to_prune)
+
+            logger.info(
+                f"Configuration history consolidation & prune complete: "
+                f"retained={len(keep_ids)}, pruned={pruned_count}, "
+                f"baseline_scn={baseline_scn} (ID={baseline_id})"
+            )
+
+            return {
+                "status": "ok",
+                "total_before": total_records,
+                "retained": len(keep_ids),
+                "pruned": pruned_count,
+                "baseline_scn": baseline_scn,
+                "message": f"Successfully pruned {pruned_count} old versions. Baseline consolidated at SCN {baseline_scn}.",
+            }

@@ -243,3 +243,15 @@ def apply_history_version(scn: str) -> Response:
     except Exception as ex:
         logger.error(f"Failed to restore configuration version {scn}: {ex}")
         return response_error(f"Failed to apply configuration version: {str(ex)}")
+
+
+@routes.route("/history/prune", methods=["POST"])
+@has_any_authority(authorities=["superuser"])
+def prune_history() -> Response:
+    try:
+        with ConfigAuditService() as audit_service:
+            result = audit_service.consolidate_and_prune_history()
+            return response_data(result)
+    except Exception as ex:
+        logger.error(f"Failed to prune configuration history: {ex}")
+        return response_error(f"Failed to prune history: {str(ex)}")
