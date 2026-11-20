@@ -8,6 +8,7 @@ except ImportError:
     pass
 
 import os
+import subprocess
 import threading
 import time
 import traceback
@@ -46,7 +47,6 @@ def _scheduler():
 
 def _ensure_storage_permissions():
     """Ensures database and log directories exist and are writable by nxguard."""
-    import subprocess
     for path in [_config.DB_PATH, "/opt/nxguard/logs", "/opt/nxguard/data"]:
         try:
             os.makedirs(path, exist_ok=True)

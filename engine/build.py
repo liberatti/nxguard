@@ -16,6 +16,7 @@ from api.repository.route_repository import RouteDao
 from api.repository.upstream_repository import UpstreamDao, NodeStatusDao, UpstreamStatesDao
 from api.repository.transaction_repository import TransactionDao
 from api.tools.network_tool import NetworkTool
+from api.tools.ssl_tool import SSLTool
 from api.middleware.logging_manager import logger
 from api.repository.acme_repository import ChallengeDao
 
@@ -71,6 +72,11 @@ def create_db():
     """Creates initial database schema tables and seeds default superuser."""
     with ConfigDao() as dao:
         dao.create_schema()
+        if not dao.get_active():
+            dao.persist({
+                "cluster_id": gen_random_string(8),
+                "active_scn": None,
+            })
     with ConfigBackupDao() as dao:
         dao.create_schema()
     with UserDao() as dao:
@@ -130,8 +136,6 @@ def init_from_data(data_dir=None, data_file="init-data.json", data=None):
             )
             if not conf.get("ca_certificate") or not conf.get("ca_private"):
                 try:
-                    from api.tools.ssl_tool import SSLTool
-
                     ca_dict = SSLTool.gen_ca("nxguard-CA")
                     conf["ca_certificate"] = SSLTool.crt_to_pem(ca_dict["certificate"])
                     conf["ca_private"] = SSLTool.private_to_pem(ca_dict["private_key"])

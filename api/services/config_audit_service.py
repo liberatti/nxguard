@@ -154,72 +154,83 @@ def compute_deepdiff(
         "type_changes": 0,
     }
 
+    def _iter_diff_items(category_data):
+        if isinstance(category_data, dict):
+            return category_data.items()
+        elif isinstance(category_data, (list, set, tuple)):
+            return [(item, None) if not isinstance(item, tuple) else item for item in category_data]
+        return []
+
     # 1. Values changed
-    for path, change in raw.get("values_changed", {}).items():
+    for path, change in _iter_diff_items(raw.get("values_changed")):
         summary["values_changed"] += 1
+        old_val = change.get("old_value") if isinstance(change, dict) else None
+        new_val = change.get("new_value") if isinstance(change, dict) else None
         changes.append({
             "type": "changed",
             "category": "values_changed",
-            "path": path,
-            "human_path": humanize_deepdiff_path(path, clean_src) or humanize_deepdiff_path(path, clean_dst),
-            "old_value": change.get("old_value"),
-            "new_value": change.get("new_value"),
+            "path": str(path),
+            "human_path": humanize_deepdiff_path(str(path), clean_src) or humanize_deepdiff_path(str(path), clean_dst),
+            "old_value": old_val,
+            "new_value": new_val,
         })
 
     # 2. Dictionary items added
-    for path, val in raw.get("dictionary_item_added", {}).items():
+    for path, val in _iter_diff_items(raw.get("dictionary_item_added")):
         summary["items_added"] += 1
         changes.append({
             "type": "added",
             "category": "dictionary_item_added",
-            "path": path,
-            "human_path": humanize_deepdiff_path(path, clean_dst),
+            "path": str(path),
+            "human_path": humanize_deepdiff_path(str(path), clean_dst),
             "new_value": val,
         })
 
     # 3. Dictionary items removed
-    for path, val in raw.get("dictionary_item_removed", {}).items():
+    for path, val in _iter_diff_items(raw.get("dictionary_item_removed")):
         summary["items_removed"] += 1
         changes.append({
             "type": "removed",
             "category": "dictionary_item_removed",
-            "path": path,
-            "human_path": humanize_deepdiff_path(path, clean_src),
+            "path": str(path),
+            "human_path": humanize_deepdiff_path(str(path), clean_src),
             "old_value": val,
         })
 
     # 4. Iterable items added
-    for path, val in raw.get("iterable_item_added", {}).items():
+    for path, val in _iter_diff_items(raw.get("iterable_item_added")):
         summary["items_added"] += 1
         changes.append({
             "type": "added",
             "category": "iterable_item_added",
-            "path": path,
-            "human_path": humanize_deepdiff_path(path, clean_dst),
+            "path": str(path),
+            "human_path": humanize_deepdiff_path(str(path), clean_dst),
             "new_value": val,
         })
 
     # 5. Iterable items removed
-    for path, val in raw.get("iterable_item_removed", {}).items():
+    for path, val in _iter_diff_items(raw.get("iterable_item_removed")):
         summary["items_removed"] += 1
         changes.append({
             "type": "removed",
             "category": "iterable_item_removed",
-            "path": path,
-            "human_path": humanize_deepdiff_path(path, clean_src),
+            "path": str(path),
+            "human_path": humanize_deepdiff_path(str(path), clean_src),
             "old_value": val,
         })
 
     # 6. Type changes
-    for path, change in raw.get("type_changes", {}).items():
+    for path, change in _iter_diff_items(raw.get("type_changes")):
         summary["type_changes"] += 1
+        old_val = change.get("old_value") if isinstance(change, dict) else None
+        new_val = change.get("new_value") if isinstance(change, dict) else None
         changes.append({
             "type": "changed",
             "category": "type_changes",
-            "path": path,
-            "human_path": humanize_deepdiff_path(path, clean_src),
-            "old_value": change.get("old_value"),
-            "new_value": change.get("new_value"),
+            "path": str(path),
+            "human_path": humanize_deepdiff_path(str(path), clean_src),
+            "old_value": old_val,
+            "new_value": new_val,
         })
 
     summary["total"] = len(changes)

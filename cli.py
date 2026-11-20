@@ -1,11 +1,14 @@
 """CLI entrypoint for managing NXGuard installation, configuration apply, and SecLanguage indexing."""
 
+import getpass
 import sys
+import bcrypt
 import requests
 
-import engine.seclang.seclang_indexer as indexer
-from api.tasks import install, update_main_config
 import config
+from api.repository.oauth_repository import UserDao
+from api.tasks import install, update_main_config
+import engine.seclang.seclang_indexer as indexer
 
 
 def health_check():
@@ -25,10 +28,6 @@ def health_check():
 def reset_admin():
     """Resets or recreates the administrator account (admin@nxguard.local / admin)."""
     try:
-        import getpass
-        import bcrypt
-        from api.repository.oauth_repository import UserDao
-
         email = sys.argv[2] if len(sys.argv) >= 3 else input("Email: ").strip()
         password = sys.argv[3] if len(sys.argv) >= 4 else getpass.getpass("Password: ")
 

@@ -4,7 +4,7 @@ from functools import wraps
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 import jwt
-from flask import jsonify, request, Response
+from flask import current_app, has_app_context, jsonify, request, Response
 
 import config as base_config
 from api.middleware.jwt_manager import JWTManager
@@ -42,10 +42,6 @@ def has_any_authority(
     def wrapper(fn: Callable) -> Callable:
         @wraps(fn)
         def decorator(*args: Any, **kwargs: Any) -> Any:
-            from flask import current_app, has_app_context
-
-
-
             if _internal:
                 api_key = None
                 if has_app_context() and "API_KEY" in current_app.config:

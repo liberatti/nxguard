@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 import json
 import os
 import socket
+import subprocess
 import time
 import traceback
 
@@ -16,6 +17,7 @@ import engine.seclang.seclang_indexer as seclang_indexer
 from api.repository.config_repository import ConfigBackupDao, ConfigDao
 from api.repository.upstream_repository import NodeStatusDao, UpstreamDao, UpstreamStatesDao
 from api.repository.certificate_repository import CertificateDao
+from api.services.config_audit_service import compute_deepdiff, compute_rfc6902_patch
 from api.tools.acme_tool import AcmeTool
 
 
@@ -168,8 +170,6 @@ def update_upstream_states() -> None:
 
 def update_main_config():
     """Applies configuration in background thread when ConfigDao SCN differs from latest ConfigBackupDao SCN."""
-    from api.services.config_audit_service import compute_deepdiff, compute_rfc6902_patch
-
     with ConfigDao() as config_dao, ConfigBackupDao() as backup_dao:
         active_scn = config_dao.get_active_scn()
         latest_backup = backup_dao.get_latest()

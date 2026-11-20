@@ -118,6 +118,8 @@ def apply(scn):
             active_config = config_dao.get_active()
             if active_config:
                 config_dao.update_by_id(active_config["_id"], {"active_scn": scn})
+            else:
+                config_dao.persist({"active_scn": scn, "cluster_id": gen_random_string(8)})
         sync_watchers(conf)
 
     return {"status": "ok", "scn": scn}

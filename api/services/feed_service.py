@@ -5,6 +5,7 @@ from api.repository.config_repository import ConfigDao
 from marshmallow import Schema, fields
 from api.middleware.repository.schemas.page_meta_schema import PageMetaSchema
 from api.model.ipxa_model import FeedSchema
+from api.tools.network_tool import NetworkTool
 from api.tools.type_parse_tool import parse_dt
 
 
@@ -321,8 +322,6 @@ class GeoService:
                 network = ip_data.get("network")
                 prefix = ip_data.get("prefix")
                 if network is not None and prefix is not None:
-                    from api.tools.network_tool import NetworkTool
-
                     try:
                         r = NetworkTool.range_from_network(f"{network}/{prefix}")
                         ip_info.update(
