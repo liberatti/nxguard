@@ -44,8 +44,30 @@ def _scheduler():
         time.sleep(1)
 
 
+def _ensure_storage_permissions():
+    """Ensures database and log directories exist and are writable by nxguard."""
+    import subprocess
+    for path in [_config.DB_PATH, "/opt/nxguard/logs", "/opt/nxguard/data"]:
+        try:
+            os.makedirs(path, exist_ok=True)
+        except Exception:
+            pass
+        if not os.access(path, os.W_OK):
+            try:
+                subprocess.run(["sudo", "chown", "-R", "nxguard:nxguard", path], check=False)
+                subprocess.run(["sudo", "chmod", "-R", "777", path], check=False)
+            except Exception as e:
+                logger.warning(f"Could not adjust permissions on {path}: {e}")
+
+
+def on_starting(server):
+    """Gunicorn master process initialization hook."""
+    _ensure_storage_permissions()
+
+
 def post_fork(server, worker):
     """Gunicorn post-fork hook initializing instance roles, tasks, and background threads."""
+    _ensure_storage_permissions()
     is_main = os.environ.get("NXGUARD_ROLE") == "main"
     logger.info("NXGuard instance is main: %s", is_main)
     if is_main:

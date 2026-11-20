@@ -141,7 +141,7 @@ server {
 
   error_page 404 403 500 502 503 504 @custom_error;
   location @custom_error {
-    content_by_lua_file {{BASE_PATH}}/luajit/share/lua/5.1/nxguard/content_by_custom_error.lua;
+    content_by_lua_file {{BASE_PATH}}/luajit/share/lua/5.1/nxguard/handlers/error_handler.lua;
   }
 
   location @rate_limited {
@@ -151,5 +151,5 @@ server {
 
   access_log off;
   error_log /opt/nxguard/logs/error-{{render_name if render_name else name}}.log warn;
-  log_by_lua_file {{BASE_PATH}}/luajit/share/lua/5.1/nxguard/log_by_custom.lua;
+  log_by_lua_file {{BASE_PATH}}/luajit/share/lua/5.1/nxguard/handlers/access_logger.lua;
 }

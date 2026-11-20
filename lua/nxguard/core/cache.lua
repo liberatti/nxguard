@@ -1,13 +1,22 @@
 local _M = {}
 local cjson = require("cjson")
 
-function _M.new(maxsize, ttl)
+function _M.new(dict_or_maxsize, ttl)
     local self = {}
-    local CACHE_TTL = ttl or 30
-    local dict = ngx.shared.ipxa_cache
+    local dict_name = "main_cache"
+    local CACHE_TTL = 30
+
+    if type(dict_or_maxsize) == "string" then
+        dict_name = dict_or_maxsize
+        CACHE_TTL = ttl or 30
+    elseif type(ttl) == "number" then
+        CACHE_TTL = ttl
+    end
+
+    local dict = ngx.shared[dict_name]
 
     if not dict then
-        ngx.log(ngx.ERR, "lua_shared_dict 'ipxa_cache' not found in nginx.conf")
+        ngx.log(ngx.ERR, "lua_shared_dict '", dict_name, "' not found in nginx.conf")
     end
 
     function self.get(key)

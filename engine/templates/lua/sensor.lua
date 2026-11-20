@@ -1,6 +1,6 @@
 local http_ok, http = pcall(require, "resty.http")
-local cache = require("nxguard.cache").new(1000, 30)
-local utils = require("nxguard.utils")
+local cache = require("nxguard.core.cache").new("ipxa_cache", 30)
+local utils = require("nxguard.core.utils")
 local cjson = require("cjson")
 
 local BLOCKED_COUNTRIES = utils.parse_list("{{blq_geo}}")

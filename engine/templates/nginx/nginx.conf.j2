@@ -28,7 +28,7 @@ http {
   lua_socket_log_errors off;
 
   init_worker_by_lua_block {
-    local flush = require "nxguard.log_flush"
+    local flush = require "nxguard.core.log_flusher"
     {%- if config.logging and config.logging.mode == 'elasticsearch' and config.logging.index_url %}
     flush.start_remote({
       url = "{{ config.logging.index_url }}",

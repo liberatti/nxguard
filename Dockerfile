@@ -101,7 +101,7 @@ WORKDIR /root/rpmbuild/BUILD
 
 COPY requirements.txt requirements.txt
 RUN export PYTHONUSERBASE=/root/rpmbuild/BUILD/site-packages \
-    && python3 -m pip install --user --break-system-packages -r requirements.txt
+    && python3 -m pip install --user --ignore-installed --break-system-packages -r requirements.txt
 
 WORKDIR /root/rpmbuild/BUILD/admin
 
@@ -112,12 +112,17 @@ COPY --from=build_frontend /app/web/package.json /root/rpmbuild/BUILD/admin/
 COPY *.py .
 COPY api api
 COPY engine engine
-COPY lualib /root/rpmbuild/BUILD/luajit
+COPY lua/nxguard /root/rpmbuild/BUILD/luajit
 
 WORKDIR /root/rpmbuild/SPECS
 COPY packages/nxguard-admin.spec .
 RUN rpmbuild --nobuild nxguard-admin.spec \
     && rpmbuild -bb nxguard-admin.spec
+
+# Estágio de Exportação dos RPMs
+FROM scratch AS rpms
+COPY --from=build_engine /root/rpmbuild/RPMS/ /
+COPY --from=build_admin /root/rpmbuild/RPMS/ /
 
 # Estágio 4: Imagem Final (Runtime)
 FROM rockylinux:10-minimal AS main
@@ -135,13 +140,15 @@ RUN microdnf install -y \
     util-linux \
     sudo \
     python3 \
+    python3-requests \
     lua \
   && microdnf clean all
 
 COPY --from=build_engine /root/rpmbuild/RPMS/**/*.rpm /RPMS/
 COPY --from=build_admin /root/rpmbuild/RPMS/**/*.rpm /RPMS/
 
-RUN rpm -ivh /RPMS/*.rpm && rm -rf /RPMS\
+RUN rm -f /RPMS/*-devel*.rpm \
+ && rpm -ivh /RPMS/*.rpm && rm -rf /RPMS\
  && mkdir -p /data\
  && chown -R nxguard:nxguard /data\
  && chmod 775 /data
@@ -158,8 +165,3 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
 VOLUME [ "/data" ]
 
 ENTRYPOINT ["gunicorn", "-c", "api/gunicorn_config.py", "main:app"]
-
-# Estágio de Exportação dos RPMs
-FROM scratch AS rpms
-COPY --from=build_engine /root/rpmbuild/RPMS/ /
-COPY --from=build_admin /root/rpmbuild/RPMS/ /
