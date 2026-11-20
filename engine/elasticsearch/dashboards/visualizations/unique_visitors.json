@@ -1,0 +1,19 @@
+{
+  "attributes": {
+    "title": "[Logs] Unique Visitors",
+    "visState": "{\"title\": \"[Logs] Unique Visitors\", \"type\": \"metric\", \"params\": {\"metric\": {\"percentageMode\": false, \"useRanges\": false, \"colorSchema\": \"Green to Red\", \"metricColorMode\": \"None\", \"style\": {\"bgFill\": \"#000\", \"bgColor\": false, \"labelColor\": false, \"subText\": \"\", \"fontSize\": 48}}}, \"aggs\": [{\"id\": \"1\", \"enabled\": true, \"type\": \"cardinality\", \"schema\": \"metric\", \"params\": {\"field\": \"source.ip\", \"customLabel\": \"Unique Visitors\"}}]}",
+    "uiStateJSON": "{}",
+    "description": "Contagem de visitantes únicos por IP de origem",
+    "version": 1,
+    "kibanaSavedObjectMeta": {
+      "searchSourceJSON": "{\"query\": {\"query\": \"\", \"language\": \"kuery\"}, \"filter\": [], \"indexRefName\": \"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+    }
+  },
+  "references": [
+    {
+      "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+      "type": "index-pattern",
+      "id": "nxguard_trn"
+    }
+  ]
+}

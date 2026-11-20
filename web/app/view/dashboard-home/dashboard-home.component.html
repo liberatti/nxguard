@@ -1,4 +1,4 @@
-<div class="container-premium">
+<div class="dashboard-container">
     <!-- Dashboard Header -->
     <div class="dashboard-header">
         <div>
@@ -73,6 +73,38 @@
             <div class="status-active stat-subtext">
                 {{ 'DASHBOARD_PAGE.ACTIVE_NODES' | translate:{ count: activeNodesCount } }}
             </div>
+        </mat-card>
+
+        <mat-card class="stat-card glass-effect ipxa-card">
+            <div class="stat-card-header">
+                <div class="stat-label">{{ 'DASHBOARD_PAGE.IPXA_TITLE' | translate }}</div>
+                <mat-icon class="stat-icon ipxa-icon">radar</mat-icon>
+            </div>
+            <div class="stat-value ipxa-status-value">
+                <span class="status-indicator" [class.online]="ipxaStatus === 'ONLINE'" [class.offline]="ipxaStatus === 'OFFLINE'"></span>
+                <span>{{ 'DASHBOARD_PAGE.IPXA_' + ipxaStatus | translate }}</span>
+            </div>
+            @if (ipxaStats) {
+            <div class="stat-pill-group ipxa-pill-group" [matTooltip]="'DASHBOARD_PAGE.IPXA_DETAILS_TOOLTIP' | translate:{ geoip: (ipxaStats.geoip_entries | number), rbl: (ipxaStats.rbl_size | number), bypass: (ipxaStats.feeds_bypass | number), rep: (ipxaStats.feeds_reputation | number), cache: (ipxaStats.cache_size | number) }">
+                <span class="stat-chip-ipxa" [matTooltip]="'DASHBOARD_PAGE.IPXA_GEOIP_LABEL' | translate">
+                    <mat-icon class="chip-icon">public</mat-icon>
+                    {{ ipxaStats.geoip_entries | number }}
+                </span>
+                <span class="stat-chip-ipxa" [matTooltip]="'DASHBOARD_PAGE.IPXA_RBL_LABEL' | translate">
+                    <mat-icon class="chip-icon">security</mat-icon>
+                    {{ ipxaStats.rbl_size | number }}
+                </span>
+                <span class="stat-chip-ipxa" [matTooltip]="'DASHBOARD_PAGE.IPXA_FEEDS_LABEL' | translate">
+                    <mat-icon class="chip-icon">dynamic_feed</mat-icon>
+                    {{ (ipxaStats.feeds_bypass + ipxaStats.feeds_reputation) | number }}
+                </span>
+            </div>
+            } @else {
+            <div class="status-critical stat-subtext">
+                <mat-icon class="stat-sub-icon">cloud_off</mat-icon>
+                {{ 'DASHBOARD_PAGE.IPXA_UNAVAILABLE' | translate }}
+            </div>
+            }
         </mat-card>
     </div>
 

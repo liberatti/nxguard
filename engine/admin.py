@@ -6,11 +6,11 @@ import os
 import subprocess
 import time
 import psutil
-from nxcore.common_utils import gen_random_string
-from nxcore.middleware.logging_manager import logger
+from api.middleware.common_utils import gen_random_string
+from api.middleware.logging_manager import logger
 
 import engine.render as c_render
-from api.model.config_model import ConfigBackupDao, ConfigDao
+from api.repository.config_repository import ConfigBackupDao, ConfigDao
 from api.tools.service_watcher import ServiceWatcher
 from config import BASE_PATH
 
@@ -64,8 +64,13 @@ def validate(conf):
     c_render.generate(conf, test=True)
     try:
         result = subprocess.Popen(
-            f"sudo {BASE_PATH}/nginx/sbin/nginx -c {BASE_PATH}/nginx/conf/tests/nginx.conf -t",
-            shell=True,
+            [
+                "sudo",
+                f"{BASE_PATH}/nginx/sbin/nginx",
+                "-c",
+                f"{BASE_PATH}/nginx/conf/tests/nginx.conf",
+                "-t",
+            ],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
@@ -75,9 +80,7 @@ def validate(conf):
             logger.error(msg)
             return msg
     finally:
-        pass
-        # TODO enable test cleanup
-        # c_render.clean(conf, test=True)
+        c_render.clean(conf, test=True)
 
     with ConfigBackupDao() as backup_dao:
         scn = gen_random_string(16)
@@ -115,6 +118,8 @@ def apply(scn):
             active_config = config_dao.get_active()
             if active_config:
                 config_dao.update_by_id(active_config["_id"], {"active_scn": scn})
+            else:
+                config_dao.persist({"active_scn": scn, "cluster_id": gen_random_string(8)})
         sync_watchers(conf)
 
     return {"status": "ok", "scn": scn}
@@ -167,9 +172,10 @@ def restart():
     )
     if is_running():
         logger.info("Nginx is running, reload required")
+        # nosemgrep: python.lang.security.audit.subprocess-shell-true.subprocess-shell-true
         result = subprocess.Popen(
             f"sudo {BASE_PATH}/nginx/sbin/nginx -c {BASE_PATH}/nginx/conf/enabled/nginx.conf -s reload",
-            shell=True,
+            shell=True,  # nosemgrep: python.lang.security.audit.subprocess-shell-true.subprocess-shell-true
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
@@ -184,9 +190,10 @@ def restart():
         time.sleep(0.5)
 
     logger.info("Nginx is not running, start required")
+    # nosemgrep: python.lang.security.audit.subprocess-shell-true.subprocess-shell-true
     result = subprocess.Popen(
         f"sudo {BASE_PATH}/nginx/sbin/nginx -c {BASE_PATH}/nginx/conf/enabled/nginx.conf",
-        shell=True,
+        shell=True,  # nosemgrep: python.lang.security.audit.subprocess-shell-true.subprocess-shell-true
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
     )
@@ -200,9 +207,10 @@ def restart():
             )
             subprocess.run("sudo pkill -9 nginx", shell=True)
             time.sleep(0.5)
+            # nosemgrep: python.lang.security.audit.subprocess-shell-true.subprocess-shell-true
             retry = subprocess.Popen(
                 f"sudo {BASE_PATH}/nginx/sbin/nginx -c {BASE_PATH}/nginx/conf/enabled/nginx.conf",
-                shell=True,
+                shell=True,  # nosemgrep: python.lang.security.audit.subprocess-shell-true.subprocess-shell-true
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
             )

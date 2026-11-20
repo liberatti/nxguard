@@ -1,10 +1,4 @@
-import json
-from typing import Dict, Any, Optional
-
-from .duck_db import DuckDAO
 from marshmallow import EXCLUDE, Schema, fields
-
-import config as config
 
 
 class SensorSecuritySchema(Schema):

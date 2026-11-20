@@ -27,12 +27,25 @@
     --shadow-premium: 0 4px 20px rgba(0, 0, 0, 0.05);
     
     /* -------------------------------------------------------------------------- */
-    /* 3. Typography                                                              */
+    /* 3. Typography & Font Size Tokens                                           */
     /* -------------------------------------------------------------------------- */
+    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    
     --text-main: #0f172a;       /* Slate 900 */
     --text-dim: #475569;        /* Slate 600 */
     --text-muted: #94a3b8;      /* Slate 400 */
-    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+    /* Standardized UX Font Size Scale */
+    --font-size-2xs: 0.6875rem; /* 11px - micro labels, badges */
+    --font-size-xs: 0.75rem;    /* 12px - table headers, captions, stat labels */
+    --font-size-sm: 0.8125rem;  /* 13px - chips, badges, descriptions, hints */
+    --font-size-base: 0.875rem; /* 14px - body text, table cells, inputs, buttons */
+    --font-size-md: 0.9375rem;  /* 15px - section subheads, list titles */
+    --font-size-lg: 1.125rem;   /* 18px - modal dialog titles, section titles */
+    --font-size-xl: 1.25rem;    /* 20px - page card titles */
+    --font-size-2xl: 1.5rem;    /* 24px - main page titles */
+    --font-size-3xl: 2.25rem;   /* 36px - stat counters */
 
     /* -------------------------------------------------------------------------- */
     /* 4. Component Tokens                                                        */
@@ -57,13 +70,13 @@
     --critical-color: var(--critical);
 }
 
-/* Base Reset */
+/* Base Reset & Variables */
 html, body {
     background-color: var(--bg-main) !important;
     color: var(--text-main) !important;
     font-family: var(--font-family);
-    margin: 0; padding: 0; height: 100%;
-    -webkit-font-smoothing: antialiased;
+    font-size: var(--font-size-base);
+    line-height: 1.5;
 }
 
 /* Material Toolbar & Sidenav */
@@ -92,6 +105,7 @@ html, body {
 
 .mat-mdc-card-header {
     display: flex !important;
+    flex-direction: row !important;
     align-items: center !important;
     justify-content: space-between !important;
     width: 100% !important;
@@ -102,6 +116,7 @@ html, body {
     margin: 0 !important;
 }
 
+.mat-mdc-card-header .mat-mdc-card-header-text,
 .mat-mdc-card-header-text {
     flex: 1 1 auto !important;
     margin: 0 !important;
@@ -306,6 +321,7 @@ td.mat-mdc-cell.text-right,
 th.text-right, 
 td.text-right {
     text-align: right !important;
+    padding-right: 20px !important;
 }
 
 td.mat-mdc-cell.text-right {
@@ -315,9 +331,135 @@ td.mat-mdc-cell.text-right {
 
 td.mat-mdc-cell.text-right .table-cell-actions, 
 td.mat-mdc-cell.text-right .toggle-container {
+    display: inline-flex !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    gap: 6px !important;
+}
+
+td.mat-mdc-cell .mat-mdc-icon-button,
+.action-menu-btn {
+    width: 32px !important;
+    height: 32px !important;
+    padding: 0 !important;
+    line-height: 32px !important;
+    border-radius: 6px !important;
+    color: var(--text-muted, #94a3b8) !important;
+    transition: all 0.15s ease !important;
+}
+
+td.mat-mdc-cell .mat-mdc-icon-button:hover,
+.action-menu-btn:hover {
+    background-color: var(--bg-darker, #f1f5f9) !important;
+    color: var(--text-main, #0f172a) !important;
+}
+
+td.mat-mdc-cell .mat-mdc-icon-button mat-icon,
+td.mat-mdc-cell .mat-mdc-icon-button .mat-icon,
+.action-menu-btn mat-icon {
+    font-size: 18px !important;
+    width: 18px !important;
+    height: 18px !important;
+    line-height: 18px !important;
+}
+
+/* Paginator */
+.mat-mdc-paginator {
+    background: #ffffff !important;
+    color: var(--text-dim) !important;
+    border-top: 1px solid var(--border-dim) !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+}
+
+.mat-mdc-paginator-container {
+    padding: 0 20px !important;
+    justify-content: flex-end !important;
+    min-height: 42px !important;
+    height: 42px !important;
+    box-sizing: border-box !important;
+}
+
+.mat-mdc-paginator-page-size-label,
+.mat-mdc-paginator-range-label {
+    color: var(--text-dim) !important;
+    font-size: var(--font-size-xs, 0.75rem) !important;
+}
+
+.mat-mdc-paginator .mat-mdc-select-value {
+    color: var(--text-main) !important;
+    font-size: var(--font-size-xs, 0.75rem) !important;
+}
+
+.mat-mdc-paginator .mat-mdc-select-arrow {
+    color: var(--text-dim) !important;
+    width: 14px !important;
+    height: 14px !important;
+}
+
+.mat-mdc-paginator .mat-mdc-icon-button {
+    color: var(--text-dim) !important;
+    width: 26px !important;
+    height: 26px !important;
+    padding: 0 !important;
+    line-height: 26px !important;
+}
+
+.mat-mdc-paginator .mat-mdc-icon-button mat-icon {
+    font-size: 18px !important;
+    width: 18px !important;
+    height: 18px !important;
+}
+
+.mat-mdc-paginator .mat-mdc-icon-button[disabled] {
+    color: var(--text-muted) !important;
+    opacity: 0.35 !important;
+}
+
+.mat-mdc-paginator .mat-mdc-text-field-wrapper {
+    background-color: #f8fafc !important;
+    border-radius: 4px !important;
+    height: 26px !important;
+    min-height: 26px !important;
+}
+
+/* Dialogs */
+.mat-mdc-dialog-container .mdc-dialog__surface {
+    border-radius: var(--card-radius) !important;
+    background: #ffffff !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15) !important;
+    overflow: hidden !important;
+}
+
+.mat-mdc-dialog-title,
+.dialog-title {
+    font-size: var(--font-size-lg) !important;
+    font-weight: 700 !important;
+    color: var(--text-main) !important;
+    padding: 12px 18px !important;
+    margin: 0 !important;
+    border-bottom: 1px solid var(--border-dim);
+}
+
+.mat-mdc-dialog-content {
+    padding: 12px 18px !important;
+    margin: 0 !important;
+    max-height: 75vh !important;
+    font-size: var(--font-size-sm) !important;
+}
+
+.mat-mdc-dialog-actions,
+.dialog-actions {
     display: flex !important;
     justify-content: flex-end !important;
     align-items: center !important;
+    padding: 8px 18px !important;
+    margin: 0 !important;
+    border-top: 1px solid var(--border-dim);
+    background: #f8fafc;
+    gap: 8px !important;
+    box-sizing: border-box;
+    width: 100%;
 }
 
 /* Paginator */
@@ -517,7 +659,7 @@ td.mat-mdc-cell.text-right .toggle-container {
 }
 
 .mat-mdc-slide-toggle .mdc-label {
-    font-size: 0.875rem !important;
+    font-size: var(--font-size-base) !important;
     font-weight: 500 !important;
     color: var(--text-dim) !important;
     cursor: pointer !important;

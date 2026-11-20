@@ -175,8 +175,36 @@ def update_main_config():
         backup_scn = latest_backup.get("scn") if latest_backup else None
 
     if not latest_backup or active_scn != backup_scn:
-        logger.info("Configuration change detected. Rebuilding config...")
+        logger.info(
+            f"Configuration change detected (active_scn={active_scn}, backup_scn={backup_scn}). Rebuilding config..."
+        )
         conf = c_builder.get_config()
+
+        if latest_backup and "data" in latest_backup:
+            try:
+                old_data = latest_backup["data"]
+                if isinstance(old_data, str):
+                    old_data = json.loads(old_data)
+                elif not isinstance(old_data, dict):
+                    old_data = {}
+
+                deepdiff_res = compute_deepdiff(old_data, conf)
+                if deepdiff_res.get("changes"):
+                    change_lines = []
+                    for ch in deepdiff_res["changes"][:20]:
+                        line = f"  • [{ch['type'].upper()}] {ch['human_path']}"
+                        if ch["type"] == "changed":
+                            line += f": {ch.get('old_value')} ➔ {ch.get('new_value')}"
+                        change_lines.append(line)
+                    logger.info(
+                        f"Configuration Semantic Diff (DeepDiff, {len(deepdiff_res['changes'])} changes):\n"
+                        + "\n".join(change_lines)
+                    )
+            except Exception as ex:
+                logger.warning(f"Could not calculate configuration diff: {ex}")
+        else:
+            logger.info("Configuration baseline created (no previous backup found).")
+
         val = c_admin.validate(conf)
         if val and val.get("status") == "ok":
             cst = c_admin.apply(val["scn"])

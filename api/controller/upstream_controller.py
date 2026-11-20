@@ -15,7 +15,7 @@ from nxcore.controllers.base_controller import (
     get_pagination,
     has_any_authority,
 )
-from nxcore.middleware.socket_manager import emit_event
+from api.middleware.socket_manager import emit_event
 
 routes = Blueprint("upstream", __name__)
 

@@ -6,30 +6,21 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatGridListModule } from '@angular/material/grid-list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatListModule } from '@angular/material/list';
-import { MatMenuModule } from '@angular/material/menu';
-
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
-import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { RuleCategory, SecRule, Sensor } from 'app/models/sensor';
 import { Feed } from 'app/models/feed';
 import { NotificationService } from 'app/services/notification.service';
 import { OAuthService } from 'app/services/oauth.service';
 import { FeedService } from 'app/services/feed.service';
 import { RuleCategoryService, SensorService } from 'app/services/sensor.service';
-import { DefaultPageMeta } from 'app/models/shared';
 import { CommonModule } from '@angular/common';
 import { FormaterService } from "app/services/formater.service";
 import { MatMomentDateModule } from "@angular/material-moment-adapter";
@@ -37,6 +28,12 @@ import { MatMomentDateModule } from "@angular/material-moment-adapter";
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { RuleDetailsDialogComponent } from 'app/components/rule-details-dialog/rule-details-dialog.component';
+import { SensorGeoipDialogComponent } from 'app/components/sensor-geoip-dialog/sensor-geoip-dialog.component';
+import { SensorRblDialogComponent } from 'app/components/sensor-rbl-dialog/sensor-rbl-dialog.component';
+import { SensorBypassDialogComponent } from 'app/components/sensor-bypass-dialog/sensor-bypass-dialog.component';
+import { RblThreatService, RblProviderInfo } from 'app/services/rbl-threat.service';
+import { BypassFeedService, BypassFeedInfo } from 'app/services/bypass-feed.service';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 
 @Component({
     selector: 'app-sensor-form',
@@ -54,16 +51,9 @@ import { RuleDetailsDialogComponent } from 'app/components/rule-details-dialog/r
 export class SensorFormComponent implements OnInit, AfterViewInit {
     isAddMode: boolean;
     submitted = false;
-    selectedTabIndex = 0;
-    breakpoint: number;
     _categories: RuleCategory[] = [];
     _rbl_feeds: Feed[] = [];
-    _geo_countries: string[] = [
-        "US", "CA", "BR", "IN", "GB", "AU", "DE", "FR", "IT", "ES",
-        "JP", "CN", "MX", "RU", "ZA", "KR", "NG", "AR", "SE", "NO",
-        "DK", "FI", "PL", "CH", "NL", "BE", "SG", "AE", "MY", "TH",
-        "PH", "NG", "KR", "None", "Unknown"
-    ];
+    _bypass_feeds: Feed[] = [];
     _allowed_http_versions: string[] = [
         'HTTP/1.0', 'HTTP/1.1', 'HTTP/2', 'HTTP/2.0'
     ];
@@ -138,10 +128,11 @@ export class SensorFormComponent implements OnInit, AfterViewInit {
         private ruleCatService: RuleCategoryService,
         private feedService: FeedService,
         private dialog: MatDialog,
-        protected oauth: OAuthService,
-        protected formater: FormaterService
+        private rblThreatService: RblThreatService,
+        private bypassFeedService: BypassFeedService,
+        private translate: TranslateService,
+        protected oauth: OAuthService
     ) {
-        this.breakpoint = (window.innerWidth <= 600) ? 2 : 8;
         this.isAddMode = false;
         this.ruleDS = new MatTableDataSource<SecRule>;
     }
@@ -156,6 +147,9 @@ export class SensorFormComponent implements OnInit, AfterViewInit {
 
         if (!this.isAddMode) {
             this.sensorService.getById(id).subscribe((data: Sensor) => {
+                if (data.categories && Array.isArray(data.categories)) {
+                    data.categories = data.categories.map(c => this.getCategoryName(c)).filter(Boolean);
+                }
                 this.form.patchValue(data);
                 if (data.categories && data.categories.length > 0) {
                     this.onSelectCategory(data.categories[0]);
@@ -164,7 +158,12 @@ export class SensorFormComponent implements OnInit, AfterViewInit {
         }
 
         this.getCategories(null);
-        this.getFeeds(null);
+        this.feedService.get_by_type('reputation').subscribe((data: any) => {
+            this._rbl_feeds = Array.isArray(data) ? data : (data?.data || []);
+        });
+        this.feedService.get_by_type('bypass').subscribe((data: any) => {
+            this._bypass_feeds = Array.isArray(data) ? data : (data?.data || []);
+        });
     }
 
     ngAfterViewInit(): void {
@@ -226,17 +225,20 @@ export class SensorFormComponent implements OnInit, AfterViewInit {
             return;
         }
 
-        const payload = this.form.value as Sensor;
+        const payload = { ...this.form.value } as Sensor;
+        if (payload.categories && Array.isArray(payload.categories)) {
+            payload.categories = payload.categories.map(c => this.getCategoryName(c)).filter(Boolean);
+        }
 
         if (this.isAddMode) {
             delete payload._id;
             this.sensorService.save(payload).subscribe(() => {
-                this.notificationService.openSnackBar('Sensor saved');
+                this.translate.stream('SENSOR.SAVED_SUCCESS').subscribe(msg => this.notificationService.openSnackBar(msg));
                 this.router.navigate(['/sensor']);
             });
         } else {
             this.sensorService.update(String(payload._id), payload).subscribe(() => {
-                this.notificationService.openSnackBar('Sensor updated');
+                this.translate.stream('SENSOR.UPDATED_SUCCESS').subscribe(msg => this.notificationService.openSnackBar(msg));
                 this.router.navigate(['/sensor']);
             });
         }
@@ -267,35 +269,31 @@ export class SensorFormComponent implements OnInit, AfterViewInit {
         }
     }
 
-    getFeeds(event: any) {
-        if (event === null) {
-            this.feedService.get(new DefaultPageMeta()).subscribe((data: any) => {
-                const list = Array.isArray(data) ? data : (data?.data || []);
-                const allowedTypes = ['reputation', 'bypass', 'by_pass', 'network', 'network_static', 'ip', 'rbl', 'cidr'];
-                this._rbl_feeds = list.filter((item: any) =>
-                    !item['type'] || allowedTypes.includes(item['type'])
-                );
-            });
-        }
-    }
-
-    onAddBlock(event: any): void {
+    onAddBlock(event: any, selectRef?: any): void {
         let val = event.value;
         if (typeof val === 'object' && val) val = val.name || val._id;
         let list = [...this.getReputation()];
         if (val && !list.includes(val)) {
             list.push(val);
             this.form.get('security.reputation')?.setValue(list);
+            this.form.markAsTouched();
+        }
+        if (selectRef) {
+            selectRef.value = null;
         }
     }
 
-    onAddPermit(event: any): void {
+    onAddPermit(event: any, selectRef?: any): void {
         let val = event.value;
         if (typeof val === 'object' && val) val = val.name || val._id;
         let list = [...this.getTrusted()];
         if (val && !list.includes(val)) {
             list.push(val);
             this.form.get('security.trusted')?.setValue(list);
+            this.form.markAsTouched();
+        }
+        if (selectRef) {
+            selectRef.value = null;
         }
     }
 
@@ -315,15 +313,7 @@ export class SensorFormComponent implements OnInit, AfterViewInit {
         if (index >= 0) {
             list.splice(index, 1);
             this.form.get('security.reputation')?.setValue(list);
-        }
-    }
-
-    onAddGeo(event: any): void {
-        let data = event.value as string;
-        let list = [...this.getGeoCodes()];
-        if (data && !list.includes(data)) {
-            list.push(data);
-            this.form.get('security.geo_codes')?.setValue(list);
+            this.form.markAsTouched();
         }
     }
 
@@ -395,10 +385,23 @@ export class SensorFormComponent implements OnInit, AfterViewInit {
         }
     }
 
+    getCategoryName(cat: any): string {
+        if (!cat) return '';
+        if (typeof cat === 'object') return cat.name || cat._id || '';
+        if (typeof cat === 'string') {
+            const trimmed = cat.trim();
+            if ((trimmed.startsWith('{') && trimmed.endsWith('}')) || (trimmed.startsWith('(') && trimmed.endsWith(')'))) {
+                const match = trimmed.match(/'name':\s*'([^']+)'|"name":\s*"([^"]+)"/);
+                if (match) return match[1] || match[2];
+            }
+            return trimmed;
+        }
+        return String(cat);
+    }
+
     onAddCategory(event: any): void {
-        let val = event.value;
-        if (typeof val === 'object' && val) val = val.name || val._id;
-        let cats = this.form.value.categories || [];
+        let val = this.getCategoryName(event.value);
+        let cats = (this.form.value.categories || []).map(c => this.getCategoryName(c));
         if (val && !cats.includes(val)) {
             cats.push(val);
             this.form.patchValue({ categories: cats });
@@ -450,9 +453,11 @@ export class SensorFormComponent implements OnInit, AfterViewInit {
         return rule;
     }
 
-    onSelectCategory(cat_name: string): void {
-        this.selectedCategory = cat_name;
-        this.ruleCatService.getBySingleName(cat_name).subscribe((data: any) => {
+    onSelectCategory(cat_name: any): void {
+        const cleanName = this.getCategoryName(cat_name);
+        if (!cleanName) return;
+        this.selectedCategory = cleanName;
+        this.ruleCatService.getBySingleName(cleanName).subscribe((data: any) => {
             if (!data) return;
             const categoryData = data.data || data;
             const rawRuleList = Array.isArray(categoryData) ? categoryData : (categoryData.rules || []);
@@ -535,14 +540,16 @@ export class SensorFormComponent implements OnInit, AfterViewInit {
     }
 
     onRemoveCategory(keyword: any): void {
+        const cleanKeyword = this.getCategoryName(keyword);
         if (this.form.value.categories != null) {
-            let index = this.form.value.categories.indexOf(keyword);
+            const currentCats = this.form.value.categories.map(c => this.getCategoryName(c));
+            let index = currentCats.indexOf(cleanKeyword);
             if (index >= 0) {
-                this.form.value.categories.splice(index, 1);
-                if (this.selectedCategory === keyword) {
-                    const remaining = this.form.value.categories;
-                    if (remaining && remaining.length > 0) {
-                        this.onSelectCategory(remaining[0]);
+                currentCats.splice(index, 1);
+                this.form.patchValue({ categories: currentCats });
+                if (this.selectedCategory === cleanKeyword) {
+                    if (currentCats.length > 0) {
+                        this.onSelectCategory(currentCats[0]);
                     } else {
                         this.selectedCategory = null;
                         this.ruleDS.data = [];
@@ -572,22 +579,18 @@ export class SensorFormComponent implements OnInit, AfterViewInit {
 
     filterActiveCategory(arr1: Array<any>, arr2: Array<any> | null | undefined): Array<any> {
         if (!arr1 || !Array.isArray(arr1)) return [];
-        if (arr2 && Array.isArray(arr2))
-            return arr1.filter(itemA => itemA && !arr2.some(itemB => itemB === itemA['name']));
-        return arr1;
+        const usedNames = (arr2 && Array.isArray(arr2)) ? arr2.map(itemB => this.getCategoryName(itemB)) : [];
+        return arr1.filter(itemA => {
+            const nameA = this.getCategoryName(itemA);
+            return nameA && !usedNames.includes(nameA);
+        });
     }
 
-    filterActiveGeo(geo: string[]): string[] {
-        if (!geo) return [];
-        const geoCodes = this.getGeoCodes();
-        return geo.filter(code => !geoCodes.includes(code));
-    }
-
-    filterActiveFeed(feeds: Array<Feed>): Array<Feed> {
-        if (!feeds) return [];
-        const used = [...this.getReputation(), ...this.getTrusted()];
-        return feeds.filter(a =>
-            a && !used.includes(a.name) && !used.includes(a._id)
+    filterActiveFeed(feeds: Array<Feed>, used: Array<string> | null | undefined): Array<Feed> {
+        if (!feeds || !Array.isArray(feeds)) return [];
+        const usedList = used && Array.isArray(used) ? used : [];
+        return feeds.filter((a: Feed) =>
+            a && !usedList.includes(a.name) && !usedList.includes(a._id)
         );
     }
 

@@ -135,6 +135,12 @@ export class AppComponent {
       descriptionKey: 'PAGES.FEATURES.DUCKDB.DESCRIPTION'
     },
     {
+      icon: 'storage',
+      titleKey: 'PAGES.FEATURES.ELASTICSEARCH.TITLE',
+      badgeKey: 'PAGES.FEATURES.ELASTICSEARCH.BADGE',
+      descriptionKey: 'PAGES.FEATURES.ELASTICSEARCH.DESCRIPTION'
+    },
+    {
       icon: 'vpn_key',
       titleKey: 'PAGES.FEATURES.ACME.TITLE',
       badgeKey: 'PAGES.FEATURES.ACME.BADGE',
@@ -205,7 +211,6 @@ export class AppComponent {
       - API_KEY=xxxxxxxx
       - IPINFO_TOKEN=xxxxxxxx
       - LOGLEVEL=INFO
-      - SECURITY_ENABLED=true
       - IBLOCKLIST_USERNAME=xxxxxxxx
       - IBLOCKLIST_PASSWORD=xxxxxxxx
       - MAXMIND_ACCOUNT_ID=xxxxxxxx

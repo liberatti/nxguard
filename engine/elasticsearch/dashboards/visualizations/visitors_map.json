@@ -1,0 +1,19 @@
+{
+  "attributes": {
+    "title": "[Logs] Visitors Map",
+    "visState": "{\"title\": \"[Logs] Visitors Map\", \"type\": \"region_map\", \"params\": {\"legendPosition\": \"bottomright\", \"addTooltip\": true, \"colorSchema\": \"Yellow to Red\", \"selectedLayer\": {\"attribution\": \"<a href=\\\"https://www.naturalearthdata.com/downloads/50m-cultural-vectors/50m-admin-0-countries-2/\\\">Made with Natural Earth</a>\", \"name\": \"World Countries\", \"format\": \"geojson\", \"url\": \"https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson\", \"fields\": [{\"name\": \"iso2\", \"description\": \"Two letter abbreviation\"}, {\"name\": \"iso3\", \"description\": \"Three letter abbreviation\"}, {\"name\": \"name\", \"description\": \"Country name\"}]}, \"selectedJoinField\": {\"name\": \"iso2\", \"description\": \"Two letter abbreviation\"}, \"isDisplayWarning\": true, \"wms\": {\"enabled\": false}, \"outlineWeight\": 1, \"showAllShapes\": true}, \"aggs\": [{\"id\": \"1\", \"enabled\": true, \"type\": \"count\", \"schema\": \"metric\", \"params\": {\"customLabel\": \"Visitors\"}}, {\"id\": \"2\", \"enabled\": true, \"type\": \"terms\", \"schema\": \"segment\", \"params\": {\"field\": \"source.geo.country\", \"size\": 100, \"order\": \"desc\", \"orderBy\": \"1\", \"customLabel\": \"Country\"}}]}",
+    "uiStateJSON": "{}",
+    "description": "Mapa mundial de visitantes por país de origem",
+    "version": 1,
+    "kibanaSavedObjectMeta": {
+      "searchSourceJSON": "{\"query\": {\"query\": \"\", \"language\": \"kuery\"}, \"filter\": [], \"indexRefName\": \"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+    }
+  },
+  "references": [
+    {
+      "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+      "type": "index-pattern",
+      "id": "nxguard_trn"
+    }
+  ]
+}

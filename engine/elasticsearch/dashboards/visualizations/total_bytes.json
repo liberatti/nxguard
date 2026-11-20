@@ -1,0 +1,19 @@
+{
+  "attributes": {
+    "title": "[Logs] Total Bytes",
+    "visState": "{\"title\": \"[Logs] Total Bytes\", \"type\": \"metric\", \"params\": {\"metric\": {\"percentageMode\": false, \"useRanges\": false, \"colorSchema\": \"Green to Red\", \"metricColorMode\": \"None\", \"style\": {\"bgFill\": \"#000\", \"bgColor\": false, \"labelColor\": false, \"subText\": \"\", \"fontSize\": 48}}}, \"aggs\": [{\"id\": \"1\", \"enabled\": true, \"type\": \"sum\", \"schema\": \"metric\", \"params\": {\"field\": \"http.response.bytes\", \"customLabel\": \"Total Bytes Out\"}}]}",
+    "uiStateJSON": "{}",
+    "description": "Volume total de bytes transferidos",
+    "version": 1,
+    "kibanaSavedObjectMeta": {
+      "searchSourceJSON": "{\"query\": {\"query\": \"\", \"language\": \"kuery\"}, \"filter\": [], \"indexRefName\": \"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+    }
+  },
+  "references": [
+    {
+      "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+      "type": "index-pattern",
+      "id": "nxguard_trn"
+    }
+  ]
+}

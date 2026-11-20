@@ -16,7 +16,7 @@
             <!-- Notifications / Apply Icon Button -->
             <button mat-icon-button (click)="onApply()" id="navbar-apply-btn"
                 class="nav-icon-btn notification-apply-btn" [matTooltip]="'APPLY_DIALOG.TITLE' | translate">
-                <mat-icon [matBadge]="changes.length || null" matBadgeColor="warn" [matBadgeHidden]="!changes.length"
+                <mat-icon aria-hidden="false" [matBadge]="changes.length || null" matBadgeColor="warn" [matBadgeHidden]="!changes.length"
                     [class.has-notifications]="trackingEvt">
                     notifications
                 </mat-icon>

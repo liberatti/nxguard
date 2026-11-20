@@ -1,12 +1,12 @@
 from flask import Blueprint, Response
 
-from nxcore.controllers.base_controller import (
+from api.middleware.controllers.base_controller import (
     response_data,
     response_error_404,
     has_any_authority
 )
 
-from api.model.seclang_model import RuleDao
+from api.repository.seclang_repository import RuleDao
 
 routes = Blueprint("rulesec", __name__)
 
@@ -28,7 +28,7 @@ def get(rule_code: int) -> Response:
             return response_data({
                 "code": 12,
                 "phase": 1,
-                "action": "DENY",
+                "action": "blocked",
                 "msg": "'Method is not allowed by route'"
             },)
         case _:

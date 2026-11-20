@@ -1,39 +1,52 @@
 from datetime import datetime
 from flask import Blueprint, request
 
-from nxcore.controllers.base_controller import (
+from api.middleware.controllers.base_controller import (
     response_data,
     response_error_404,
     get_pagination,
     has_any_authority,
 )
 
-from nxcore.common_utils import replace_tz
-from api.model.transaction_model import TransactionDao
+from api.middleware.common_utils import replace_tz
+from api.repository.transaction_repository import TransactionDao
+from api.repository.config_repository import ConfigDao
+from api.services.elasticsearch_service import ElasticsearchService
 import config as env_config
-from config import DATETIME_FMT
+from config import DATETIME_FMT, COMMON_LOG_FORMATS
 
 routes = Blueprint("trn", __name__)
+
+
+def get_transaction_storage():
+    try:
+        with ConfigDao() as config_dao:
+            active = config_dao.get_active()
+            logging_conf = active.get("logging") if active else {}
+            if logging_conf and logging_conf.get("mode") in ["elasticsearch"]:
+                return ElasticsearchService(logging_conf)
+    except Exception:
+        pass
+    return TransactionDao()
 
 
 def parse_date(date_str, fallback):
     if not date_str:
         return fallback
-    for fmt in (
-        DATETIME_FMT,
-        "%Y-%m-%d %H:%M:%S",
-        "%Y-%m-%dT%H:%M:%S",
-        "%Y-%m-%dT%H:%M:%S.%fZ",
-        "%Y-%m-%dT%H:%M:%S%z",
+    # Fast path for ISO-8601 strings
+    if "T" in date_str or (
+        len(date_str) >= 10 and date_str[4] == "-" and date_str[7] == "-"
     ):
+        try:
+            return replace_tz(datetime.fromisoformat(date_str.replace("Z", "+00:00")))
+        except Exception:
+            pass
+    for fmt in COMMON_LOG_FORMATS:
         try:
             return replace_tz(datetime.strptime(date_str, fmt))
         except (ValueError, TypeError):
             continue
-    try:
-        return replace_tz(datetime.fromisoformat(date_str))
-    except Exception:
-        return fallback
+    return fallback
 
 
 @routes.route("/stats/tpm", methods=["POST"])
@@ -46,7 +59,7 @@ def st_tpm():
     ed_date = parse_date(ed_val, datetime.now(env_config.TZ))
 
     filters = req.get("filters")
-    with TransactionDao() as dao:
+    with get_transaction_storage() as dao:
         tpm = dao.get_tpm(st_date, ed_date, filters=filters)
         if tpm:
             for s in tpm:
@@ -68,7 +81,7 @@ def st_tpm():
 @routes.route("/<trn_id>", methods=["GET"])
 @has_any_authority(authorities=["viewer", "superuser"])
 def get(trn_id):
-    with TransactionDao() as dao:
+    with get_transaction_storage() as dao:
         trn = dao.get_by_id(trn_id)
         if trn:
             return response_data(trn, dao.schema)
@@ -86,7 +99,7 @@ def search():
 
     filters = req.get("filters")
     _pagination = get_pagination()
-    with TransactionDao() as dao:
+    with get_transaction_storage() as dao:
         result = dao.get_all(
             _pagination,
             dt_start=st_date,

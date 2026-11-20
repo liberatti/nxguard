@@ -9,6 +9,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatDividerModule } from '@angular/material/divider';
 import moment from 'moment';
 import Chart from 'chart.js/auto';
 
@@ -39,6 +41,8 @@ import { TransactionRAWDialogComponent } from '../../components/transaction-raw-
         MatButtonModule,
         MatCardModule,
         MatTooltipModule,
+        MatMenuModule,
+        MatDividerModule,
         DateFormatPipe,
         ByteFormatPipe,
         TranslatePipe,
@@ -48,6 +52,8 @@ import { TransactionRAWDialogComponent } from '../../components/transaction-raw-
 })
 export class DashboardHomeComponent implements OnInit, AfterViewInit, OnDestroy {
     health: Health = {} as Health;
+    ipxaStats: IpxaStats | null = null;
+    ipxaStatus: 'ONLINE' | 'OFFLINE' = 'OFFLINE';
     totalThreats: number = 0;
     totalUpstreams: number = 0;
     totalRequests: number = 0;
@@ -65,11 +71,30 @@ export class DashboardHomeComponent implements OnInit, AfterViewInit, OnDestroy 
     requestsChart: any;
 
     refreshIntervalSeconds: number = 10;
+    isRefreshing: boolean = false;
     private autoRefreshTimer: any = null;
+
+    get currentRefreshLabel(): string {
+        switch (this.refreshIntervalSeconds) {
+            case 5:
+                return 'DASHBOARD_PAGE.REFRESH_5S';
+            case 10:
+                return 'DASHBOARD_PAGE.REFRESH_10S';
+            case 15:
+                return 'DASHBOARD_PAGE.REFRESH_15S';
+            case 30:
+                return 'DASHBOARD_PAGE.REFRESH_30S';
+            case 60:
+                return 'DASHBOARD_PAGE.REFRESH_60S';
+            default:
+                return 'DASHBOARD_PAGE.REFRESH_OFF';
+        }
+    }
 
     constructor(
         private detailsDialog: MatDialog,
         private healthService: HealthService,
+        private ipxaService: IpxaService,
         private routeService: RouteService,
         private serviceService: ServiceService,
         private transactionService: TransactionService,
@@ -137,12 +162,63 @@ export class DashboardHomeComponent implements OnInit, AfterViewInit, OnDestroy 
     }
 
     refresh(): void {
+        this.isRefreshing = true;
         this.loadHealth();
         this.loadUpstreams();
         this.loadProtectedAssets();
         this.loadRequestStats();
         this.loadThreatLogs();
         this.loadTrafficChart();
+        setTimeout(() => {
+            this.isRefreshing = false;
+            this.cdr.markForCheck();
+        }, 600);
+    }
+
+    loadIpxaStats(): void {
+        this.ipxaService.getStats().subscribe({
+            next: (res: any) => {
+                const stats = res?.data ?? res;
+                if (stats && typeof stats === 'object') {
+                    this.ipxaStats = {
+                        cache_size: Number(stats.cache_size ?? 0),
+                        feeds_bypass: Number(stats.feeds_bypass ?? 0),
+                        feeds_reputation: Number(stats.feeds_reputation ?? 0),
+                        geoip_entries: Number(stats.geoip_entries ?? 0),
+                        rbl_size: Number(stats.rbl_size ?? 0),
+                    };
+                    this.ipxaStatus = 'ONLINE';
+                } else {
+                    this.ipxaStats = null;
+                    this.ipxaStatus = 'OFFLINE';
+                }
+                this.cdr.markForCheck();
+            },
+            error: () => {
+                this.ipxaStats = null;
+                this.ipxaStatus = 'OFFLINE';
+                this.cdr.markForCheck();
+            },
+        });
+    }
+
+    loadUpstreams(): void {
+        this.upstreamService.get().subscribe({
+            next: (res: any) => {
+                this.totalUpstreams =
+                    res?.metadata?.total_elements ??
+                    (Array.isArray(res?.data)
+                        ? res.data.length
+                        : Array.isArray(res)
+                            ? res.length
+                            : 0);
+                this.cdr.markForCheck();
+            },
+            error: () => {
+                this.totalUpstreams = 0;
+                this.cdr.markForCheck();
+            },
+        });
     }
 
     loadUpstreams(): void {
@@ -239,7 +315,7 @@ export class DashboardHomeComponent implements OnInit, AfterViewInit, OnDestroy 
 
         this.transactionService
             .search(
-                { start, end, filters: ['{"action": "DENY"}'] },
+                { start, end, filters: [JSON.stringify({ action: ['blocked', 'DENY', 'block', 'BLOCKED'] })] },
                 { page: 1, per_page: 1 } as any
             )
             .subscribe({
@@ -257,7 +333,7 @@ export class DashboardHomeComponent implements OnInit, AfterViewInit, OnDestroy 
 
         this.transactionService
             .search(
-                { start, end, filters: ['{"action": "WARN"}'] },
+                { start, end, filters: [JSON.stringify({ action: ['warn', 'WARN', 'warning'] })] },
                 { page: 1, per_page: 1 } as any
             )
             .subscribe({
@@ -287,11 +363,11 @@ export class DashboardHomeComponent implements OnInit, AfterViewInit, OnDestroy 
                     const list = res?.data || [];
                     this.threatLogs = list;
                     this.criticalIncidents = list.filter(
-                        (t: TransactionLog) => t.action === 'DENY'
+                        (t: TransactionLog) => ['blocked', 'deny', 'block'].includes(String(t.action || '').toLowerCase())
                     ).length;
                     this.highIncidents = list.filter(
                         (t: TransactionLog) =>
-                            t.action === 'WARN' || t.action === 'REJECTED'
+                            ['warn', 'warning', 'rejected'].includes(String(t.action || '').toLowerCase())
                     ).length;
                     this.cdr.markForCheck();
                 },
@@ -419,18 +495,7 @@ export class DashboardHomeComponent implements OnInit, AfterViewInit, OnDestroy 
                                 display: false,
                             },
                             legend: {
-                                display: true,
-                                position: 'top',
-                                align: 'end',
-                                labels: {
-                                    boxWidth: 10,
-                                    boxHeight: 10,
-                                    usePointStyle: true,
-                                    pointStyle: 'circle',
-                                    color: '#475569',
-                                    font: { size: 11, weight: 'bold' },
-                                    padding: 10,
-                                },
+                                display: false,
                             },
                             tooltip: {
                                 enabled: true,
@@ -592,6 +657,21 @@ export class DashboardHomeComponent implements OnInit, AfterViewInit, OnDestroy 
                 });
             }
         }
+    }
+
+    toggleDataset(chartName: 'bandwidth' | 'requests', datasetIndex: number): void {
+        const chart = chartName === 'bandwidth' ? this.bandwidthChart : this.requestsChart;
+        if (!chart) return;
+        const isVisible = chart.isDatasetVisible(datasetIndex);
+        chart.setDatasetVisibility(datasetIndex, !isVisible);
+        chart.update();
+        this.cdr.markForCheck();
+    }
+
+    isDatasetVisible(chartName: 'bandwidth' | 'requests', datasetIndex: number): boolean {
+        const chart = chartName === 'bandwidth' ? this.bandwidthChart : this.requestsChart;
+        if (!chart) return true;
+        return chart.isDatasetVisible(datasetIndex);
     }
 
     show_details(nodeData: EngineNode): void {

@@ -24,5 +24,8 @@ web/npm-debug.log*
 
 # Database & runtime files
 data/
-README-dev.md
 
+TODO.md
+.agents/backlog
+.github/issues
+engine/lua/nxguard/sensors

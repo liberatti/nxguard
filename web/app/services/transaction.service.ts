@@ -31,7 +31,8 @@ export class TransactionService extends APIService<TransactionLog, number> {
         let t_list = []
         if (filter.filters)
             for (let i = 0; i < filter.filters.length; i++) {
-                t_list.push(JSON.parse(filter.filters[i]))
+                const item: any = filter.filters[i];
+                t_list.push(typeof item === 'string' ? JSON.parse(item) : item);
             }
         /*
               const f = {
@@ -52,7 +53,8 @@ export class TransactionService extends APIService<TransactionLog, number> {
         let f_list = []
         if (filter.filters)
             for (let i = 0; i < filter.filters.length; i++) {
-                f_list.push(JSON.parse(filter.filters[i]))
+                const item: any = filter.filters[i];
+                f_list.push(typeof item === 'string' ? JSON.parse(item) : item);
             }
         const f = {
             "logtime_start": moment(filter.start).utc().format(this._API_DATA_FORMAT),

@@ -76,22 +76,22 @@
 <mat-dialog-actions align="end" class="dialog-actions">
     @if (!applying && !applied) {
         <button mat-stroked-button (click)="closeDialog()" id="apply-cancel-btn">
-            {{ 'actions.cancel' | translate }}
+            {{ 'ACTIONS.CANCEL' | translate }}
         </button>
         <button mat-flat-button color="primary" [disabled]="changes.length === 0" (click)="onApply()" id="apply-confirm-btn">
             <mat-icon>play_arrow</mat-icon>
-            {{ 'actions.apply' | translate }}
+            {{ 'ACTIONS.APPLY' | translate }}
         </button>
     }
 
     @if (applied && !applying) {
         <button mat-stroked-button (click)="closeDialog()" id="apply-close-btn">
-            {{ 'actions.close' | translate }}
+            {{ 'ACTIONS.CLOSE' | translate }}
         </button>
         @if (!success) {
         <button mat-flat-button color="primary" (click)="onApply()" id="apply-retry-btn">
             <mat-icon>refresh</mat-icon>
-            {{ 'actions.refresh' | translate }}
+            {{ 'ACTIONS.REFRESH' | translate }}
         </button>
         }
     }

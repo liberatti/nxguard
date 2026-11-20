@@ -1,8 +1,11 @@
 <ng-container>
     <mat-card>
         <mat-card-header>
-            <mat-card-title>{{ 'view.sensor.title'|translate }}</mat-card-title>
-            <mat-card-subtitle>{{ 'view.sensor.subtitle'|translate }}</mat-card-subtitle>
+            <mat-card-title class="title-with-icon">
+                <mat-icon class="title-icon">security</mat-icon>
+                <span>{{ 'VIEW.SENSOR.TITLE'|translate }}</span>
+            </mat-card-title>
+            <mat-card-subtitle>{{ 'VIEW.SENSOR.SUBTITLE'|translate }}</mat-card-subtitle>
 
             <mat-card-actions class="align-right">
                 <mat-form-field appearance="outline" subscriptSizing="dynamic" class="search-filter-field">
@@ -19,11 +22,16 @@
                 @if (oauth.isRole('superuser')) {
                 <button mat-flat-button color="primary" [routerLink]="['add']" id="add-sensor-btn">
                     <mat-icon>add</mat-icon>
-                    {{ 'actions.create'|translate }}
+                    {{ 'ACTIONS.CREATE'|translate }}
                 </button>
                 }
             </mat-card-actions>
         </mat-card-header>
+
+        @if (isLoading) {
+            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        }
+
         <mat-card-content>
             <table mat-table [dataSource]="sensorDS" matSort class="sensor-table">
                 <tr mat-header-row *matHeaderRowDef="sensorDC"></tr>
@@ -51,7 +59,8 @@
                                     <mat-icon>more_vert</mat-icon>
                                 </button>
                                 <mat-menu #menu="matMenu" xPosition="before">
-                                    <button mat-menu-item type="button" [routerLink]="['edit',element._id]" id="edit-sensor-{{i}}">
+                                    <button mat-menu-item type="button" [routerLink]="['edit',element._id]"
+                                        id="edit-sensor-{{i}}">
                                         <mat-icon>edit</mat-icon>
                                         {{ 'actions.edit'|translate }}
                                     </button>
@@ -68,7 +77,7 @@
                 </ng-container>
             </table>
             <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" [pageSize]="sensorPA.per_page"
-                           [length]="sensorPA.total_elements" (page)="nextPage($event)" id="sensor-paginator"></mat-paginator>
+                [length]="sensorPA.total_elements" (page)="nextPage($event)" id="sensor-paginator"></mat-paginator>
         </mat-card-content>
     </mat-card>
 </ng-container>

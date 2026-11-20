@@ -76,6 +76,12 @@ class UpstreamSchema(Schema):
                     "Backend upstream requires at least one target.", "targets"
                 )
 
+    @pre_load
+    def process_id(self, data, **kwargs):
+        if isinstance(data, dict):
+            if data.get("_id") == "" or data.get("_id") is None:
+                data.pop("_id", None)
+        return data
 
 class UpstreamDao(DuckDAO):
 
@@ -249,11 +255,9 @@ class NodeStatusSchema(Schema):
     net_send = fields.Float()
 
 
-class NodeStatusDao(DuckDAO):
-    def __init__(self):
-        super().__init__(
-            db_path=config.DB_PATH, table_name="node_status", schema=NodeStatusSchema
-        )
+class UpstreamStatesSchema(Schema):
+    class Meta:
+        unknown = EXCLUDE
 
     def create_schema(self):
         self.ddl(

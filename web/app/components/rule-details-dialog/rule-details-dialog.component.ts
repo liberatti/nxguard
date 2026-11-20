@@ -44,26 +44,40 @@ import { HighlightModule } from 'ngx-highlightjs';
 })
 export class RuleDetailsDialogComponent {
     copied: boolean = false;
+    selectedTabIndex: number = 0;
 
     constructor(
         @Inject(MAT_DIALOG_DATA) public data: any,
         public dialogRef: MatDialogRef<RuleDetailsDialogComponent>,
         private clipboard: Clipboard,
         private snackBar: MatSnackBar
-    ) {}
+    ) {
+        if (data?.initialTab === 'json') {
+            this.selectedTabIndex = data?.raw ? 1 : 0;
+        } else {
+            this.selectedTabIndex = 0;
+        }
+    }
 
     get jsonData(): string {
-        return JSON.stringify(this.data, null, 4);
+        const { initialTab, ...cleanData } = this.data || {};
+        return JSON.stringify(cleanData, null, 4);
     }
 
     copyToClipboard(): void {
-        this.clipboard.copy(this.jsonData);
+        const isRawTab = this.selectedTabIndex === 0 && !!this.data?.raw;
+        const textToCopy = isRawTab ? this.data.raw : this.jsonData;
+        this.clipboard.copy(textToCopy);
         this.copied = true;
-        this.snackBar.open('Rule JSON copied to clipboard!', 'OK', {
-            duration: 2500,
-            horizontalPosition: 'center',
-            verticalPosition: 'bottom',
-        });
+        this.snackBar.open(
+            isRawTab ? 'Raw SecRule copied to clipboard!' : 'Rule JSON copied to clipboard!',
+            'OK',
+            {
+                duration: 2500,
+                horizontalPosition: 'center',
+                verticalPosition: 'bottom',
+            }
+        );
         setTimeout(() => {
             this.copied = false;
         }, 2000);

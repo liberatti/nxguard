@@ -1,47 +1,54 @@
 <div class="filter-dialog-container">
-    <div mat-dialog-title class="dialog-header">
+    <!-- Header -->
+    <div class="dialog-header">
         <div class="header-icon-box">
             <mat-icon>filter_alt</mat-icon>
         </div>
         <div class="header-titles">
-            <h2 class="dialog-title">{{ 'TRANSACTION.FILTER.DIALOG_TITLE' | translate }}</h2>
-            <p class="dialog-subtitle">{{ 'TRANSACTION.FILTER.DIALOG_SUBTITLE' | translate }}</p>
+            <h2 class="dialog-header-title">{{ 'TRANSACTION.FILTER.DIALOG_TITLE' | translate }}</h2>
+            <p class="dialog-header-subtitle">{{ 'TRANSACTION.FILTER.DIALOG_SUBTITLE' | translate }}</p>
         </div>
-        <button mat-icon-button (click)="onCancel()" class="close-btn" [matTooltip]="'actions.close' | translate">
+        <button mat-icon-button (click)="onCancel()" class="close-btn" [matTooltip]="'ACTIONS.CLOSE' | translate">
             <mat-icon>close</mat-icon>
         </button>
     </div>
 
+    <!-- Body Content -->
     <mat-dialog-content class="dialog-content">
         <form [formGroup]="filterForm" class="filter-form">
-            <!-- Category Chips Selector (Left aligned) -->
-            <div class="category-selector">
-                <mat-chip-listbox [(ngModel)]="selectedCategory" [ngModelOptions]="{standalone: true}">
-                    <mat-chip-option value="ALL" color="primary" [selected]="selectedCategory === 'ALL'">
-                        {{ 'TRANSACTION.FILTER.CATEGORY_LABEL' | translate }}: All
+            <!-- Category Chips Selector -->
+            <div class="category-section">
+                <div class="section-label">
+                    <mat-icon class="section-icon">tune</mat-icon>
+                    <span>{{ 'TRANSACTION.FILTER.CATEGORY_LABEL' | translate }}</span>
+                </div>
+                <mat-chip-listbox [ngModel]="selectedCategory" (ngModelChange)="onCategoryChange($event)" [ngModelOptions]="{standalone: true}" class="category-chip-listbox">
+                    <mat-chip-option value="ALL" [selected]="selectedCategory === 'ALL'">
+                        <mat-icon matChipAvatar class="cat-chip-icon">apps</mat-icon>
+                        {{ 'TRANSACTION.FILTER.CATEGORIES.ALL' | translate }}
                     </mat-chip-option>
-                    <mat-chip-option value="GENERAL" color="primary">
-                        <mat-icon matChipAvatar>security</mat-icon>
+                    <mat-chip-option value="GENERAL">
+                        <mat-icon matChipAvatar class="cat-chip-icon">security</mat-icon>
                         {{ 'TRANSACTION.FILTER.CATEGORIES.GENERAL' | translate }}
                     </mat-chip-option>
-                    <mat-chip-option value="ROUTING" color="primary">
-                        <mat-icon matChipAvatar>alt_route</mat-icon>
+                    <mat-chip-option value="ROUTING">
+                        <mat-icon matChipAvatar class="cat-chip-icon">alt_route</mat-icon>
                         {{ 'TRANSACTION.FILTER.CATEGORIES.ROUTING' | translate }}
                     </mat-chip-option>
-                    <mat-chip-option value="NETWORK" color="primary">
-                        <mat-icon matChipAvatar>travel_explore</mat-icon>
+                    <mat-chip-option value="NETWORK">
+                        <mat-icon matChipAvatar class="cat-chip-icon">travel_explore</mat-icon>
                         {{ 'TRANSACTION.FILTER.CATEGORIES.NETWORK' | translate }}
                     </mat-chip-option>
-                    <mat-chip-option value="HTTP" color="primary">
-                        <mat-icon matChipAvatar>http</mat-icon>
+                    <mat-chip-option value="HTTP">
+                        <mat-icon matChipAvatar class="cat-chip-icon">http</mat-icon>
                         {{ 'TRANSACTION.FILTER.CATEGORIES.HTTP' | translate }}
                     </mat-chip-option>
-                    <mat-chip-option value="SECURITY" color="primary">
-                        <mat-icon matChipAvatar>policy</mat-icon>
+                    <mat-chip-option value="SECURITY">
+                        <mat-icon matChipAvatar class="cat-chip-icon">policy</mat-icon>
                         {{ 'TRANSACTION.FILTER.CATEGORIES.SECURITY' | translate }}
                     </mat-chip-option>
-                    <mat-chip-option value="SYSTEM" color="primary">
-                        <mat-icon matChipAvatar>dns</mat-icon>
+                    <mat-chip-option value="SYSTEM">
+                        <mat-icon matChipAvatar class="cat-chip-icon">dns</mat-icon>
                         {{ 'TRANSACTION.FILTER.CATEGORIES.SYSTEM' | translate }}
                     </mat-chip-option>
                 </mat-chip-listbox>
@@ -110,16 +117,18 @@
                         }
                     </div>
                 </div>
-                }
             </div>
 
-            <!-- Live JSON Preview (Left aligned) -->
-            <div class="preview-card">
-                <div class="preview-header">
-                    <mat-icon class="preview-icon">code</mat-icon>
-                    <span>{{ 'TRANSACTION.FILTER.PREVIEW_LABEL' | translate }}</span>
+            <!-- Live JSON Preview (Compact Horizontal Strip) -->
+            <div class="preview-strip">
+                <div class="preview-strip-left">
+                    <mat-icon class="preview-icon">data_object</mat-icon>
+                    <span class="preview-title">{{ 'TRANSACTION.FILTER.PREVIEW_LABEL' | translate }}</span>
+                    <span class="preview-badge">JSON</span>
                 </div>
-                <code class="preview-code">{{ previewJson }}</code>
+                <div class="preview-code-wrapper">
+                    <code>{{ previewJson }}</code>
+                </div>
             </div>
         </form>
     </mat-dialog-content>

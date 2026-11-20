@@ -1,7 +1,7 @@
 from flask import Blueprint, request, Response
 from marshmallow import ValidationError
 
-from nxcore.controllers.base_controller import (
+from api.middleware.controllers.base_controller import (
     response_data,
     response_error,
     response_error_404,
@@ -169,6 +169,6 @@ def geoip_info(ipaddr: str) -> Response:
     Returns:
         Response: JSON response containing GeoIP information or error response
     """
-    geo = IPXAService.geo_info(ipaddr)
+    geo = GeoService.geo_info(ipaddr)
     ip_info = {"country": geo["country"]}
     return response_data(ip_info)

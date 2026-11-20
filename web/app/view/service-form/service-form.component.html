@@ -216,13 +216,13 @@
                                                                 <button mat-menu-item type="button"
                                                                     (click)="onEditBind(i)" id="edit-bind-{{i}}">
                                                                     <mat-icon>edit</mat-icon>
-                                                                    {{ 'actions.edit' | translate }}
+                                                                    {{ 'ACTIONS.EDIT' | translate }}
                                                                 </button>
                                                                 @if (form.enabled) {
                                                                 <button mat-menu-item type="button"
                                                                     (click)="onBindRemove(i)" id="remove-bind-{{i}}">
                                                                     <mat-icon>delete</mat-icon>
-                                                                    {{ 'actions.delete' | translate }}
+                                                                    {{ 'ACTIONS.DELETE' | translate }}
                                                                 </button>
                                                                 }
                                                             </mat-menu>
@@ -242,7 +242,7 @@
                                             <button mat-flat-button color="primary" type="button"
                                                 (click)="onAddBind()" id="add-bind-button">
                                                 <mat-icon>add</mat-icon>
-                                                {{ 'actions.create' | translate }}
+                                                {{ 'ACTIONS.CREATE' | translate }}
                                             </button>
                                             }
                                         </mat-card-actions>
@@ -381,7 +381,7 @@
                                                         <button mat-menu-item type="button" (click)="onRemoveHeader(i)"
                                                             id="remove-header-{{i}}">
                                                             <mat-icon>delete</mat-icon>
-                                                            {{ 'actions.delete' | translate }}
+                                                            {{ 'ACTIONS.DELETE' | translate }}
                                                         </button>
                                                     </mat-menu>
                                                 </div>
@@ -525,7 +525,7 @@
                                         <button mat-stroked-button color="primary" type="button" class="mt-2"
                                             (click)="onAddRoute()">
                                             <mat-icon>add</mat-icon>
-                                            {{ 'actions.create' | translate }}
+                                            {{ 'ACTIONS.CREATE' | translate }}
                                         </button>
                                         }
                                     </div>

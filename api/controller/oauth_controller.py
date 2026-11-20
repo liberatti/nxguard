@@ -2,17 +2,18 @@ import traceback
 from typing import Dict
 
 import bcrypt
-from nxcore.controllers.base_controller import (
+from api.middleware.controllers.base_controller import (
     response_data,
     response_error_parse,
     response_error_500,
     response_error_401,
 )
-from nxcore.middleware.jwt_manager import JWTManager
+from api.middleware.jwt_manager import JWTManager
 from flask import Blueprint, request, Response
 from marshmallow import ValidationError
 
-from api.model.oauth_model import OIDCToken, UserDao
+from api.model.oauth_model import OIDCToken
+from api.repository.oauth_repository import UserDao
 from config import JWT_EXPIRE
 
 routes = Blueprint("oauth", __name__)

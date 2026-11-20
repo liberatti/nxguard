@@ -1,16 +1,7 @@
-import json
-from typing import Dict, Any, List, Optional
-
-from nxcore.middleware.logging_manager import logger
-from .duck_db import DuckDAO
 from marshmallow import EXCLUDE, Schema, fields, post_load
 
-import config
-from api.model.certificate_model import CertificateDao, CertificateSchema
-from api.model.route_model import (
-    RouteDao,
-    RouteSchema,
-)
+from api.model.certificate_model import CertificateSchema
+from api.model.route_model import RouteSchema
 
 
 class HeaderSchema(Schema):

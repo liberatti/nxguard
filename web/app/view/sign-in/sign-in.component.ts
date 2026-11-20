@@ -10,14 +10,16 @@ import {MatIconModule} from '@angular/material/icon';
 import {MatInputModule} from '@angular/material/input';
 import {MatProgressBarModule} from '@angular/material/progress-bar';
 import {MatSelectModule} from '@angular/material/select';
+import {MatMenuModule} from '@angular/material/menu';
 import {MatTooltipModule} from '@angular/material/tooltip';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {Router, RouterModule} from '@angular/router';
 import {User} from 'app/models/oauth';
 import {Language} from 'app/models/shared';
 import {LocalStorageService} from 'app/services/localstorage.service';
 import {NotificationService} from 'app/services/notification.service';
 import {OAuthService} from 'app/services/oauth.service';
-import {CommonModule, NgOptimizedImage} from "@angular/common";
+import {CommonModule} from "@angular/common";
 import {TranslatePipe, TranslateService} from "@ngx-translate/core";
 import {environment} from "environments/environment";
 
@@ -27,7 +29,8 @@ import {environment} from "environments/environment";
     imports: [RouterModule, CommonModule, FormsModule, ReactiveFormsModule, TranslatePipe,
         MatIconModule, MatButtonModule, MatFormFieldModule,
         MatCardModule, MatProgressBarModule, MatInputModule,
-        MatTooltipModule, MatSelectModule, MatOptionModule, MatGridListModule
+        MatTooltipModule, MatSelectModule, MatOptionModule, MatGridListModule, MatMenuModule,
+        MatProgressSpinnerModule
     ],
 
     templateUrl: './sign-in.component.html',
@@ -37,6 +40,9 @@ export class SignInComponent implements OnInit {
     locales = [] as Array<Language>;
     hidePassword = true;
     version: string = environment.version;
+    currentYear: number = new Date().getFullYear();
+    currentLangCode: string = 'EN';
+    isLoading: boolean = false;
 
     form = new FormGroup({
         email: new FormControl<string>('', {
@@ -93,17 +99,20 @@ export class SignInComponent implements OnInit {
     }
 
     login() {
-        if (this.form.status === "INVALID") {
+        if (this.form.status === "INVALID" || this.isLoading) {
             return;
         }
+        this.isLoading = true;
         const formData = this.form.value as User;
         this.auth.login(formData).subscribe({
             next: (data) => {
+                this.isLoading = false;
                 this.auth.storeTokens(data);
                 this.router.navigate(['/dashboard']).then(r => true);
             },
             error: (err) => {
-                this.notificationService.openSnackBar("Authentication failed")
+                this.isLoading = false;
+                this.notificationService.openSnackBar("Authentication failed");
                 this.router.navigate(['/signin']).then(r => true);
             }
         });
@@ -114,3 +123,4 @@ export class SignInComponent implements OnInit {
         this.localStorage.remove('oidc');
     }
 }
+

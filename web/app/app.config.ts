@@ -8,12 +8,49 @@ import { JwtInterceptor } from './interceptors/jwt.interceptor';
 import { environment } from 'environments/environment';
 import { provideMomentDateAdapter } from "@angular/material-moment-adapter";
 import { provideHighlightOptions } from 'ngx-highlightjs';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 
 export const REST_API_URL = new InjectionToken<string>('REST_API_URL');
 export const API_DATA_FORMAT = new InjectionToken<string>('API_DATA_FORMAT');
 
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 import { provideTranslateService } from "@ngx-translate/core";
+
+const getInitialLang = (): string => {
+  if (typeof window === 'undefined') {
+    return 'en_US';
+  }
+  try {
+    const rawLang = localStorage.getItem('lang');
+    if (rawLang) {
+      try {
+        const parsed = JSON.parse(rawLang);
+        if (parsed) {
+          const clean = String(parsed).replace(/['"]+/g, '').trim();
+          if (clean) return clean;
+        }
+      } catch {
+        const clean = rawLang.replace(/['"]+/g, '').trim();
+        if (clean) return clean;
+      }
+    }
+    const rawUiConfig = localStorage.getItem('ui_config');
+    if (rawUiConfig) {
+      const parsedConfig = JSON.parse(rawUiConfig);
+      const loc = parsedConfig?.locale;
+      if (loc) {
+        if (typeof loc === 'object') {
+          const key = loc.key || loc.id;
+          if (key) return String(key).replace(/['"]+/g, '').trim();
+        }
+        return String(loc).replace(/['"]+/g, '').trim();
+      }
+    }
+  } catch {
+    // fallback
+  }
+  return 'en_US';
+};
 
 export const appConfig: ApplicationConfig = {
   providers: [

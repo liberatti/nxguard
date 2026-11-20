@@ -15,5 +15,6 @@ export interface Certificate {
     provider: CertificateProviderType;
     not_before: Date;
     not_after: Date;
-    force_renew:boolean;
+    force_renew: boolean;
+    in_use?: number;
 }

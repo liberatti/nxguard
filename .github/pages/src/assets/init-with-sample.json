@@ -2,9 +2,26 @@
   "config": {
     "dns_resolver": "127.0.0.11 8.8.8.8 1.1.1.1",
     "ipxa": {
-      "url": "http://ipxa:5000",
+      "url": "http://ipxa:5000/ipxa",
       "key": "tZzDBUSnoy76LLSvu1Vg3e9vdFJINMT2"
+    },
+    "acme_directory_url": "https://acme-v02.api.letsencrypt.org/directory",
+    "logging": {
+        "audit_log_parts": "ABHF",
+        "dashboard_password": "",
+        "dashboard_url": "",
+        "dashboard_username": "",
+        "index_password": "",
+        "index_url": "",
+        "index_username": "",
+        "mode": "local",
+        "type": "elasticsearch"
+    },
+    "purge": {
+        "enabled": true,
+        "purge_after": 30
     }
+  
   },
   "user": {
     "name": "Default admin user",
@@ -12,6 +29,7 @@
     "email": "admin@nxguard.local",
     "role": "superuser"
   },
+  
   "certificates": [
     {
       "certificate": "-----BEGIN CERTIFICATE-----\nMIIFGzCCBAOgAwIBAgISBQqkrUkJaFJbLVBsdml3GxDxMA0GCSqGSIb3DQEBCwUA\nMDMxCzAJBgNVBAYTAlVTMRYwFAYDVQQKEw1MZXQncyBFbmNyeXB0MQwwCgYDVQQD\nEwNSMTMwHhcNMjUxMDEwMTQwMzI2WhcNMjYwMTA4MTQwMzI1WjAfMR0wGwYDVQQD\nExRhZG1pbi5ueGd1YXJkLmNvbS5icjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCC\nAQoCggEBAKGn7EThuHxn/zneappMO2yWSZe2qquKR64sB/3UPzthkbd6HVqlT6R2\n6Bt1lB7pjTam8YLgyHXz1Jn+MFeuxm7+i8P7B/cx/lrWcXkK0ET2/McQssqDQFSc\nTu5+UXbIn+lYUQQeFsMQuYvYPko1twB9wAz1yfjflO4Rl61pli+SYMeS+dC7cP+k\nCg30+59gzwvFzVcfrdqqmVKZEeqeTcsdOd6rj3jhIQ/7zuxzbFEPKSVTygM5qPmN\nYKpK3JeZcyUP0YkJfNDX2aNb+1CH5yfsyMBwz9S6EdcbHTlpkEvXDhGP63JYF7d5\nGcedk4wgsuhK+lLO4fxtgARgUtragVECAwEAAaOCAjswggI3MA4GA1UdDwEB/wQE\nAwIFoDAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwDAYDVR0TAQH/BAIw\nADAdBgNVHQ4EFgQUDZPtRUCXN680hPoki6sge35Jt9cwHwYDVR0jBBgwFoAU56uf\nDywzoFPTXk94yLKEDjvWkjMwMwYIKwYBBQUHAQEEJzAlMCMGCCsGAQUFBzAChhdo\ndHRwOi8vcjEzLmkubGVuY3Iub3JnLzA1BgNVHREELjAsghRhZG1pbi5ueGd1YXJk\nLmNvbS5icoIUcHJveHkubnhndWFyZC5jb20uYnIwEwYDVR0gBAwwCjAIBgZngQwB\nAgEwLwYDVR0fBCgwJjAkoCKgIIYeaHR0cDovL3IxMy5jLmxlbmNyLm9yZy8xMTQu\nY3JsMIIBBAYKKwYBBAHWeQIEAgSB9QSB8gDwAHYAZBHEbKQS7KeJHKICLgC8q08o\nB9QeNSer6v7VA8l9zfAAAAGZzqST2wAABAMARzBFAiAOGWLMWatdSzZRNdbTfjuU\nXgEvYNjEqaX+V6I+wI3bpQIhAIRpJ4YbyTr6ZkKKH0osalBdakYWatPBHhFb8AOn\nWdntAHYAlpdkv1VYl633Q4doNwhCd+nwOtX2pPM2bkakPw/KqcYAAAGZzqSUIwAA\nBAMARzBFAiEAzHLglHa1c+2A8hJFlUSEAcNDUik8qmMHeqImavT0oM8CIFvapjTX\nKi+Z2i749iCdPNE/9UHLjQYyPjPWjf5zRkWnMA0GCSqGSIb3DQEBCwUAA4IBAQBN\ncP9N8zfx5jkX00nisq0+g0sDBnKfu3lTj5YGx4GFxWRTYFTCkwFD/Uw43Lb2WrZe\nFOJFPd4IGQmflGMhVQhq6F0mx0JVYRoLXGkWHZzKKGpwFrSZZsHsY5HbG7qYwYgY\nmMPUHM6KG1qTEGtGhr7QCYlrzFCoUQxHKaM9EUr9pO2blxNuDEcPt48fkOQ2jJaD\nc1v52vNAbIoDCsaITWHnmLg7LqbQSwTUHZ63T0v/YLc8bG99XgdCEsGDsjt0STyg\nvaq20debdtnX1d+vOEc5S7xDQQtjRzAvfB1aYC5ZalOn2NQmPtRZE//Gtgzd+UCQ\n4KySxCelCg539oWPB33n\n-----END CERTIFICATE-----\n",
@@ -65,7 +83,9 @@
           "firehol_level1"
         ],
         "trusted": [
-          "lan_bypass"
+          "internal_networks",
+          "loopback_vpn",
+          "rfc1918_private"
         ]
       },
       "inspection": {
@@ -181,7 +201,9 @@
           "firehol_level1"
         ],
         "trusted": [
-          "lan_bypass"
+          "internal_networks",
+          "loopback_vpn",
+          "rfc1918_private"
         ]
       },
       "inspection": {

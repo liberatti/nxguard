@@ -1,11 +1,17 @@
 
-export interface ConfigArchive {
-    enabled: boolean;
-    archive_after: number;
-    type: string;
-    url: string;
-    username: string;
-    password: string;
+export interface ConfigLogging {
+    mode: 'local' | 'elasticsearch' | string;
+    type?: string;
+    audit_log_parts?: string;
+    index_url?: string;
+    index_username?: string;
+    index_password?: string;
+    dashboard_url?: string;
+    dashboard_username?: string;
+    dashboard_password?: string;
+    url?: string;
+    username?: string;
+    password?: string;
 }
 
 export interface ConfigPurge {
@@ -40,4 +46,61 @@ export interface EngineNode {
 }
 export interface Health {
     nodes: EngineNode[];
+}
+
+export interface ConfigAuditHistoryItem {
+    _id: number;
+    scn: string;
+    created_at: string;
+    is_active: boolean;
+    jcs_hash: string;
+    counts: {
+        services: number;
+        upstreams: number;
+        sensors: number;
+        certificates: number;
+    };
+    deepdiff_summary?: DeepDiffSummary;
+}
+
+export interface DeepDiffChange {
+    type: 'changed' | 'added' | 'removed';
+    category: string;
+    path: string;
+    human_path: string;
+    old_value?: any;
+    new_value?: any;
+}
+
+export interface DeepDiffSummary {
+    total: number;
+    values_changed: number;
+    items_added: number;
+    items_removed: number;
+    type_changes?: number;
+}
+
+export interface DeepDiffResult {
+    available: boolean;
+    raw: Record<string, any>;
+    summary: DeepDiffSummary;
+    changes: DeepDiffChange[];
+}
+
+export interface ConfigVersionDiff {
+    target: {
+        _id: number;
+        scn: string;
+        created_at: string;
+        jcs_hash: string;
+        raw_data: any;
+    };
+    base: {
+        _id?: number;
+        scn?: string;
+        created_at?: string;
+        jcs_hash?: string;
+        raw_data?: any;
+    };
+    deepdiff?: DeepDiffResult;
 }

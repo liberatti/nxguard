@@ -6,8 +6,6 @@ from .duck_db import DuckDAO
 from flask_marshmallow import Schema
 from marshmallow import EXCLUDE, fields
 
-import config as config
-
 
 class ChallengeSchema(Schema):
     class Meta:

@@ -15,12 +15,12 @@
     "HERO": {
       "BADGE": "API Gateway de Alta Performance & Proxy Reverso de Segurança",
       "TITLE_LINE_1": "Defesa de Camada 7 de Próxima Geração com",
-      "TITLE_GRADIENT": "OpenResty & ModSecurity v3",
-      "SUBTITLE_1": "O NXGuard oferece inspeção de requisições em sub-milissegundos via LuaJIT, inteligência de ameaças em tempo real sincronizada com o",
+      "TITLE_GRADIENT": "NGINX & ModSecurity v3",
+      "SUBTITLE_1": "O NXGuard oferece inspeção de requisições em sub-milissegundos via LuaJIT no Rocky Linux 10, inteligência de ameaças em tempo real sincronizada com o",
       "SUBTITLE_2": ", análises de telemetria integradas com",
       "SUBTITLE_3": "e automação SSL ACME sem intervenção manual.",
       "CHIP_LICENSE": "Apache 2.0",
-      "CHIP_DOCKER": "Pronto para Docker",
+      "CHIP_DOCKER": "Docker & Rocky Linux 10",
       "CHIP_LATENCY": "Latência Sub-0.4ms",
       "CHIP_OWASP": "OWASP CRS 4.25+",
       "CTA_QUICKSTART": "Início Rápido",
@@ -41,7 +41,7 @@
       "ENGINE": {
         "LABEL": "Stack do Motor",
         "VALUE": "Nginx + LuaJIT",
-        "CAPTION": "Núcleo OpenResty de alta concorrência"
+        "CAPTION": "Núcleo NGINX de alta concorrência no Rocky Linux 10"
       },
       "ANALYTICS": {
         "LABEL": "Banco de Telemetria",
@@ -81,11 +81,11 @@
       "DIAGRAM_TITLE": "Diagrama do Pipeline",
       "DIAGRAM_SUBTITLE": "Fluxo de Entrada, Inspeção e Telemetria",
       "STEP_1_TITLE": "Entrada & Pré-validação LuaJIT",
-      "STEP_1_DESC": "O tráfego chega às threads de trabalho do OpenResty. Sensores Lua customizados realizam bypass dinâmico rápido, geofiltragem e validação inicial antes de acionar a inspeção.",
+      "STEP_1_DESC": "O tráfego chega às threads de trabalho do NGINX. Sensores Lua customizados realizam bypass dinâmico rápido, geofiltragem e validação inicial antes de acionar a inspeção.",
       "STEP_2_TITLE": "Regras ModSecurity v3 & CRS",
       "STEP_2_DESC": "Análise completa de payload e avaliação regex contra o OWASP Core Rule Set 4.25+. Políticas granulares por rota permitem ajustes dinâmicos sem reinicialização.",
-      "STEP_3_TITLE": "Feeds IPXA & Telemetria DuckDB",
-      "STEP_3_DESC": "Inteligência de ameaças contínua sincronizada com o IPXA. Todos os logs de auditoria e transações bloqueadas são salvos no DuckDB embutido para relatórios e análises imediatos."
+      "STEP_3_TITLE": "Feeds IPXA & Telemetria DuckDB / Elasticsearch",
+      "STEP_3_DESC": "Inteligência de ameaças contínua sincronizada com o IPXA. Logs de auditoria e transações são processados para análise local via DuckDB ou transmitidos em lote para clusters Elasticsearch/Kibana com index templates automatizados."
     },
     "FEATURES": {
       "BADGE": "Capacidades",
@@ -99,7 +99,7 @@
       "LUAJIT": {
         "TITLE": "Núcleo LuaJIT de Alta Performance",
         "BADGE": "Sub-milissegundo",
-        "DESCRIPTION": "Sensores Lua executados diretamente nas threads do OpenResty para filtragem rápida, sanitização de cabeçalhos e limitação de taxa."
+        "DESCRIPTION": "Sensores Lua executados diretamente nas threads do NGINX para filtragem rápida, sanitização de cabeçalhos e limitação de taxa."
       },
       "IPXA": {
         "TITLE": "Inteligência de Ameaças IPXA",
@@ -110,6 +110,11 @@
         "TITLE": "Telemetria Embutida DuckDB",
         "BADGE": "Zero BD Externo",
         "DESCRIPTION": "Mecanismo colunar embutido diretamente no backend de administração para consultas, agregações e auditoria instantâneas de transações em tempo real."
+      },
+      "ELASTICSEARCH": {
+        "TITLE": "Integração Elasticsearch & SIEM",
+        "BADGE": "Index Templates & Bulk",
+        "DESCRIPTION": "Exportação contínua de logs e auditoria WAF via Bulk API, com provisionamento automático de index templates (nxguard_trn*) e mappings tipados."
       },
       "ACME": {
         "TITLE": "Automação ACME & SSL",

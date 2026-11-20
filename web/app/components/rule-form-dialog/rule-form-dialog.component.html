@@ -1,0 +1,184 @@
+<div class="rule-dialog-container">
+    <!-- Header -->
+    <div class="rule-dialog-header">
+        <div class="header-icon-box">
+            <mat-icon class="header-icon">gavel</mat-icon>
+        </div>
+        <div class="header-title-box">
+            <h2 class="dialog-title">
+                {{ (isEdit ? 'RULECAT.RULE_DIALOG.EDIT_TITLE' : 'RULECAT.RULE_DIALOG.CREATE_TITLE') | translate }}
+            </h2>
+            <p class="dialog-subtitle">{{ 'RULECAT.RULE_DIALOG.SUBTITLE' | translate }}</p>
+        </div>
+        <button mat-icon-button type="button" class="btn-close" (click)="onCancel()" [attr.aria-label]="'ACTIONS.CANCEL' | translate">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+
+    <!-- Content -->
+    <mat-dialog-content class="rule-dialog-content">
+        <mat-tab-group [(selectedIndex)]="selectedTabIndex" animationDuration="150ms" class="dialog-tabs">
+            <!-- Tab 1: Configuration -->
+            <mat-tab>
+                <ng-template mat-tab-label>
+                    <mat-icon class="tab-label-icon">tune</mat-icon>
+                    <span>{{ 'RULECAT.RULE_DIALOG.TAB_STRUCTURED' | translate }}</span>
+                </ng-template>
+
+                <form [formGroup]="form" class="rule-form">
+                    <!-- Row 1: Code, Phase, Action, Severity -->
+                    <div class="form-row form-row-4">
+                        <mat-form-field appearance="outline" class="form-col">
+                            <mat-label>{{ 'RULECAT.RULE_DIALOG.CODE' | translate }}</mat-label>
+                            <input matInput type="number" formControlName="code" id="rule-dialog-code-input"
+                                [placeholder]="'RULECAT.RULE_DIALOG.CODE_HINT' | translate" required>
+                            <mat-icon matSuffix class="input-icon">tag</mat-icon>
+                            <mat-error *ngIf="form.get('code')?.invalid">
+                                {{ 'RULECAT.FIELDS.REQUIRED' | translate }}
+                            </mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="form-col">
+                            <mat-label>{{ 'RULECAT.RULE_DIALOG.PHASE' | translate }}</mat-label>
+                            <mat-select formControlName="phase" id="rule-dialog-phase-select">
+                                @for (p of phaseOptions; track p.value) {
+                                <mat-option [value]="p.value">{{ p.label }}</mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="form-col">
+                            <mat-label>{{ 'RULECAT.RULE_DIALOG.ACTION' | translate }}</mat-label>
+                            <mat-select formControlName="action" id="rule-dialog-action-select">
+                                @for (act of actionOptions; track act) {
+                                <mat-option [value]="act">{{ act | uppercase }}</mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="form-col">
+                            <mat-label>{{ 'RULECAT.RULE_DIALOG.SEVERITY' | translate }}</mat-label>
+                            <mat-select formControlName="severity" id="rule-dialog-severity-select">
+                                @for (sev of severityOptions; track sev) {
+                                <mat-option [value]="sev">{{ sev }}</mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+
+                    <!-- Row 2: Message / Description -->
+                    <div class="form-row">
+                        <mat-form-field appearance="outline" class="form-col full-width">
+                            <mat-label>{{ 'RULECAT.RULE_DIALOG.MSG' | translate }}</mat-label>
+                            <input matInput formControlName="msg" id="rule-dialog-msg-input"
+                                [placeholder]="'RULECAT.RULE_DIALOG.MSG_HINT' | translate" required>
+                            <mat-icon matSuffix class="input-icon">description</mat-icon>
+                            <mat-error *ngIf="form.get('msg')?.invalid">
+                                {{ 'RULECAT.FIELDS.REQUIRED' | translate }}
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+
+                    <!-- Row 3: Scope / Target Variables with Quick Chips -->
+                    <div class="form-row">
+                        <div class="form-col full-width">
+                            <mat-form-field appearance="outline" class="full-width">
+                                <mat-label>{{ 'RULECAT.RULE_DIALOG.SCOPE' | translate }}</mat-label>
+                                <input matInput formControlName="scope" id="rule-dialog-scope-input"
+                                    [placeholder]="'RULECAT.RULE_DIALOG.SCOPE_HINT' | translate" required>
+                                <mat-icon matSuffix class="input-icon">filter_center_focus</mat-icon>
+                            </mat-form-field>
+
+                            <!-- Scope Suggestions -->
+                            <div class="scope-suggestions-box">
+                                <span class="suggestion-label">{{ 'RULECAT.FIELDS.SCOPE' | translate }}:</span>
+                                <div class="suggestion-chips">
+                                    @for (s of commonScopes; track s) {
+                                    <button type="button" class="scope-pill-btn" [class.selected]="isScopeSelected(s)"
+                                        (click)="toggleScopeSuggestion(s)" id="scope-pill-{{s}}">
+                                        <mat-icon class="pill-icon">{{ isScopeSelected(s) ? 'check' : 'add' }}</mat-icon>
+                                        {{ s }}
+                                    </button>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Row 4: Operator & Pattern -->
+                    <div class="form-row form-row-2">
+                        <mat-form-field appearance="outline" class="form-col col-4">
+                            <mat-label>{{ 'RULECAT.RULE_DIALOG.OPERATOR' | translate }}</mat-label>
+                            <mat-select formControlName="operator" id="rule-dialog-operator-select">
+                                @for (op of operatorOptions; track op) {
+                                <mat-option [value]="op">{{ op }}</mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="form-col col-8">
+                            <mat-label>{{ 'RULECAT.RULE_DIALOG.PATTERN' | translate }}</mat-label>
+                            <input matInput formControlName="pattern" id="rule-dialog-pattern-input"
+                                [placeholder]="'RULECAT.RULE_DIALOG.PATTERN_HINT' | translate">
+                            <mat-icon matSuffix class="input-icon">code</mat-icon>
+                        </mat-form-field>
+                    </div>
+
+                    <!-- Row 5: Tags & Comments -->
+                    <div class="form-row form-row-2">
+                        <mat-form-field appearance="outline" class="form-col col-6">
+                            <mat-label>{{ 'RULECAT.RULE_DIALOG.TAGS' | translate }}</mat-label>
+                            <input matInput formControlName="tags" id="rule-dialog-tags-input"
+                                [placeholder]="'RULECAT.RULE_DIALOG.TAGS_HINT' | translate">
+                            <mat-icon matSuffix class="input-icon">label</mat-icon>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="form-col col-6">
+                            <mat-label>{{ 'RULECAT.RULE_DIALOG.COMMENT' | translate }}</mat-label>
+                            <input matInput formControlName="comment" id="rule-dialog-comment-input">
+                            <mat-icon matSuffix class="input-icon">comment</mat-icon>
+                        </mat-form-field>
+                    </div>
+                </form>
+            </mat-tab>
+
+            <!-- Tab 2: Raw SecRule Statement -->
+            <mat-tab>
+                <ng-template mat-tab-label>
+                    <mat-icon class="tab-label-icon">terminal</mat-icon>
+                    <span>{{ 'RULECAT.RULE_DIALOG.TAB_RAW' | translate }}</span>
+                </ng-template>
+
+                <div class="raw-tab-pane">
+                    <p class="raw-tab-desc">
+                        {{ 'RULECAT.RULE_DIALOG.RAW_HINT' | translate }}
+                    </p>
+                    <mat-form-field appearance="outline" class="full-width raw-field">
+                        <mat-label>{{ 'RULECAT.RULE_DIALOG.RAW' | translate }}</mat-label>
+                        <textarea matInput [formControl]="form.controls.raw" rows="6"
+                            class="raw-textarea" id="rule-dialog-raw-input"
+                            placeholder="SecRule REQUEST_URI &quot;@rx ...&quot; &quot;id:...,phase:...,block&quot;"></textarea>
+                    </mat-form-field>
+                    <div class="raw-actions-hint">
+                        <button type="button" mat-stroked-button (click)="updateAutoRaw()" id="btn-rebuild-raw">
+                            <mat-icon>refresh</mat-icon>
+                            <span>Auto-gerar a partir dos campos</span>
+                        </button>
+                    </div>
+                </div>
+            </mat-tab>
+        </mat-tab-group>
+    </mat-dialog-content>
+
+    <!-- Dialog Actions -->
+    <mat-dialog-actions align="end" class="rule-dialog-actions">
+        <button mat-stroked-button type="button" (click)="onCancel()" id="rule-dialog-cancel-btn">
+            {{ 'ACTIONS.CANCEL' | translate }}
+        </button>
+        <button mat-flat-button color="primary" type="button" (click)="onSave()" [disabled]="form.invalid" id="rule-dialog-save-btn">
+            <mat-icon>check</mat-icon>
+            {{ (isEdit ? 'RULECAT.RULE_DIALOG.SAVE_BUTTON' : 'RULECAT.RULE_DIALOG.ADD_BUTTON') | translate }}
+        </button>
+    </mat-dialog-actions>
+</div>
+

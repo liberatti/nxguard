@@ -2,11 +2,10 @@
 
 import traceback
 
-import nxcore.config as nxcore_config
-from nxcore.controllers.base_controller import response_error_404, response_error_500
-from nxcore.middleware.logging_manager import logger, LoggingManager
-from nxcore.middleware.socket_manager import init_socketio
-from nxcore.middleware.jwt_manager import JWTManager
+from api.middleware.controllers.base_controller import response_error_404, response_error_500
+from api.middleware.logging_manager import logger, LoggingManager
+from api.middleware.socket_manager import init_socketio
+from api.middleware.jwt_manager import JWTManager
 
 from flask import Flask, Blueprint
 from flask_cors import CORS
@@ -15,17 +14,6 @@ from flask_restful import Api
 
 import config
 from api.routes import register as register_api_routes
-
-nxcore_config.init(
-    {
-        "LOGLEVEL": config.LOGLEVEL,
-        "JWT_SECRET_KEY": config.JWT_SECRET_KEY,
-        "JWT_AUD": config.JWT_AUD,
-        "SECURITY_ENABLED": config.SECURITY_ENABLED,
-        "API_KEY": config.NXGUARD_API_KEY,
-    }
-)
-
 
 app = Flask(__name__)
 app.config["UPLOAD_FOLDER"] = "/tmp"

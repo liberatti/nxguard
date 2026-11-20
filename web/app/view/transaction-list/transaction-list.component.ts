@@ -77,7 +77,6 @@ import {RblDetailsDialogComponent} from 'app/components/rbl-details-dialog/rbl-d
     templateUrl: './transaction-list.component.html',
     styleUrl: './transaction-list.component.css',
 })
-
 export class TransactionListComponent implements OnInit {
     readonly panelOpenState = signal(false);
     input_regex: string = "";
@@ -88,6 +87,17 @@ export class TransactionListComponent implements OnInit {
         end: new FormControl<Date>(moment().toDate()),
         filters: new FormControl<Array<string>>([]),
     });
+
+    totalTransactions: number = 0;
+    actionStats: ActionStat[] = [];
+    isChartZoomed: boolean = false;
+    hasChartData: boolean = false;
+    isLoading: boolean = false;
+    isLoadingChart: boolean = false;
+    savedDateRange: { start: Date; end: Date } = {
+        start: moment().subtract(1, 'day').toDate(),
+        end: moment().toDate(),
+    };
 
     get formattedDateRange(): string {
         const start = this.form.get('start')?.value;
@@ -102,7 +112,7 @@ export class TransactionListComponent implements OnInit {
         return `${startM.format('DD/MM/YY HH:mm')} - ${endM.format('DD/MM/YY HH:mm')}`;
     }
 
-    transactionDC: string[] = ['expand', 'logtime', 'score', 'source', 'service', 'request_line', 'duration'];
+    transactionDC: string[] = ['expand', 'logtime', 'status', 'score', 'source', 'service', 'request_line', 'duration'];
     transactionDS: MatTableDataSource<TransactionLog>;
     transactionPA = new DefaultPageMeta();
     transactions: Array<TransactionLog> = [];
@@ -137,9 +147,8 @@ export class TransactionListComponent implements OnInit {
         },
         options: {
             layout: {
-                padding: 5
+                padding: { top: 6, bottom: 2, left: 2, right: 6 }
             },
-            aspectRatio: 1.5,
             responsive: true,
             maintainAspectRatio: false,
             interaction: {
@@ -192,6 +201,7 @@ export class TransactionListComponent implements OnInit {
                         mode: 'x',
                         onZoomComplete: (chartUpdate: any) => {
                             const xAxis = chartUpdate['chart'].scales['x'];
+                            this.isChartZoomed = true;
                             this.form.get('start')?.setValue(xAxis.min);
                             this.form.get('end')?.setValue(xAxis.max);
                             this.onSearch();
@@ -203,22 +213,25 @@ export class TransactionListComponent implements OnInit {
                 x: {
                     type: 'time',
                     grid: {
-                        color: 'rgba(0, 0, 0, 0.05)',
+                        color: 'rgba(148, 163, 184, 0.08)',
                     },
                     ticks: {
                         color: '#64748b',
                         font: { size: 11 },
                         autoSkip: true,
-                        autoSkipPadding: 50,
+                        autoSkipPadding: 45,
                         maxRotation: 0
                     },
                     time: {
-                        unit: 'day',
                         displayFormats: {
-                            day: 'dd',
-                            hour: 'HH:mm',
+                            millisecond: 'HH:mm:ss.SSS',
+                            second: 'HH:mm:ss',
                             minute: 'HH:mm',
-                            second: 'HH:mm:ss'
+                            hour: 'HH:mm',
+                            day: 'DD/MM',
+                            week: 'DD/MM',
+                            month: 'MM/YYYY',
+                            year: 'YYYY'
                         }
                     },
                     border: {
@@ -227,11 +240,12 @@ export class TransactionListComponent implements OnInit {
                 },
                 y: {
                     grid: {
-                        color: 'rgba(0, 0, 0, 0.05)',
+                        color: 'rgba(148, 163, 184, 0.08)',
                     },
                     ticks: {
                         color: '#64748b',
                         font: { size: 11 },
+                        precision: 0,
                         callback: (value: any) => {
                             return this.formatService.tpm(value);
                         }
@@ -259,7 +273,9 @@ export class TransactionListComponent implements OnInit {
         this.responsive.observe([Breakpoints.Small])
             .subscribe(result => {
                 if (result.breakpoints[Breakpoints.Small]) {
-                    this.transactionDC = ['expand', 'logtime', 'source', 'service', 'request_line'];
+                    this.transactionDC = ['expand', 'logtime', 'status', 'source', 'request_line'];
+                } else {
+                    this.transactionDC = ['expand', 'logtime', 'status', 'score', 'source', 'service', 'request_line', 'duration'];
                 }
             });
     }
@@ -298,12 +314,16 @@ export class TransactionListComponent implements OnInit {
         if (start && end) {
             const durationMs = moment(end).diff(moment(start));
             if (durationMs > 0 && durationMs <= 7 * 24 * 60 * 60 * 1000) {
-                this.form.get('start')?.setValue(moment(now).subtract(durationMs, 'milliseconds').toDate());
+                const newStart = moment(now).subtract(durationMs, 'milliseconds').toDate();
+                this.form.get('start')?.setValue(newStart);
                 this.form.get('end')?.setValue(now);
+                this.savedDateRange = { start: newStart, end: now };
             } else {
                 this.form.get('end')?.setValue(now);
+                this.savedDateRange = { start, end: now };
             }
         }
+        this.isChartZoomed = false;
         this.onSearch();
     }
 
@@ -319,6 +339,8 @@ export class TransactionListComponent implements OnInit {
 
         dialogRef.afterClosed().subscribe((result: { start: Date; end: Date } | undefined) => {
             if (result) {
+                this.savedDateRange = { start: result.start, end: result.end };
+                this.isChartZoomed = false;
                 this.form.get('start')?.setValue(result.start);
                 this.form.get('end')?.setValue(result.end);
                 this.onSearch();
@@ -405,6 +427,8 @@ export class TransactionListComponent implements OnInit {
 
     onSearch() {
         let filter = this.form.value as TransactionFilter;
+        this.isLoading = true;
+        this.isLoadingChart = true;
         this.transactionService.getTpm(filter).subscribe({
             next: (data) => {
                 this.renderTpmChart(data || []);
@@ -416,6 +440,7 @@ export class TransactionListComponent implements OnInit {
 
         this.transactionService.search(filter, this.transactionPA).subscribe({
             next: (data) => {
+                this.isLoading = false;
                 const list = (data && data.data) ? data.data : [];
                 this.transactions = list;
                 this.transactionDS.data = list;
@@ -426,6 +451,7 @@ export class TransactionListComponent implements OnInit {
                 }
             },
             error: () => {
+                this.isLoading = false;
                 this.transactions = [];
                 this.transactionDS.data = [];
                 this.transactionPA = new DefaultPageMeta();
@@ -483,6 +509,67 @@ export class TransactionListComponent implements OnInit {
         });
     }
 
+    getMethod(trn: TransactionLog): string {
+        if (trn?.http?.request?.method) {
+            return trn.http.request.method.toUpperCase();
+        }
+        if (trn?.http?.request_line) {
+            const parts = trn.http.request_line.trim().split(/\s+/);
+            if (parts.length > 0 && /^[A-Za-z]+$/.test(parts[0])) {
+                return parts[0].toUpperCase();
+            }
+        }
+        return 'GET';
+    }
+
+    getUri(trn: TransactionLog): string {
+        if (trn?.http?.request?.uri) {
+            return trn.http.request.uri;
+        }
+        if (trn?.http?.request_line) {
+            const parts = trn.http.request_line.trim().split(/\s+/);
+            if (parts.length > 1) {
+                return parts[1];
+            }
+        }
+        return '/';
+    }
+
+    getStatusCode(trn: TransactionLog): number {
+        return trn?.http?.response?.status_code || 200;
+    }
+
+    getStatusClass(code: number | string | undefined): string {
+        const num = Number(code) || 200;
+        if (num >= 200 && num < 300) return '2xx';
+        if (num >= 300 && num < 400) return '3xx';
+        if (num >= 400 && num < 500) return '4xx';
+        if (num >= 500) return '5xx';
+        return 'other';
+    }
+
+    copyHeader(name: string, content: string): void {
+        if (!content) return;
+        const text = `${name}: ${content}`;
+        navigator.clipboard?.writeText(text);
+        this.snackBar.open(`Copied: ${name}`, undefined, { duration: 1500 });
+    }
+
+    copyText(text: string | undefined, label: string = 'Content'): void {
+        if (!text) return;
+        navigator.clipboard?.writeText(text);
+        this.snackBar.open(`Copied ${label}`, undefined, { duration: 1500 });
+    }
+
+    filterValidHeaders(headers: any[] | undefined): any[] {
+        if (!Array.isArray(headers)) return [];
+        return headers.filter(h => h && h.name && h.content && String(h.content).trim() !== '');
+    }
+
+    isTriggerRule(ruleCode: any): boolean {
+        return String(ruleCode) === '949110';
+    }
+
     ngAfterViewInit(): void {
         this.responsive.observe([Breakpoints.Small])
             .subscribe(result => {
@@ -497,7 +584,7 @@ export class TransactionListComponent implements OnInit {
 
     openFilterDialog(): void {
         const dialogRef = this.confirmDialog.open(TransactionFilterDialogComponent, {
-            width: '620px',
+            width: '800px',
             maxWidth: '95vw',
         });
 

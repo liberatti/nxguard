@@ -2,7 +2,7 @@ import json
 
 import config
 from engine.seclang.seclang_parser import RuleSetParser
-from api.model.seclang_model import RuleCategoryDao, RuleDao
+from api.repository.seclang_repository import RuleCategoryDao, RuleDao
 
 
 def get_default_vars(
@@ -36,27 +36,32 @@ def index(
         rule_dao.delete_all()
 
         for c in meta["categories"]:
+            c["srctype"] = "feed"
             cat_dao.persist(c)
             parser = RuleSetParser()
             rules = parser.load(c["file"], base_path)
             s = 1
             for rule in rules:
-                if rule.get("schema_type") == "SecRule":
-                    rule_doc = {
-                        "_id": f"{rule.get('code')}",
-                        "code": rule.get("code"),
-                        "category_id": c["_id"],
-                        "raw": rule.get("raw"),
-                        "attachment": rule.get("attachment"),
-                        "action": rule.get("action"),
-                        "scope": rule.get("scope"),
-                        "tags": rule.get("tags"),
-                        "msg": rule.get("msg"),
-                        "logdata": rule.get("logdata"),
-                        "phase": rule.get("phase"),
-                        "seq": s,
-                        "severity": rule.get("severity"),
-                        "comment": rule.get("comment"),
-                    }
-                    rule_dao.persist(rule_doc)
-                    s += 1
+                code = rule.get("code")
+                schema_type = rule.get("schema_type") or "SecRule"
+                rule_id = str(code) if code is not None else f"{c['_id']}_{s}"
+                rule_doc = {
+                    "_id": rule_id,
+                    "code": code,
+                    "schema_type": schema_type,
+                    "category_id": c["_id"],
+                    "raw": rule.get("raw"),
+                    "attachment": rule.get("attachment"),
+                    "action": rule.get("action"),
+                    "scope": rule.get("scope"),
+                    "tags": rule.get("tags"),
+                    "msg": rule.get("msg"),
+                    "logdata": rule.get("logdata"),
+                    "phase": rule.get("phase"),
+                    "seq": s,
+                    "severity": rule.get("severity"),
+                    "comment": rule.get("comment"),
+                }
+
+                rule_dao.persist(rule_doc)
+                s += 1

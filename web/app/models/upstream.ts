@@ -1,4 +1,6 @@
-import { ProtocolType, SessionPersistenceEntity, UpstreamType } from "./service";
+import { ProtocolType, SessionPersistenceEntity, TargetEntity, UpstreamType } from "./service";
+
+export type UpstreamHealthStatus = 'healthy' | 'partially_healthy' | 'unhealthy' | 'invalid';
 
 export type UpstreamHealthStatus = 'healthy' | 'partially_healthy' | 'unhealthy' | 'invalid';
 
@@ -12,7 +14,7 @@ export interface Upstream {
     retry: number;
     retry_timeout: number;
     conn_timeout: number;
-    targets: [];
+    targets: TargetEntity[];
     persist: SessionPersistenceEntity;
     index: string;
     healthy?: UpstreamHealthStatus;

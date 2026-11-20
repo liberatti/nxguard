@@ -80,6 +80,7 @@ def apply_config() -> Response:
                 if change_dao.has_certificate_change():
                     renew_certificates()
                 change_dao.delete_all()
+
             emit_event("tracking_aply")
             return response_data({"status": "ok", "scn": cst.get("scn")})
         else:

@@ -3,12 +3,12 @@ import os
 import re
 
 from jinja2 import Environment, FileSystemLoader
-from nxcore.middleware.logging_manager import logger
+from api.middleware.logging_manager import logger
 
 import config
-from api.model.seclang_model import RuleCategoryDao
+from api.repository.seclang_repository import RuleCategoryDao, RuleDao
 from api.model.route_model import RouteType
-from api.services.ipxa_services import FeedService
+from api.services.feed_service import FeedService
 
 
 def _remove_file(file_path: str) -> None:
@@ -136,7 +136,6 @@ def _generate_sensors(
                     "trusted": ",".join(sensor["security"]["trusted"]),
                 }
             )
-            # TODO create test step for lua sensor
             _render_template_to_file(
                 env,
                 "lua/sensor.lua",
@@ -153,7 +152,7 @@ def _generate_sensors(
         exclusion_lists = [
             ",".join(
                 f"ctl:ruleRemoveById={str(x).strip()}"
-                for x in exclusions[i : i + chunk_size]
+                for x in exclusions[i:i + chunk_size]
             )
             for i in range(0, len(exclusions), chunk_size)
         ]
@@ -191,13 +190,45 @@ def _generate_sensors(
                 cat if isinstance(cat, str) else (cat.get("name") or cat.get("_id"))
                 for cat in sensor.get("categories", [])
             }
-            for c in ordered_cats["data"]:
-                if bool(c.get("system")) or c.get("name") in sensor_cats:
-                    if c.get("file"):
-                        file_path = f"{output_dir}/modsec/coreruleset/{c['file']}"
-                        if os.path.exists(file_path):
-                            with open(file_path, "r", encoding="utf-8") as r_data:
-                                c.update({"rules": r_data.read()})
+            with RuleDao() as rule_dao:
+                for c in ordered_cats["data"]:
+                    if bool(c.get("system")) or c.get("name") in sensor_cats:
+                        rules = rule_dao.get_by_category(c["_id"])
+                        c.update(
+                            {
+                                "rules": "\n\n".join(
+                                    r["raw"].strip()
+                                    for r in rules
+                                    if r.get("raw") and r["raw"].strip()
+                                )
+                                + "\n"
+                            }
+                        )
+                        #TODO: Create attachment support on engine.index to copy attachment files to modsec/coreruleset folder
+                        """for r in rules:
+                            att = r.get("attachment")
+                            raw = r.get("raw") or ""
+                            if att:
+                                for match in re.finditer(
+                                    r"@(pmFromFile|ipMatchFromFile|pmf)\s+([^\s\"\'\)]+)",
+                                    raw,
+                                ):
+                                    data_file_name = os.path.basename(
+                                        match.group(2).strip().strip("\"'")
+                                    )
+                                    target_data_file = (
+                                        f"{output_dir}/modsec/coreruleset/{data_file_name}"
+                                    )
+                                    if not os.path.exists(target_data_file):
+                                        os.makedirs(
+                                            os.path.dirname(target_data_file),
+                                            exist_ok=True,
+                                        )
+                                        with open(
+                                            target_data_file, "w", encoding="utf-8"
+                                        ) as df:
+                                            df.write(att)
+                        """
                     categories.append(c)
 
             sensor.update({"categories": categories})
@@ -369,6 +400,8 @@ def generate(data, output_dir=config.BASE_PATH, test=False):
 
     _normalize_entities(data)
     data.update({"IS_TEST": test, "config.BASE_PATH": config.BASE_PATH})
+    # Safe: Jinja2 is used exclusively to generate Nginx/ModSecurity server configuration files, not HTML.
+    # nosemgrep: python.flask.security.xss.audit.direct-use-of-jinja2.direct-use-of-jinja2
     env = Environment(loader=FileSystemLoader("engine/templates"))
 
     conf_dir = (

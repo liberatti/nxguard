@@ -48,6 +48,7 @@ export class CertificateListComponent implements OnInit {
     certificateDC: string[] = ['status', 'name', 'provider', 'subjects', 'force_renew', 'action'];
     certificateDS: MatTableDataSource<Certificate>;
     certificatePA: PageMeta;
+    isLoading: boolean = false;
 
     constructor(
         private notificationService: NotificationService,
@@ -65,11 +66,20 @@ export class CertificateListComponent implements OnInit {
     }
 
     updateGridTable() {
-        this.certificateService.get(this.certificatePA).subscribe(data => {
-            if (data.metadata) {
-                this.certificateDS.data = data.data;
-                this.certificatePA.total_elements = data.metadata.total_elements;
-            } else {
+        this.isLoading = true;
+        this.certificateService.get(this.certificatePA).subscribe({
+            next: (data) => {
+                this.isLoading = false;
+                if (data.metadata) {
+                    this.certificateDS.data = data.data;
+                    this.certificatePA.total_elements = data.metadata.total_elements;
+                } else {
+                    this.certificateDS.data = [];
+                    this.certificatePA.total_elements = 0;
+                }
+            },
+            error: () => {
+                this.isLoading = false;
                 this.certificateDS.data = [];
                 this.certificatePA.total_elements = 0;
             }
@@ -106,7 +116,7 @@ export class CertificateListComponent implements OnInit {
     }
 
     getStatusTip(e: Certificate) {
-        let format = this.translateService.instant('format.display.datetime');
+        let format = this.translateService.instant('FORMAT.DISPLAY.DATETIME');
         return `not_after: ${moment(e.not_after).format(format)}
         not_before: ${moment(e.not_before).format(format)}`
     }

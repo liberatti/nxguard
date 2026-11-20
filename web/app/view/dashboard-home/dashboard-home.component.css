@@ -1,6 +1,7 @@
 /* Local styles for dashboard-home */
 :host {
     display: block;
+    width: 100%;
 }
 
 .dashboard-header {
@@ -199,7 +200,83 @@
     flex-wrap: wrap;
 }
 
-.stat-badge {
+.widget-card {
+    padding: 12px 16px !important;
+}
+
+.widget-chart-header {
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.chart-title-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.chart-title {
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.chart-desc {
+    margin: 1px 0 0;
+    font-size: 0.73rem;
+}
+
+.badge-group {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.legend-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: rgba(15, 23, 42, 0.03);
+    border: 1px solid var(--border-dim);
+    transition: all 0.2s ease;
+    cursor: pointer;
+    user-select: none;
+}
+
+.legend-badge:hover {
+    background: rgba(15, 23, 42, 0.06);
+    border-color: rgba(0, 0, 0, 0.15);
+}
+
+.legend-color-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.legend-color-dot.inbound-dot {
+    background-color: #0284c7;
+    box-shadow: 0 0 6px rgba(2, 132, 199, 0.5);
+}
+
+.legend-color-dot.outbound-dot {
+    background-color: #10b981;
+    box-shadow: 0 0 6px rgba(16, 185, 129, 0.5);
+}
+
+.legend-color-dot.req-dot {
+    background-color: #8b5cf6;
+    box-shadow: 0 0 6px rgba(139, 92, 246, 0.5);
+}
+
+.legend-text-col {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -209,15 +286,15 @@
     border: 1px solid var(--border-dim);
 }
 
-.stat-badge-label {
-    font-size: 0.6rem;
+.legend-badge-label {
+    font-size: 0.62rem;
     font-weight: 700;
     color: var(--text-dim);
     letter-spacing: 0.4px;
 }
 
-.stat-badge-value {
-    font-size: 0.82rem;
+.legend-badge-value {
+    font-size: 0.85rem;
     font-weight: 700;
     color: var(--primary);
 }
@@ -230,8 +307,12 @@
     color: #059669;
 }
 
-.stat-badge-value small {
-    font-size: 0.6rem;
+.legend-badge-req .legend-badge-value {
+    color: #7c3aed;
+}
+
+.legend-badge-value small {
+    font-size: 0.65rem;
     font-weight: 500;
     color: var(--text-muted);
 }
@@ -370,6 +451,7 @@
 }
 
 .status-chip.warn,
+.status-chip.warning,
 .status-chip.rejected {
     background: #fffbeb;
     color: #d97706;

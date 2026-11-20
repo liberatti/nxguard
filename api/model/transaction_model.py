@@ -1,27 +1,16 @@
-import json
-from datetime import datetime
-from typing import Dict, Any, List, Optional, Tuple
-
-from nxcore.middleware.logging_manager import logger
-from .duck_db import DuckDAO
 from marshmallow import EXCLUDE, Schema, fields
-
-import config as config
 
 
 class TransactionSchema(Schema):
     class Meta:
         unknown = EXCLUDE
 
-    _id = fields.Integer(required=False)
+    _id = fields.Raw(required=False)
     logtime = fields.Raw(required=False)
     unique_id = fields.String(required=False)
     server_id = fields.String(required=False)
     service = fields.Dict(required=False)
     action = fields.String(required=False)
-    limit_req_status = fields.String(required=False)
-    geoip_status = fields.String(required=False)
-    rbl_status = fields.String(required=False)
     ipxa = fields.String(required=False)
     rate_limit = fields.Dict(required=False)
     geoip = fields.Dict(required=False)

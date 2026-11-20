@@ -1,17 +1,25 @@
 <ng-container>
     <mat-card>
         <mat-card-header>
-            <mat-card-title>{{ 'view.certificate.title'|translate }}</mat-card-title>
-            <mat-card-subtitle>{{ 'view.certificate.subtitle'|translate }}</mat-card-subtitle>
+            <mat-card-title class="title-with-icon">
+                <mat-icon class="title-icon">verified_user</mat-icon>
+                <span>{{ 'VIEW.CERTIFICATE.TITLE'|translate }}</span>
+            </mat-card-title>
+            <mat-card-subtitle>{{ 'VIEW.CERTIFICATE.SUBTITLE'|translate }}</mat-card-subtitle>
             <mat-card-actions class="align-right">
                 @if (oauth.isRole('superuser')) {
                 <button mat-flat-button color="primary" id="add-certificate-btn" [routerLink]="['add']">
                     <mat-icon>add</mat-icon>
-                    {{ 'actions.create'|translate }}
+                    {{ 'ACTIONS.CREATE'|translate }}
                 </button>
                 }
             </mat-card-actions>
         </mat-card-header>
+
+        @if (isLoading) {
+            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        }
+
         <mat-card-content>
             <table mat-table [dataSource]="certificateDS" matSort>
                 <tr mat-header-row *matHeaderRowDef="certificateDC"></tr>

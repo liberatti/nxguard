@@ -4,29 +4,24 @@
     "EDIT": "Edit",
     "REMOVE": "Remove",
     "DELETE": "Delete",
-    "SEARCH": "Search",
-    "FILTER": "Filter",
     "EXPORT": "Export",
     "SAVE": "Save",
-    "IMPORT": "Import",
     "REFRESH": "Refresh",
     "CLOSE": "Close",
     "CANCEL": "Cancel",
     "CONFIRM": "Confirm",
-    "NEXT": "Next",
-    "BACK": "Back",
-    "ADD": "Add",
     "APPLY": "Apply",
-    "BACKUP": "Backup",
-    "RESTORE": "Restore"
+    "RESTORE": "Restore",
+    "CLEAR": "Clear",
+    "VIEW": "View"
   },
   "AUTH": {
-    "TITLE": "NXGUARD",
+    "TITLE": "NXGuard",
     "SUBTITLE": "Enterprise Proxy & Security Gateway",
     "HOST_CLIENT": "Host Management Client",
     "SIGN_IN": "Sign In",
-    "SIGN_IN_BTN": "Log in",
-    "EMAIL": "User name / Email",
+    "SIGN_IN_BTN": "Login to Dashboard",
+    "EMAIL": "Email",
     "PASSWORD": "Password",
     "LANGUAGE": "Language",
     "SUBTITLE_LOGIN": "Enter your credentials to access the console",
@@ -38,60 +33,60 @@
   "ABOUT": {
     "TITLE": "About NXGuard",
     "SUBTITLE": "High-Performance API Gateway & Security Engine",
-    "TAB_ABOUT": "About",
-    "TAB_RESTORE": "Restore Config",
-    "CHOOSE_FILE": "Choose ZIP file to restore",
-    "SELECTED_FILE": "Selected File",
-    "POWERED_BY": "Powered by OpenResty & ModSecurity"
+    "TAB_ABOUT": "Overview",
+    "TAB_BACKUP": "Backup",
+    "TAB_RESTORE": "Restore",
+    "CHOOSE_FILE": "Choose JSON backup file",
+    "BACKUP_TITLE": "Export Configuration (Backup)",
+    "BACKUP_DESC": "Download a complete backup of all services, upstreams, and security rules in JSON format.",
+    "BACKUP_BTN": "Download Backup",
+    "RESTORE_TITLE": "Import Configuration (Restore)",
+    "RESTORE_DESC": "Upload a previously exported JSON backup to restore system configuration.",
+    "GITHUB_TITLE": "GitHub Repository",
+    "GITHUB_SUB": "Source code, releases & issue tracking",
+    "ARCHITECTURE_TITLE": "Core Architecture"
   },
   "ATTR": {
-    "ACTIVE": "Active",
     "NAME": "Name",
     "DOMAINS": "Domains",
     "ROUTES": "Routes",
-    "LOGIN": {
-      "USERNAME": "Enter your username",
-      "PASSWORD": "Password here"
-    }
+    "ACTIONS": "Actions",
+    "DESCRIPTION": "Description",
+    "PROTOCOL": "Protocol",
+    "TARGETS": "Targets"
   },
   "CONTENT": {
-    "COPY": "&copy; 2025 nxguard. All rights reserved. This solution is built on top of OpenResty.",
-    "ABOUT": "This is a proxy server built on OpenResty with ModSecurity for advanced protection.",
+    "COPY": "&copy; 2026 NXGuard. All rights reserved. This solution is built on NGINX with OpenResty modules and ModSecurity.",
+    "ABOUT": "This is a proxy server built on NGINX with OpenResty modules and ModSecurity for advanced protection.",
     "RESTORE_NOTICE": "Configuration Restore Notice: All existing data will be overwritten by the restored configuration."
   },
   "NAV": {
-    "SERVICES": "Services",
-    "UPSTREAMS": "Upstreams",
-    "SENSORS": "Sensors",
     "ABOUT": "About",
-    "DASHBOARD": "Dashboard",
-    "SYSTEM": "System",
-    "HOSTNAMES": "Hostnames",
-    "CERTIFICATES": "Certificates",
-    "DICTIONARIES": "Dictionaries",
-    "GATEWAY": "Gateway",
-    "TRANSACTIONS": "Transactions",
     "ACCOUNT": "Account",
     "LOGOUT": "Log Out"
   },
   "VIEW": {
-    "BACKUP": {
-      "LINK": "backup",
-      "TITLE": "Backup"
-    },
     "DASHBOARD": {
-      "LINK": "Dashboard",
-      "TITLE": "Dashboard"
+      "LINK": "Security Overview"
     },
     "TRANSACTION": {
-      "LINK": "Network Activity",
-      "TITLE": "Transactions",
-      "SUBTITLE": "List all transactions"
+      "LINK": "Threat Detection Log",
+      "TITLE": "Threat Detection Log",
+      "SUBTITLE": "List all transaction logs in parsed and raw format"
     },
     "SERVICE": {
-      "LINK": "Service",
+      "LINK": "Services",
       "TITLE": "Services",
-      "SUBTITLE": "Describe all services"
+      "SUBTITLE": "Manage HTTP/HTTPS reverse proxy services, virtual hosts, routing rules and SSL/TLS policies",
+      "FILTER_PLACEHOLDER": "Search by name or domain...",
+      "NO_DATA": "No services configured",
+      "NO_DATA_DESC": "Add a service to start proxying and protecting web traffic.",
+      "NO_RESULTS": "No matching services found",
+      "NO_RESULTS_HINT": "Try adjusting your search criteria.",
+      "ALL_DOMAINS": "All domains (*)",
+      "ACTIVE_STATUS": "Active",
+      "INACTIVE_STATUS": "Inactive",
+      "TOGGLE_ACTIVE": "Toggle service status"
     },
     "UPSTREAM": {
       "LINK": "Upstream",
@@ -111,27 +106,35 @@
       "SUBTITLE": "List of all Hostnames"
     },
     "CERTIFICATE": {
-      "LINK": "Certificate",
-      "TITLE": "Certificate",
-      "SUBTITLE": "List of all certificates"
+      "LINK": "Certificates",
+      "TITLE": "Certificates",
+      "SUBTITLE": "Manage SSL/TLS certificates, private keys, automatic ACME renewals, and CA authority configurations"
     },
     "SENSOR": {
-      "LINK": "Sensor",
-      "TITLE": "Sensor",
-      "SUBTITLE": "List of all sensors"
+      "LINK": "Sensors",
+      "TITLE": "Sensors",
+      "SUBTITLE": "Configure WAF inspection sensors, threat detection engines, rate limiting, and security rules",
+      "FILTER_PLACEHOLDER": "Search by name or description..."
     },
     "USER": {
       "LINK": "Users",
       "TITLE": "Users",
-      "SUBTITLE": "List of all users"
+      "SUBTITLE": "Manage console operators, administrative credentials, role-based access control, and user permissions"
     },
     "CONFIG": {
-      "LINK": "Config",
-      "TITLE": "Config",
-      "SUBTITLE": "List of all configs"
+      "LINK": "Configuration"
+    },
+    "CONFIG_AUDIT": {
+      "LINK": "Audit & History"
     },
     "SYSTEM": {
       "LINK": "System"
+    },
+    "RULECAT": {
+      "LINK": "Categories",
+      "TITLE": "Rule Categories",
+      "SUBTITLE": "Manage ModSecurity CRS core rule sets, inspection phases, custom categories, and attack prevention rules",
+      "FILTER_PLACEHOLDER": "Search categories by name, ID or phase..."
     }
   },
   "CERTIFICATE": {
@@ -155,7 +158,6 @@
     "PATH_HINT": "e.g. ^/api/v1/.* or /static/"
   },
   "SENSOR": {
-    "CONFIG": "Config",
     "IP_REPUTATION": "IP Reputation",
     "SECURITY_INSPECTION": "Security Inspection",
     "INSPECT_LEVEL": "Inspect Level",
@@ -164,8 +166,6 @@
     "VARIABLES_TITLE": "Inspection Variables",
     "ALLOWED_HTTP_VERSIONS": "Allowed HTTP Versions",
     "MAX_FILE_SIZE": "Max File Size (bytes)",
-    "ALLOWED_METHODS": "Allowed HTTP Methods",
-    "ALLOWED_CONTENT_TYPE": "Allowed Content Types",
     "RESTRICTED_EXTENSIONS": "Restricted Extensions",
     "MAX_NUM_ARGS": "Max Number of Arguments",
     "ARG_NAME_LENGTH": "Argument Name Length",
@@ -185,9 +185,7 @@
     "RULE_DESCRIPTION": "Description",
     "ACTION": "Action",
     "ACTIVE": "Active",
-    "ALL_RULES": "All Rules",
     "NO_RULES_FOUND": "No rules found matching your filter",
-    "TOTAL_RULES": "Rules",
     "CONTROL_RULE": "Engine Control / Paranoia Gate",
     "VIEW_DETAILS": "View rule details",
     "NO_CATEGORIES_SELECTED": "No categories added to this sensor yet",
@@ -197,7 +195,24 @@
     "NO_GEO_SELECTED": "No geo-blocked countries selected.",
     "CLEAR_ALL": "Clear all",
     "SAVED_SUCCESS": "Sensor saved successfully",
-    "UPDATED_SUCCESS": "Sensor updated successfully"
+    "UPDATED_SUCCESS": "Sensor updated successfully",
+    "TITLE": "Sensor"
+  },
+  "THREAT_CATEGORY": {
+    "TOR_EXIT_NODES": "Tor Exit Nodes",
+    "MALWARE_C2": "Malware C2",
+    "BRUTE_FORCE": "Brute Force",
+    "WEB_ATTACKS": "Web Attacks",
+    "COMPROMISED_HOSTS": "Compromised Hosts",
+    "SPAM_BOGONS": "Spam & Bogons",
+    "THREAT_INTEL": "Threat Intel"
+  },
+  "BYPASS_CATEGORY": {
+    "LOCAL_NETWORKS": "Private & Local Networks",
+    "SEARCH_CRAWLERS": "Search Engine Crawlers",
+    "CDN_CLOUD": "CDNs & Cloud Proxies",
+    "MONITORING": "Monitoring & Healthchecks",
+    "TRUSTED_LISTS": "Trusted & Custom Whitelists"
   },
   "SERVICE": {
     "DETAILS": "Details",
@@ -217,14 +232,18 @@
     "COMPRESSION_TITLE": "Compression",
     "COMPRESSION_ADD": "Add MIME Type",
     "PORT_BINDINGS": "Port Bindings",
+    "BINDINGS_MODAL_TITLE_ADD": "Add Port Binding",
+    "BINDINGS_MODAL_TITLE_EDIT": "Edit Port Binding",
+    "BINDINGS_MODAL_SUBTITLE": "Configure listening network protocol, port, and SSL redirection.",
     "PORT": "Port",
     "PROTOCOL": "Protocol",
     "FORCE_SSL": "Force SSL",
+    "FORCE_SSL_HINT": "Automatically redirect HTTP traffic to HTTPS",
+    "SSL_UPGRADE_PORT": "SSL Redirect Port",
     "SSL_CONFIG": "SSL / TLS Configuration",
     "CERTIFICATE": "Certificate",
     "SSL_CLIENT_AUTH": "Require Client Certificate (mTLS)",
     "SSL_CA": "Certificate Authority (CA)",
-    "SSL_PROTOCOLS": "SSL / TLS Protocols",
     "PROTOCOL_INPUT": "Protocol version",
     "HEADERS_TITLE": "Custom HTTP Headers",
     "HEADER_NAME": "Header Name",
@@ -279,7 +298,6 @@
     "NAME": "Certificate Name",
     "NAME_HINT": "Unique alphanumeric identifier for this certificate",
     "PROVIDER": "Certificate Provider",
-    "GENERAL_INFO": "General Configuration",
     "CREDENTIALS_TITLE": "Certificate & Key Material",
     "MANAGED_TITLE": "Automated ACME Certificate",
     "MANAGED_NOTICE": "Managed certificates are automatically requested, provisioned and renewed via Let's Encrypt / ACME.",
@@ -301,15 +319,55 @@
     "PANEL_CA_DESC": "Manage root CA certificate and private key for client certificates & TLS inspection",
     "CA_CERT": "Root CA Certificate (PEM)",
     "CA_KEY": "Root CA Private Key (PEM)",
-    "PANEL_POLICY": "Transaction Policies",
-    "PANEL_POLICY_DESC": "Configure automated data archiving and database retention purging",
-    "ARCHIVE_TITLE": "Transaction Archiving",
-    "ARCHIVE_TOGGLE": "Enable Archiving",
-    "ARCHIVE_DESC": "Automatically stream and archive transaction telemetry to an external Elasticsearch / OpenSearch cluster for audit compliance.",
-    "ARCHIVE_AFTER": "Archive After (minutes)",
-    "CLUSTER_URL": "Cluster URL",
-    "CLUSTER_USER": "Username",
-    "CLUSTER_PASS": "Password",
+    "PANEL_POLICY": "Transaction Policies & Storage",
+    "PANEL_POLICY_DESC": "Configure transactional logging targets and database retention purging",
+    "LOGGING_TITLE": "Transaction Logging",
+    "LOGGING_DESC": "Configure how transaction and security audit logs are stored. Logs can be written locally to DuckDB or streamed to an external cluster.",
+    "LOGGING_MODE": "Logging Destination",
+    "LOGGING_MODE_HINT": "Storage destination for access and security transaction logs",
+    "LOGGING_MODE_LOCAL": "Local Storage (DuckDB)",
+    "LOGGING_MODE_ELASTICSEARCH": "Elasticsearch Cluster",
+    "LOGGING_MODE_LOCAL_INFO": "Logs are stored locally in the embedded DuckDB database. Fast, self-contained, and requires zero external infrastructure.",
+    "LOGGING_MODE_ES_INFO": "Logs are streamed in real time to the remote Elasticsearch/OpenSearch cluster with dashboard support.",
+    "SEC_AUDIT_LOG_PARTS": "ModSecurity Audit Log Parts",
+    "SEC_AUDIT_LOG_PARTS_HINT": "Select transaction sections to record in the audit log",
+    "SEC_AUDIT_LOG_PARTS_PLACEHOLDER": "Select audit parts...",
+    "PARTS_SELECTED": "parts selected",
+    "AUDIT_PART_A_NAME": "Audit Header",
+    "AUDIT_PART_A_DESC": "Timestamp, unique transaction ID, client IP and request metadata",
+    "AUDIT_PART_B_NAME": "Request Headers",
+    "AUDIT_PART_B_DESC": "HTTP method, request URI and all client headers",
+    "AUDIT_PART_C_NAME": "Request Body",
+    "AUDIT_PART_C_DESC": "Payload data (POST/PUT body, JSON, forms) when inspection is enabled",
+    "AUDIT_PART_E_NAME": "Intermediary Response Body",
+    "AUDIT_PART_E_DESC": "Response body before WAF transformations are applied",
+    "AUDIT_PART_F_NAME": "Response Headers",
+    "AUDIT_PART_F_DESC": "Final HTTP status code and server response headers",
+    "AUDIT_PART_H_NAME": "Audit Trailer",
+    "AUDIT_PART_H_DESC": "ModSecurity metadata, matched rule IDs and actions taken",
+    "AUDIT_PART_I_NAME": "Compact Request Body",
+    "AUDIT_PART_I_DESC": "Alternative to part C excluding large file uploads",
+    "AUDIT_PART_J_NAME": "Uploaded Files Info",
+    "AUDIT_PART_J_DESC": "Information and filenames of uploaded multipart files",
+    "AUDIT_PART_K_NAME": "Matched Rules List",
+    "AUDIT_PART_K_DESC": "Complete list of matched security rules in execution order",
+    "AUDIT_PART_Z_NAME": "Final Boundary",
+    "AUDIT_PART_Z_DESC": "Closing boundary marking the end of the audit log entry",
+    "PRESET_DEFAULT": "Standard (ABHF)",
+    "PRESET_FULL": "Full Inspection (ABCEFHJKZ)",
+    "ELASTICSEARCH_SECTION_TITLE": "Elasticsearch Cluster Connection",
+    "ELASTICSEARCH_SECTION_DESC": "Configure remote cluster endpoint and credentials for transaction ingestion",
+    "DASHBOARD_SECTION_TITLE": "Dashboards & Analytics (Kibana / OpenSearch)",
+    "DASHBOARD_SECTION_DESC": "Configure dashboard visualization URL and user access credentials",
+    "LOGGING_TYPE": "Engine Type",
+    "INDEX_URL": "Elasticsearch URL",
+    "INDEX_URL_HINT": "Cluster endpoint URL (e.g. http://elasticsearch:9200)",
+    "INDEX_USERNAME": "Elasticsearch Username",
+    "INDEX_PASSWORD": "Elasticsearch Password",
+    "DASHBOARD_URL": "Dashboards URL",
+    "DASHBOARD_URL_HINT": "Kibana endpoint URL (e.g. http://kibana:5601)",
+    "DASHBOARD_USERNAME": "Dashboard Username",
+    "DASHBOARD_PASSWORD": "Dashboard Password",
     "PURGE_TITLE": "Transaction Purging",
     "PURGE_TOGGLE": "Enable Database Purging",
     "PURGE_DESC": "Automatically delete outdated transactional records from the local DuckDB database to preserve high performance and disk storage.",
@@ -364,6 +422,22 @@
     "SERVICE": "Service"
   },
   "TRANSACTION": {
+    "VIEW_RAW_JSON": "View Raw JSON",
+    "RAW_TITLE": "Transaction Raw JSON",
+    "COPY_JSON": "Copy JSON",
+    "COPY_CLIPBOARD": "Copy JSON to clipboard",
+    "COPIED": "Copied",
+    "BLOCKED_BY": "Blocked By",
+    "CHART": {
+      "TITLE": "Transaction Traffic by Action",
+      "SUBTITLE": "Time-series volume and request rate broken down by security action",
+      "TOTAL": "Total",
+      "TOTAL_TRANSACTIONS": "Total transactions in selected window",
+      "RESET_ZOOM": "Reset Zoom",
+      "TOGGLE_SERIES": "Click to toggle this action in the chart",
+      "NO_DATA": "No transactions recorded for the selected period",
+      "NO_DATA_HINT": "Adjust your time window or search filters to display telemetry"
+    },
     "FILTER": {
       "ADD_FILTER": "Add Filter",
       "CLEAR_ALL": "Clear All",
@@ -372,7 +446,6 @@
       "DIALOG_SUBTITLE": "Select a transaction attribute and value to filter network traffic",
       "CATEGORY_LABEL": "Category",
       "FIELD_LABEL": "Field",
-      "OPERATOR_LABEL": "Operator",
       "VALUE_LABEL": "Value",
       "VALUE_PLACEHOLDER": "Enter filter value...",
       "PREVIEW_LABEL": "Filter JSON Preview",
@@ -380,6 +453,7 @@
       "CANCEL": "Cancel",
       "APPLY": "Apply Filter",
       "CATEGORIES": {
+        "ALL": "All Categories",
         "GENERAL": "General & Status",
         "ROUTING": "Services & Routing",
         "NETWORK": "Network & Geolocation",
@@ -387,34 +461,33 @@
         "SECURITY": "Security & WAF",
         "SYSTEM": "System & Node"
       },
+      "CLEAR_VALUE": "Clear value",
       "FIELDS": {
-        "ACTION": "Security Action (action)",
-        "SERVICE_ID": "Service (service._id)",
-        "ROUTE_NAME": "Route Name (route_name)",
-        "UPSTREAM_ID": "Upstream (upstream._id)",
-        "SOURCE_IP": "Source IP (source.ip)",
-        "SOURCE_PORT": "Source Port (source.port)",
-        "GEOIP_COUNTRY": "Source Country (geoip.country_code)",
-        "DESTINATION_HOST": "Destination Host (destination.host)",
-        "DESTINATION_IP": "Destination IP (destination.ip)",
-        "DESTINATION_PORT": "Destination Port (destination.port)",
-        "HTTP_METHOD": "HTTP Method (http.request.method)",
-        "HTTP_URI": "HTTP Request URI (http.request.uri)",
-        "STATUS_CODE": "HTTP Status Code (http.response.status_code)",
-        "DURATION": "Duration seconds (http.duration)",
-        "SCORE": "Anomaly Score (score)",
-        "RATE_LIMIT_ACTION": "Rate Limit Action (rate_limit.action)",
-        "LIMIT_REQ_STATUS": "Limit Req Status (limit_req_status)",
-        "GEOIP_STATUS": "GeoIP Status (geoip_status)",
-        "RBL_STATUS": "RBL Status (rbl_status)",
-        "IPXA": "IPXA Status (ipxa)",
-        "MTLS_ENABLED": "mTLS Enabled (mtls.enabled)",
-        "MTLS_VERIFIED": "mTLS Verified (mtls.verified)",
-        "AUDIT_RULE_CODE": "WAF Rule ID / Code (rule_code)",
-        "USER_AGENT": "User Agent Family (user_agent.family)",
-        "SERVER_ID": "Node / Server ID (server_id)",
-        "UNIQUE_ID": "Unique Transaction ID (unique_id)",
-        "ARCHIVED": "Archived Status (archived)"
+        "ACTION": "Security Action",
+        "BLOCKED_BY": "Blocked By / Origin",
+        "SERVICE_NAME": "Service",
+        "ROUTE_NAME": "Route Name",
+        "UPSTREAM_NAME": "Upstream",
+        "UPSTREAM_STATUS": "Upstream Status",
+        "SENSOR_NAME": "Sensor",
+        "SOURCE_IP": "Source IP",
+        "SOURCE_PORT": "Source Port",
+        "GEOIP_COUNTRY": "Source Country",
+        "DESTINATION_HOST": "Destination Host",
+        "DESTINATION_PORT": "Destination Port",
+        "HTTP_METHOD": "HTTP Method",
+        "HTTP_URI": "HTTP Request URI",
+        "STATUS_CODE": "HTTP Status Code",
+        "SCORE": "Anomaly Score",
+        "RATE_LIMIT_ACTION": "Rate Limit Action",
+        "GEOIP_ACTION": "GeoIP Action",
+        "REPUTATION_ACTION": "Reputation Action",
+        "IPXA": "IPXA Status",
+        "MTLS_VERIFIED": "mTLS Verified",
+        "AUDIT_RULE_CODE": "WAF Rule ID / Code",
+        "USER_AGENT": "User Agent Family",
+        "SERVER_ID": "Node / Server ID",
+        "UNIQUE_ID": "Unique Transaction ID"
       }
     },
     "DATE_RANGE": {
@@ -445,9 +518,7 @@
     "EMAIL": "Email Address",
     "PASSWORD": "New Password",
     "PASSWORD_HINT": "Leave blank to keep your current password",
-    "ROLE": "Role",
-    "SUCCESS": "Profile updated successfully",
-    "SAVE": "Save Changes"
+    "SUCCESS": "Profile updated successfully"
   },
   "USER_MGMT": {
     "NAME": "Full Name",
@@ -455,12 +526,42 @@
     "ROLE": "Access Role",
     "PASSWORD": "Password",
     "CONFIRM_PASSWORD": "Confirm Password",
-    "ROLES": {
-      "SUPERUSER": "Superuser",
-      "VIEWER": "Viewer"
+    "ACTIONS": "Actions"
+  },
+  "UPSTREAM": {
+    "ERR_TARGET_REQUIRED": "Backend upstream requires at least one target.",
+    "PERSISTENCE": {
+      "STICKY": "Sticky"
     },
-    "ACTIONS": "Actions",
-    "NO_USERS": "No users found"
+    "TARGETS": {
+      "TITLE": "Targets",
+      "ADD_BTN": "Add Target",
+      "NETWORK_ADDRESS": "Network Address",
+      "SERVICE_PORT": "Service Port",
+      "DISTRIBUTION_WEIGHT": "Distribution Weight",
+      "ACTIONS": "Actions",
+      "EDIT_TOOLTIP": "Edit target",
+      "REMOVE_TOOLTIP": "Remove target",
+      "MODAL_TITLE_ADD": "Add Upstream Target",
+      "MODAL_TITLE_EDIT": "Edit Upstream Target",
+      "MODAL_SUBTITLE": "Configure destination network address, service port, and traffic distribution weight.",
+      "EMPTY_MESSAGE": "No targets configured. Add at least one target for this backend."
+    },
+    "STATES": {
+      "NODE": "Node",
+      "STATUS": "Status",
+      "LATENCY": "Latency",
+      "HEALTHY": "Healthy",
+      "PARTIALLY_HEALTHY": "Partially Healthy",
+      "UNHEALTHY": "Unhealthy",
+      "INVALID": "Unverified",
+      "NO_STATES": "No health check states recorded yet for this upstream."
+    }
+  },
+  "DATETIME": {
+    "HOUR": "Hour",
+    "MINUTE": "Minute",
+    "SECOND": "Second"
   },
   "UPSTREAM": {
     "ERR_TARGET_REQUIRED": "Backend upstream requires at least one target.",
@@ -498,10 +599,7 @@
   },
   "FORMAT": {
     "DISPLAY": {
-      "DATETIME": "DD/MM/YYYY HH:mm:ss",
-      "MONTH_YEAR_LABEL": "MMM YYYY",
-      "DATE_A11Y_LABEL": "LL",
-      "MONTH_YEAR_A11Y_LABEL": "MMMM YYYY"
+      "DATETIME": "DD/MM/YYYY HH:mm:ss"
     }
   },
   "actions": {
@@ -564,14 +662,33 @@
     "backup": {
       "link": "backup"
     },
-    "dashboard": {
-      "link": "Dashboard",
-      "title": "Dashboard"
+    "EMPTY": "No rule categories found",
+    "FIELDS": {
+      "ID": "ID",
+      "ID_HINT": "Numeric identifier or prefix (e.g. 945)",
+      "NAME": "Category Name",
+      "NAME_HINT": "Descriptive category name (e.g. 945-NGGUARD-CUSTOM-RULES)",
+      "PHASE": "Phase",
+      "SCOPE": "Scope",
+      "SEQ": "Sequence",
+      "SEQ_HINT": "Execution sequence order",
+      "FILE": "Rule File",
+      "FILE_HINT": "Rule configuration file (e.g. REQUEST-945-NGGUARD-CUSTOM-RULES.conf)",
+      "SYSTEM": "System Protected",
+      "SYSTEM_DESC": "System protected rule category cannot be modified without superuser access",
+      "PROVIDER": "Provider",
+      "ACTIONS": "Actions",
+      "TYPE": "Type",
+      "PROVIDER_DESC": "Rule category provider or feed source",
+      "REQUIRED": "Field is required"
     },
-    "transaction": {
-      "link": "Network Activity",
-      "title": "Transactions",
-      "subtitle": "List all transactions"
+    "PHASES": {
+      "1": "Phase 1 - Request Headers (Config & Exceptions)",
+      "2": "Phase 2 - Request Body (Rules & Attacks)",
+      "3": "Phase 3 - Request Blocking Evaluation",
+      "4": "Phase 4 - Response Headers (Data Leakages)",
+      "5": "Phase 5 - Response Body (Blocking Evaluation)",
+      "6": "Phase 6 - Correlation & Logging"
     },
     "service": {
       "link": "Services",

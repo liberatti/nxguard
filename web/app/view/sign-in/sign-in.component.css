@@ -20,6 +20,7 @@
     box-sizing: border-box;
 }
 
+/* Ambient Subtle Background Pattern */
 .vmware-bg-glow {
     position: absolute;
     top: 25%;
@@ -30,9 +31,10 @@
     background: radial-gradient(circle, rgba(15, 39, 68, 0.12) 0%, rgba(22, 54, 92, 0.05) 50%, transparent 80%);
     filter: blur(70px);
     pointer-events: none;
+    z-index: 1;
 }
 
-.vmware-bg-grid {
+.vmware-bg-pattern {
     position: absolute;
     top: 0;
     left: 0;
@@ -43,6 +45,7 @@
         linear-gradient(90deg, rgba(15, 23, 42, 0.035) 1px, transparent 1px);
     background-size: 36px 36px;
     pointer-events: none;
+    z-index: 2;
 }
 
 /* Modern Dual-Tone Login Box */
@@ -59,14 +62,112 @@
     animation: fadeInScale 0.3s ease-out;
 }
 
-@keyframes fadeInScale {
+.top-nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    user-select: none;
+}
+
+.top-brand-text {
+    font-size: 1.1rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    color: #0f172a;
+}
+
+.top-brand-separator {
+    color: #94a3b8;
+    font-size: 0.95rem;
+    font-weight: 300;
+}
+
+.top-brand-edition {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #0079b8;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+}
+
+.top-nav-actions {
+    display: flex;
+    align-items: center;
+}
+
+.vmware-lang-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 32px;
+    padding: 0 10px;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    color: #334155;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+}
+
+.vmware-lang-btn:hover {
+    background: #f8fafc;
+    border-color: #0079b8;
+    color: #0079b8;
+    box-shadow: 0 2px 6px rgba(0, 121, 184, 0.15);
+}
+
+.lang-icon {
+    font-size: 15px;
+    width: 15px;
+    height: 15px;
+    color: #0079b8;
+}
+
+.chevron-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: #64748b;
+}
+
+/* Centered Form Wrapper */
+.login-main-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 24px 16px;
+    box-sizing: border-box;
+    z-index: 10;
+}
+
+/* Crisp White Enterprise Login Card */
+.vmware-card {
+    width: 100%;
+    max-width: 440px;
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 
+        0 20px 48px -10px rgba(15, 23, 42, 0.1),
+        0 4px 16px -2px rgba(15, 23, 42, 0.05),
+        0 0 1px 1px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+    position: relative;
+    animation: cardEntrance 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes cardEntrance {
     from {
         opacity: 0;
-        transform: scale(0.98);
+        transform: translateY(12px) scale(0.99);
     }
     to {
         opacity: 1;
-        transform: scale(1);
+        transform: translateY(0) scale(1);
     }
 }
 
@@ -165,8 +266,8 @@
     box-sizing: border-box;
 }
 
-.form-header {
-    margin-bottom: 24px;
+.form-title-group {
+    margin-bottom: 20px;
 }
 
 .form-header-row {
@@ -192,34 +293,46 @@
 
 .form-title {
     margin: 0;
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     font-weight: 700;
     color: #0f172a;
-    letter-spacing: -0.3px;
+    letter-spacing: -0.2px;
 }
 
-.form-subtitle {
+.form-subheading {
     margin: 4px 0 0 0;
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     color: #64748b;
 }
 
+/* Form Styles */
 .login-form {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 16px;
 }
 
 .form-field-custom {
     margin-bottom: 4px;
 }
 
-.input-icon {
-    color: #94a3b8;
+/* Input Fields (Light Outline with Refined Contrast) */
+.clean-form-field {
+    width: 100%;
+    --mdc-outlined-text-field-container-shape: 8px;
+    --mdc-outlined-text-field-outline-color: #cbd5e1;
+    --mdc-outlined-text-field-hover-outline-color: #0079b8;
+    --mdc-outlined-text-field-focus-outline-color: #0079b8;
+    --mdc-outlined-text-field-outline-width: 1px;
+    --mdc-outlined-text-field-focus-outline-width: 1.5px;
+    --mdc-outlined-text-field-input-text-color: #0f172a;
+    --mdc-outlined-text-field-input-text-placeholder-color: #94a3b8;
 }
 
-.password-toggle-btn {
-    color: #94a3b8;
+.clean-form-field .mat-mdc-text-field-wrapper.mdc-text-field--outlined {
+    background-color: #f8fafc !important;
+    border-radius: 8px !important;
+    transition: all 0.2s ease !important;
 }
 
 .password-toggle-btn:hover {
@@ -255,12 +368,26 @@
 }
 
 .btn-icon {
-    font-size: 20px !important;
-    width: 20px !important;
-    height: 20px !important;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    line-height: 18px;
 }
 
-.form-footer-notice {
+.btn-spinner {
+    display: inline-block;
+}
+
+/* Card Footer */
+.card-footer {
+    padding: 0 32px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    box-sizing: border-box;
+}
+
+.security-notice {
     display: flex;
     align-items: center;
     gap: 6px;
@@ -278,13 +405,41 @@
     flex-shrink: 0;
 }
 
+.security-text {
+    font-size: 0.72rem;
+    color: #475569;
+    line-height: 1.35;
+}
+
+.card-meta-bar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-top: 12px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.version-tag {
+    font-family: var(--font-mono, monospace);
+    font-size: 0.7rem;
+    color: #64748b;
+    background: #f8fafc;
+    padding: 3px 8px;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+}
+
 /* Global Footer */
 .vmware-global-footer {
     margin-top: 24px;
     font-size: 0.78rem;
     color: #64748b;
-    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 8px;
     text-align: center;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
 .license-link {
@@ -342,8 +497,8 @@
         font-size: 0.8rem;
     }
 
-    .brand-bottom-status {
-        display: none;
+    .card-body {
+        padding: 18px 20px 20px;
     }
 
     .vmware-form-pane {

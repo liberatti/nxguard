@@ -1,13 +1,13 @@
 import json
 from flask import Blueprint, Response
 
-from nxcore.controllers.base_controller import (
+from api.middleware.controllers.base_controller import (
     response_data,
     response_error_404,
     has_any_authority,
     response_error_500,
 )
-from api.model.config_model import ConfigDao, ConfigBackupDao
+from api.repository.config_repository import ConfigDao, ConfigBackupDao
 
 routes = Blueprint("replica", __name__)
 

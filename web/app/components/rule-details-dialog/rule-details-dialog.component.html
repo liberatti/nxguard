@@ -20,6 +20,11 @@
                             Phase: {{ data.phase }}
                         </span>
                     }
+                    @if (data?.severity) {
+                        <span class="meta-badge severity">
+                            {{ data.severity }}
+                        </span>
+                    }
                     @if (data?.category_id) {
                         <span class="meta-badge category">
                             Cat: {{ data.category_id }}
@@ -30,7 +35,7 @@
         </div>
 
         <div class="header-actions">
-            <button mat-icon-button (click)="copyToClipboard()" matTooltip="Copy JSON to clipboard">
+            <button mat-icon-button (click)="copyToClipboard()" matTooltip="Copy to clipboard">
                 <mat-icon>{{ copied ? 'check' : 'content_copy' }}</mat-icon>
             </button>
             <button mat-icon-button (click)="onDismiss()" matTooltip="Close dialog">
@@ -39,23 +44,46 @@
         </div>
     </div>
 
-    @if (data?.msg) {
+    @if (data?.msg || data?.comment) {
         <div class="rule-msg-banner">
             <mat-icon class="msg-icon">info</mat-icon>
-            <span class="msg-text">{{ data.msg }}</span>
+            <span class="msg-text">{{ data.msg || data.comment }}</span>
         </div>
     }
 
     <mat-dialog-content class="rule-dialog-content">
-        <div class="code-wrapper">
-            <pre><code [highlight]="jsonData" language="json" id="rule-details-code"></code></pre>
-        </div>
+        @if (data?.raw) {
+            <mat-tab-group [(selectedIndex)]="selectedTabIndex" animationDuration="0ms" class="rule-tabs">
+                <mat-tab>
+                    <ng-template mat-tab-label>
+                        <mat-icon class="tab-icon">terminal</mat-icon>
+                        <span>SecRule (Raw)</span>
+                    </ng-template>
+                    <div class="code-wrapper raw-code-wrapper">
+                        <pre class="raw-pre"><code class="raw-code" id="rule-details-raw-code">{{ data.raw }}</code></pre>
+                    </div>
+                </mat-tab>
+                <mat-tab>
+                    <ng-template mat-tab-label>
+                        <mat-icon class="tab-icon">data_object</mat-icon>
+                        <span>JSON</span>
+                    </ng-template>
+                    <div class="code-wrapper">
+                        <pre><code [highlight]="jsonData" language="json" id="rule-details-code"></code></pre>
+                    </div>
+                </mat-tab>
+            </mat-tab-group>
+        } @else {
+            <div class="code-wrapper">
+                <pre><code [highlight]="jsonData" language="json" id="rule-details-code"></code></pre>
+            </div>
+        }
     </mat-dialog-content>
 
     <mat-dialog-actions align="end" class="rule-dialog-actions">
         <button mat-stroked-button (click)="copyToClipboard()">
             <mat-icon>{{ copied ? 'check' : 'content_copy' }}</mat-icon>
-            {{ copied ? 'Copied' : 'Copy JSON' }}
+            {{ copied ? 'Copied' : (selectedTabIndex === 0 && data?.raw ? 'Copy SecRule' : 'Copy JSON') }}
         </button>
         <button mat-flat-button color="primary" (click)="onDismiss()" id="rule-details-close-btn">
             Close

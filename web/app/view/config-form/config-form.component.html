@@ -1,6 +1,6 @@
 <ng-container>
     <mat-card class="config-card">
-        <mat-card-header>
+        <mat-card-header class="config-header">
             <mat-card-title>{{ 'CONFIG_PAGE.TITLE' | translate }}</mat-card-title>
             <mat-card-subtitle>{{ 'CONFIG_PAGE.SUBTITLE' | translate }}</mat-card-subtitle>
         </mat-card-header>
@@ -148,26 +148,16 @@
                                                 <mat-icon matSuffix class="field-icon">dns</mat-icon>
                                             </mat-form-field>
                                         </div>
-
-                                        <div class="fields-grid">
-                                            <mat-form-field class="full-width">
-                                                <mat-label>{{ 'CONFIG_PAGE.CLUSTER_USER' | translate }}</mat-label>
-                                                <input matInput formControlName="username" id="elasticsearch-username-input">
-                                                <mat-icon matSuffix class="field-icon">person</mat-icon>
-                                            </mat-form-field>
-
-                                            <mat-form-field class="full-width">
-                                                <mat-label>{{ 'CONFIG_PAGE.CLUSTER_PASS' | translate }}</mat-label>
-                                                <input matInput type="password" formControlName="password" id="elasticsearch-password-input">
-                                                <mat-icon matSuffix class="field-icon">lock</mat-icon>
-                                            </mat-form-field>
+                                        <div class="policy-header-title-wrap">
+                                            <h3 class="policy-card-title">{{ 'CONFIG_PAGE.LOGGING_TITLE' | translate }}</h3>
+                                            <p class="policy-card-subtitle">{{ 'CONFIG_PAGE.LOGGING_DESC' | translate }}</p>
                                         </div>
                                     </div>
                                     }
                                 </mat-card-content>
                             </mat-card>
 
-                            <!-- Purging Card -->
+                            <!-- Card 2: Purging Card -->
                             <mat-card appearance="outlined" formGroupName="purge" class="policy-card">
                                 <mat-card-header class="policy-header">
                                     <div class="policy-title-group">

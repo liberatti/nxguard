@@ -1,10 +1,16 @@
-import { Feed } from "./feed";
-
 export interface RuleCategory {
-    _id: string;
+    _id?: string;
     name: string;
-    rules: Array<SecRule>;
-    mandatory: boolean;
+    phase?: number;
+    file?: string;
+    scope?: string;
+    seq?: number;
+    system?: boolean;
+    provider: string;
+    srctype?: 'feed' | 'user' | string;
+    rules?: Array<SecRule>;
+    exclusions?: number[];
+    mandatory?: boolean;
 }
 
 export interface SecRule {
@@ -25,8 +31,11 @@ export interface SecRule {
 
 export interface SensorSecurity {
     geo_codes?: string[];
+    geo_codes_count?: number;
     reputation?: string[];
+    reputation_count?: number;
     trusted?: string[];
+    trusted_count?: number;
 }
 
 export interface SensorScore {
@@ -54,6 +63,7 @@ export interface Sensor {
     name: string;
     description?: string;
     categories?: string[];
+    categories_count?: number;
     exclusions?: number[];
     security?: SensorSecurity;
     inspection?: SensorInspection;

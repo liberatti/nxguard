@@ -4,7 +4,7 @@ import json
 import os
 
 import bcrypt
-from nxcore.common_utils import gen_random_string
+from api.middleware.common_utils import gen_random_string
 
 import config
 from api.model.certificate_model import CertificateDao
@@ -16,11 +16,12 @@ from api.model.route_model import RouteDao
 from api.model.upstream_model import UpstreamDao, NodeStatusDao, UpstreamStatesDao
 from api.model.transaction_model import TransactionDao
 from api.tools.network_tool import NetworkTool
-from nxcore.middleware.logging_manager import logger
-from api.model.acme_model import ChallengeDao
+from api.tools.ssl_tool import SSLTool
+from api.middleware.logging_manager import logger
+from api.repository.acme_repository import ChallengeDao
 
 
-def get_config():
+def get_config(dependents: bool = False):
     """Assembles active configuration from DAOs into a single dictionary."""
     c = dict()
     with ConfigDao() as dao:
@@ -33,7 +34,7 @@ def get_config():
         c.update({"certificates": dao.get_all()["data"]})
 
     with ServiceDao() as s_dao:
-        c.update({"services": s_dao.get_all()["data"]})
+        c.update({"services": s_dao.get_all(dependents=dependents)["data"]})
 
     with SensorDao() as dao:
         c.update({"sensors": dao.get_all()["data"]})
@@ -71,6 +72,11 @@ def create_db():
     """Creates initial database schema tables and seeds default superuser."""
     with ConfigDao() as dao:
         dao.create_schema()
+        if not dao.get_active():
+            dao.persist({
+                "cluster_id": gen_random_string(8),
+                "active_scn": None,
+            })
     with ConfigBackupDao() as dao:
         dao.create_schema()
     with UserDao() as dao:
@@ -189,14 +195,24 @@ def init_from_data(data_dir=None, data_file="init-data.json", data=None):
     if "sensors" in data:
         with SensorDao() as dao:
             dao.delete_all()
-            dao.persist_many(data["sensors"])
-            logger.info(f"Sensors: {len(data['sensors'])}")
+            cleaned_sensors = []
+            for s in data["sensors"]:
+                s_clean = dict(s)
+                s_clean.pop("render_name", None)
+                cleaned_sensors.append(s_clean)
+            dao.persist_many(cleaned_sensors)
+            logger.info(f"Sensors: {len(cleaned_sensors)}")
 
     if "services" in data:
         with ServiceDao() as dao:
             dao.delete_all()
-            dao.persist_many(data["services"])
-            logger.info(f"Services: {len(data['services'])}")
+            cleaned_services = []
+            for s in data["services"]:
+                s_clean = dict(s)
+                s_clean.pop("render_name", None)
+                cleaned_services.append(s_clean)
+            dao.persist_many(cleaned_services)
+            logger.info(f"Services: {len(cleaned_services)}")
 
 
 def validate(data):

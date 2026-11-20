@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component, Inject, OnInit, ViewChild } from '@angular/core';
 import {
     MAT_DIALOG_DATA,
+    MatDialog,
     MatDialogActions,
     MatDialogContent,
     MatDialogRef,
@@ -13,6 +14,7 @@ import { Route, RouteType } from 'app/models/service';
 import { Upstream } from 'app/models/upstream';
 import { UpstreamService } from 'app/services/upstream.service';
 import { SensorService } from 'app/services/sensor.service';
+import { SensorGeoipDialogComponent } from '../sensor-geoip-dialog/sensor-geoip-dialog.component';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -71,7 +73,8 @@ export function nginxRegexValidator(): ValidatorFn {
         MatDialogTitle,
         MatDialogContent,
         MatDialogActions, MatSlideToggle,
-        MatIconModule, MatSelectModule, MatTabsModule
+        MatIconModule, MatSelectModule, MatTabsModule,
+        MatTooltipModule
     ],
 })
 
@@ -139,6 +142,7 @@ export class ServiceRouteFormDialogComponent implements OnInit {
 
     constructor(
         private dialogRef: MatDialogRef<any>,
+        private dialog: MatDialog,
         private upstreamService: UpstreamService,
         private staticService: StaticService,
         private sensorService: SensorService,
@@ -146,6 +150,47 @@ export class ServiceRouteFormDialogComponent implements OnInit {
         @Inject(MAT_DIALOG_DATA) public routeData: Route
     ) {
         this.isAddMode = false;
+    }
+
+    openSensorGeoipDialog(): void {
+        const selectedSensor = this.form.get('sensor')?.value;
+        if (!selectedSensor || !selectedSensor._id) {
+            return;
+        }
+
+        const openWithSensor = (sensor: Sensor) => {
+            const dialogRef = this.dialog.open(SensorGeoipDialogComponent, {
+                width: '800px',
+                maxWidth: '95vw',
+                maxHeight: '90vh',
+                data: {
+                    sensorId: sensor._id,
+                    sensor: sensor,
+                    sensorName: sensor.name,
+                    geo_codes: sensor.security?.geo_codes || [],
+                    editable: true
+                }
+            });
+
+            dialogRef.afterClosed().subscribe((result) => {
+                if (result && result.updated && result.sensor) {
+                    this.form.patchValue({ sensor: result.sensor });
+                    const idx = this._sensors.findIndex(s => s._id === result.sensor._id);
+                    if (idx !== -1) {
+                        this._sensors[idx] = result.sensor;
+                    }
+                    this.cdr.markForCheck();
+                }
+            });
+        };
+
+        if (!selectedSensor.security || !Array.isArray(selectedSensor.security.geo_codes)) {
+            this.sensorService.getById(selectedSensor._id).subscribe((fullSensor) => {
+                openWithSensor(fullSensor);
+            });
+        } else {
+            openWithSensor(selectedSensor);
+        }
     }
 
     ngOnInit(): void {

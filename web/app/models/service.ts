@@ -32,6 +32,7 @@ export interface TargetEntity {
     host: string;
     port: number;
     weight: number;
+    healthy?: boolean;
 }
 
 export interface SessionPersistenceEntity {
