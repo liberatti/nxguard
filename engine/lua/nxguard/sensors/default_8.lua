@@ -3,7 +3,7 @@ local cache = require("nxguard.core.cache").new("ipxa_cache", 30)
 local utils = require("nxguard.core.utils")
 local cjson = require("cjson")
 
-local BLOCKED_COUNTRIES = utils.parse_list("")
+local BLOCKED_COUNTRIES = utils.parse_list("DZ,AO,BJ,BW,BF,BI,CV,CM,CF,TD,KM,CG,DJ,CD,EG,GQ,ER,SZ,ET,GA,GM,GH,GN,GW,CI,KE,LS,LR,LY,MG,MW,ML,MR,MU,MA,MZ,NA,NE,NG,RW,ST,SN,SC,SL,SO,ZA,SS,SD,TZ,TG,TN,UG,ZM,ZW")
 local BLOCKED_RBL = utils.parse_list("firehol_level1")
 local TRUSTED = utils.parse_list("internal_networks,loopback_vpn,rfc1918_private")
 

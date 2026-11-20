@@ -4,7 +4,7 @@ trigger: always_on
 
 # Gateway engine and containers
 
-- Treat `engine/templates/` and `lua/nxguard/` as source files for gateway
+- Treat `engine/templates/` and `engine/lua/nxguard/` as source files for gateway
   configuration. `engine/render.py` coordinates rendering; do not edit generated
   runtime files as the source of truth.
 - Check the versions in `Dockerfile` and `packages/` before using NGINX, OpenResty,

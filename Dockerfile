@@ -112,7 +112,7 @@ COPY --from=build_frontend /app/web/package.json /root/rpmbuild/BUILD/admin/
 COPY *.py .
 COPY api api
 COPY engine engine
-COPY lua/nxguard /root/rpmbuild/BUILD/luajit
+COPY engine/lua/nxguard /root/rpmbuild/BUILD/luajit
 
 WORKDIR /root/rpmbuild/SPECS
 COPY packages/nxguard-admin.spec .

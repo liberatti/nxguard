@@ -9,7 +9,7 @@ Engine changes can affect traffic, availability, and false-positive rates. Keep 
 focused and validate them before operational use.
 
 1. Read `.agents/rules/gateway-engine.md` and locate the source in
-   `engine/templates/`, `engine/seclang/`, `engine/render.py`, or `lua/nxguard/`.
+   `engine/templates/`, `engine/seclang/`, `engine/render.py`, or `engine/lua/nxguard/`.
    Trace related callers and templates; do not edit generated runtime files.
 2. Check NGINX, OpenResty/LuaJIT, ModSecurity, and CRS versions in `Dockerfile`,
    `packages/`, and `README.md`. Do not assume newer features are available.
