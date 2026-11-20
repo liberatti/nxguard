@@ -25,6 +25,11 @@
                 }
             </mat-card-actions>
         </mat-card-header>
+
+        @if (isLoading) {
+            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        }
+
         <mat-card-content>
             <table mat-table [dataSource]="upstreamDS" matSort class="upstream-table">
                 <tr mat-header-row *matHeaderRowDef="upstreamDC"></tr>

@@ -11,15 +11,6 @@
     max-width: 320px;
 }
 
-.table-loading-bar {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 5;
-    height: 3px;
-}
-
 .table-responsive-container {
     width: 100%;
     overflow-x: auto;

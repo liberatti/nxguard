@@ -46,6 +46,7 @@ export class UserListComponent implements OnInit {
     userDC: string[] = ['name', 'email', 'role', 'action'];
     userDS: MatTableDataSource<User>;
     userPA = new DefaultPageMeta();
+    isLoading: boolean = false;
 
     constructor(
         private notificationService: NotificationService,
@@ -61,9 +62,18 @@ export class UserListComponent implements OnInit {
     }
 
     updateGridTable() {
-        this.dictService.get(this.userPA).subscribe(data => {
-            this.userDS.data = data.data;
-            this.userPA.total_elements = data.metadata.total_elements;
+        this.isLoading = true;
+        this.dictService.get(this.userPA).subscribe({
+            next: (data) => {
+                this.isLoading = false;
+                this.userDS.data = data.data;
+                this.userPA.total_elements = data.metadata.total_elements;
+            },
+            error: () => {
+                this.isLoading = false;
+                this.userDS.data = [];
+                this.userPA.total_elements = 0;
+            }
         });
     }
 

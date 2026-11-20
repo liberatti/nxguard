@@ -8,6 +8,10 @@
             <mat-card-subtitle>{{ 'VIEW.TRANSACTION.SUBTITLE' | translate }}</mat-card-subtitle>
         </mat-card-header>
 
+        @if (isLoading) {
+            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        }
+
         <mat-card-content>
             <div class="filter-toolbar">
                 <div class="filter-left-group">

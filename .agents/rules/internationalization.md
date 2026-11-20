@@ -5,7 +5,10 @@ trigger: always_on
 # Internationalization
 
 - The frontend uses `@ngx-translate/core`. Translation files are in
-  `web/assets/i18n/{lang}.json`; keep `en_US.json` and `pt_BR.json` synchronized.
+  `web/assets/i18n/{lang}.json`; keep `en_US.json` and `pt_BR.json` strictly synchronized
+  and up to date with tags used and removed in code.
+- Prune obsolete or unused translation keys immediately whenever templates, components,
+  or features are modified or deleted; never leave orphaned tags in translation files.
 - Put all user-visible text, including labels, placeholders, accessibility text, and
   UI error messages, in translation files. Do not display raw backend error strings.
 - Use hierarchical `SCREAMING_SNAKE_CASE` keys, such as

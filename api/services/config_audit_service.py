@@ -5,11 +5,6 @@ import re
 from typing import Any, Dict, List, Optional
 
 try:
-    import jsonpatch
-except ImportError:
-    jsonpatch = None
-
-try:
     from deepdiff import DeepDiff
 except ImportError:
     DeepDiff = None
@@ -21,45 +16,6 @@ import engine.admin as c_admin
 import engine.build as c_builder
 
 
-def json_pointer_escape(token: Any) -> str:
-    """Escapes a JSON Pointer token according to RFC 6901 (~ to ~0, / to ~1)."""
-    return str(token).replace("~", "~0").replace("/", "~1")
-
-
-def _builtin_rfc6902_diff(src: Any, dst: Any, path: str = "") -> List[Dict[str, Any]]:
-    """Generates an RFC 6902 JSON Patch between two objects in pure Python."""
-    ops = []
-    if src == dst:
-        return ops
-
-    if isinstance(src, dict) and isinstance(dst, dict):
-        for k in src:
-            if k not in dst:
-                ops.append({"op": "remove", "path": f"{path}/{json_pointer_escape(k)}"})
-        for k in dst:
-            curr_path = f"{path}/{json_pointer_escape(k)}"
-            if k not in src:
-                ops.append({"op": "add", "path": curr_path, "value": dst[k]})
-            elif src[k] != dst[k]:
-                ops.extend(_builtin_rfc6902_diff(src[k], dst[k], curr_path))
-    elif isinstance(src, list) and isinstance(dst, list):
-        common_len = min(len(src), len(dst))
-        for i in range(common_len):
-            curr_path = f"{path}/{i}"
-            if src[i] != dst[i]:
-                ops.extend(_builtin_rfc6902_diff(src[i], dst[i], curr_path))
-        if len(dst) > len(src):
-            for i in range(common_len, len(dst)):
-                ops.append({"op": "add", "path": f"{path}/{i}", "value": dst[i]})
-        elif len(src) > len(dst):
-            for i in range(len(src) - 1, common_len - 1, -1):
-                ops.append({"op": "remove", "path": f"{path}/{i}"})
-    else:
-        ops.append({"op": "replace", "path": path or "/", "value": dst})
-
-    return ops
-
-
 def _to_json_compatible(obj: Any) -> Any:
     if hasattr(obj, "isoformat"):
         return obj.isoformat()
@@ -68,21 +24,6 @@ def _to_json_compatible(obj: Any) -> Any:
     if isinstance(obj, (list, tuple)):
         return [_to_json_compatible(item) for item in obj]
     return obj
-
-
-def compute_rfc6902_patch(
-    src: Dict[str, Any], dst: Dict[str, Any]
-) -> List[Dict[str, Any]]:
-    """Calculates an RFC 6902 JSON Patch between a source and destination dictionary."""
-    clean_src = _to_json_compatible(copy.deepcopy(src or {}))
-    clean_dst = _to_json_compatible(copy.deepcopy(dst or {}))
-    if jsonpatch is not None:
-        try:
-            patch = jsonpatch.make_patch(clean_src, clean_dst)
-            return list(patch.patch)
-        except Exception:
-            pass
-    return _builtin_rfc6902_diff(clean_src, clean_dst)
 
 
 def humanize_deepdiff_path(path_str: str, root_obj: Any) -> str:
@@ -285,32 +226,6 @@ def compute_jcs_hash(data: Any) -> str:
     return hashlib.sha256(canonical_str.encode("utf-8")).hexdigest()
 
 
-def summarize_patch(patch_ops: List[Dict[str, Any]]) -> Dict[str, Any]:
-    """Provides categorized operation statistics for an RFC 6902 JSON Patch."""
-    stats = {
-        "total": len(patch_ops),
-        "add": 0,
-        "remove": 0,
-        "replace": 0,
-        "move": 0,
-        "copy": 0,
-        "affected_paths": [],
-    }
-    paths_set = set()
-    for op in patch_ops:
-        op_type = op.get("op", "")
-        if op_type in stats:
-            stats[op_type] += 1
-        path = op.get("path", "")
-        # Extract top-level category path (e.g. /services, /upstreams)
-        parts = [p for p in path.split("/") if p]
-        if parts:
-            paths_set.add(parts[0])
-
-    stats["affected_paths"] = sorted(list(paths_set))
-    return stats
-
-
 def clean_data_for_restore(raw_data: Dict[str, Any]) -> Dict[str, Any]:
     """Sanitizes configuration data from backup so that it can be safely re-inserted
 
@@ -441,16 +356,14 @@ def clean_data_for_restore(raw_data: Dict[str, Any]) -> Dict[str, Any]:
 
 
 class ConfigAuditService:
-    """Service orchestrating configuration audit history, RFC 8785 canonical states,
+    """Service orchestrating configuration audit history, integrity checksums,
 
-    and RFC 6902 JSON Patch diff calculations.
+    and DeepDiff semantic diff calculations.
     """
 
     rfc8785_canonicalize = staticmethod(rfc8785_canonicalize)
     compute_jcs_hash = staticmethod(compute_jcs_hash)
-    compute_rfc6902_patch = staticmethod(compute_rfc6902_patch)
     compute_deepdiff = staticmethod(compute_deepdiff)
-    summarize_patch = staticmethod(summarize_patch)
 
     def __enter__(self):
         return self
@@ -459,7 +372,7 @@ class ConfigAuditService:
         pass
 
     def get_history(self, page: int = 1, per_page: int = 20) -> Dict[str, Any]:
-        """Returns paginated configuration history with RFC 8785 checksums and RFC 6902 summaries."""
+        """Returns paginated configuration history with RFC 8785 checksums and DeepDiff summaries."""
         page = max(1, int(page))
         per_page = max(1, min(100, int(per_page)))
         offset = (page - 1) * per_page
@@ -487,7 +400,6 @@ class ConfigAuditService:
                 certificates_count = len(data.get("certificates") or [])
 
                 predecessor = backup_dao.get_predecessor(b.get("_id", 0))
-                patch_summary = {"total": 0, "add": 0, "remove": 0, "replace": 0, "affected_paths": []}
                 deepdiff_summary = {"total": 0, "values_changed": 0, "items_added": 0, "items_removed": 0, "type_changes": 0}
                 if predecessor and predecessor.get("data"):
                     prev_data = predecessor["data"]
@@ -496,8 +408,6 @@ class ConfigAuditService:
                             prev_data = json.loads(prev_data)
                         except Exception:
                             prev_data = {}
-                    patch_ops = compute_rfc6902_patch(prev_data, data)
-                    patch_summary = summarize_patch(patch_ops)
                     deepdiff_data = compute_deepdiff(prev_data, data)
                     deepdiff_summary = deepdiff_data.get("summary", deepdiff_summary)
 
@@ -520,7 +430,6 @@ class ConfigAuditService:
                             "sensors": sensors_count,
                             "certificates": certificates_count,
                         },
-                        "patch_summary": patch_summary,
                         "deepdiff_summary": deepdiff_summary,
                     }
                 )
@@ -536,7 +445,7 @@ class ConfigAuditService:
     def get_version_diff(
         self, scn: str, base_scn: Optional[str] = None
     ) -> Optional[Dict[str, Any]]:
-        """Calculates RFC 6902 JSON Patch and RFC 8785 canonical representations between two SCN versions."""
+        """Calculates DeepDiff semantic representations between two SCN versions."""
         with ConfigBackupDao() as backup_dao:
             target_record = backup_dao.get_by_scn(scn)
             if not target_record:
@@ -562,16 +471,11 @@ class ConfigAuditService:
             else:
                 base_data = {}
 
-            # Canonicalize both datasets using RFC 8785
             target_canonical = rfc8785_canonicalize(target_data)
             base_canonical = rfc8785_canonicalize(base_data)
 
             target_hash = hashlib.sha256(target_canonical.encode("utf-8")).hexdigest()
             base_hash = hashlib.sha256(base_canonical.encode("utf-8")).hexdigest()
-
-            # Compute RFC 6902 Patch
-            patch_ops = compute_rfc6902_patch(base_data, target_data)
-            patch_summary = summarize_patch(patch_ops)
 
             # Compute Semantic DeepDiff
             deepdiff_res = compute_deepdiff(base_data, target_data)
@@ -586,7 +490,6 @@ class ConfigAuditService:
                         else str(target_record.get("created_at"))
                     ),
                     "jcs_hash": target_hash,
-                    "canonical_json": target_canonical,
                     "raw_data": target_data,
                 },
                 "base": {
@@ -598,11 +501,8 @@ class ConfigAuditService:
                         else str(base_record.get("created_at")) if base_record else None
                     ),
                     "jcs_hash": base_hash if base_record else None,
-                    "canonical_json": base_canonical if base_record else "{}",
                     "raw_data": base_data,
                 },
-                "rfc6902_patch": patch_ops,
-                "patch_summary": patch_summary,
                 "deepdiff": deepdiff_res,
             }
 

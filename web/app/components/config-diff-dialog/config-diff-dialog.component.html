@@ -39,7 +39,7 @@
                 <span class="hash-box" [matTooltip]="item.jcs_hash || ''">
                     <span class="hash-prefix">RFC 8785:</span>
                     <code class="hash-code">{{ (item.jcs_hash || '').substring(0, 16) }}...</code>
-                    <button mat-icon-button class="mini-copy-btn" (click)="copyText(item.jcs_hash || '', 'hash')" [matTooltip]="'ACTIONS.COPY' | translate">
+                    <button mat-icon-button class="mini-copy-btn" (click)="copyText(item.jcs_hash || '')" [matTooltip]="'ACTIONS.COPY' | translate">
                         <mat-icon class="mini-icon">{{ copiedHash() ? 'check' : 'content_copy' }}</mat-icon>
                     </button>
                 </span>
@@ -47,9 +47,6 @@
         </div>
 
         <div class="header-actions">
-            <button mat-icon-button (click)="copyText(patchJson, 'patch')" [matTooltip]="'CONFIG_AUDIT.COPY_PATCH_JSON' | translate">
-                <mat-icon>{{ copiedPatch() ? 'check' : 'code' }}</mat-icon>
-            </button>
             <button mat-icon-button (click)="onDismiss()" [matTooltip]="'ACTIONS.CLOSE' | translate">
                 <mat-icon>close</mat-icon>
             </button>
@@ -68,197 +65,100 @@
                 <span>Carregando diferenças...</span>
             </div>
         } @else {
-            <mat-tab-group animationDuration="0ms" class="diff-tab-group">
-                <!-- TAB 0: Semantic DeepDiff -->
-                <mat-tab>
-                    <ng-template mat-tab-label>
-                        <mat-icon class="tab-icon">hub</mat-icon>
-                        <span>{{ 'CONFIG_AUDIT.TAB_DEEPDIFF' | translate }}</span>
-                        @if (diff()?.deepdiff?.summary?.total; as count) {
-                            <span class="tab-count-badge" [class.has-changes]="count > 0">{{ count }}</span>
-                        }
-                    </ng-template>
-
-                    <div class="tab-body">
-                        <!-- Stats Bar & Semantic Filter Pills -->
-                        <div class="diff-filter-toolbar">
-                            <div class="filter-pills">
-                                <button type="button" class="filter-pill" [class.active]="selectedSemanticFilter() === 'all'" (click)="selectedSemanticFilter.set('all')">
-                                    {{ 'ACTIONS.ALL' | translate }} ({{ diff()?.deepdiff?.summary?.total || 0 }})
-                                </button>
-                                <button type="button" class="filter-pill pill-replace" [class.active]="selectedSemanticFilter() === 'changed'" (click)="selectedSemanticFilter.set('changed')">
-                                    ~ {{ 'CONFIG_AUDIT.STATS_CHANGED' | translate }} ({{ diff()?.deepdiff?.summary?.values_changed || 0 }})
-                                </button>
-                                <button type="button" class="filter-pill pill-add" [class.active]="selectedSemanticFilter() === 'added'" (click)="selectedSemanticFilter.set('added')">
-                                    + {{ 'CONFIG_AUDIT.STATS_ADD' | translate }} ({{ diff()?.deepdiff?.summary?.items_added || 0 }})
-                                </button>
-                                <button type="button" class="filter-pill pill-remove" [class.active]="selectedSemanticFilter() === 'removed'" (click)="selectedSemanticFilter.set('removed')">
-                                    - {{ 'CONFIG_AUDIT.STATS_REMOVE' | translate }} ({{ diff()?.deepdiff?.summary?.items_removed || 0 }})
-                                </button>
-                            </div>
-
-                            <div class="semantic-search-box">
-                                <mat-icon class="search-icon">search</mat-icon>
-                                <input type="text" [placeholder]="'CONFIG_AUDIT.SEARCH_CHANGES' | translate"
-                                    [ngModel]="semanticSearchQuery()" (ngModelChange)="semanticSearchQuery.set($event)"
-                                    class="search-input" />
-                                @if (semanticSearchQuery()) {
-                                    <button mat-icon-button class="clear-search-btn" (click)="semanticSearchQuery.set('')">
-                                        <mat-icon>clear</mat-icon>
-                                    </button>
-                                }
-                            </div>
-                        </div>
-
-                        <!-- Semantic Changes List -->
-                        @if (deepdiffChanges.length > 0) {
-                            <div class="patch-operations-list">
-                                @for (change of deepdiffChanges; track $index) {
-                                    <div class="patch-op-card op-{{ change.type === 'changed' ? 'replace' : (change.type === 'added' ? 'add' : 'remove') }}">
-                                        <div class="op-header">
-                                            <span class="op-type-badge op-badge-{{ change.type === 'changed' ? 'replace' : (change.type === 'added' ? 'add' : 'remove') }}">
-                                                {{ change.type | uppercase }}
-                                            </span>
-                                            <span class="semantic-human-path">{{ change.human_path }}</span>
-                                            <span class="semantic-raw-path">{{ change.path }}</span>
-                                        </div>
-                                        <div class="op-body">
-                                            @if (change.old_value !== undefined) {
-                                                <div class="val-box val-old">
-                                                    <span class="val-label">{{ 'CONFIG_AUDIT.VALUE_BEFORE' | translate }}:</span>
-                                                    <pre><code>{{ formatValue(change.old_value) }}</code></pre>
-                                                </div>
-                                            }
-                                            @if (change.new_value !== undefined) {
-                                                <div class="val-box val-new">
-                                                    <span class="val-label">{{ 'CONFIG_AUDIT.VALUE_AFTER' | translate }}:</span>
-                                                    <pre><code>{{ formatValue(change.new_value) }}</code></pre>
-                                                </div>
-                                            }
-                                        </div>
-                                    </div>
-                                }
-                            </div>
-                        } @else {
-                            <div class="empty-diff-state">
-                                <mat-icon class="empty-icon">verified</mat-icon>
-                                <h4>{{ 'CONFIG_AUDIT.NO_CHANGES' | translate }}</h4>
-                            </div>
-                        }
+            <div class="diff-container">
+                <!-- Toolbar: Filters, Search & Expand/Collapse All -->
+                <div class="diff-filter-toolbar">
+                    <div class="filter-pills">
+                        <button type="button" class="filter-pill" [class.active]="selectedSemanticFilter() === 'all'" (click)="selectedSemanticFilter.set('all')">
+                            {{ 'ACTIONS.ALL' | translate }} ({{ diff()?.deepdiff?.summary?.total || 0 }})
+                        </button>
+                        <button type="button" class="filter-pill pill-replace" [class.active]="selectedSemanticFilter() === 'changed'" (click)="selectedSemanticFilter.set('changed')">
+                            ~ {{ 'CONFIG_AUDIT.STATS_CHANGED' | translate }} ({{ diff()?.deepdiff?.summary?.values_changed || 0 }})
+                        </button>
+                        <button type="button" class="filter-pill pill-add" [class.active]="selectedSemanticFilter() === 'added'" (click)="selectedSemanticFilter.set('added')">
+                            + {{ 'CONFIG_AUDIT.STATS_ADD' | translate }} ({{ diff()?.deepdiff?.summary?.items_added || 0 }})
+                        </button>
+                        <button type="button" class="filter-pill pill-remove" [class.active]="selectedSemanticFilter() === 'removed'" (click)="selectedSemanticFilter.set('removed')">
+                            - {{ 'CONFIG_AUDIT.STATS_REMOVE' | translate }} ({{ diff()?.deepdiff?.summary?.items_removed || 0 }})
+                        </button>
                     </div>
-                </mat-tab>
 
-                <!-- TAB 1: RFC 6902 Patch Differences -->
-                <mat-tab>
-                    <ng-template mat-tab-label>
-                        <mat-icon class="tab-icon">alt_route</mat-icon>
-                        <span>{{ 'CONFIG_AUDIT.TAB_CHANGES' | translate }}</span>
-                        @if (diff()?.patch_summary?.total; as count) {
-                            <span class="tab-count-badge" [class.has-changes]="count > 0">{{ count }}</span>
-                        }
-                    </ng-template>
-
-                    <div class="tab-body">
-                        <!-- Stats Summary Bar & Filter Pills -->
-                        <div class="diff-filter-toolbar">
-                            <div class="filter-pills">
-                                <button type="button" class="filter-pill" [class.active]="selectedOpFilter() === 'all'" (click)="selectedOpFilter.set('all')">
-                                    {{ 'ACTIONS.ALL' | translate }} ({{ diff()?.patch_summary?.total || 0 }})
+                    <div class="toolbar-right">
+                        <div class="semantic-search-box">
+                            <mat-icon class="search-icon">search</mat-icon>
+                            <input type="text" [placeholder]="'CONFIG_AUDIT.SEARCH_CHANGES' | translate"
+                                [ngModel]="semanticSearchQuery()" (ngModelChange)="semanticSearchQuery.set($event)"
+                                class="search-input" />
+                            @if (semanticSearchQuery()) {
+                                <button mat-icon-button class="clear-search-btn" (click)="semanticSearchQuery.set('')">
+                                    <mat-icon>clear</mat-icon>
                                 </button>
-                                <button type="button" class="filter-pill pill-add" [class.active]="selectedOpFilter() === 'add'" (click)="selectedOpFilter.set('add')">
-                                    + {{ 'CONFIG_AUDIT.STATS_ADD' | translate }} ({{ diff()?.patch_summary?.add || 0 }})
-                                </button>
-                                <button type="button" class="filter-pill pill-replace" [class.active]="selectedOpFilter() === 'replace'" (click)="selectedOpFilter.set('replace')">
-                                    ~ {{ 'CONFIG_AUDIT.STATS_REPLACE' | translate }} ({{ diff()?.patch_summary?.replace || 0 }})
-                                </button>
-                                <button type="button" class="filter-pill pill-remove" [class.active]="selectedOpFilter() === 'remove'" (click)="selectedOpFilter.set('remove')">
-                                    - {{ 'CONFIG_AUDIT.STATS_REMOVE' | translate }} ({{ diff()?.patch_summary?.remove || 0 }})
-                                </button>
-                            </div>
-
-                            @if (diff()?.patch_summary?.affected_paths?.length) {
-                                <div class="affected-sections">
-                                    <span class="affected-label">{{ 'CONFIG_AUDIT.AFFECTED_SECTIONS' | translate }}:</span>
-                                    @for (sec of diff()?.patch_summary?.affected_paths; track sec) {
-                                        <span class="section-tag">/{{ sec }}</span>
-                                    }
-                                </div>
                             }
                         </div>
 
-                        <!-- Diff Operations List -->
-                        @if (filteredOperations.length > 0) {
-                            <div class="patch-operations-list">
-                                @for (op of filteredOperations; track $index) {
-                                    <div class="patch-op-card op-{{ op.op }}">
-                                        <div class="op-header">
-                                            <span class="op-type-badge op-badge-{{ op.op }}">{{ op.op | uppercase }}</span>
-                                            <code class="op-path">{{ op.path }}</code>
-                                        </div>
-                                        <div class="op-body">
-                                            @if (op.op === 'replace' && op.from_value !== undefined) {
-                                                <div class="val-box val-old">
-                                                    <span class="val-label">Anterior:</span>
-                                                    <pre><code>{{ formatValue(op.from_value) }}</code></pre>
-                                                </div>
-                                            }
-                                            @if (op.value !== undefined) {
-                                                <div class="val-box val-new">
-                                                    <span class="val-label">Novo:</span>
-                                                    <pre><code>{{ formatValue(op.value) }}</code></pre>
-                                                </div>
-                                            }
-                                        </div>
-                                    </div>
-                                }
-                            </div>
-                        } @else {
-                            <div class="empty-diff-state">
-                                <mat-icon class="empty-icon">verified</mat-icon>
-                                <h4>{{ 'CONFIG_AUDIT.NO_CHANGES' | translate }}</h4>
-                            </div>
-                        }
-                    </div>
-                </mat-tab>
-
-                <!-- TAB 2: RFC 8785 Canonical JSON -->
-                <mat-tab>
-                    <ng-template mat-tab-label>
-                        <mat-icon class="tab-icon">fingerprint</mat-icon>
-                        <span>{{ 'CONFIG_AUDIT.TAB_CANONICAL' | translate }}</span>
-                    </ng-template>
-
-                    <div class="tab-body">
-                        <div class="canonical-header-row">
-                            <div class="canonical-info-card">
-                                <mat-icon class="info-icon">info</mat-icon>
-                                <span class="info-text">{{ 'CONFIG_AUDIT.CANONICAL_NOTE' | translate }}</span>
-                            </div>
-                            <button mat-stroked-button class="toggle-format-btn" (click)="showFormattedCanonical.set(!showFormattedCanonical())" [matTooltip]="showFormattedCanonical() ? 'Exibir string contínua RFC 8785' : 'Exibir indentado'">
-                                <mat-icon>{{ showFormattedCanonical() ? 'data_object' : 'wrap_text' }}</mat-icon>
-                                <span>{{ showFormattedCanonical() ? 'Raw JCS' : 'Formatted' }}</span>
+                        <div class="accordion-controls">
+                            <button mat-button class="ctrl-btn" (click)="expandAll()" [matTooltip]="'CONFIG_AUDIT.EXPAND_ALL' | translate">
+                                <mat-icon class="btn-icon">unfold_more</mat-icon>
+                                <span>{{ 'CONFIG_AUDIT.EXPAND_ALL' | translate }}</span>
+                            </button>
+                            <button mat-button class="ctrl-btn" (click)="collapseAll()" [matTooltip]="'CONFIG_AUDIT.COLLAPSE_ALL' | translate">
+                                <mat-icon class="btn-icon">unfold_less</mat-icon>
+                                <span>{{ 'CONFIG_AUDIT.COLLAPSE_ALL' | translate }}</span>
                             </button>
                         </div>
-                        <div class="code-wrapper">
-                            <pre><code [highlight]="canonicalJson" language="json"></code></pre>
-                        </div>
                     </div>
-                </mat-tab>
+                </div>
 
-                <!-- TAB 3: Full Raw JSON -->
-                <mat-tab>
-                    <ng-template mat-tab-label>
-                        <mat-icon class="tab-icon">data_object</mat-icon>
-                        <span>{{ 'CONFIG_AUDIT.TAB_RAW' | translate }}</span>
-                    </ng-template>
+                <!-- DeepDiff Collapsible List (Accordion with Before and After together) -->
+                @if (deepdiffChanges.length > 0) {
+                    <mat-accordion multi class="diff-accordion">
+                        @for (change of deepdiffChanges; track $index) {
+                            <mat-expansion-panel [expanded]="allExpanded()" class="diff-panel panel-{{ change.type }}">
+                                <mat-expansion-panel-header>
+                                    <mat-panel-title class="panel-title">
+                                        <span class="change-type-badge badge-{{ change.type }}">
+                                            {{ change.type | uppercase }}
+                                        </span>
+                                        <span class="change-human-path" [matTooltip]="change.human_path">{{ change.human_path }}</span>
+                                    </mat-panel-title>
+                                    <mat-panel-description class="panel-description">
+                                        <code class="change-raw-path" [matTooltip]="change.path">{{ change.path }}</code>
+                                    </mat-panel-description>
+                                </mat-expansion-panel-header>
 
-                    <div class="tab-body">
-                        <div class="code-wrapper">
-                            <pre><code [highlight]="rawJson" language="json"></code></pre>
-                        </div>
+                                <!-- Comparison Body: Before & After Together -->
+                                <div class="diff-comparison-body">
+                                    <div class="diff-comparison-grid" [class.single-col]="change.old_value === undefined || change.new_value === undefined">
+                                        @if (change.old_value !== undefined) {
+                                            <div class="val-box val-old">
+                                                <div class="val-header">
+                                                    <mat-icon class="val-icon">remove_circle_outline</mat-icon>
+                                                    <span class="val-label">{{ 'CONFIG_AUDIT.VALUE_BEFORE' | translate }}</span>
+                                                </div>
+                                                <pre class="val-content"><code>{{ formatValue(change.old_value) }}</code></pre>
+                                            </div>
+                                        }
+                                        @if (change.new_value !== undefined) {
+                                            <div class="val-box val-new">
+                                                <div class="val-header">
+                                                    <mat-icon class="val-icon">add_circle_outline</mat-icon>
+                                                    <span class="val-label">{{ 'CONFIG_AUDIT.VALUE_AFTER' | translate }}</span>
+                                                </div>
+                                                <pre class="val-content"><code>{{ formatValue(change.new_value) }}</code></pre>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </mat-expansion-panel>
+                        }
+                    </mat-accordion>
+                } @else {
+                    <div class="empty-diff-state">
+                        <mat-icon class="empty-icon">verified</mat-icon>
+                        <h4>{{ 'CONFIG_AUDIT.NO_CHANGES' | translate }}</h4>
                     </div>
-                </mat-tab>
-            </mat-tab-group>
+                }
+            </div>
         }
     </mat-dialog-content>
 

@@ -38,7 +38,11 @@ export class GeoCountryService {
     }
 
     loadGeoCountries(forceRefresh: boolean = false): Observable<ContinentRegion[]> {
-        if (!this.loadCache$ || forceRefresh) {
+        if (this.continentRegions.length > 0 && !forceRefresh) {
+            return of(this.continentRegions);
+        }
+
+        if (!this.loadCache$ || forceRefresh || this.continentRegions.length === 0) {
             this.loadCache$ = this.configService.get_geo_countries().pipe(
                 map((data: any) => {
                     const list = Array.isArray(data) ? data : (data?.data || []);
@@ -51,12 +55,17 @@ export class GeoCountryService {
                 }),
                 catchError(err => {
                     console.error('Failed to load geo countries from feed service:', err);
+                    this.loadCache$ = null;
                     return of(this.continentRegions);
                 }),
                 shareReplay(1)
             );
         }
         return this.loadCache$;
+    }
+
+    hasData(): boolean {
+        return this.continentRegions.length > 0;
     }
 
     loadContinentRegions(forceRefresh: boolean = false): Observable<ContinentRegion[]> {

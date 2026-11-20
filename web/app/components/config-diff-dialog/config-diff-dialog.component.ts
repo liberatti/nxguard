@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, inject, signal } from '@angular/core';
+import { Component, Inject, OnInit, ViewChild, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -11,17 +11,16 @@ import {
     MatDialogContent,
     MatDialogRef,
 } from '@angular/material/dialog';
+import { MatExpansionModule, MatAccordion } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Clipboard, ClipboardModule } from '@angular/cdk/clipboard';
-import { HighlightModule } from 'ngx-highlightjs';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
-import { ConfigAuditHistoryItem, ConfigVersionDiff, DeepDiffChange, JsonPatchOperation } from 'app/models/config';
+import { ConfigAuditHistoryItem, ConfigVersionDiff, DeepDiffChange } from 'app/models/config';
 import { ConfigService } from 'app/services/config.service';
 import { NotificationService } from 'app/services/notification.service';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
@@ -45,18 +44,19 @@ export interface ConfigDiffDialogData {
         MatChipsModule,
         MatDialogContent,
         MatDialogActions,
-        MatTabsModule,
+        MatExpansionModule,
         MatIconModule,
         MatTooltipModule,
         MatSnackBarModule,
         MatProgressBarModule,
         MatProgressSpinnerModule,
         ClipboardModule,
-        HighlightModule,
         TranslatePipe,
     ],
 })
 export class ConfigDiffDialogComponent implements OnInit {
+    @ViewChild(MatAccordion) accordion?: MatAccordion;
+
     private readonly configService = inject(ConfigService);
     private readonly notificationService = inject(NotificationService);
     private readonly snackBar = inject(MatSnackBar);
@@ -68,13 +68,11 @@ export class ConfigDiffDialogComponent implements OnInit {
     readonly activeScn: string | null;
     readonly diff = signal<ConfigVersionDiff | null>(null);
     readonly isLoading = signal<boolean>(false);
-    readonly selectedOpFilter = signal<string>('all');
     readonly selectedSemanticFilter = signal<string>('all');
     readonly semanticSearchQuery = signal<string>('');
     readonly isApplying = signal<boolean>(false);
     readonly copiedHash = signal<boolean>(false);
-    readonly copiedPatch = signal<boolean>(false);
-    readonly showFormattedCanonical = signal<boolean>(true);
+    readonly allExpanded = signal<boolean>(true);
 
     constructor(
         @Inject(MAT_DIALOG_DATA) public data: ConfigDiffDialogData,
@@ -125,65 +123,21 @@ export class ConfigDiffDialogComponent implements OnInit {
         return list;
     }
 
-    get deepdiffRawJson(): string {
-        const d = this.diff();
-        if (!d || !d.deepdiff || !d.deepdiff.raw) return '{}';
-        return JSON.stringify(d.deepdiff.raw, null, 2);
+    expandAll(): void {
+        this.allExpanded.set(true);
+        this.accordion?.openAll();
     }
 
-    get filteredOperations(): JsonPatchOperation[] {
-        const d = this.diff();
-        if (!d || !d.rfc6902_patch) return [];
-        const filter = this.selectedOpFilter();
-        if (filter === 'all') return d.rfc6902_patch;
-        return d.rfc6902_patch.filter(op => op.op === filter);
+    collapseAll(): void {
+        this.allExpanded.set(false);
+        this.accordion?.closeAll();
     }
 
-    get rawJson(): string {
-        const d = this.diff();
-        if (!d || !d.target || !d.target.raw_data) return '{}';
-        return JSON.stringify(d.target.raw_data, null, 2);
-    }
-
-    get canonicalJson(): string {
-        const d = this.diff();
-        if (!d || !d.target) return '';
-        if (!this.showFormattedCanonical()) {
-            return d.target.canonical_json || '';
-        }
-        if (d.target.raw_data) {
-            try {
-                return JSON.stringify(d.target.raw_data, null, 2);
-            } catch {}
-        }
-        if (d.target.canonical_json) {
-            try {
-                return JSON.stringify(JSON.parse(d.target.canonical_json), null, 2);
-            } catch {
-                return d.target.canonical_json;
-            }
-        }
-        return '';
-    }
-
-    get patchJson(): string {
-        const d = this.diff();
-        if (!d || !d.rfc6902_patch) return '[]';
-        return JSON.stringify(d.rfc6902_patch, null, 2);
-    }
-
-    copyText(text: string, type: 'hash' | 'patch'): void {
+    copyText(text: string): void {
         this.clipboard.copy(text);
-        if (type === 'hash') {
-            this.copiedHash.set(true);
-            setTimeout(() => this.copiedHash.set(false), 2000);
-        } else {
-            this.copiedPatch.set(true);
-            setTimeout(() => this.copiedPatch.set(false), 2000);
-        }
-        const msg = type === 'hash'
-            ? this.translate.instant('CONFIG_AUDIT.HASH_COPIED') || 'Hash copied to clipboard'
-            : this.translate.instant('CONFIG_AUDIT.PATCH_COPIED') || 'Patch JSON copied to clipboard';
+        this.copiedHash.set(true);
+        setTimeout(() => this.copiedHash.set(false), 2000);
+        const msg = this.translate.instant('CONFIG_AUDIT.HASH_COPIED') || 'Hash copied to clipboard';
         this.snackBar.open(msg, 'OK', { duration: 2500, horizontalPosition: 'center', verticalPosition: 'bottom' });
     }
 

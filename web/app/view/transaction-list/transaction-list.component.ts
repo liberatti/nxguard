@@ -99,6 +99,7 @@ export class TransactionListComponent implements OnInit {
     actionStats: ActionStat[] = [];
     isChartZoomed: boolean = false;
     hasChartData: boolean = false;
+    isLoading: boolean = false;
     isLoadingChart: boolean = false;
     savedDateRange: { start: Date; end: Date } = {
         start: moment().subtract(1, 'day').toDate(),
@@ -567,6 +568,7 @@ export class TransactionListComponent implements OnInit {
 
     onSearch() {
         let filter = this.form.value as TransactionFilter;
+        this.isLoading = true;
         this.isLoadingChart = true;
         this.transactionService.getTpm(filter).subscribe({
             next: (data) => {
@@ -581,6 +583,7 @@ export class TransactionListComponent implements OnInit {
 
         this.transactionService.search(filter, this.transactionPA).subscribe({
             next: (data) => {
+                this.isLoading = false;
                 const list = (data && data.data) ? data.data : [];
                 this.transactions = list;
                 this.transactionDS.data = list;
@@ -591,6 +594,7 @@ export class TransactionListComponent implements OnInit {
                 }
             },
             error: () => {
+                this.isLoading = false;
                 this.transactions = [];
                 this.transactionDS.data = [];
                 this.transactionPA = new DefaultPageMeta();

@@ -44,8 +44,32 @@
 
     <!-- Continents & Countries Content -->
     <div class="dialog-body-scroll" [class.blocking-disabled]="!isBlockingActive">
-        <div class="continents-list">
-            @for (continent of continents; track continent.id) {
+        @if (isLoading) {
+            <div class="loading-state-container">
+                <mat-spinner diameter="36" class="loading-spinner"></mat-spinner>
+                <span class="loading-text">{{ 'SENSOR.LOADING_GEO_DATA' | translate }}</span>
+            </div>
+        } @else if (loadError && continents.length === 0) {
+            <div class="empty-state-container">
+                <mat-icon class="empty-icon">public_off</mat-icon>
+                <span class="empty-title">{{ 'SENSOR.NO_GEO_DATA' | translate }}</span>
+                <p class="empty-desc">{{ 'SENSOR.GEO_LOAD_ERROR' | translate }}</p>
+                <button mat-stroked-button color="primary" type="button" class="btn-retry" (click)="loadContinents(true)">
+                    <mat-icon>refresh</mat-icon>
+                    {{ 'ACTIONS.REFRESH' | translate }}
+                </button>
+            </div>
+        } @else if (continents.length === 0 && searchQuery) {
+            <div class="empty-state-container">
+                <mat-icon class="empty-icon">search_off</mat-icon>
+                <span class="empty-title">{{ 'SENSOR.NO_GEO_MATCH' | translate }}</span>
+                <button mat-button type="button" class="btn-clear-search" (click)="clearSearch()">
+                    {{ 'ACTIONS.CLEAR' | translate }}
+                </button>
+            </div>
+        } @else {
+            <div class="continents-list">
+                @for (continent of continents; track continent.id) {
                 <div class="continent-card" [class.is-expanded]="isContinentExpanded(continent.id)">
                     <!-- Continent Summary Row -->
                     <div class="continent-summary-row" (click)="toggleContinent(continent.id)">
@@ -193,7 +217,8 @@
                     }
                 </div>
             }
-        </div>
+            </div>
+        }
     </div>
 
     <!-- Dialog Actions Footer -->

@@ -17,7 +17,7 @@ import engine.seclang.seclang_indexer as seclang_indexer
 from api.repository.config_repository import ConfigBackupDao, ConfigDao
 from api.repository.upstream_repository import NodeStatusDao, UpstreamDao, UpstreamStatesDao
 from api.repository.certificate_repository import CertificateDao
-from api.services.config_audit_service import compute_deepdiff, compute_rfc6902_patch, ConfigAuditService
+from api.services.config_audit_service import compute_deepdiff, ConfigAuditService
 from api.tools.acme_tool import AcmeTool
 
 
@@ -201,12 +201,6 @@ def update_main_config():
                         f"Configuration Semantic Diff (DeepDiff, {len(deepdiff_res['changes'])} changes):\n"
                         + "\n".join(change_lines)
                     )
-
-                patch_ops = compute_rfc6902_patch(old_data, conf)
-                logger.info(
-                    f"Configuration diff (RFC 6902, {len(patch_ops)} operations):\n"
-                    f"{json.dumps(patch_ops, indent=2, ensure_ascii=False, default=lambda o: o.isoformat() if hasattr(o, 'isoformat') else str(o))}"
-                )
             except Exception as ex:
                 logger.warning(f"Could not calculate configuration diff: {ex}")
         else:

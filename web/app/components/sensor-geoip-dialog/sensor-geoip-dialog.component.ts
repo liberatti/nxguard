@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -63,6 +63,8 @@ export class SensorGeoipDialogComponent implements OnInit {
         asia: true // Default open or active as in the screenshot
     };
     isSaving: boolean = false;
+    isLoading: boolean = false;
+    loadError: boolean = false;
 
     constructor(
         @Inject(MAT_DIALOG_DATA) public data: SensorGeoipDialogData,
@@ -70,14 +72,39 @@ export class SensorGeoipDialogComponent implements OnInit {
         private geoCountryService: GeoCountryService,
         private sensorService: SensorService,
         private notificationService: NotificationService,
-        private translate: TranslateService
+        private translate: TranslateService,
+        private cdr: ChangeDetectorRef
     ) {}
 
     ngOnInit(): void {
         const rawCodes = this.data?.geo_codes || this.data?.sensor?.security?.geo_codes || [];
         this.selectedCountryCodes = new Set<string>(rawCodes.map(c => (c || '').trim().toUpperCase()));
         this.isBlockingActive = this.selectedCountryCodes.size > 0 || this.data?.editable !== false;
-        this.geoCountryService.loadContinentRegions().subscribe();
+        this.loadContinents();
+    }
+
+    loadContinents(forceRefresh: boolean = false): void {
+        if (this.geoCountryService.hasData() && !forceRefresh) {
+            this.isLoading = false;
+            this.loadError = false;
+            return;
+        }
+
+        this.isLoading = true;
+        this.loadError = false;
+        this.geoCountryService.loadContinentRegions(forceRefresh || !this.geoCountryService.hasData()).subscribe({
+            next: (data) => {
+                this.isLoading = false;
+                this.loadError = (!data || data.length === 0) && !this.geoCountryService.hasData();
+                this.cdr.markForCheck();
+            },
+            error: (err) => {
+                console.error('Failed to load continents in GeoIP dialog:', err);
+                this.isLoading = false;
+                this.loadError = !this.geoCountryService.hasData();
+                this.cdr.markForCheck();
+            }
+        });
     }
 
     get isEditable(): boolean {

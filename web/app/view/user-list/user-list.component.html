@@ -16,6 +16,10 @@
             </mat-card-actions>
         </mat-card-header>
 
+        @if (isLoading) {
+            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        }
+
         <mat-card-content class="user-table-container">
             <table mat-table [dataSource]="userDS" matSort id="user-table" class="premium-table full-width">
                 <tr mat-header-row *matHeaderRowDef="userDC"></tr>

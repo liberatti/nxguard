@@ -82,20 +82,20 @@
                     </td>
                 </ng-container>
 
-                <!-- RFC 6902 Patch Diff Column -->
+                <!-- Differences Column -->
                 <ng-container matColumnDef="patch">
-                    <th mat-header-cell *matHeaderCellDef>{{ 'CONFIG_AUDIT.TAB_CHANGES' | translate }}</th>
+                    <th mat-header-cell *matHeaderCellDef>{{ 'CONFIG_AUDIT.DIFF_TITLE' | translate }}</th>
                     <td mat-cell *matCellDef="let element">
-                        @if (element.patch_summary?.total > 0) {
+                        @if (element.deepdiff_summary?.total > 0) {
                             <div class="diff-summary-badges">
-                                @if (element.patch_summary?.add > 0) {
-                                    <span class="patch-badge patch-badge-add" [matTooltip]="'CONFIG_AUDIT.STATS_ADD' | translate">+{{ element.patch_summary.add }}</span>
+                                @if (element.deepdiff_summary?.items_added > 0) {
+                                    <span class="patch-badge patch-badge-add" [matTooltip]="'CONFIG_AUDIT.STATS_ADD' | translate">+{{ element.deepdiff_summary.items_added }}</span>
                                 }
-                                @if (element.patch_summary?.replace > 0) {
-                                    <span class="patch-badge patch-badge-replace" [matTooltip]="'CONFIG_AUDIT.STATS_REPLACE' | translate">~{{ element.patch_summary.replace }}</span>
+                                @if (element.deepdiff_summary?.values_changed > 0) {
+                                    <span class="patch-badge patch-badge-replace" [matTooltip]="'CONFIG_AUDIT.STATS_CHANGED' | translate">~{{ element.deepdiff_summary.values_changed }}</span>
                                 }
-                                @if (element.patch_summary?.remove > 0) {
-                                    <span class="patch-badge patch-badge-remove" [matTooltip]="'CONFIG_AUDIT.STATS_REMOVE' | translate">-{{ element.patch_summary.remove }}</span>
+                                @if (element.deepdiff_summary?.items_removed > 0) {
+                                    <span class="patch-badge patch-badge-remove" [matTooltip]="'CONFIG_AUDIT.STATS_REMOVE' | translate">-{{ element.deepdiff_summary.items_removed }}</span>
                                 }
                             </div>
                         } @else {

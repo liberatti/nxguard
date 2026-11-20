@@ -15,6 +15,11 @@
                 }
             </mat-card-actions>
         </mat-card-header>
+
+        @if (isLoading) {
+            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        }
+
         <mat-card-content>
             <table mat-table [dataSource]="certificateDS" matSort>
                 <tr mat-header-row *matHeaderRowDef="certificateDC"></tr>

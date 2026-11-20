@@ -706,6 +706,60 @@
 }
 
 /* -------------------------------------------------------------------------- */
+/* Loading & Empty States                                                     */
+/* -------------------------------------------------------------------------- */
+.loading-state-container,
+.empty-state-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 24px;
+    text-align: center;
+    gap: 12px;
+}
+
+.loading-spinner {
+    margin-bottom: 8px;
+}
+
+.loading-text,
+.empty-desc {
+    font-size: var(--font-size-sm, 0.875rem);
+    color: var(--text-dim, #64748b);
+    margin: 0;
+}
+
+.empty-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: var(--text-muted, #94a3b8);
+}
+
+.empty-title {
+    font-size: var(--font-size-base, 1rem);
+    font-weight: 600;
+    color: var(--text-main, #0f172a);
+}
+
+.btn-retry {
+    margin-top: 8px;
+}
+
+:host-context(.dark-theme) .empty-title,
+:host-context([data-theme="dark"]) .empty-title {
+    color: #f1f5f9;
+}
+
+:host-context(.dark-theme) .loading-text,
+:host-context([data-theme="dark"]) .loading-text,
+:host-context(.dark-theme) .empty-desc,
+:host-context([data-theme="dark"]) .empty-desc {
+    color: #94a3b8;
+}
+
+/* -------------------------------------------------------------------------- */
 /* Dialog Footer                                                              */
 /* -------------------------------------------------------------------------- */
 
