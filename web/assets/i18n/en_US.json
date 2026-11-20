@@ -111,8 +111,8 @@
       "TITLE": "Dashboard"
     },
     "TRANSACTION": {
-      "LINK": "Network Activity",
-      "TITLE": "Network Activity",
+      "LINK": "Threat Detection Log",
+      "TITLE": "Threat Detection Log",
       "SUBTITLE": "List all transaction logs in parsed and raw format"
     },
     "SERVICE": {
@@ -529,7 +529,7 @@
   },
   "CONFIG_AUDIT": {
     "TITLE": "Configuration Audit & History",
-    "SUBTITLE": "Configuration timeline, RFC 8785 canonical checksums, RFC 6902 JSON Patches, and version rollbacks",
+    "SUBTITLE": "Configuration timeline and version rollbacks",
     "HISTORY_CARD_TITLE": "Configuration Timeline",
     "DIFF_CARD_TITLE": "Version Audit & Changes",
     "SELECT_PROMPT": "Select a configuration version from the timeline to inspect changes and canonical data.",

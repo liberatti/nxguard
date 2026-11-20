@@ -111,8 +111,8 @@
       "TITLE": "Painel"
     },
     "TRANSACTION": {
-      "LINK": "Atividade de Rede",
-      "TITLE": "Atividade de Rede",
+      "LINK": "Log de Detecção de Ameaças",
+      "TITLE": "Log de Detecção de Ameaças",
       "SUBTITLE": "Listar todos os logs de transações em formato estruturado e bruto"
     },
     "SERVICE": {
