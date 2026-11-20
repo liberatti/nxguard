@@ -611,6 +611,161 @@ td.mat-mdc-cell .mat-mdc-icon-button .mat-icon,
     gap: 8px !important;
 }
 
+/* Dialog Header Close & Action Buttons */
+.mat-mdc-dialog-container .btn-header-close,
+.mat-mdc-dialog-container .close-header-btn,
+.mat-mdc-dialog-container .close-btn,
+.mat-mdc-dialog-container .btn-close,
+.mat-mdc-dialog-container [id*="btn-close-"],
+.mat-mdc-dialog-container .dialog-header button[mat-icon-button],
+.mat-mdc-dialog-container [class*="-dialog-header"] button[mat-icon-button],
+.mat-mdc-dialog-container .header-actions button[mat-icon-button],
+.btn-header-close,
+.close-header-btn,
+.close-btn,
+.btn-close {
+    --mdc-icon-button-state-layer-size: 32px !important;
+    --mat-icon-button-state-layer-size: 32px !important;
+    --mat-icon-button-touch-target-size: 32px !important;
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    min-height: 32px !important;
+    max-width: 32px !important;
+    max-height: 32px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    position: relative !important;
+    border-radius: 50% !important;
+    flex-shrink: 0 !important;
+    line-height: 1 !important;
+    color: var(--text-muted, #94a3b8) !important;
+    background: transparent !important;
+    transition: background-color 0.15s ease, color 0.15s ease !important;
+}
+
+.mat-mdc-dialog-container .btn-header-close:hover,
+.mat-mdc-dialog-container .close-header-btn:hover,
+.mat-mdc-dialog-container .close-btn:hover,
+.mat-mdc-dialog-container .btn-close:hover,
+.mat-mdc-dialog-container [id*="btn-close-"]:hover,
+.mat-mdc-dialog-container .dialog-header button[mat-icon-button]:hover,
+.mat-mdc-dialog-container [class*="-dialog-header"] button[mat-icon-button]:hover,
+.mat-mdc-dialog-container .header-actions button[mat-icon-button]:hover,
+.btn-header-close:hover,
+.close-header-btn:hover,
+.close-btn:hover,
+.btn-close:hover {
+    color: var(--text-main, #0f172a) !important;
+    background-color: var(--bg-darker, #f1f5f9) !important;
+}
+
+:host-context(.dark-theme) .mat-mdc-dialog-container .btn-header-close:hover,
+:host-context([data-theme="dark"]) .mat-mdc-dialog-container .btn-header-close:hover,
+[data-theme="dark"] .mat-mdc-dialog-container .btn-header-close:hover,
+[data-theme="dark"] .mat-mdc-dialog-container .close-header-btn:hover,
+[data-theme="dark"] .mat-mdc-dialog-container .close-btn:hover,
+[data-theme="dark"] .mat-mdc-dialog-container .btn-close:hover,
+[data-theme="dark"] .mat-mdc-dialog-container [id*="btn-close-"]:hover,
+[data-theme="dark"] .mat-mdc-dialog-container .dialog-header button[mat-icon-button]:hover,
+[data-theme="dark"] .mat-mdc-dialog-container [class*="-dialog-header"] button[mat-icon-button]:hover,
+[data-theme="dark"] .mat-mdc-dialog-container .header-actions button[mat-icon-button]:hover,
+[data-theme="dark"] .btn-header-close:hover,
+[data-theme="dark"] .close-header-btn:hover,
+[data-theme="dark"] .close-btn:hover,
+[data-theme="dark"] .btn-close:hover {
+    color: #f8fafc !important;
+    background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.mat-mdc-dialog-container .btn-header-close mat-icon,
+.mat-mdc-dialog-container .close-header-btn mat-icon,
+.mat-mdc-dialog-container .close-btn mat-icon,
+.mat-mdc-dialog-container .btn-close mat-icon,
+.mat-mdc-dialog-container [id*="btn-close-"] mat-icon,
+.mat-mdc-dialog-container .dialog-header button[mat-icon-button] mat-icon,
+.mat-mdc-dialog-container [class*="-dialog-header"] button[mat-icon-button] mat-icon,
+.mat-mdc-dialog-container .header-actions button[mat-icon-button] mat-icon,
+.btn-header-close mat-icon,
+.close-header-btn mat-icon,
+.close-btn mat-icon,
+.btn-close mat-icon {
+    font-size: 20px !important;
+    width: 20px !important;
+    height: 20px !important;
+    line-height: 20px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.mat-mdc-dialog-container .btn-header-close .mat-mdc-button-persistent-ripple,
+.mat-mdc-dialog-container .close-header-btn .mat-mdc-button-persistent-ripple,
+.mat-mdc-dialog-container .close-btn .mat-mdc-button-persistent-ripple,
+.mat-mdc-dialog-container .btn-close .mat-mdc-button-persistent-ripple,
+.mat-mdc-dialog-container [id*="btn-close-"] .mat-mdc-button-persistent-ripple,
+.mat-mdc-dialog-container .dialog-header button[mat-icon-button] .mat-mdc-button-persistent-ripple,
+.mat-mdc-dialog-container [class*="-dialog-header"] button[mat-icon-button] .mat-mdc-button-persistent-ripple,
+.mat-mdc-dialog-container .header-actions button[mat-icon-button] .mat-mdc-button-persistent-ripple,
+.btn-header-close .mat-mdc-button-persistent-ripple,
+.close-header-btn .mat-mdc-button-persistent-ripple,
+.close-btn .mat-mdc-button-persistent-ripple,
+.btn-close .mat-mdc-button-persistent-ripple,
+.mat-mdc-dialog-container .btn-header-close .mat-mdc-button-ripple,
+.mat-mdc-dialog-container .close-header-btn .mat-mdc-button-ripple,
+.mat-mdc-dialog-container .close-btn .mat-mdc-button-ripple,
+.mat-mdc-dialog-container .btn-close .mat-mdc-button-ripple,
+.mat-mdc-dialog-container [id*="btn-close-"] .mat-mdc-button-ripple,
+.mat-mdc-dialog-container .dialog-header button[mat-icon-button] .mat-mdc-button-ripple,
+.mat-mdc-dialog-container [class*="-dialog-header"] button[mat-icon-button] .mat-mdc-button-ripple,
+.mat-mdc-dialog-container .header-actions button[mat-icon-button] .mat-mdc-button-ripple,
+.btn-header-close .mat-mdc-button-ripple,
+.close-header-btn .mat-mdc-button-ripple,
+.close-btn .mat-mdc-button-ripple,
+.btn-close .mat-mdc-button-ripple,
+.mat-mdc-dialog-container .btn-header-close .mat-focus-indicator,
+.mat-mdc-dialog-container .close-header-btn .mat-focus-indicator,
+.mat-mdc-dialog-container .close-btn .mat-focus-indicator,
+.mat-mdc-dialog-container .btn-close .mat-focus-indicator,
+.mat-mdc-dialog-container [id*="btn-close-"] .mat-focus-indicator,
+.mat-mdc-dialog-container .dialog-header button[mat-icon-button] .mat-focus-indicator,
+.mat-mdc-dialog-container [class*="-dialog-header"] button[mat-icon-button] .mat-focus-indicator,
+.mat-mdc-dialog-container .header-actions button[mat-icon-button] .mat-focus-indicator,
+.btn-header-close .mat-focus-indicator,
+.close-header-btn .mat-focus-indicator,
+.close-btn .mat-focus-indicator,
+.btn-close .mat-focus-indicator {
+    border-radius: 50% !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.mat-mdc-dialog-container .btn-header-close .mat-mdc-button-touch-target,
+.mat-mdc-dialog-container .close-header-btn .mat-mdc-button-touch-target,
+.mat-mdc-dialog-container .close-btn .mat-mdc-button-touch-target,
+.mat-mdc-dialog-container .btn-close .mat-mdc-button-touch-target,
+.mat-mdc-dialog-container [id*="btn-close-"] .mat-mdc-button-touch-target,
+.mat-mdc-dialog-container .dialog-header button[mat-icon-button] .mat-mdc-button-touch-target,
+.mat-mdc-dialog-container [class*="-dialog-header"] button[mat-icon-button] .mat-mdc-button-touch-target,
+.mat-mdc-dialog-container .header-actions button[mat-icon-button] .mat-mdc-button-touch-target,
+.btn-header-close .mat-mdc-button-touch-target,
+.close-header-btn .mat-mdc-button-touch-target,
+.close-btn .mat-mdc-button-touch-target,
+.btn-close .mat-mdc-button-touch-target {
+    width: 32px !important;
+    height: 32px !important;
+}
+
 /* -------------------------------------------------------------------------- */
 /* Menus & Dropdown Lists (Modern UX Standards)                               */
 /* -------------------------------------------------------------------------- */

@@ -118,9 +118,6 @@
 
 .btn-header-close {
     color: var(--text-dim, #64748b) !important;
-    width: 32px !important;
-    height: 32px !important;
-    line-height: 32px !important;
 }
 
 .btn-header-close:hover {

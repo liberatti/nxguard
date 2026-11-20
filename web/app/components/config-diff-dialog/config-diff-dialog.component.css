@@ -211,15 +211,6 @@
     gap: 4px;
 }
 
-.header-actions button {
-    color: var(--text-dim, #64748b);
-}
-
-.header-actions button:hover {
-    color: var(--text-main, #0f172a);
-    background: var(--bg-darker, #f1f5f9);
-}
-
 /* Content */
 .diff-dialog-content {
     padding: 0 !important;
