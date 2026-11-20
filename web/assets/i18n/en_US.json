@@ -112,7 +112,7 @@
     },
     "TRANSACTION": {
       "LINK": "Network Activity",
-      "TITLE": "Transactions",
+      "TITLE": "Network Activity",
       "SUBTITLE": "List all transaction logs in parsed and raw format"
     },
     "SERVICE": {

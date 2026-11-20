@@ -1,9 +1,11 @@
 <ng-container>
-    <mat-card class="elevation-card" id="sensor-form-card">
-        <mat-card-header class="mat-mdc-card-header">
-            <mat-card-title>
-                <h1>{{ isAddMode ? ('SENSOR.ADD_TITLE' | translate) : ('SENSOR.EDIT_TITLE' | translate) }}</h1>
+    <mat-card class="elevation-card sensor-form-card" id="sensor-form-card">
+        <mat-card-header class="mb-2">
+            <mat-card-title class="title-with-icon">
+                <mat-icon class="title-icon">security</mat-icon>
+                <span>{{ isAddMode ? ('SENSOR.ADD_TITLE' | translate) : ('SENSOR.EDIT_TITLE' | translate) }}</span>
             </mat-card-title>
+            <mat-card-subtitle>{{ (isAddMode ? 'ACTIONS.CREATE' : 'ACTIONS.EDIT') | translate }}</mat-card-subtitle>
         </mat-card-header>
         <mat-card-content>
             <form [formGroup]="form" id="sensor-form">
@@ -371,22 +373,22 @@
                             <mat-label>{{ 'SENSOR.CATEGORY' | translate }}</mat-label>
                             <mat-select (selectionChange)="onAddCategory($event)" id="category-select"
                                 [placeholder]="'SENSOR.CATEGORY_SELECT_PLACEHOLDER' | translate">
-                                @for (c of filterActiveCategory(_categories, form.value.categories); track c.name || c)
+                                @for (c of filterActiveCategory(_categories, form.value.categories); track getCategoryName(c))
                                 {
-                                <mat-option [value]="c.name || c" id="category-option-{{c.name || c}}">
-                                    {{ c.name || c }}
+                                <mat-option [value]="getCategoryName(c)" id="category-option-{{getCategoryName(c)}}">
+                                    {{ getCategoryName(c) }}
                                 </mat-option>
                                 }
                             </mat-select>
                         </mat-form-field>
                         <mat-chip-listbox class="category-chip-list" [multiple]="false" [selectable]="true">
-                            @for (p of form.value.categories; track p; let i = $index) {
-                            <mat-chip-option class="category-chip small-chip" [selected]="selectedCategory === p"
-                                (removed)="onRemoveCategory(p)" (click)="onSelectCategory(p)" id="category-chip-{{p}}">
-                                @if (selectedCategory === p) {
+                            @for (p of form.value.categories; track getCategoryName(p); let i = $index) {
+                            <mat-chip-option class="category-chip small-chip" [selected]="selectedCategory === getCategoryName(p)"
+                                (removed)="onRemoveCategory(p)" (click)="onSelectCategory(p)" id="category-chip-{{getCategoryName(p)}}">
+                                @if (selectedCategory === getCategoryName(p)) {
                                 <mat-icon matChipAvatar>check</mat-icon>
                                 }
-                                {{ p }}
+                                {{ getCategoryName(p) }}
                                 <button matChipRemove [matTooltip]="'ACTIONS.REMOVE' | translate">
                                     <mat-icon>cancel</mat-icon>
                                 </button>

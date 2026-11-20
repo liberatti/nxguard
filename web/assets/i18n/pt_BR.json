@@ -112,7 +112,7 @@
     },
     "TRANSACTION": {
       "LINK": "Atividade de Rede",
-      "TITLE": "Transações",
+      "TITLE": "Atividade de Rede",
       "SUBTITLE": "Listar todos os logs de transações em formato estruturado e bruto"
     },
     "SERVICE": {

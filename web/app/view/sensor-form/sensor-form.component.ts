@@ -158,6 +158,9 @@ export class SensorFormComponent implements OnInit, AfterViewInit {
 
         if (!this.isAddMode) {
             this.sensorService.getById(id).subscribe((data: Sensor) => {
+                if (data.categories && Array.isArray(data.categories)) {
+                    data.categories = data.categories.map(c => this.getCategoryName(c)).filter(Boolean);
+                }
                 this.form.patchValue(data);
                 if (data.categories && data.categories.length > 0) {
                     this.onSelectCategory(data.categories[0]);
@@ -292,7 +295,10 @@ export class SensorFormComponent implements OnInit, AfterViewInit {
             return;
         }
 
-        const payload = this.form.value as Sensor;
+        const payload = { ...this.form.value } as Sensor;
+        if (payload.categories && Array.isArray(payload.categories)) {
+            payload.categories = payload.categories.map(c => this.getCategoryName(c)).filter(Boolean);
+        }
 
         if (this.isAddMode) {
             delete payload._id;
@@ -449,10 +455,23 @@ export class SensorFormComponent implements OnInit, AfterViewInit {
         }
     }
 
+    getCategoryName(cat: any): string {
+        if (!cat) return '';
+        if (typeof cat === 'object') return cat.name || cat._id || '';
+        if (typeof cat === 'string') {
+            const trimmed = cat.trim();
+            if ((trimmed.startsWith('{') && trimmed.endsWith('}')) || (trimmed.startsWith('(') && trimmed.endsWith(')'))) {
+                const match = trimmed.match(/'name':\s*'([^']+)'|"name":\s*"([^"]+)"/);
+                if (match) return match[1] || match[2];
+            }
+            return trimmed;
+        }
+        return String(cat);
+    }
+
     onAddCategory(event: any): void {
-        let val = event.value;
-        if (typeof val === 'object' && val) val = val.name || val._id;
-        let cats = this.form.value.categories || [];
+        let val = this.getCategoryName(event.value);
+        let cats = (this.form.value.categories || []).map(c => this.getCategoryName(c));
         if (val && !cats.includes(val)) {
             cats.push(val);
             this.form.patchValue({ categories: cats });
@@ -504,9 +523,11 @@ export class SensorFormComponent implements OnInit, AfterViewInit {
         return rule;
     }
 
-    onSelectCategory(cat_name: string): void {
-        this.selectedCategory = cat_name;
-        this.ruleCatService.getBySingleName(cat_name).subscribe((data: any) => {
+    onSelectCategory(cat_name: any): void {
+        const cleanName = this.getCategoryName(cat_name);
+        if (!cleanName) return;
+        this.selectedCategory = cleanName;
+        this.ruleCatService.getBySingleName(cleanName).subscribe((data: any) => {
             if (!data) return;
             const categoryData = data.data || data;
             const rawRuleList = Array.isArray(categoryData) ? categoryData : (categoryData.rules || []);
@@ -589,14 +610,16 @@ export class SensorFormComponent implements OnInit, AfterViewInit {
     }
 
     onRemoveCategory(keyword: any): void {
+        const cleanKeyword = this.getCategoryName(keyword);
         if (this.form.value.categories != null) {
-            let index = this.form.value.categories.indexOf(keyword);
+            const currentCats = this.form.value.categories.map(c => this.getCategoryName(c));
+            let index = currentCats.indexOf(cleanKeyword);
             if (index >= 0) {
-                this.form.value.categories.splice(index, 1);
-                if (this.selectedCategory === keyword) {
-                    const remaining = this.form.value.categories;
-                    if (remaining && remaining.length > 0) {
-                        this.onSelectCategory(remaining[0]);
+                currentCats.splice(index, 1);
+                this.form.patchValue({ categories: currentCats });
+                if (this.selectedCategory === cleanKeyword) {
+                    if (currentCats.length > 0) {
+                        this.onSelectCategory(currentCats[0]);
                     } else {
                         this.selectedCategory = null;
                         this.ruleDS.data = [];
@@ -626,9 +649,11 @@ export class SensorFormComponent implements OnInit, AfterViewInit {
 
     filterActiveCategory(arr1: Array<any>, arr2: Array<any> | null | undefined): Array<any> {
         if (!arr1 || !Array.isArray(arr1)) return [];
-        if (arr2 && Array.isArray(arr2))
-            return arr1.filter(itemA => itemA && !arr2.some(itemB => itemB === itemA['name']));
-        return arr1;
+        const usedNames = (arr2 && Array.isArray(arr2)) ? arr2.map(itemB => this.getCategoryName(itemB)) : [];
+        return arr1.filter(itemA => {
+            const nameA = this.getCategoryName(itemA);
+            return nameA && !usedNames.includes(nameA);
+        });
     }
 
     filterActiveFeed(feeds: Array<Feed>, used: Array<string> | null | undefined): Array<Feed> {
