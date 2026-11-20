@@ -24,6 +24,11 @@ do not migrate neighboring code just to adopt a newer style.
   with the existing interface.
 - Reuse existing theme tokens and Material styling APIs. Avoid arbitrary colors,
   typography, spacing, shadows, and undocumented component selectors.
+- Form field labels must always float at the top (`floatLabel: 'always'`), configured
+  globally via `MAT_FORM_FIELD_DEFAULT_OPTIONS`, ensuring consistent notch placement
+  and preventing overlap with prefix icons or empty inputs.
+- Action buttons in dialogs and views must always be right-aligned (`justify-content: flex-end`,
+  `align="end"`), maintaining a standard action layout across all screens and modals.
 - Use CSS Grid or Flexbox for layout. Prefer fluid sizing and avoid horizontal
   overflow on small screens.
 - Keep component styles scoped. Avoid inline styles, `ngStyle`, `::ng-deep`, and

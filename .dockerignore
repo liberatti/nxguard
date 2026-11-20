@@ -58,3 +58,4 @@ web/dist/
 .github
 .agent
 .docs
+engine/lua/nxguard/sensors

@@ -198,6 +198,11 @@
 .rule-dialog-actions {
     padding: 16px 24px !important;
     border-top: 1px solid var(--border-color, #e2e8f0);
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
     gap: 8px;
+    width: 100%;
+    box-sizing: border-box;
 }
 

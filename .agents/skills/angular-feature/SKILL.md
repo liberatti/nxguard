@@ -17,6 +17,8 @@ description: Use when implementing or changing NXGuard Angular screens, componen
 4. Translate visible text and keep `web/assets/i18n/en_US.json` and
    `web/assets/i18n/pt_BR.json` synchronized. Preserve accessibility, keyboard use,
    and responsive behavior.
+   Ensure dialog action buttons are right-aligned (`align="end"`, `justify-content: flex-end`)
+   and form fields maintain `floatLabel: 'always'` to prevent prefix icon collision.
 5. Add focused tests only when the existing setup supports them. Run
    `npm run build` from `web/`; do not assume there is a test script.
 6. Review the diff, report the checks performed, and note any validation limits.

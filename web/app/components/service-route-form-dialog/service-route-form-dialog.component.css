@@ -339,7 +339,11 @@
     padding: 14px 24px !important;
     border-top: 1px solid var(--border-dim);
     display: flex;
+    justify-content: flex-end;
+    align-items: center;
     gap: 10px;
+    width: 100%;
+    box-sizing: border-box;
     background: var(--bg-main, #f8fafc);
 }
 

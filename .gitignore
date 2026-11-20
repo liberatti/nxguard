@@ -28,3 +28,4 @@ data/
 TODO.md
 .agents/backlog
 .github/issues
+engine/lua/nxguard/sensors

@@ -55,6 +55,11 @@
     padding: 12px 24px 20px 24px;
     gap: 10px;
     margin: 0;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .action-btn {

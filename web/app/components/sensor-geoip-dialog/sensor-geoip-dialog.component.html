@@ -199,6 +199,21 @@
     <!-- Dialog Actions Footer -->
     <div class="dialog-footer">
         <div class="footer-left">
+            <span class="summary-total-pill">
+                {{ (totalSelectedCount === 1 ? 'SENSOR.GEO_TOTAL_SUMMARY_ONE' : 'SENSOR.GEO_TOTAL_SUMMARY') | translate:{ count: totalSelectedCount } }}
+            </span>
+        </div>
+
+        <div class="footer-right">
+            <button
+                mat-button
+                type="button"
+                class="btn-cancel"
+                (click)="onClose()"
+                id="geoip-dialog-cancel-btn"
+                [disabled]="isSaving">
+                {{ 'ACTIONS.CANCEL' | translate }}
+            </button>
             <button
                 mat-flat-button
                 color="primary"
@@ -214,21 +229,6 @@
                 }
                 {{ 'ACTIONS.SAVE' | translate }}
             </button>
-            <button
-                mat-button
-                type="button"
-                class="btn-cancel"
-                (click)="onClose()"
-                id="geoip-dialog-cancel-btn"
-                [disabled]="isSaving">
-                {{ 'ACTIONS.CANCEL' | translate }}
-            </button>
-        </div>
-
-        <div class="footer-right">
-            <span class="summary-total-pill">
-                {{ (totalSelectedCount === 1 ? 'SENSOR.GEO_TOTAL_SUMMARY_ONE' : 'SENSOR.GEO_TOTAL_SUMMARY') | translate:{ count: totalSelectedCount } }}
-            </span>
         </div>
     </div>
 </div>

@@ -603,12 +603,30 @@ td.mat-mdc-cell .mat-mdc-icon-button .mat-icon,
     font-size: var(--font-size-sm) !important;
 }
 
-.mat-mdc-dialog-actions {
+.mat-mdc-dialog-actions,
+.dialog-actions {
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
     padding: 8px 18px !important;
     margin: 0 !important;
     border-top: 1px solid var(--border-dim);
     background: #f8fafc;
     gap: 8px !important;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+:host-context(.dark-theme) .mat-mdc-dialog-actions,
+:host-context([data-theme="dark"]) .mat-mdc-dialog-actions,
+.dark-theme .mat-mdc-dialog-actions,
+[data-theme="dark"] .mat-mdc-dialog-actions,
+:host-context(.dark-theme) .dialog-actions,
+:host-context([data-theme="dark"]) .dialog-actions,
+.dark-theme .dialog-actions,
+[data-theme="dark"] .dialog-actions {
+    background: #1e293b !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
 }
 
 /* Dialog Header Close & Action Buttons */
@@ -1086,6 +1104,16 @@ td.mat-mdc-cell .mat-mdc-icon-button .mat-icon,
 }
 
 /* Floating Labels (Proper Notch Alignment & Zero Text Collision) */
+.mat-mdc-form-field-label-always-float .mat-mdc-text-field-wrapper.mdc-text-field--outlined .mdc-floating-label,
+.mat-mdc-text-field-wrapper.mdc-text-field--outlined .mdc-floating-label--float-above {
+    top: 0 !important;
+    transform: translateY(-50%) scale(0.75) !important;
+    transform-origin: left top !important;
+    font-size: var(--font-size-sm, 0.8125rem) !important;
+    font-weight: 600 !important;
+    line-height: 1 !important;
+}
+
 .mat-mdc-text-field-wrapper.mdc-text-field--outlined .mat-mdc-floating-label:not(.mdc-floating-label--float-above) {
     top: 50% !important;
     transform: translateY(-50%) !important;
@@ -1096,15 +1124,6 @@ td.mat-mdc-cell .mat-mdc-icon-button .mat-icon,
 .mat-mdc-form-field:has(textarea) .mat-mdc-floating-label:not(.mdc-floating-label--float-above) {
     top: 18px !important;
     transform: translateY(-50%) !important;
-}
-
-.mat-mdc-text-field-wrapper.mdc-text-field--outlined .mdc-floating-label--float-above {
-    top: 0 !important;
-    transform: translateY(-50%) scale(0.75) !important;
-    transform-origin: left top !important;
-    font-size: var(--font-size-sm, 0.8125rem) !important;
-    font-weight: 600 !important;
-    line-height: 1 !important;
 }
 
 .mat-mdc-text-field-wrapper.mdc-text-field--outlined .mdc-notched-outline__notch {
