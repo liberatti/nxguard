@@ -554,6 +554,7 @@
       "VALUE_PLACEHOLDER": "Enter filter value...",
       "PREVIEW_LABEL": "Filter JSON Preview",
       "PRESETS": "Presets / Quick Values",
+      "QUICK_FILTERS": "Quick Filters",
       "CANCEL": "Cancel",
       "APPLY": "Apply Filter",
       "CATEGORIES": {

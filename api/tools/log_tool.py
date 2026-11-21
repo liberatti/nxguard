@@ -188,6 +188,7 @@ class LogParserTool:
                 "upstream": upstream_obj,
                 "sensor": sensor_obj,
                 "action": action,
+                "blocked_by": blocked_by or "none",
                 "rate_limit": rate_limit_obj,
                 "geoip": geoip_obj,
                 "reputation": reputation_obj,

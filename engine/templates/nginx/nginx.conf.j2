@@ -78,10 +78,17 @@ http {
   large_client_header_buffers 4 32k;
 
   map $host $missing_domain_match {
+  {%- set seen_domains = [] %}
   {%- for s in services %}
   {%- if s.active %}
   {%- for t in s.sans %}
-    {{ t }} 0;
+  {%- if t and (t|string|trim) %}
+  {%- set clean_t = t|string|trim %}
+  {%- if clean_t|lower not in seen_domains %}
+  {%- set _ = seen_domains.append(clean_t|lower) %}
+    {{ clean_t }} 0;
+  {%- endif %}
+  {%- endif %}
   {%- endfor %}
   {%- endif %}
   {%- endfor %}

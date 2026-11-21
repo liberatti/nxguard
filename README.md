@@ -13,7 +13,7 @@ simplicity.
 ## 🚀 Key Features
 
 - **🛡️ Advanced Security:** Integrates natively with **ModSecurity v3** for real-time threat detection, including SQL injection and cross-site scripting.
-- **⚡ High Performance:** Uses **OpenResty (NGINX + LuaJIT)** for sub-millisecond request processing.
+- **⚡ High Performance:** Uses **NGINX with OpenResty modules and Lua** for sub-millisecond request processing.
 - **📊 Real-Time Monitoring:** Provides detailed transaction logs and telemetry to help identify threats proactively.
 - **⚖️ Smart Load Balancing:** Distributes traffic across backend services.
 - **🛠️ Operational Simplicity:** Combines a lightweight architecture with a modern management interface.
@@ -43,7 +43,7 @@ simplicity.
 ## 🏗️ Architecture
 
 ![NXGuard Architecture Diagram](.github/pages/src/assets/architecture_diagram.png)
-*An architecture that integrates OpenResty, ModSecurity, and IPXA.*
+*An architecture that integrates NGINX, OpenResty modules & Lua, ModSecurity, and IPXA.*
 
 ---
 
@@ -97,7 +97,14 @@ docker run --rm \
   --shm-size=2g \
   --add-host nxguard.local:host-gateway \
   -v ${PWD}/.github/pages/src/assets/reports:/app/reports \
-  wallarm/gotestwaf --url=https://nxguard.local:8443/nxg/ --blockStatusCodes=403,404,400 --reportFormat=html --noEmailReport
+  wallarm/gotestwaf \
+#  --testSet=false-pos \
+  --addDebugHeader \
+  --url=https://nxguard.local:8443/ipxa/ \
+  --blockStatusCodes=403 \
+  --reportFormat=html \
+  --noEmailReport
+  --nonBlockedAsPassed
 ```
 
 ![Waf Evaluation Report](.github/pages/src/assets/benchmarks.png)

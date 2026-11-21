@@ -169,6 +169,34 @@ class ElasticsearchService:
                 doc["reputation"] = {"action": "", "score": int(doc["reputation"])}
 
     @classmethod
+    def _normalize_hit_blocked_by(cls, doc: Dict[str, Any]):
+        if not doc.get("blocked_by") or doc.get("blocked_by") == "none":
+            action = doc.get("action")
+            http_resp = (
+                doc.get("http", {}).get("response", {})
+                if isinstance(doc.get("http"), dict)
+                else {}
+            )
+            status_code = http_resp.get("status_code")
+            if action == "blocked" or status_code in [403, 429]:
+                if status_code == 429:
+                    doc["blocked_by"] = "rate_limit"
+                elif (
+                    isinstance(doc.get("sensor"), dict)
+                    and doc.get("sensor", {}).get("action") == "blocked"
+                ):
+                    doc["blocked_by"] = "sensor"
+                elif (
+                    isinstance(doc.get("upstream"), dict)
+                    and doc.get("upstream", {}).get("status") == 403
+                ):
+                    doc["blocked_by"] = "upstream"
+                elif doc.get("audit") and doc.get("audit", {}).get("messages"):
+                    doc["blocked_by"] = "waf"
+                elif action == "blocked":
+                    doc["blocked_by"] = "waf"
+
+    @classmethod
     def _normalize_ip_fields(cls, doc: Dict[str, Any]):
         """Ensures IP fields are valid IP addresses or None to avoid Elasticsearch mapper_parsing_exception."""
         for path in (("source", "ip"), ("destination", "ip")):
@@ -204,6 +232,7 @@ class ElasticsearchService:
         cls._normalize_geo(doc)
         cls._normalize_reputation(doc)
         cls._normalize_ip_fields(doc)
+        cls._normalize_hit_blocked_by(doc)
         return doc
 
     def persist(self, record: Dict[str, Any]) -> bool:
@@ -303,6 +332,7 @@ class ElasticsearchService:
         "server_id": "server_id",
         "action": "action",
         "action.keyword": "action.keyword",
+        "blocked_by": "blocked_by",
         "service": "service.name",
         "service_id": "service._id",
         "service._id": "service._id",
@@ -468,6 +498,7 @@ class ElasticsearchService:
                 if hits:
                     source = hits[0].get("_source", {})
                     source["_id"] = hits[0].get("_id")
+                    self._normalize_hit_blocked_by(source)
                     return source
         except Exception as e:
             logger.error(f"Error querying Elasticsearch for transaction {trn_id}: {e}")
@@ -519,6 +550,7 @@ class ElasticsearchService:
                 for hit in raw_hits:
                     src = hit.get("_source", {})
                     src["_id"] = hit.get("_id")
+                    self._normalize_hit_blocked_by(src)
                     rows.append(src)
 
                 meta = dict(pagination) if pagination else {"total_elements": total, "page": 1, "per_page": total}

@@ -20,6 +20,7 @@ class TransactionDao(DuckDAO):
         "server_id",
         "service_id",
         "action",
+        "blocked_by",
         "ipxa",
         "route_name",
         "score",
@@ -57,6 +58,7 @@ class TransactionDao(DuckDAO):
                 server_id TEXT,
                 service_id TEXT,
                 action TEXT,
+                blocked_by TEXT,
                 ipxa TEXT,
                 route_name TEXT,
                 score INTEGER,
@@ -78,6 +80,7 @@ class TransactionDao(DuckDAO):
         )
         # Migrate existing table if missing new columns
         new_columns = [
+            ("blocked_by", "TEXT"),
             ("ipxa", "TEXT"),
             ("service_json", "JSON"),
             ("sensor_json", "JSON"),
@@ -118,6 +121,7 @@ class TransactionDao(DuckDAO):
     _FILTER_FIELD_MAP = {
         "server_id": "server_id",
         "action": "action",
+        "blocked_by": "blocked_by",
         "service": "COALESCE(json_extract_string(CAST(service_json AS JSON), '$.name'), json_extract_string(CAST(service_json AS JSON), '$._id'), service_id)",
         "service_id": "COALESCE(json_extract_string(CAST(service_json AS JSON), '$._id'), service_id, json_extract_string(CAST(service_json AS JSON), '$.name'))",
         "service._id": "COALESCE(json_extract_string(CAST(service_json AS JSON), '$._id'), service_id, json_extract_string(CAST(service_json AS JSON), '$.name'))",
@@ -311,6 +315,32 @@ class TransactionDao(DuckDAO):
                     and "_id" not in row["service"]
                 ):
                     row["service"]["_id"] = svc_id
+
+            if not row.get("blocked_by") or row.get("blocked_by") == "none":
+                action = row.get("action")
+                http_resp = (
+                    row.get("http", {}).get("response", {})
+                    if isinstance(row.get("http"), dict)
+                    else {}
+                )
+                status_code = http_resp.get("status_code")
+                if action == "blocked" or status_code in [403, 429]:
+                    if status_code == 429:
+                        row["blocked_by"] = "rate_limit"
+                    elif (
+                        isinstance(row.get("sensor"), dict)
+                        and row.get("sensor", {}).get("action") == "blocked"
+                    ):
+                        row["blocked_by"] = "sensor"
+                    elif (
+                        isinstance(row.get("upstream"), dict)
+                        and row.get("upstream", {}).get("status") == 403
+                    ):
+                        row["blocked_by"] = "upstream"
+                    elif row.get("audit") and row.get("audit", {}).get("messages"):
+                        row["blocked_by"] = "waf"
+                    elif action == "blocked":
+                        row["blocked_by"] = "waf"
 
         return super().to_dict(row)
 

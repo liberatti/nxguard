@@ -11,6 +11,7 @@ class TransactionSchema(Schema):
     server_id = fields.String(required=False)
     service = fields.Dict(required=False)
     action = fields.String(required=False)
+    blocked_by = fields.String(required=False, allow_none=True)
     ipxa = fields.String(required=False)
     rate_limit = fields.Dict(required=False)
     geoip = fields.Dict(required=False)

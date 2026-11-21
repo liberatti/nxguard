@@ -93,8 +93,8 @@ services:
       - 8080:80
       - 8443:443
     volumes:
-      #- "./api:/opt/nxguard/admin/api"
-      #- "./engine:/opt/nxguard/admin/engine"
+      - "./api:/opt/nxguard/admin/api"
+      - "./engine/render.py:/opt/nxguard/admin/engine/render.py"
       #- "./config.py:/opt/nxguard/admin/config.py"
       #- "./cli.py:/opt/nxguard/admin/cli.py"
       #- "./main.py:/opt/nxguard/admin/main.py"

@@ -1,3 +1,0 @@
-# NXGUard
-
-http://nxguard.local:8080/

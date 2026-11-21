@@ -55,8 +55,9 @@ def clean(data, output_dir=config.BASE_PATH, test=False):
             f"{output_dir}/keystore/test-*",
             f"{conf_dir}/*",
         ]:
-            for file_path in glob.glob(pattern):
-                _remove_file(file_path)
+            logger.info(f"[{output_dir}] - [MUST ENABLE] Cleanup pattern: {pattern}")
+            #for file_path in glob.glob(pattern):
+            #    _remove_file(file_path)
     else:
         files = [
             f"{conf_dir}/mime.types",
@@ -257,6 +258,14 @@ def _normalize_entities(data: dict) -> None:
             for item in data[key]:
                 if isinstance(item, dict):
                     item["render_name"] = _normalize_name_for_render(item)
+                    if key == "services":
+                        sans = item.get("sans")
+                        if isinstance(sans, list):
+                            item["sans"] = list(
+                                dict.fromkeys(
+                                    str(s).strip() for s in sans if str(s).strip()
+                                )
+                            )
                     if key == "upstreams":
                         persist = item.get("persist")
                         if isinstance(persist, dict) and persist.get("type") == "COOKIE":

@@ -54,6 +54,46 @@
                 </mat-chip-listbox>
             </div>
 
+            <!-- Quick Filter Shortcuts -->
+            <div class="quick-filters-bar">
+                <span class="quick-filters-label">
+                    <mat-icon class="quick-icon">bolt</mat-icon>
+                    {{ 'TRANSACTION.FILTER.QUICK_FILTERS' | translate }}:
+                </span>
+                <div class="quick-chips">
+                    <button type="button" class="quick-chip"
+                        [class.active]="filterForm.get('field')?.value === 'action' && filterForm.get('value')?.value === 'blocked'"
+                        (click)="setFilter('action', 'blocked')">
+                        <mat-icon class="quick-chip-icon">block</mat-icon>
+                        <span>Action: Blocked</span>
+                    </button>
+                    <button type="button" class="quick-chip"
+                        [class.active]="filterForm.get('field')?.value === 'blocked_by' && filterForm.get('value')?.value === 'waf'"
+                        (click)="setFilter('blocked_by', 'waf')">
+                        <mat-icon class="quick-chip-icon">shield</mat-icon>
+                        <span>Blocked: WAF</span>
+                    </button>
+                    <button type="button" class="quick-chip"
+                        [class.active]="filterForm.get('field')?.value === 'blocked_by' && filterForm.get('value')?.value === 'sensor'"
+                        (click)="setFilter('blocked_by', 'sensor')">
+                        <mat-icon class="quick-chip-icon">sensors</mat-icon>
+                        <span>Blocked: Sensor</span>
+                    </button>
+                    <button type="button" class="quick-chip"
+                        [class.active]="filterForm.get('field')?.value === 'blocked_by' && filterForm.get('value')?.value === 'rate_limit'"
+                        (click)="setFilter('blocked_by', 'rate_limit')">
+                        <mat-icon class="quick-chip-icon">timer</mat-icon>
+                        <span>Blocked: Rate Limit</span>
+                    </button>
+                    <button type="button" class="quick-chip"
+                        [class.active]="filterForm.get('field')?.value === 'blocked_by' && filterForm.get('value')?.value === 'upstream'"
+                        (click)="setFilter('blocked_by', 'upstream')">
+                        <mat-icon class="quick-chip-icon">dns</mat-icon>
+                        <span>Blocked: Upstream</span>
+                    </button>
+                </div>
+            </div>
+
             <!-- Form Fields Grid (2 Columns: Field on left, Value on right) -->
             <div class="form-grid">
                 <!-- Field Selection Column -->

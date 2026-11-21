@@ -80,12 +80,12 @@ def post_fork(server, worker):
                 else "engine"
             )
             c_builder.init_from_data(data_dir=init_path)
-        conf = c_builder.get_config()
-        val = c_admin.validate(conf)
+        conf = c_builder.get_last_applied_config()
+        val = c_admin.validate(conf) if conf else None
         if val and val.get("status") == "ok":
             c_admin.apply(val["scn"])
         else:
-            logger.error(f"Failed to apply config: {val['message']}")
+            logger.error(f"Failed to apply config: {val['message'] if val else 'No active configuration found'}")
         schedule.every(10).seconds.do(update_main_config)
         schedule.every(1).days.do(renew_certificates)
         schedule.every(1).days.do(prune_config_history)

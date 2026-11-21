@@ -56,6 +56,15 @@ export class TransactionFilterDialogComponent implements OnInit {
             options: ['allowed', 'blocked', 'warn', 'rejected', 'delayed'],
         },
         {
+            key: 'blocked_by',
+            labelKey: 'TRANSACTION.FILTER.FIELDS.BLOCKED_BY',
+            category: 'GENERAL',
+            icon: 'shield',
+            type: 'enum',
+            options: ['sensor', 'waf', 'upstream', 'rate_limit', 'none'],
+            presets: ['waf', 'sensor', 'rate_limit', 'upstream', 'none'],
+        },
+        {
             key: 'score',
             labelKey: 'TRANSACTION.FILTER.FIELDS.SCORE',
             category: 'GENERAL',
@@ -197,14 +206,6 @@ export class TransactionFilterDialogComponent implements OnInit {
 
         // SECURITY
         {
-            key: 'blocked_by',
-            labelKey: 'TRANSACTION.FILTER.FIELDS.BLOCKED_BY',
-            category: 'SECURITY',
-            icon: 'shield',
-            type: 'enum',
-            options: ['sensor', 'waf', 'upstream', 'rate_limit', 'none'],
-        },
-        {
             key: 'rate_limit.action',
             labelKey: 'TRANSACTION.FILTER.FIELDS.RATE_LIMIT_ACTION',
             category: 'SECURITY',
@@ -315,11 +316,24 @@ export class TransactionFilterDialogComponent implements OnInit {
         if (this.selectedCategory === 'ALL') {
             return this.fields;
         }
-        return this.fields.filter((f) => f.category === this.selectedCategory);
+        return this.fields.filter(
+            (f) => f.category === this.selectedCategory || (this.selectedCategory === 'SECURITY' && f.key === 'blocked_by')
+        );
     }
 
     onSelectPreset(val: any): void {
         this.filterForm.get('value')?.setValue(val);
+    }
+
+    setFilter(fieldKey: string, value: string): void {
+        const field = this.getField(fieldKey);
+        if (field) {
+            this.selectedCategory = 'ALL';
+            this.filterForm.patchValue({
+                field: fieldKey,
+                value: value,
+            });
+        }
     }
 
     get previewJson(): string {
