@@ -17,8 +17,7 @@ local blocked_by = "none"
 if status_code == 403 then
     if is_upstream then
         blocked_by = "upstream"
-    elseif (ngx.ctx.sensor and ngx.ctx.sensor.action == "blocked")
-        or ngx.ctx.geoip_action == "blocked"
+    elseif ngx.ctx.geoip_action == "blocked"
         or ngx.ctx.reputation_action == "blocked"
         or ngx.ctx.blocked_by == "sensor" then
         blocked_by = "sensor"
@@ -56,9 +55,9 @@ local log_data = {
     referer = ngx.var.http_referer or "-",
     user_agent = ngx.var.http_user_agent or "-",
     sensor = {
-        _id = (ngx.ctx.sensor and (ngx.ctx.sensor._id or ngx.ctx.sensor.name)) or ngx.var.sensor or "-",
-        name = (ngx.ctx.sensor and ngx.ctx.sensor.name) or ngx.var.sensor or "-",
-        action = (ngx.ctx.sensor and ngx.ctx.sensor.action) or (blocked_by == "sensor" and "blocked") or "allowed"
+        _id = ngx.var.sensor_id or "-",
+        name = ngx.var.sensor or "-",
+        action = (blocked_by == "sensor" and "blocked") or "allowed"
     },
     rate_limit = {
         action = rate_limit_action

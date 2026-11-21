@@ -11,6 +11,21 @@ from api.model.certificate_model import CertificateSchema
 
 class CertificateDao(DuckDAO):
 
+    CERTIFICATE_COLUMNS = {
+        "_id",
+        "name",
+        "subjects",
+        "chain",
+        "certificate",
+        "private_key",
+        "ssl_client_ca",
+        "not_before",
+        "not_after",
+        "status",
+        "provider",
+        "force_renew",
+    }
+
     def __init__(self, conn=None):
         super().__init__(
             db_path=config.DB_PATH,
@@ -38,6 +53,12 @@ class CertificateDao(DuckDAO):
             );
         """
         )
+
+    def from_dict(self, vo: Dict[str, Any]) -> Dict[str, Any]:
+        data = {k: v for k, v in vo.items() if k in self.CERTIFICATE_COLUMNS}
+        if "subjects" in data and isinstance(data["subjects"], (list, dict)):
+            data["subjects"] = json.dumps(data["subjects"])
+        return super().from_dict(data)
 
     def to_dict(self, row):
         if not row:

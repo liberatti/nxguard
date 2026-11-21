@@ -112,13 +112,19 @@
       "SUBTITLE": "Manage console operators, administrative credentials, role-based access control, and user permissions"
     },
     "CONFIG": {
-      "LINK": "Configuration"
+      "LINK": "Configuration",
+      "TITLE": "Configuration"
     },
     "CONFIG_AUDIT": {
       "LINK": "Audit & History"
     },
     "SYSTEM": {
-      "LINK": "System"
+      "LINK": "System",
+      "TITLE": "System"
+    },
+    "FEED": {
+      "LINK": "Feeds",
+      "TITLE": "Threat Feeds"
     },
     "RULECAT": {
       "LINK": "Categories",

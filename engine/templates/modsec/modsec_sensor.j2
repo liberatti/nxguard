@@ -43,13 +43,14 @@ SecRule REMOTE_ADDR "@ipMatchFromFile IPSET-{{ ipset }}.data" \
 {% endfor %}
 
 #### RULE EXCLUSION
-{%for el in exclusion_lists %}
+{% for el in exclusion_lists %}
 SecRule REQUEST_URI "@unconditionalMatch" \
-            "id:90{{"%02d"|format(loop.index)}}, \
-            phase:1, \
-            nolog, \
-            pass, \
-            {{ el }}"
+    "id:{{ 900500 + loop.index }},\
+    phase:1,\
+    pass,\
+    t:none,\
+    nolog,\
+    {{ el }}"
 {% endfor %}
 
 ####################################################################################

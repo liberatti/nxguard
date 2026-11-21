@@ -6,6 +6,7 @@ import config
 from api.middleware.logging_manager import logger
 from api.middleware.repository.duck_db import DuckDAO
 from api.model.transaction_model import TransactionSchema
+from api.tools.type_parse_tool import to_int as _to_int
 
 
 class TransactionDao(DuckDAO):
@@ -367,6 +368,24 @@ class TransactionDao(DuckDAO):
         if unique_id:
             existing = self.get_by_unique_id(unique_id)
             if existing and "_id" in existing:
+                if existing.get("audit") and not vo.get("audit"):
+                    vo["audit"] = existing["audit"]
+                    existing_rbl = _to_int(
+                        (existing.get("reputation") or {}).get("score", 0), 0
+                    )
+                    existing_score = _to_int(existing.get("score", 0), 0)
+                    existing_modsec = max(0, existing_score - existing_rbl)
+                    vo_rbl = _to_int(
+                        (vo.get("reputation") or {}).get("score", vo.get("score", 0)), 0
+                    )
+                    vo["score"] = vo_rbl + existing_modsec
+                elif existing.get("reputation") and not vo.get("reputation"):
+                    vo["reputation"] = existing["reputation"]
+                    existing_rbl = _to_int(
+                        (existing.get("reputation") or {}).get("score", 0), 0
+                    )
+                    vo_modsec = _to_int(vo.get("score", 0), 0)
+                    vo["score"] = existing_rbl + vo_modsec
                 self.update_by_id(existing["_id"], vo)
                 return existing["_id"]
         return self.persist(vo)

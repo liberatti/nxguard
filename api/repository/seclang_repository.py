@@ -84,7 +84,7 @@ class RuleDao(DuckDAO):
         return self.to_dict(rs[0]) if rs else None
 
     def get_by_category(self, category_id: str) -> List[Dict[str, Any]]:
-        sql = f"SELECT * FROM {self.table_name} WHERE category_id = ?"
+        sql = f"SELECT * FROM {self.table_name} WHERE category_id = ? ORDER BY seq ASC"
         rs = self._query(sql, (category_id,), fetch=True)
         return [self.to_dict(row) for row in rs]
 

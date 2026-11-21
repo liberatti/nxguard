@@ -112,13 +112,19 @@
       "SUBTITLE": "Gerenciar operadores do console, credenciais administrativas, controle de acesso baseado em papéis e permissões"
     },
     "CONFIG": {
-      "LINK": "Configurações"
+      "LINK": "Configurações",
+      "TITLE": "Configurações"
     },
     "CONFIG_AUDIT": {
       "LINK": "Auditoria & Histórico"
     },
     "SYSTEM": {
-      "LINK": "Sistema"
+      "LINK": "Sistema",
+      "TITLE": "Sistema"
+    },
+    "FEED": {
+      "LINK": "Feeds",
+      "TITLE": "Feeds de Ameaças"
     },
     "RULECAT": {
       "LINK": "Categorias",

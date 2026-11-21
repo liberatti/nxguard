@@ -100,7 +100,7 @@ docker run --rm \
   wallarm/gotestwaf \
 #  --testSet=false-pos \
   --addDebugHeader \
-  --url=https://nxguard.local:8443/ipxa/ \
+  --url=https://localhost:8443/ipxa/ \
   --blockStatusCodes=403 \
   --reportFormat=html \
   --noEmailReport
@@ -126,11 +126,11 @@ inspection:
 | Range                     | Description                |
 |:--------------------------|:---------------------------|
 | **1-99,999**              | Local/internal use |
-| **9,001-9,010**            | NXGuard exclusion lists (up to 10 items) |
 | **100,000-199,999**        | Oracle published rules |
 | **200,000-299,999**        | Comodo published rules |
 | **300,000-399,999**        | GotRoot.com rules |
 | **900,000-999,999**        | OWASP Core Rule Set (CRS) |
+| **900,501-900,599**        | NXGuard exclusion lists |
 | **2,000,000-2,999,999**    | Trustwave SpiderLabs rules |
 
 ---

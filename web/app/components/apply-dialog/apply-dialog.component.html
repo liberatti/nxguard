@@ -55,7 +55,7 @@
                 @for (c of changes; track c.name) {
                 <mat-list-item class="change-item">
                     <mat-icon matListItemIcon class="change-icon">{{ getModuleIcon(c.name) }}</mat-icon>
-                    <span matListItemTitle class="change-title">{{ ('view.' + c.name + '.title') | translate }}</span>
+                    <span matListItemTitle class="change-title">{{ getChangeTitleKey(c.name) | translate }}</span>
                     <span matListItemLine class="change-subtitle">{{ 'APPLY_DIALOG.PENDING_CHANGE' | translate }}</span>
                 </mat-list-item>
                 }

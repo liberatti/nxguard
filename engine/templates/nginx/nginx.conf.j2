@@ -24,7 +24,7 @@ http {
   lua_package_cpath "{{BASE_PATH}}/lualib/?.so;{{BASE_PATH}}/luajit/lib/lua/5.1/?.so;;";
   lua_shared_dict log_buffer 2m;
   lua_shared_dict ipxa_cache 1m;
-  lua_shared_dict healthcheck 2m;
+  lua_shared_dict healthcheck 1m;
   lua_socket_log_errors off;
 
   init_worker_by_lua_block {

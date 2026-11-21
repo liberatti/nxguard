@@ -128,6 +128,10 @@ export class ApplyDialogComponent implements OnInit {
         }
     }
 
+    getChangeTitleKey(name: string): string {
+        return `VIEW.${(name || '').toUpperCase()}.TITLE`;
+    }
+
     closeDialog(): void {
         this.dialogRef.close(this.success);
     }
