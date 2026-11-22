@@ -1,27 +1,51 @@
-<h1 mat-dialog-title>
-    Header Override
-</h1>
+<div class="header-dialog-container">
+    <div class="dialog-header">
+        <div class="header-left">
+            <div class="header-icon-box">
+                <mat-icon class="header-icon">tune</mat-icon>
+            </div>
+            <div>
+                <h2 mat-dialog-title class="dialog-title">
+                    {{ (isAddMode ? 'SERVICE.HEADERS_MODAL_TITLE_ADD' : 'SERVICE.HEADERS_MODAL_TITLE_EDIT') | translate }}
+                </h2>
+                <p class="dialog-subtitle">{{ 'SERVICE.HEADERS_MODAL_SUBTITLE' | translate }}</p>
+            </div>
+        </div>
+        <button mat-icon-button type="button" class="btn-header-close" (click)="onCancel()" [matTooltip]="'ACTIONS.CLOSE' | translate" id="btn-close-header-dialog">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
 
-<div mat-dialog-content>
-    <form [formGroup]="form" id="service-header-form">
-        <mat-form-field class="full-width">
-            <mat-label>Name</mat-label>
-            <input matInput formControlName="name" id="service-header-name-input">
-        </mat-form-field>
-        <mat-form-field class="full-width">
-            <mat-label>Content</mat-label>
-            <input matInput formControlName="content" id="service-header-content-input">
-        </mat-form-field>
-    </form>
-</div>
+    <mat-dialog-content class="dialog-content-body">
+        <form [formGroup]="form" id="service-header-form" (ngSubmit)="onSubmit()">
+            <div class="field-row">
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>{{ 'SERVICE.HEADER_NAME' | translate }}</mat-label>
+                    <mat-icon matPrefix class="field-icon">label</mat-icon>
+                    <input matInput formControlName="name" id="service-header-name-input"
+                           [placeholder]="'SERVICE.HEADER_NAME_PLACEHOLDER' | translate" required>
+                </mat-form-field>
+            </div>
 
-<div mat-dialog-actions align="end" class="dialog-actions">
-    <button type="button" mat-stroked-button (click)="onCancel()" id="cancel-service-header-btn">
-        <mat-icon>keyboard_return</mat-icon>
-        {{ 'ACTIONS.CANCEL' | translate }}
-    </button>
-    <button type="button" (click)="onSubmit()" mat-flat-button color="primary" id="save-service-header-btn">
-        <mat-icon>save</mat-icon>
-        {{ 'ACTIONS.SAVE' | translate }}
-    </button>
+            <div class="field-row">
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>{{ 'SERVICE.HEADER_VALUE' | translate }}</mat-label>
+                    <mat-icon matPrefix class="field-icon">text_fields</mat-icon>
+                    <input matInput formControlName="content" id="service-header-content-input"
+                           [placeholder]="'SERVICE.HEADER_VALUE_PLACEHOLDER' | translate" required>
+                </mat-form-field>
+            </div>
+        </form>
+    </mat-dialog-content>
+
+    <div mat-dialog-actions align="end" class="dialog-actions">
+        <button type="button" mat-stroked-button (click)="onCancel()" id="cancel-service-header-btn">
+            <mat-icon>keyboard_return</mat-icon>
+            {{ 'ACTIONS.CANCEL' | translate }}
+        </button>
+        <button type="button" (click)="onSubmit()" mat-flat-button color="primary" [disabled]="form.invalid" id="save-service-header-btn">
+            <mat-icon>save</mat-icon>
+            {{ 'ACTIONS.SAVE' | translate }}
+        </button>
+    </div>
 </div>

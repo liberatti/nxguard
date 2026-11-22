@@ -1,0 +1,123 @@
+:host {
+    display: block;
+    width: 100%;
+}
+
+.header-dialog-container {
+    display: flex;
+    flex-direction: column;
+    min-width: 380px;
+    max-width: 480px;
+    background: var(--surface);
+    color: var(--text-main);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Dialog Header                                                              */
+/* -------------------------------------------------------------------------- */
+.dialog-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px 14px 20px;
+    border-bottom: 1px solid var(--border-dim);
+    box-sizing: border-box;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.header-icon-box {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--primary);
+    border: 1px solid rgba(37, 99, 235, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.header-icon {
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
+}
+
+.dialog-title {
+    margin: 0 !important;
+    font-size: var(--font-size-lg) !important;
+    font-weight: 700 !important;
+    color: var(--text-main);
+    line-height: 1.25;
+    padding: 0 !important;
+}
+
+.dialog-subtitle {
+    margin: 2px 0 0;
+    font-size: var(--font-size-xs);
+    color: var(--text-dim);
+    line-height: 1.3;
+}
+
+.btn-header-close {
+    color: var(--text-muted);
+    transition: color var(--transition);
+}
+
+.btn-header-close:hover {
+    color: var(--text-main);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Dialog Content Body                                                        */
+/* -------------------------------------------------------------------------- */
+.dialog-content-body {
+    padding: 20px !important;
+    margin: 0 !important;
+    background: var(--surface);
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
+.field-row {
+    width: 100%;
+}
+
+.full-width {
+    width: 100%;
+}
+
+.field-icon {
+    color: var(--text-muted);
+    margin-right: 8px;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Dialog Actions                                                             */
+/* -------------------------------------------------------------------------- */
+.dialog-actions {
+    padding: 14px 20px !important;
+    margin: 0 !important;
+    border-top: 1px solid var(--border-dim);
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    box-sizing: border-box;
+    background: var(--bg-main, #f8fafc);
+}
+
+:host-context(.dark-theme) .dialog-actions,
+:host-context([data-theme="dark"]) .dialog-actions {
+    background: rgba(0, 0, 0, 0.2);
+}

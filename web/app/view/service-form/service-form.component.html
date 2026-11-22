@@ -372,6 +372,11 @@
                                                         <mat-icon>more_vert</mat-icon>
                                                     </button>
                                                     <mat-menu #menu="matMenu" xPosition="before">
+                                                        <button mat-menu-item type="button" (click)="onEditHeader(i)"
+                                                            id="edit-header-{{i}}">
+                                                            <mat-icon>edit</mat-icon>
+                                                            {{ 'ACTIONS.EDIT' | translate }}
+                                                        </button>
                                                         <button mat-menu-item type="button" (click)="onRemoveHeader(i)"
                                                             id="remove-header-{{i}}">
                                                             <mat-icon>delete</mat-icon>
