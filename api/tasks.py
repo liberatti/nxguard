@@ -196,10 +196,6 @@ def update_main_config():
                         if ch["type"] == "changed":
                             line += f": {ch.get('old_value')} ➔ {ch.get('new_value')}"
                         change_lines.append(line)
-                    logger.info(
-                        f"Configuration Semantic Diff (DeepDiff, {len(deepdiff_res['changes'])} changes):\n"
-                        + "\n".join(change_lines)
-                    )
             except Exception as ex:
                 logger.warning(f"Could not calculate configuration diff: {ex}")
         else:
