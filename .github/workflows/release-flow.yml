@@ -11,7 +11,8 @@ permissions:
   contents: write
   issues: write
   pull-requests: read
-
+  actions: write
+  
 jobs:
   checkout:
     if: github.event.pull_request.merged == true
@@ -80,7 +81,9 @@ jobs:
           target: main
           platforms: ${{ matrix.platform }}
           outputs: type=image,name=liberatti/nxguard,push-by-digest=true,name-canonical=true,push=true
-          cache-from: type=gha,scope=main-${{ matrix.arch }}
+          cache-from: |
+            type=gha,scope=main-${{ matrix.arch }}
+            type=gha,scope=v-branches-${{ matrix.arch }}
           cache-to: type=gha,mode=max,scope=main-${{ matrix.arch }}
 
       - name: Export RPMs from Docker build
@@ -90,7 +93,9 @@ jobs:
           platforms: ${{ matrix.platform }}
           target: rpms
           outputs: type=local,dest=./dist/rpms
-          cache-from: type=gha,scope=main-${{ matrix.arch }}
+          cache-from: |
+            type=gha,scope=main-${{ matrix.arch }}
+            type=gha,scope=v-branches-${{ matrix.arch }}
 
       - name: Upload RPM Artifacts
         uses: actions/upload-artifact@v4

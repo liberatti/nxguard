@@ -1,0 +1,29 @@
+name: CI / cleanup cache
+
+on:
+  schedule:
+    - cron: '0 3 * * 0' # Every Sunday at 03:00 UTC
+  workflow_dispatch:
+
+permissions:
+  actions: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete caches older than 30 days
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          cutoff=$(date -d "30 days ago" +%s)
+
+          gh cache list --repo "$GH_REPO" --limit 100 --json id,key,createdAt | jq -r --argjson cutoff "$cutoff" '
+            .[] | select((.createdAt | fromdateiso8601) < $cutoff) | .id
+          ' | while read -r id; do
+            if [ -n "$id" ]; then
+              echo "Deleting cache ID: $id"
+              gh cache delete "$id" --repo "$GH_REPO"
+            fi
+          done
