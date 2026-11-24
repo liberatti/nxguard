@@ -21,6 +21,36 @@ from api.middleware.logging_manager import logger
 from api.repository.acme_repository import ChallengeDao
 
 
+def get_last_applied_config():
+    """Retrieves the last successfully applied configuration from ConfigBackupDao using active_scn."""
+    try:
+        with ConfigDao() as config_dao:
+            active_scn = config_dao.get_active_scn()
+
+        if active_scn:
+            with ConfigBackupDao() as backup_dao:
+                backup = backup_dao.get_by_scn(active_scn)
+                if backup and "data" in backup:
+                    data = backup["data"]
+                    if isinstance(data, str):
+                        try:
+                            data = json.loads(data)
+                        except Exception as e:
+                            logger.error(f"Failed to parse active config backup JSON: {e}")
+                            data = None
+                    if isinstance(data, dict):
+                        data.update(
+                            {
+                                "NGINX_DIR": os.path.join(config.BASE_PATH, "nginx"),
+                                "BASE_PATH": config.BASE_PATH,
+                            }
+                        )
+                        return data
+    except Exception as e:
+        logger.error(f"Error retrieving last applied configuration: {e}")
+    return None
+
+
 def get_config(dependents: bool = False):
     """Assembles active configuration from DAOs into a single dictionary."""
     c = dict()

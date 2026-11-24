@@ -55,6 +55,7 @@ def clean(data, output_dir=config.BASE_PATH, test=False):
             f"{output_dir}/keystore/test-*",
             f"{conf_dir}/*",
         ]:
+            #logger.info(f"[{output_dir}] - [MUST ENABLE] Cleanup pattern: {pattern}")
             for file_path in glob.glob(pattern):
                 _remove_file(file_path)
     else:
@@ -124,7 +125,7 @@ def _generate_sensors(
     ipxa = ipxa or {}
 
     for sensor in data["sensors"]:
-        sensor_name = sensor.get("render_name") or sensor.get("name")
+        sensor_name = sensor["render_name"]
         if isinstance(ipxa, dict) and ipxa.get("url"):
             sensor.update(
                 {
@@ -168,7 +169,7 @@ def _generate_sensors(
 
         sensor.update(
             {
-                "name": sensor_name,
+                "render_name": sensor_name,
                 "inbound_anomaly_score_threshold": sensor["inspection"]["score"][
                     "inbound"
                 ],
@@ -204,31 +205,7 @@ def _generate_sensors(
                                 + "\n"
                             }
                         )
-                        # TODO: Create attachment support on engine.index to copy attachment files to modsec/coreruleset folder
-                        # for r in rules:
-                        #     att = r.get("attachment")
-                        #     raw = r.get("raw") or ""
-                        #     if att:
-                        #         for match in re.finditer(
-                        #             r"@(pmFromFile|ipMatchFromFile|pmf)\s+([^\s\"\'\)]+)",
-                        #             raw,
-                        #         ):
-                        #             data_file_name = os.path.basename(
-                        #                 match.group(2).strip().strip("\"'")
-                        #             )
-                        #             target_data_file = (
-                        #                 f"{output_dir}/modsec/coreruleset/{data_file_name}"
-                        #             )
-                        #             if not os.path.exists(target_data_file):
-                        #                 os.makedirs(
-                        #                     os.path.dirname(target_data_file),
-                        #                     exist_ok=True,
-                        #                 )
-                        #                 with open(
-                        #                     target_data_file, "w", encoding="utf-8"
-                        #                 ) as df:
-                        #                     df.write(att)
-                    categories.append(c)
+                        categories.append(c)
 
             sensor.update({"categories": categories})
             _render_template_to_file(
@@ -257,6 +234,14 @@ def _normalize_entities(data: dict) -> None:
             for item in data[key]:
                 if isinstance(item, dict):
                     item["render_name"] = _normalize_name_for_render(item)
+                    if key == "services":
+                        sans = item.get("sans")
+                        if isinstance(sans, list):
+                            item["sans"] = list(
+                                dict.fromkeys(
+                                    str(s).strip() for s in sans if str(s).strip()
+                                )
+                            )
                     if key == "upstreams":
                         persist = item.get("persist")
                         if isinstance(persist, dict) and persist.get("type") == "COOKIE":
@@ -335,7 +320,7 @@ def _generate_services(
     for service in data["services"]:
         if not service.get("active"):
             continue
-        svc_name = service.get("render_name") or service.get("name")
+        svc_name = service["render_name"]
         service.update(
             {
                 "BASE_PATH": config.BASE_PATH,
@@ -350,6 +335,7 @@ def _generate_services(
             if b["protocol"] == "HTTPS":
                 service.update({"ssl_enable": True})
 
+        has_sensor = False
         for r in service.get("routes", []):
             if r["type"] == RouteType.UPSTREAM:
                 r["upstream"] = __resolve_upstream_by_name(r.get("upstream"), data)
@@ -360,39 +346,34 @@ def _generate_services(
 
             if "sensor" in r and r.get("sensor"):
                 sensor = __resolve_sensor_by_name(r["sensor"], data)
-                sensor_name = (
-                    (sensor.get("render_name") or sensor.get("name"))
-                    if sensor
-                    else (
-                        r["sensor"].get("name")
-                        if isinstance(r["sensor"], dict)
-                        else r["sensor"]
+                if sensor:
+                    has_sensor = True
+                    sensor_name = sensor["render_name"]
+                    r.update(
+                        {
+                            "sensor": sensor,
+                            "route_policy_file": f"{output_dir}/modsec/conf/{prefix}ROUTE-{svc_name}.{r['name']}.policy",
+                            "sensor_policy_file": f"{output_dir}/modsec/coreruleset/{prefix}SENSOR-{sensor_name}.policy",
+                        }
                     )
-                )
-                service.update(
-                    {
-                        "service_policy_file": f"{output_dir}/modsec/conf/{prefix}SERVICE-{svc_name}.policy",
-                    }
-                )
-                r.update(
-                    {
-                        "sensor": sensor,
-                        "route_policy_file": f"{output_dir}/modsec/conf/{prefix}ROUTE-{svc_name}.{r['name']}.policy",
-                        "sensor_policy_file": f"{output_dir}/modsec/coreruleset/{prefix}SENSOR-{sensor_name}.policy",
-                    }
-                )
-                _render_template_to_file(
-                    env,
-                    "modsec/modsec_route.j2",
-                    r["route_policy_file"],
-                    r,
-                )
-                _render_template_to_file(
-                    env,
-                    "modsec/modsec_service.j2",
-                    service["service_policy_file"],
-                    service,
-                )
+                    _render_template_to_file(
+                        env,
+                        "modsec/modsec_route.j2",
+                        r["route_policy_file"],
+                        r,
+                    )
+
+        if has_sensor:
+            service["service_policy_file"] = (
+                f"{output_dir}/modsec/conf/{prefix}SERVICE-{svc_name}.policy"
+            )
+            _render_template_to_file(
+                env,
+                "modsec/modsec_service.j2",
+                service["service_policy_file"],
+                service,
+            )
+
         _render_template_to_file(env, "nginx/service.conf.j2", service_path, service)
 
 

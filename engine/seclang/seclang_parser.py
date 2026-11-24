@@ -36,21 +36,21 @@ class RuleSetParser:
         return com
 
     def _parse_signature(self, line) -> SecComponentSignature:
+        msg = line.split('"')[1] if '"' in line else line.split()[1]
         m = SecComponentSignature().load(
             {
                 "schema_type": "SecComponentSignature",
-                "msg": line.split('"')[1],
+                "msg": msg,
                 "raw": line,
             }
         )
-        self.line_index += 1
         return m
 
     def _parse_marker(self, line) -> SecMarker:
+        marker_name = line.split('"')[1] if '"' in line else line.split()[1]
         m = SecMarker().load(
-            {"schema_type": "SecMarker", "msg": line.split('"')[1], "raw": line}
+            {"schema_type": "SecMarker", "msg": marker_name, "raw": line}
         )
-        self.line_index += 1
         return m
 
     def _parse_action(self, line) -> SecAction:
@@ -82,7 +82,6 @@ class RuleSetParser:
                         elif "log" in key_pair[0]:
                             a["logging"] = key_pair[0]
 
-        self.line_index += 1
         return a
 
     def _parse_scope(self, scope):
@@ -134,7 +133,6 @@ class RuleSetParser:
             if tag_matches:
                 rule["tags"] = [m[0] or m[1] for m in tag_matches]
 
-        self.line_index += 1
         logger.debug(rule)
 
         return rule
@@ -222,7 +220,6 @@ class RuleSetParser:
                 r_line = e_lines.pop(0)
                 if self._is_com_break(r_line):
                     e_lines = [r_line] + e_lines
-                    read_lines.append(line)
                     break
                 else:
                     line += " " + r_line

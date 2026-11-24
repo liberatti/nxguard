@@ -20,11 +20,11 @@ class HttpParseTool:
     def resolve_status_code(code: Any) -> str:
         """Categorizes HTTP status codes into action categories (blocked, warn, allowed)."""
         c = to_int(code, default=200)
-        if c == 403:
+        if c in (403, 406, 429):
             return "blocked"
-        elif c in (404, 401, 500, 502, 503, 504):
+        elif c in (400, 401, 404, 500, 502, 503, 504):
             return "warn"
-        elif c in (200, 201, 204, 301, 302, 304):
+        elif 200 <= c < 400:
             return "allowed"
         return "allowed"
 

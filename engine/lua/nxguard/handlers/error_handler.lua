@@ -26,8 +26,7 @@ local blocked_by = nil
 if status == 403 then
     if is_upstream then
         blocked_by = "upstream"
-    elseif (ngx.ctx.sensor and ngx.ctx.sensor.action == "blocked")
-        or ngx.ctx.geoip_action == "blocked"
+    elseif ngx.ctx.geoip_action == "blocked"
         or ngx.ctx.reputation_action == "blocked"
         or ngx.ctx.blocked_by == "sensor" then
         blocked_by = "sensor"

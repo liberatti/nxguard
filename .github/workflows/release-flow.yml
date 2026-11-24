@@ -11,7 +11,8 @@ permissions:
   contents: write
   issues: write
   pull-requests: read
-
+  actions: write
+  
 jobs:
   checkout:
     if: github.event.pull_request.merged == true
@@ -80,8 +81,9 @@ jobs:
           target: main
           platforms: ${{ matrix.platform }}
           outputs: type=image,name=liberatti/nxguard,push-by-digest=true,name-canonical=true,push=true
-          cache-from: type=gha,scope=main-${{ matrix.arch }}
-          cache-to: type=gha,mode=max,scope=main-${{ matrix.arch }}
+          cache-from: |
+            type=gha,scope=main-${{ matrix.arch }}
+            type=gha,scope=v-branches-${{ matrix.arch }}
 
       - name: Export RPMs from Docker build
         uses: docker/build-push-action@v6
@@ -90,7 +92,9 @@ jobs:
           platforms: ${{ matrix.platform }}
           target: rpms
           outputs: type=local,dest=./dist/rpms
-          cache-from: type=gha,scope=main-${{ matrix.arch }}
+          cache-from: |
+            type=gha,scope=main-${{ matrix.arch }}
+            type=gha,scope=v-branches-${{ matrix.arch }}
 
       - name: Upload RPM Artifacts
         uses: actions/upload-artifact@v4
@@ -172,7 +176,7 @@ jobs:
             "repos/$GH_REPO/issues?milestone=$MILESTONE_NUMBER&state=closed&per_page=100" \
             > "$RUNNER_TEMP/release-issues-pages.json"
           jq -cer '
-            [.[[]] | select(.pull_request == null)]
+            [.[][] | select(.pull_request == null)]
             | map({
                 number,
                 title,
@@ -183,8 +187,7 @@ jobs:
             > "$RUNNER_TEMP/release-issues.json"
           gh pr list \
             --repo "$GH_REPO" \
-            --milestone "$MILESTONE_TITLE" \
-            --state merged \
+            --search "milestone:\"$MILESTONE_TITLE\" is:merged" \
             --limit 1000 \
             --json number,title,url,body \
             > "$RUNNER_TEMP/release-pull-requests.json"
@@ -202,7 +205,7 @@ jobs:
               --slurpfile pages "$RUNNER_TEMP/pull-request-$PR_NUMBER-commits.json" '
                 $pr + {
                   commits: [
-                    $pages[][] |
+                    $pages[0][][] |
                     {
                       sha,
                       short_sha: (.sha[0:7]),

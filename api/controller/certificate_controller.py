@@ -223,7 +223,8 @@ def partial_update(certificate_id: str) -> Response:
     """
     try:
         with CertificateDao() as dao:
-            c_new = dao.json_load(request.json)
+            c_new = dao.json_load(request.json, partial=True)
+            c_new.pop("in_use", None)
             c_old = dao.get_by_id(certificate_id)
             dao.update_by_id(certificate_id, deep_merge(c_old, c_new))
             return response_ok("Certificate partially updated")

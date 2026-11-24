@@ -366,6 +366,7 @@ export class ServiceFormComponent implements OnInit {
     onAddHeader() {
         const dialogRef = this.confirmDialog.open(ServiceHeaderFormDialogComponent, {
             width: '450px',
+            maxWidth: '95vw',
         });
 
         dialogRef.afterClosed().subscribe(result => {
@@ -373,6 +374,25 @@ export class ServiceFormComponent implements OnInit {
                 const data = [...(this.headerDS.data || []), result];
                 this.headerDS.data = data;
                 this.form.get('headers')?.reset(data);
+                this.cdr.detectChanges();
+            }
+        });
+    }
+
+    onEditHeader(index: number) {
+        const currentHeader = this.headerDS.data[index];
+        const dialogRef = this.confirmDialog.open(ServiceHeaderFormDialogComponent, {
+            width: '450px',
+            maxWidth: '95vw',
+            data: currentHeader,
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result) {
+                const data = (this.headerDS.data || []).slice();
+                data[index] = result;
+                this.headerDS.data = data;
+                this.form.get('headers')?.setValue(data);
                 this.cdr.detectChanges();
             }
         });

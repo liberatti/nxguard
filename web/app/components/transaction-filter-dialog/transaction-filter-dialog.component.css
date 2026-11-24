@@ -139,6 +139,81 @@
 }
 
 /* -------------------------------------------------------------------------- */
+/* Quick Filter Shortcuts                                                     */
+/* -------------------------------------------------------------------------- */
+.quick-filters-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 6px 10px;
+    background: var(--bg-main, #f8fafc);
+    border: 1px dashed var(--border-dim, #e2e8f0);
+    border-radius: 8px;
+}
+
+.quick-filters-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: var(--font-size-xs, 0.75rem);
+    font-weight: 600;
+    color: var(--text-muted, #64748b);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.quick-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+    color: var(--warning, #f59e0b);
+}
+
+.quick-chips {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.quick-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    height: 24px;
+    padding: 0 8px;
+    border-radius: 4px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    font-family: var(--font-mono, monospace);
+    background: var(--surface, #ffffff);
+    border: 1px solid var(--border-dim, #e2e8f0);
+    color: var(--text-dim, #475569);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.quick-chip:hover {
+    background: var(--primary-light, rgba(37, 99, 235, 0.08));
+    border-color: var(--primary, #2563eb);
+    color: var(--primary, #2563eb);
+}
+
+.quick-chip.active {
+    background: var(--primary, #2563eb);
+    border-color: var(--primary, #2563eb);
+    color: #ffffff;
+}
+
+.quick-chip-icon {
+    font-size: 13px;
+    width: 13px;
+    height: 13px;
+    line-height: 13px;
+}
+
+/* -------------------------------------------------------------------------- */
 /* Form Fields Grid (2 Columns)                                               */
 /* -------------------------------------------------------------------------- */
 .form-grid {
@@ -328,6 +403,31 @@ mat-option .mdc-list-item__primary-text {
 .enum-delayed {
     background: rgba(245, 158, 11, 0.12);
     color: var(--warning, #d97706);
+}
+
+.enum-sensor {
+    background: rgba(239, 68, 68, 0.12);
+    color: #dc2626;
+}
+
+.enum-waf {
+    background: rgba(234, 88, 12, 0.12);
+    color: #ea580c;
+}
+
+.enum-upstream {
+    background: rgba(37, 99, 235, 0.12);
+    color: #2563eb;
+}
+
+.enum-rate_limit {
+    background: rgba(192, 38, 211, 0.12);
+    color: #c026d3;
+}
+
+.enum-none {
+    background: rgba(148, 163, 184, 0.15);
+    color: #64748b;
 }
 
 .presets-container {

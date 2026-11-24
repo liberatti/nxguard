@@ -174,10 +174,7 @@ class LogParserTool:
                     req_method = req_parts[0]
 
             blocked_by = dto.get("blocked_by")
-            if blocked_by == "upstream":
-                action = "allowed"
-            else:
-                action = _resolve_status_code(status_code)
+            action = _resolve_status_code(status_code)
 
             return {
                 "logtime": _parse_logtime(dto.get("time")),
@@ -188,6 +185,7 @@ class LogParserTool:
                 "upstream": upstream_obj,
                 "sensor": sensor_obj,
                 "action": action,
+                "blocked_by": blocked_by or "none",
                 "rate_limit": rate_limit_obj,
                 "geoip": geoip_obj,
                 "reputation": reputation_obj,
@@ -349,15 +347,6 @@ class LogParserTool:
                         for m in messages
                     )
 
-                if str(record.get("action") or "").lower() not in (
-                    "blocked",
-                    "deny",
-                    "block",
-                ):
-                    if any(
-                        str(m.get("severity") or "") in ("2", "3") for m in messages
-                    ):
-                        record["action"] = "blocked"
 
             record.update({"audit": audit})
             return record
@@ -623,17 +612,9 @@ class LogParserTool:
         dest_ip = audit.get("destination", {}).get("ip", "")
         clean_dest_ip = dest_ip if _is_ip(dest_ip) else None
         status_code = _to_int(
-            audit.get("http", {}).get("response", {}).get("status_code"), 403
+            audit.get("http", {}).get("response", {}).get("status_code"), 200
         )
-        raw_action = str(audit.get("action") or "").lower()
-        if raw_action in ("deny", "block", "blocked"):
-            action = "blocked"
-        elif raw_action in ("warn", "warning"):
-            action = "warn"
-        elif raw_action in ("allow", "allowed", "pass", "passed"):
-            action = "allowed"
-        else:
-            action = _resolve_status_code(status_code)
+        action = _resolve_status_code(status_code)
 
         return {
             "logtime": audit.get("logtime") or datetime.now(),
@@ -722,27 +703,19 @@ class LogParserTool:
 
         if audit.get("audit"):
             merged["audit"] = audit["audit"]
-        if audit.get("score"):
-            merged["score"] = max(merged.get("score", 0), audit["score"])
 
-        audit_act = str(audit.get("action") or "").lower()
-        merged_act = str(merged.get("action") or "").lower()
-        if audit_act in ("deny", "blocked", "block") or merged_act in (
-            "deny",
-            "blocked",
-            "block",
-        ):
-            merged["action"] = "blocked"
-        elif audit_act in ("warn", "warning") or merged_act in ("warn", "warning"):
-            merged["action"] = "warn"
-
-        status_code = _to_int(
-            merged.get("http", {}).get("response", {}).get("status_code"), 0
-        ) or _to_int(audit.get("http", {}).get("response", {}).get("status_code"), 0)
-        if status_code in (403, 406):
-            merged["action"] = "blocked"
+        rbl_score = _to_int(
+            (merged.get("reputation") or {}).get("score", merged.get("score", 0)), 0
+        )
+        modsec_score = _to_int(audit.get("score", 0), 0)
+        merged["score"] = rbl_score + modsec_score
 
         cls._merge_audit_http(merged, audit.get("http"))
+
+        status_code = _to_int(
+            merged.get("http", {}).get("response", {}).get("status_code"), 200
+        )
+        merged["action"] = _resolve_status_code(status_code)
 
         return merged
 

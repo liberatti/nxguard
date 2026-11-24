@@ -13,7 +13,7 @@ simplicity.
 ## 🚀 Key Features
 
 - **🛡️ Advanced Security:** Integrates natively with **ModSecurity v3** for real-time threat detection, including SQL injection and cross-site scripting.
-- **⚡ High Performance:** Uses **OpenResty (NGINX + LuaJIT)** for sub-millisecond request processing.
+- **⚡ High Performance:** Uses **NGINX with OpenResty modules and Lua** for sub-millisecond request processing.
 - **📊 Real-Time Monitoring:** Provides detailed transaction logs and telemetry to help identify threats proactively.
 - **⚖️ Smart Load Balancing:** Distributes traffic across backend services.
 - **🛠️ Operational Simplicity:** Combines a lightweight architecture with a modern management interface.
@@ -43,7 +43,7 @@ simplicity.
 ## 🏗️ Architecture
 
 ![NXGuard Architecture Diagram](.github/pages/src/assets/architecture_diagram.png)
-*An architecture that integrates OpenResty, ModSecurity, and IPXA.*
+*An architecture that integrates NGINX, OpenResty modules & Lua, ModSecurity, and IPXA.*
 
 ---
 
@@ -97,7 +97,14 @@ docker run --rm \
   --shm-size=2g \
   --add-host nxguard.local:host-gateway \
   -v ${PWD}/.github/pages/src/assets/reports:/app/reports \
-  wallarm/gotestwaf --url=https://nxguard.local:8443/nxg/ --blockStatusCodes=403,404,400 --reportFormat=html --noEmailReport
+  wallarm/gotestwaf \
+#  --testSet=false-pos \
+  --addDebugHeader \
+  --url=https://localhost:8443/ipxa/ \
+  --blockStatusCodes=403 \
+  --reportFormat=html \
+  --noEmailReport
+  --nonBlockedAsPassed
 ```
 
 ![Waf Evaluation Report](.github/pages/src/assets/benchmarks.png)
@@ -119,19 +126,63 @@ inspection:
 | Range                     | Description                |
 |:--------------------------|:---------------------------|
 | **1-99,999**              | Local/internal use |
-| **9,001-9,010**            | NXGuard exclusion lists (up to 10 items) |
 | **100,000-199,999**        | Oracle published rules |
 | **200,000-299,999**        | Comodo published rules |
 | **300,000-399,999**        | GotRoot.com rules |
 | **900,000-999,999**        | OWASP Core Rule Set (CRS) |
+| **900,501-900,599**        | NXGuard exclusion lists |
 | **2,000,000-2,999,999**    | Trustwave SpiderLabs rules |
 
 ---
 
-## 📡 Telemetry Notice
 
-To improve its security engine, NXGuard collects anonymous traffic statistics in 24-hour cycles. **It does not collect
-sensitive, personal, or request-specific data.** This information is used solely to improve threat detection accuracy.
+## 🔄 Release & CI/CD Workflow
+
+IPXA follows an automated release lifecycle managed by GitHub Actions workflows:
+
+```mermaid
+flowchart LR
+    A["Push to v1.0.x-rc"] --> B["CI / develop"]
+    B --> C["Docker Hub: liberatti/ipxa:v1.0.x-rc"]
+    C --> D["Pull Request to main"]
+    D --> E["PR Merged"]
+    E --> F["CI / main"]
+    F --> G["Docker Hub: v1.0.x & latest"]
+    F --> H["Git Tag: v1.0.x"]
+    F --> I["Delete v1.0.x-rc branch"]
+    F --> J["GitHub Release & Close Milestone"]
+```
+
+### 1. Push to Release Candidate Branch (`v1.0.x-rc` / `v*-fix`)
+
+When committing and pushing to a release candidate branch (e.g., `v1.0.11-rc` or `v*-fix`):
+- **Code Check & Lint**: Runs code quality checks (`flake8`) and security validation.
+- **Multi-Architecture Build**: Builds Docker images across `linux/amd64` and `linux/arm64`.
+- **Pre-Release Docker Image**: Generates and pushes the multi-arch manifest to Docker Hub tagged with the branch name:
+  ```bash
+  docker pull liberatti/ipxa:v1.0.x-rc
+  ```
+- **Production Safety**: The `latest` tag is **not** modified during candidate branch builds.
+
+### 2. Merge Pull Request to `main`
+
+When a Pull Request from a `v1.0.x-rc` (or `v*-fix`) branch is merged into `main`:
+- **Version Resolution**: Automatically extracts the release version from the source branch (e.g., `v1.0.11-rc` &rarr; `v1.0.11`).
+- **Production Docker Images**: Builds and pushes the multi-arch image to Docker Hub under two tags:
+  * `liberatti/ipxa:v1.0.x` (e.g., `liberatti/ipxa:v1.0.11`)
+  * `liberatti/ipxa:latest`
+- **Git Tagging**: Automatically creates and pushes the release tag `v1.0.x` to the repository.
+- **Branch Cleanup**: Automatically deletes the merged source branch (`v1.0.x-rc`) from the remote repository.
+- **GitHub Release & Milestone**: Compiles release notes from merged PRs and closed issues, attaches the release notes, publishes the GitHub Release, and closes the corresponding milestone.
+
+
+---
+
+## ⚖️ Limitation of Liability
+
+**Disclaimer of Warranty**: This software is provided "AS IS", without warranty of any kind, express or implied. The author(s) and contributor(s) shall not be liable for any claim, damages, or other liability, whether in an action of contract, tort, or otherwise, arising from, out of, or in connection with the software or the use or other dealings in the software.
+
+**Use at Your Own Risk**: You are solely responsible for any decisions made or actions taken based on the data provided by NXGuard.
 
 ---
 
