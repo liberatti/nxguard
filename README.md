@@ -135,10 +135,54 @@ inspection:
 
 ---
 
-## 📡 Telemetry Notice
 
-To improve its security engine, NXGuard collects anonymous traffic statistics in 24-hour cycles. **It does not collect
-sensitive, personal, or request-specific data.** This information is used solely to improve threat detection accuracy.
+## 🔄 Release & CI/CD Workflow
+
+IPXA follows an automated release lifecycle managed by GitHub Actions workflows:
+
+```mermaid
+flowchart LR
+    A["Push to v1.0.x-rc"] --> B["CI / develop"]
+    B --> C["Docker Hub: liberatti/ipxa:v1.0.x-rc"]
+    C --> D["Pull Request to main"]
+    D --> E["PR Merged"]
+    E --> F["CI / main"]
+    F --> G["Docker Hub: v1.0.x & latest"]
+    F --> H["Git Tag: v1.0.x"]
+    F --> I["Delete v1.0.x-rc branch"]
+    F --> J["GitHub Release & Close Milestone"]
+```
+
+### 1. Push to Release Candidate Branch (`v1.0.x-rc` / `v*-fix`)
+
+When committing and pushing to a release candidate branch (e.g., `v1.0.11-rc` or `v*-fix`):
+- **Code Check & Lint**: Runs code quality checks (`flake8`) and security validation.
+- **Multi-Architecture Build**: Builds Docker images across `linux/amd64` and `linux/arm64`.
+- **Pre-Release Docker Image**: Generates and pushes the multi-arch manifest to Docker Hub tagged with the branch name:
+  ```bash
+  docker pull liberatti/ipxa:v1.0.x-rc
+  ```
+- **Production Safety**: The `latest` tag is **not** modified during candidate branch builds.
+
+### 2. Merge Pull Request to `main`
+
+When a Pull Request from a `v1.0.x-rc` (or `v*-fix`) branch is merged into `main`:
+- **Version Resolution**: Automatically extracts the release version from the source branch (e.g., `v1.0.11-rc` &rarr; `v1.0.11`).
+- **Production Docker Images**: Builds and pushes the multi-arch image to Docker Hub under two tags:
+  * `liberatti/ipxa:v1.0.x` (e.g., `liberatti/ipxa:v1.0.11`)
+  * `liberatti/ipxa:latest`
+- **Git Tagging**: Automatically creates and pushes the release tag `v1.0.x` to the repository.
+- **Branch Cleanup**: Automatically deletes the merged source branch (`v1.0.x-rc`) from the remote repository.
+- **GitHub Release & Milestone**: Compiles release notes from merged PRs and closed issues, attaches the release notes, publishes the GitHub Release, and closes the corresponding milestone.
+
+
+---
+
+## ⚖️ Limitation of Liability
+
+**Disclaimer of Warranty**: This software is provided "AS IS", without warranty of any kind, express or implied. The author(s) and contributor(s) shall not be liable for any claim, damages, or other liability, whether in an action of contract, tort, or otherwise, arising from, out of, or in connection with the software or the use or other dealings in the software.
+
+**Use at Your Own Risk**: You are solely responsible for any decisions made or actions taken based on the data provided by NXGuard.
 
 ---
 

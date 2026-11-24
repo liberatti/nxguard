@@ -134,13 +134,17 @@ jobs:
 
       - name: Create multi-platform manifest and push
         working-directory: ${{ runner.temp }}/digests
+        env:
+          BRANCH_NAME: ${{ github.ref_name }}
         run: |
           DIGESTS=""
           for digest in *; do
             DIGESTS="$DIGESTS liberatti/nxguard@sha256:$digest"
           done
-          docker buildx imagetools create -t liberatti/nxguard:latest $DIGESTS
+          docker buildx imagetools create -t "liberatti/nxguard:$BRANCH_NAME" $DIGESTS
 
       - name: Inspect final multi-arch image
+        env:
+          BRANCH_NAME: ${{ github.ref_name }}
         run: |
-          docker buildx imagetools inspect liberatti/nxguard:latest
+          docker buildx imagetools inspect "liberatti/nxguard:$BRANCH_NAME"
